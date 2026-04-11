@@ -1,0 +1,31 @@
+name: sapstack CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+
+      - name: Lint SKILL.md / agent frontmatter
+        run: ./scripts/lint-frontmatter.sh
+
+      - name: Check marketplace.json integrity
+        run: ./scripts/check-marketplace.sh
+
+      - name: Check hardcoding (warnings only)
+        run: ./scripts/check-hardcoding.sh

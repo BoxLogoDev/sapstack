@@ -7,6 +7,7 @@ description: >
   transport request, SM50, SM66, ST05, ST12, SM21, authorization, PFCG, SU53, SU01,
   client, SCC4, background job, SM36, SM37, kernel, system log, CCMS, alert,
   work process, short dump, system copy, landscape refresh, SCC1, SPAM, SAINT.
+allowed-tools: Read, Grep
 ---
 
 ## 1. Transport Management (STMS)

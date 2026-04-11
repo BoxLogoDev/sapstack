@@ -8,6 +8,7 @@ description: >
   profit center, internal order, KSU5, KSV5, KO88, CK11N, CO-PA, COPA, assessment,
   distribution, settlement, variance, controlling area, allocation cycle, activity type,
   KSB1, KSB5, cost element, plan vs actual, product cost collector.
+allowed-tools: Read, Grep
 ---
 
 ## 1. Environment Questions

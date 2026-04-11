@@ -1,7 +1,7 @@
 {
   "name": "sapstack",
-  "version": "1.0.0",
-  "description": "Universal SAP skills and agents for Claude Code — all modules, any company",
+  "version": "1.1.0",
+  "description": "Universal SAP skills and agents for Claude Code — 13 modules, active advisors, context persistence, quality gates",
   "author": "BoxLogoDev",
   "license": "MIT",
   "repository": "https://github.com/BoxLogoDev/sapstack",
@@ -112,6 +112,15 @@
       "description": "System administration, transport management, performance, security",
       "path": "plugins/sap-basis",
       "keywords": ["BASIS","STMS","SM50","ST05","SCC4","transport","performance","authorization","PFCG","SU53","SM21","SM36","SM37"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-bc",
+      "name": "SAP BC (Korean BC Consultant)",
+      "version": "1.0.0",
+      "description": "한국 SAP BC(Basis) 컨설턴트 특화 — Solution Manager Korea, HANA 한국 로케일, 전자세금계산서, 망분리, KISA 보안, PFCG 한국 권한, K-SOX 내부통제. 글로벌 Basis 주제는 sap-basis 참조.",
+      "path": "plugins/sap-bc",
+      "keywords": ["BC","베이시스","한국","Korea","Solman","HANA","전자세금계산서","e-Document","망분리","KISA","PFCG","K-SOX","한글","Unicode","Korean locale","공인인증","STRUST","SM50","ST22","STMS"],
       "compatibility": { "ecc": true, "s4hana": true, "btp": false }
     }
   ]

@@ -7,6 +7,7 @@ description: >
   production order, CO01, CO11N, MFBF, BOM, routing, work center, capacity,
   planned order, operation, confirmation, goods issue, backflush, MRP Live,
   MPS, demand management, scheduling, process order, PP-PI, KANBAN.
+allowed-tools: Read, Grep
 ---
 
 ## 1. MRP (Material Requirements Planning)

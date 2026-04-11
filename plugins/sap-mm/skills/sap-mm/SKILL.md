@@ -8,6 +8,7 @@ description: >
   MB52, MR11, GR/IR, material master, inventory, stock, MRP, info record,
   outline agreement, MMPV, account determination, OBYC, movement type,
   physical inventory, batch management, valuation class.
+allowed-tools: Read, Grep
 ---
 
 ## 1. Procurement Cycle

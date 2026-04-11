@@ -1,0 +1,116 @@
+# sapstack — Environment Profile (예시)
+#
+# 이 파일을 `.sapstack/config.yaml`로 복사한 뒤 실제 값으로 채우세요.
+# sapstack 플러그인·에이전트·커맨드는 이 파일을 읽어 "환경 인테이크"를
+# 자동으로 건너뛰고 맥락을 유지합니다.
+#
+# .gitignore에 `.sapstack/config.yaml`을 추가해 민감 정보가 푸시되지 않도록
+# 주의하세요. 이 예시 파일(config.example.yaml)만 커밋 대상입니다.
+
+# ──────────────────────────────────────────────────────────────
+# 1) 시스템 기본 정보
+# ──────────────────────────────────────────────────────────────
+system:
+  # SAP 릴리스: ECC_6_EHP8 / S4HANA_2022 / S4HANA_2023 / S4HANA_2024
+  release: S4HANA_2023
+
+  # 배포 모델: on_premise / rise / cloud_pe
+  deployment: on_premise
+
+  # DB 종류: hana / oracle / db2 / mssql
+  database: hana
+
+  # Kernel 레벨 (x.xx)
+  kernel: "7.89"
+
+  # Unicode: true / false (S/4HANA는 항상 true)
+  unicode: true
+
+# ──────────────────────────────────────────────────────────────
+# 2) 회계 / 조직 설정
+# ──────────────────────────────────────────────────────────────
+organization:
+  # 주 회사코드 (예: KR01, 1000) — 절대 하드코딩하지 않음
+  primary_company_code: "<YOUR_COMPANY_CODE>"
+
+  # 회계연도 변형
+  # K4 = calendar (1~12월), V3 = non-calendar (예: 4월~3월)
+  fiscal_year_variant: K4
+
+  # 통화 (현지통화)
+  local_currency: KRW
+
+  # Group 통화 (연결재무제표용)
+  group_currency: USD
+
+  # 회계기준
+  accounting_standard: K_IFRS  # K_IFRS / IFRS / US_GAAP / LOCAL_GAAP
+
+  # 산업 섹터
+  industry: MANUFACTURING  # MANUFACTURING / RETAIL / FINANCE / PUBLIC / UTILITIES / OIL_GAS / ...
+
+# ──────────────────────────────────────────────────────────────
+# 3) Landscape (Transport 경로)
+# ──────────────────────────────────────────────────────────────
+landscape:
+  dev: { sid: DEV, client: "100" }
+  qas: { sid: QAS, client: "200" }
+  stg: { sid: STG, client: "300" }  # 한국 대기업 표준 (없으면 주석 처리)
+  prd: { sid: PRD, client: "400" }
+
+# ──────────────────────────────────────────────────────────────
+# 4) 한국 Localization
+# ──────────────────────────────────────────────────────────────
+korea:
+  # 전자세금계산서 연동 여부
+  e_tax_invoice: true
+
+  # 연동 방식: sap_drc / ecount / bizplay / smartbill / custom
+  e_tax_invoice_provider: sap_drc
+
+  # 원천세 사용 여부
+  withholding_tax: true
+
+  # CVI KR (Country Version Korea) 활성화
+  cvi_kr: true
+
+  # 망분리 환경 여부 (금융/공공)
+  closed_network: false
+
+  # K-SOX 내부통제 대상 (상장사 필수)
+  k_sox: true
+
+# ──────────────────────────────────────────────────────────────
+# 5) 프로젝트 맥락 (선택)
+# ──────────────────────────────────────────────────────────────
+project:
+  # 현재 주력 작업: run_operation / new_implementation / migration / upgrade
+  phase: run_operation
+
+  # S/4HANA 마이그레이션 진행 중이면 경로 지정
+  # migration_path: brownfield / greenfield / selective
+  # migration_target: S4HANA_2024
+
+  # 주요 커스텀 모듈 (자주 확장한 영역)
+  custom_focus:
+    - FI
+    - MM
+
+  # Add-on / Industry Solution
+  add_ons: []  # 예: [IS-OIL, IS-U, DM]
+
+# ──────────────────────────────────────────────────────────────
+# 6) 선호 응답 스타일
+# ──────────────────────────────────────────────────────────────
+preferences:
+  # 답변 언어: ko / en / auto (auto는 사용자 입력 언어 따름)
+  language: ko
+
+  # 응답 상세도: concise / standard / verbose
+  verbosity: standard
+
+  # T-code 뒤 메뉴 경로 포함 여부 (교육 목적 시 true)
+  include_menu_path: true
+
+  # SAP Note 번호 추정 금지 (확실한 것만 언급)
+  only_confirmed_notes: true

@@ -8,6 +8,7 @@ description: >
   Fiori Elements, OData, Integration Suite, iFlow, side-by-side extension, BTP cockpit,
   subaccount, service binding, XSUAA, destination, Cloud Foundry, Kyma,
   event mesh, SAP Build, HANA Cloud, BTP ABAP environment, MTA.
+allowed-tools: Read, Grep
 ---
 
 ## 1. BTP Landscape Structure

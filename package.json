@@ -1,7 +1,7 @@
 {
   "name": "sapstack",
-  "version": "1.0.0",
-  "description": "Universal SAP skills and agents for Claude Code — all modules, any company",
+  "version": "1.1.0",
+  "description": "Universal SAP skills and agents for Claude Code — 13 modules, active advisors, context persistence, quality gates",
   "license": "MIT",
   "author": "BoxLogoDev",
   "keywords": [

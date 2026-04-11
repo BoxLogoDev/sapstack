@@ -8,6 +8,7 @@ description: >
   S/4HANA migration, system conversion, greenfield, brownfield, SUM, DMO, readiness
   check, simplification item, BP migration, custom code, ACDOCA, Clean Core,
   RISE with SAP, S/4HANA Cloud, selective data transition, H4S4, conversion project.
+allowed-tools: Read, Grep
 ---
 
 ## 1. Approach Decision Tree

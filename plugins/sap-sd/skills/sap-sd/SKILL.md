@@ -7,6 +7,7 @@ description: >
   delivery, pricing, condition type, credit check, FD32, revenue recognition, rebate,
   intercompany sales, consignment, returns, RMA, VKOA, output, NACE, account
   determination, copy control, partner function, schedule line, incompletion.
+allowed-tools: Read, Grep
 ---
 
 ## 1. Order-to-Cash Flow

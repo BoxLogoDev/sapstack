@@ -43,7 +43,7 @@ Install all plugins at once:
 
 ---
 
-## Available Plugins (12)
+## Available Plugins (13)
 
 ### Core Financials
 
@@ -75,7 +75,8 @@ Install all plugins at once:
 | `sap-abap` | ABAP, SE38, BAdI, CDS, RAP, ST22, clean core, ATC | ABAP Development — classic + RAP |
 | `sap-s4-migration` | migration, brownfield, readiness check, BP migration, SUM | ECC → S/4HANA Migration |
 | `sap-btp` | BTP, CAP, Fiori, OData, Integration Suite, XSUAA | SAP BTP Development |
-| `sap-basis` | BASIS, STMS, transport, PFCG, SM50, performance | BASIS Administration |
+| `sap-basis` | BASIS, STMS, transport, PFCG, SM50, performance | BASIS Administration (Global) |
+| `sap-bc` 🇰🇷 | BC, 베이시스, 한국, Solman, 전자세금계산서, 망분리, KISA, K-SOX | **한국 BC 컨설턴트 특화** — Basis 심화 + 한국 현장 |
 
 ---
 
@@ -108,6 +109,86 @@ You can also invoke directly with a slash command:
 5. **Simulate before actual run** — AFAB, F.13, FAGL_FC_VAL, KSU5, MR11, etc.
 6. **Never recommend** SE16N data changes in production
 7. **Provide T-code + menu path** for every action
+
+---
+
+## 🚀 고급 사용법 (v1.1.0 신규) — 한국어 가이드
+
+sapstack v1.1.0부터 **3축 구조** — Active Advisors + Context Persistence + Quality Gates — 로 재구축되었습니다.
+
+### 축 1. Active Advisors — 위임 가능한 컨설턴트
+
+#### 📍 서브에이전트 (`agents/`)
+복잡한 다단계 분석이 필요한 작업은 **독립 컨텍스트**의 서브에이전트에 위임됩니다.
+
+| 에이전트 | 역할 | 자동 위임 트리거 |
+|---------|------|-----------------|
+| `sap-fi-consultant` | FI 이슈 체계적 진단 (환경 인테이크 → Issue → Root Cause → Fix) | 복잡한 FI 문제, 월결산 이슈 |
+| `sap-abap-reviewer` | ABAP 코드 리뷰 (Clean Core, HANA 최적화, ATC, K-SOX 보안) | 코드 리뷰 요청 |
+| `sap-s4-migration-advisor` | Brownfield/Greenfield/Selective 경로 추천 + Risk 분석 | S/4HANA 전환 질문 |
+
+#### 📍 슬래시 커맨드 (`commands/`)
+반복 작업을 원샷 워크플로로 실행합니다.
+
+```bash
+/sap-fi-closing 월결산 <회사코드>       # FI 월결산/연결산 체크리스트 단계별 실행
+/sap-abap-review <파일경로>             # ABAP 코드를 reviewer 서브에이전트에 위임
+/sap-s4-readiness --auto                # S/4HANA 마이그레이션 Readiness 평가
+/sap-migo-debug <에러번호> <이동유형>   # MIGO 포스팅 에러 진단 파이프라인
+/sap-payment-run-debug <벤더번호>       # F110 지급실행 디버그
+```
+
+### 축 2. Context Persistence — 환경 프로필
+
+**문제**: "ECC인가요 S/4인가요?", "회사코드는요?" 같은 질문을 매 세션 반복하는 UX 고통.
+
+**해결**: 프로젝트 루트에 `.sapstack/config.yaml` **1회 설정** → 모든 산출물이 자동 참조.
+
+```bash
+# 프로젝트 루트에서
+mkdir -p .sapstack
+curl -o .sapstack/config.example.yaml \
+  https://raw.githubusercontent.com/BoxLogoDev/sapstack/main/.sapstack/config.example.yaml
+cp .sapstack/config.example.yaml .sapstack/config.yaml
+echo ".sapstack/config.yaml" >> .gitignore   # 민감정보 보호
+```
+
+상세: [`docs/environment-profile.md`](docs/environment-profile.md)
+
+### 축 3. Quality Gates — 품질 보증
+
+13개 모듈을 유지보수 가능한 품질로 관리하기 위한 **자동 검증** 파이프라인.
+
+```bash
+./scripts/lint-frontmatter.sh      # name/description/tools 검증
+./scripts/check-marketplace.sh     # marketplace.json 무결성
+./scripts/check-hardcoding.sh      # 회사코드/계정 하드코딩 탐지
+```
+
+GitHub Actions CI (`.github/workflows/ci.yml`)가 main 푸시·PR에서 자동 실행합니다.
+
+---
+
+## 🇰🇷 한국어 사용자 가이드
+
+### 각 모듈의 한국어 퀵가이드
+13개 모든 모듈에 **한국 현장 관점 요약**이 포함되어 있습니다.
+
+```
+plugins/<module>/skills/<module>/references/ko/quick-guide.md
+```
+
+### sap-bc — 한국 BC 컨설턴트 특화 플러그인
+글로벌 `sap-basis`는 영문 Basis 주제를 다루고, `sap-bc`는 **한국 현장**에 집중합니다:
+- Solution Manager Korea, HANA 한국 로케일
+- 한글 Unicode 이슈, SAPGUI 한글 깨짐
+- 전자세금계산서 연동 (STRUST 공인인증서)
+- 망분리 환경 Kernel 업그레이드
+- K-SOX 내부통제 권한 관리
+- 한국 SAPNet OSS 사용법
+
+### 한국어 답변 설정
+`.sapstack/config.yaml`에서 `preferences.language: ko`로 설정하면 모든 sapstack 산출물이 한국어로 응답합니다.
 
 ---
 
