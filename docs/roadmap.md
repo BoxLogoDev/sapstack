@@ -93,22 +93,40 @@
 
 ---
 
-## 🎯 v1.4.0 — Industry & Automation
+## ✅ v1.4.0 — Polish & Close the Loops (완료)
 
-**테마**: Industry Solution + 자동화
+**테마**: 모든 열린 loop 닫기 + Multi-AI 생태계 확장
+
+- [x] **한국어 전문 번역 100% 완성** — sfsf, s4mig, btp, basis, bc (14/14)
+- [x] **sap-gts 플러그인 신설** — 한국 UNI-PASS 관세청 연동 특화
+- [x] **check-links + check-ecc-s4-split strict 전환** (8개 게이트 전부 strict)
+- [x] **build-multi-ai.sh 자동 생성** (sync block 기반)
+- [x] **Continue.dev / Aider 예시** (6개 AI 도구 실전 세션)
+- [x] **Reusable GitHub Actions workflow** — 다른 저장소에서 재사용
+- [x] **MCP server 매니페스트** (v1.5 네이티브 구현 예정)
+- [x] **VS Code Extension 스텁** (v1.5 실구현)
+- [x] **Scaffolding scripts** — new-{agent,command,plugin}.sh
+- [x] **SAP Note Resolver Web UI** — 정적 사이트
+- [x] **README 대개편** — 랜딩 페이지화
+
+---
+
+## 🎯 v1.5.0 — Native Runtime
+
+**테마**: 매니페스트에서 실제 동작으로
 
 ### 계획
-- [ ] **한국어 전문 번역 완성** — 나머지 5개 모듈 (sfsf, s4mig, btp, basis, bc)
-- [ ] **Industry Solution 플러그인**:
+- [ ] **MCP Server 네이티브 TypeScript 구현** — Claude Desktop·Zed 등 직접 지원
+- [ ] **VS Code Extension 실제 구현** — 5 commands, ABAP snippets 확장, quick picker
+- [ ] **build-multi-ai.sh 완전 자동화** — SKILL.md → AGENTS/copilot/cursor/continue/aider 전체 재생성
+- [ ] **Web UI 확장** — T-code 탭, Plugin 카탈로그 탭, 다크/라이트 테마
+- [ ] **PWA** — 오프라인 사용 가능 Web UI
+- [ ] **Industry Solution 추가**:
   - [ ] `sap-is-retail` — 리테일 특화
   - [ ] `sap-is-utilities` — 유틸리티
-  - [ ] `sap-gts` — Global Trade Services (한국 수출입 중요)
   - [ ] `sap-ibp` — Integrated Business Planning
-- [ ] **자동 빌드 스크립트 완성** — `scripts/build-multi-ai.sh`가 실제로 SKILL.md에서 호환 레이어를 생성
-- [ ] **`check-links --strict`** + **`check-ecc-s4-split --strict`** 전환
-- [ ] **Continue.dev end-to-end 테스트 + 예제**
-- [ ] **Aider 워크플로 가이드**
-- [ ] **GitHub Actions reusable workflow** — 다른 저장소가 재사용 가능한 SAP CI
+- [ ] **Continue.dev / Aider 통합 테스트 자동화**
+- [ ] **NPM 패키지** — `npx @boxlogodev/sapstack-mcp`
 
 ---
 

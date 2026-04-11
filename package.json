@@ -1,7 +1,7 @@
 {
   "name": "sapstack",
-  "version": "1.3.0",
-  "description": "Universal SAP skills, agents, and commands for 6 AI coding assistants — 13 modules, 9 subagents, 10 commands, 273 T-codes, Korean full translations",
+  "version": "1.4.0",
+  "description": "SAP Operations Advisory Platform for 6 AI coding assistants — 14 modules, 9 subagents, 10 commands, 279 T-codes, 100% Korean, MCP-ready",
   "license": "MIT",
   "author": "BoxLogoDev",
   "keywords": [

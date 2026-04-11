@@ -1,7 +1,7 @@
 {
   "name": "sapstack",
-  "version": "1.3.0",
-  "description": "Universal SAP skills, agents, and commands for 6 AI coding assistants — 13 modules, 9 subagents, 10 commands, 273 T-codes, Korean full translations",
+  "version": "1.4.0",
+  "description": "SAP Operations Advisory Platform for 6 AI coding assistants — 14 modules, 9 subagents, 10 commands, 279 T-codes, 100% Korean, MCP-ready",
   "author": "BoxLogoDev",
   "license": "MIT",
   "repository": "https://github.com/BoxLogoDev/sapstack",
@@ -121,6 +121,15 @@
       "description": "한국 SAP BC(Basis) 컨설턴트 특화 — Solution Manager Korea, HANA 한국 로케일, 전자세금계산서, 망분리, KISA 보안, PFCG 한국 권한, K-SOX 내부통제. 글로벌 Basis 주제는 sap-basis 참조.",
       "path": "plugins/sap-bc",
       "keywords": ["BC","베이시스","한국","Korea","Solman","HANA","전자세금계산서","e-Document","망분리","KISA","PFCG","K-SOX","한글","Unicode","Korean locale","공인인증","STRUST","SM50","ST22","STMS"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-gts",
+      "name": "SAP GTS (Global Trade Services)",
+      "version": "1.0.0",
+      "description": "Global Trade Services — Export/Import compliance, SPL screening, HS code classification, customs declaration, FTA preference, L/C management. 한국 UNI-PASS 관세청 연동 특화.",
+      "path": "plugins/sap-gts",
+      "keywords": ["GTS","global trade","export","import","customs","HS code","HSK","sanctioned party","SPL","embargo","license","preference","FTA","KORUS","RCEP","UNI-PASS","관세청","수출","수입","수출신고","수입신고","HS코드","통관","원산지","Letter of Credit","L/C","KOSTI","전략물자"],
       "compatibility": { "ecc": true, "s4hana": true, "btp": false }
     }
   ]

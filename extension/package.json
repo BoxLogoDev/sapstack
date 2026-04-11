@@ -1,0 +1,100 @@
+{
+  "name": "sapstack-vscode",
+  "displayName": "sapstack for VS Code",
+  "description": "SAP operations advisory — 14 modules, 9 agents, 10 commands for AI coding assistants",
+  "version": "1.4.0",
+  "publisher": "BoxLogoDev",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BoxLogoDev/sapstack",
+    "directory": "extension"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other",
+    "Education",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "sap",
+    "abap",
+    "s4hana",
+    "claude",
+    "copilot",
+    "korean",
+    "sap-fi",
+    "sap-abap",
+    "sap-bc"
+  ],
+  "activationEvents": [
+    "onLanguage:abap",
+    "workspaceContains:.sapstack/config.yaml",
+    "workspaceContains:plugins/sap-*/skills/**/SKILL.md"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "sapstack.resolveNote",
+        "title": "sapstack: Resolve SAP Note by keyword",
+        "category": "sapstack"
+      },
+      {
+        "command": "sapstack.checkTcode",
+        "title": "sapstack: Verify T-code",
+        "category": "sapstack"
+      },
+      {
+        "command": "sapstack.listPlugins",
+        "title": "sapstack: List all plugin modules",
+        "category": "sapstack"
+      },
+      {
+        "command": "sapstack.openAgent",
+        "title": "sapstack: Open subagent prompt",
+        "category": "sapstack"
+      },
+      {
+        "command": "sapstack.runQualityGates",
+        "title": "sapstack: Run quality gates",
+        "category": "sapstack"
+      }
+    ],
+    "configuration": {
+      "title": "sapstack",
+      "properties": {
+        "sapstack.sapstackPath": {
+          "type": "string",
+          "default": "sapstack",
+          "description": "Path to sapstack directory (relative to workspace or absolute)"
+        },
+        "sapstack.language": {
+          "type": "string",
+          "enum": ["ko", "en", "auto"],
+          "default": "auto",
+          "description": "Default response language for sapstack prompts"
+        },
+        "sapstack.showInStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show sapstack status in the status bar"
+        }
+      }
+    },
+    "snippets": [
+      {
+        "language": "abap",
+        "path": "./snippets/abap.code-snippets"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "echo 'v1.4.0 is stub — full implementation in v1.5.0'",
+    "compile": "echo 'stub'",
+    "watch": "echo 'stub'",
+    "test": "echo 'stub'"
+  }
+}

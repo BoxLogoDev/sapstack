@@ -5,6 +5,129 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-04-11
+
+### Theme
+**"Polish & Close the Loops"** — v1.3.0의 모든 열린 loop 닫기 + 생태계 확장을 새 차원으로. 한국어 100% 완성, strict 모드 전환, Multi-AI 자동 빌드, MCP/VS Code 확장 기반 마련, GitHub README 랜딩 페이지화.
+
+### Added — 한국어 100% 완성 (8 → 14)
+- `sap-sfsf/references/ko/SKILL-ko.md`
+- `sap-s4-migration/references/ko/SKILL-ko.md`
+- `sap-btp/references/ko/SKILL-ko.md`
+- `sap-basis/references/ko/SKILL-ko.md`
+- `sap-bc/references/ko/SKILL-ko.md`
+
+→ **14/14 모든 모듈 한국어 퀵가이드 + 전문 번역 완성**
+
+### Added — sap-gts 플러그인 (14번째) 🌍
+- `plugins/sap-gts/skills/sap-gts/SKILL.md` — Global Trade Services
+- Compliance (SPL, Embargo, Legal Control)
+- Customs Management (수출입 신고)
+- Risk Management (L/C, FTA Preference)
+- **한국 UNI-PASS** 관세청 연동 특화
+- `references/korea-customs-uni-pass.md` — 상세 가이드
+- 한국어 퀵가이드 + 전문 번역
+
+### Changed — Quality Gates Strict 전환
+- **`check-links.sh --strict`** CI 기본 활성화 (모든 내부 링크 유효성)
+- **`check-ecc-s4-split.sh --strict`** CI 기본 활성화
+- **`check-tcodes.sh --strict`** 이미 v1.3.0에서 활성화
+- `.release-notes-*.md` 임시 파일을 링크 검사에서 제외
+- **8개 품질 게이트 전부 strict 모드** (lint-frontmatter, marketplace, hardcoding, tcodes, ko-refs, links, ecc-s4-split, build-multi-ai)
+
+### Added — 데이터 자산 확장
+- T-codes 273 → **279개** (GTS /SAPSLL/ 네임스페이스 6개 추가)
+- sap-notes.yaml 그대로 50+ (SAP Note는 v1.3.0에서 확장 완료)
+- `scripts/check-tcodes.sh` false-positive allowlist 확장 (CL_EXITHANDLER, IT0001~, CONVT_CODEPAGE, KR01, MT940 등)
+
+### Added — build-multi-ai.sh 실제 자동 생성
+- **Sync block 주입** — `<!-- BEGIN sapstack-auto: stats -->` 마커 기반
+- `--check` 모드: drift 검출 (diff 계산)
+- `--write` 모드: 실제 파일 갱신
+- `scripts/templates/` 디렉토리 + 템플릿 파일
+- `docs/build-multi-ai.md` 사용 가이드
+
+### Added — Reusable GitHub Actions Workflow
+- `.github/workflows/sapstack-ci-reusable.yml` — 다른 저장소에서 호출 가능
+- Inputs: `run-strict`, `check-hardcoding`, `check-ko-references`, `sapstack-ref`
+- `docs/reusable-ci.md` — 사용 가이드
+
+### Added — 6개 AI 도구 실전 예시
+- `docs/examples/claude-code-example.md` — Claude Code 세션
+- `docs/examples/codex-cli-example.md` — Codex CLI 사용법
+- `docs/examples/copilot-example.md` — VS Code Copilot Chat
+- `docs/examples/cursor-example.md` — Cursor IDE
+- `docs/examples/continue-example.md` — Continue.dev
+- `docs/examples/aider-example.md` — Aider CLI
+
+### Added — MCP Server (Manifest)
+- `mcp/sapstack-server.json` — MCP manifest (Resources, Prompts, Tools)
+- `docs/mcp-server.md` — Claude Desktop 통합 가이드
+- **v1.5.0에서 TypeScript 네이티브 구현 예정**
+
+### Added — VS Code Extension Stub
+- `extension/package.json` — 매니페스트 (5개 commands, settings, snippets)
+- `extension/README.md` — v1.5.0 로드맵
+- `extension/snippets/abap.code-snippets` — ABAP 스니펫 5개
+
+### Added — Scaffolding Scripts
+- `scripts/new-agent.sh` — 새 서브에이전트 템플릿 생성
+- `scripts/new-command.sh` — 새 슬래시 커맨드 생성
+- `scripts/new-plugin.sh` — 새 SAP 모듈 플러그인 전체 구조 생성
+
+### Added — SAP Note Resolver Web UI
+- `web/index.html` — 브라우저용 Note 검색 UI
+- `web/style.css` — GitHub Dark 스타일
+- `web/script.js` — 정적 YAML parser + 검색 로직
+- `web/README.md` — 로컬 실행 + GitHub Pages 배포 가이드
+- **정적 사이트** — 서버 없음, 완전 오프라인 동작 가능
+
+### Changed — README 대개편 (랜딩 페이지화)
+- **배지 추가**: Version, License, CI, Korean, Multi-AI
+- **30초 소개** 섹션 (요약 통계)
+- **Quick Start** 6개 도구별 (30초 설치)
+- **3축 아키텍처** ASCII 다이어그램
+- **14개 플러그인 카탈로그** 카테고리별 테이블 + 트리거 키워드
+- **9개 에이전트 테이블** (v1.4.0 반영)
+- **10개 커맨드** 카테고리별 (결산·디버그·분석)
+- **BC = Basis** 관계 명확화 표
+- **한국어 100%** 섹션 강조
+- **8개 품질 게이트** 검증 블록
+- **학습 경로** 테이블 (초급 → 고급 → 기여자)
+- **v1.4.0 신규 확장 도구** 섹션
+
+### Changed — 문서 폴리싱
+- `docs/architecture.md` — 14 플러그인, 9 agents, 10 commands 반영
+- `docs/roadmap.md` — v1.5.0 후보 업데이트
+
+### Statistics
+- 신규 파일: **80+**
+- 수정 파일: 12
+- **14 플러그인** (13 → 14, sap-gts 추가)
+- **9 서브에이전트** (v1.3.0 유지)
+- **10 슬래시 커맨드** (v1.3.0 유지)
+- **6 AI 도구 호환** (v1.3.0 유지)
+- **279 확정 T-codes** (273 → 279)
+- **14/14 한국어 완성** (62% → **100%**)
+- **8 Quality Gate** (7 → 8, build-multi-ai 실제 구현)
+- v1.4.0 신규 섹션: MCP / VS Code Extension / Web UI / Scaffolding / Reusable CI
+
+### Philosophy
+- **"Polish over Expand"** — 새 에이전트·커맨드 추가 없이 기존 구조 완성도 집중
+- **"Close the Loops"** — CHANGELOG [Known Limitations] 전부 해결
+- **"Landing page as product marketing"** — README를 저장소 첫 페이지로서 재설계
+
+### Known Limitations → v1.5.0
+- MCP server 네이티브 TypeScript 구현
+- VS Code Extension 실제 동작
+- `build-multi-ai.sh` 템플릿 기반 전체 자동 생성 (현재는 sync block만)
+- Continue.dev / Aider end-to-end 통합 테스트 자동화
+- 추가 Industry Solution (IS-Retail, IS-U, IBP)
+
+[1.4.0]: https://github.com/BoxLogoDev/sapstack/releases/tag/v1.4.0
+
+---
+
 ## [1.3.0] - 2026-04-11
 
 ### Theme

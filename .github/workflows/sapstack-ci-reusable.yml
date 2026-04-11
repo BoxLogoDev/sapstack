@@ -1,0 +1,103 @@
+name: sapstack CI (Reusable)
+
+# 이 workflow는 다른 저장소에서 호출 가능한 reusable workflow입니다.
+# 사용 예 (다른 저장소의 .github/workflows/ci.yml):
+#
+#   jobs:
+#     sapstack-quality-gates:
+#       uses: BoxLogoDev/sapstack/.github/workflows/sapstack-ci-reusable.yml@v1.4.0
+#       with:
+#         run-strict: true
+#         check-hardcoding: true
+#
+# 자세한 가이드: docs/reusable-ci.md
+
+on:
+  workflow_call:
+    inputs:
+      run-strict:
+        description: 'Run lints in strict mode (fail on warnings)'
+        required: false
+        default: true
+        type: boolean
+      check-hardcoding:
+        description: 'Run hardcoding check'
+        required: false
+        default: true
+        type: boolean
+      check-ko-references:
+        description: 'Verify Korean references exist'
+        required: false
+        default: false
+        type: boolean
+      sapstack-ref:
+        description: 'sapstack version/branch to checkout for scripts'
+        required: false
+        default: 'main'
+        type: string
+
+jobs:
+  quality-gates:
+    name: sapstack Quality Gates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout caller repo
+        uses: actions/checkout@v4
+        with:
+          path: caller
+
+      - name: Checkout sapstack
+        uses: actions/checkout@v4
+        with:
+          repository: BoxLogoDev/sapstack
+          ref: ${{ inputs.sapstack-ref }}
+          path: sapstack
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Make sapstack scripts executable
+        run: chmod +x sapstack/scripts/*.sh
+
+      - name: Lint frontmatter
+        working-directory: caller
+        run: bash ../sapstack/scripts/lint-frontmatter.sh
+
+      - name: Check marketplace integrity
+        working-directory: caller
+        if: ${{ hashFiles('caller/.claude-plugin/marketplace.json') != '' }}
+        run: bash ../sapstack/scripts/check-marketplace.sh
+
+      - name: Check hardcoding
+        if: ${{ inputs.check-hardcoding }}
+        working-directory: caller
+        run: |
+          if [[ "${{ inputs.run-strict }}" == "true" ]]; then
+            bash ../sapstack/scripts/check-hardcoding.sh --strict
+          else
+            bash ../sapstack/scripts/check-hardcoding.sh
+          fi
+
+      - name: Check T-code registry
+        if: ${{ hashFiles('caller/data/tcodes.yaml') != '' }}
+        working-directory: caller
+        run: |
+          if [[ "${{ inputs.run-strict }}" == "true" ]]; then
+            bash ../sapstack/scripts/check-tcodes.sh --strict
+          else
+            bash ../sapstack/scripts/check-tcodes.sh
+          fi
+
+      - name: Check Korean references
+        if: ${{ inputs.check-ko-references }}
+        working-directory: caller
+        run: bash ../sapstack/scripts/check-ko-references.sh --strict
+
+      - name: Check internal links
+        working-directory: caller
+        run: bash ../sapstack/scripts/check-links.sh
+
+      - name: Report
+        run: |
+          echo "✅ sapstack quality gates passed (sapstack ref: ${{ inputs.sapstack-ref }})"

@@ -36,11 +36,11 @@ jobs:
       - name: Check Korean references (strict)
         run: ./scripts/check-ko-references.sh --strict
 
-      - name: Check internal markdown links
-        run: ./scripts/check-links.sh
+      - name: Check internal markdown links (strict)
+        run: ./scripts/check-links.sh --strict
 
-      - name: Check ECC vs S/4HANA split (warning)
-        run: ./scripts/check-ecc-s4-split.sh
+      - name: Check ECC vs S/4HANA split (strict)
+        run: ./scripts/check-ecc-s4-split.sh --strict
 
       - name: Build multi-AI compatibility layer (check-only)
         run: ./scripts/build-multi-ai.sh --check

@@ -1,6 +1,6 @@
 # sapstack 아키텍처
 
-> 버전: v1.1.0
+> 버전: v1.4.0
 > 최종 업데이트: 2026-04-11
 
 sapstack은 단순한 "지식 문서 번들"이 아니라 **SAP 운영 자문 파이프라인**입니다. 이 문서는 sapstack이 어떤 구성 요소로 이뤄져 있고 각 요소가 어떻게 상호작용하는지 설명합니다.
@@ -19,9 +19,9 @@ sapstack은 세 가지 축으로 구성됩니다:
 │  ① Active Advisors        ② Context            │
 │     (위임 가능한 컨설턴트)     Persistence       │
 │  ─────────────────        ──────────────       │
-│  • SKILL.md (12+1)        • .sapstack/         │
-│  • agents/*.md              config.yaml        │
-│  • commands/*.md          • 환경 프로필 자동     │
+│  • 14 SKILL.md            • .sapstack/         │
+│  • 9 agents/*.md            config.yaml        │
+│  • 10 commands/*.md       • 환경 프로필 자동     │
 │                             로드                │
 │           ▲                      ▲             │
 │           └───────┬──────────────┘             │

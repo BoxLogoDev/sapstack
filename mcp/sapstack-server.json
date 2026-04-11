@@ -1,0 +1,120 @@
+{
+  "$schema": "https://schema.modelcontextprotocol.io/server/v1",
+  "name": "sapstack",
+  "version": "1.4.0",
+  "description": "SAP operations advisory knowledge base — 14 modules, 9 agents, 10 commands, 279 T-codes",
+  "author": "BoxLogoDev",
+  "license": "MIT",
+  "homepage": "https://github.com/BoxLogoDev/sapstack",
+
+  "capabilities": {
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    },
+    "tools": {
+      "listChanged": false
+    }
+  },
+
+  "resources": [
+    {
+      "uri": "sapstack://rules/universal",
+      "name": "sapstack Universal Rules",
+      "description": "8 universal rules that all SAP answers must follow",
+      "mimeType": "text/markdown"
+    },
+    {
+      "uri": "sapstack://data/tcodes",
+      "name": "Verified T-code Registry",
+      "description": "279 verified SAP T-codes with module mapping and ECC/S4 classification",
+      "mimeType": "application/yaml"
+    },
+    {
+      "uri": "sapstack://data/sap-notes",
+      "name": "Verified SAP Notes",
+      "description": "50+ verified SAP Notes catalog with keywords",
+      "mimeType": "application/yaml"
+    },
+    {
+      "uri": "sapstack://skill/{module}",
+      "name": "Module SKILL.md",
+      "description": "14 SAP module skills: fi, co, tr, mm, sd, pp, hcm, sfsf, abap, s4-migration, btp, basis, bc, gts",
+      "mimeType": "text/markdown"
+    }
+  ],
+
+  "prompts": [
+    {
+      "name": "sap-fi-consultant",
+      "description": "FI consultant agent prompt — systematic diagnosis of FI issues",
+      "arguments": [
+        { "name": "issue", "description": "FI issue description", "required": true }
+      ]
+    },
+    {
+      "name": "sap-abap-reviewer",
+      "description": "ABAP code reviewer — Clean Core, HANA optimization, ATC",
+      "arguments": [
+        { "name": "code", "description": "ABAP code to review", "required": true }
+      ]
+    },
+    {
+      "name": "sap-s4-migration-advisor",
+      "description": "S/4HANA migration path advisor",
+      "arguments": [
+        { "name": "scenario", "description": "Migration scenario", "required": true }
+      ]
+    },
+    {
+      "name": "sap-basis-troubleshooter",
+      "description": "Basis issue routing — dumps, WP hang, transport",
+      "arguments": [
+        { "name": "symptom", "description": "Observed symptom", "required": true }
+      ]
+    },
+    {
+      "name": "sap-mm-consultant",
+      "description": "MM consultant — procurement, inventory, GR/IR",
+      "arguments": [
+        { "name": "issue", "description": "MM issue", "required": true }
+      ]
+    }
+  ],
+
+  "tools": [
+    {
+      "name": "resolve_sap_note",
+      "description": "Search verified SAP Notes by keyword",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "keyword": { "type": "string", "description": "Search keyword (English or Korean)" }
+        },
+        "required": ["keyword"]
+      }
+    },
+    {
+      "name": "check_tcode",
+      "description": "Verify if a T-code is in the verified registry",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tcode": { "type": "string", "description": "SAP T-code" }
+        },
+        "required": ["tcode"]
+      }
+    },
+    {
+      "name": "list_plugins",
+      "description": "List all 14 sapstack plugin modules",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  ]
+}

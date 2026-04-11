@@ -1,0 +1,94 @@
+{
+  "BAPI call with error handling": {
+    "prefix": "bapi-call",
+    "body": [
+      "DATA lt_return TYPE TABLE OF bapiret2.",
+      "",
+      "CALL FUNCTION '${1:BAPI_NAME}'",
+      "  EXPORTING",
+      "    ${2:iv_param} = ${3:lv_value}",
+      "  IMPORTING",
+      "    ${4:ev_result} = ${5:lv_result}",
+      "  TABLES",
+      "    return    = lt_return.",
+      "",
+      "\" ALWAYS check return table — sapstack rule",
+      "IF line_exists( lt_return[ type = 'E' ] )",
+      "OR line_exists( lt_return[ type = 'A' ] ).",
+      "  LOOP AT lt_return INTO DATA(ls_err) WHERE type CA 'EA'.",
+      "    MESSAGE ls_err-message TYPE 'E'.",
+      "  ENDLOOP.",
+      "ELSE.",
+      "  CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'",
+      "    EXPORTING wait = abap_true.",
+      "ENDIF."
+    ],
+    "description": "BAPI call with sapstack-compliant error handling (Clean Core)"
+  },
+
+  "ALV OO display": {
+    "prefix": "alv-oo",
+    "body": [
+      "DATA: lo_alv    TYPE REF TO cl_salv_table,",
+      "      lt_result TYPE TABLE OF ${1:your_structure}.",
+      "",
+      "\" ... populate lt_result ...",
+      "",
+      "TRY.",
+      "    cl_salv_table=>factory(",
+      "      IMPORTING r_salv_table = lo_alv",
+      "      CHANGING  t_table      = lt_result ).",
+      "",
+      "    lo_alv->get_columns( )->set_optimize( abap_true ).",
+      "    lo_alv->display( ).",
+      "  CATCH cx_salv_msg INTO DATA(lx_err).",
+      "    MESSAGE lx_err->get_text( ) TYPE 'E'.",
+      "ENDTRY."
+    ],
+    "description": "ALV OO approach (recommended over REUSE_ALV_GRID_DISPLAY)"
+  },
+
+  "CDS View (S/4HANA)": {
+    "prefix": "cds-view",
+    "body": [
+      "@AbapCatalog.viewEnhancementCategory: [#NONE]",
+      "@AccessControl.authorizationCheck: #CHECK",
+      "@EndUserText.label: '${1:Entity description}'",
+      "@Metadata.ignorePropagatedAnnotations: true",
+      "",
+      "define view entity ${2:ZI_EntityName}",
+      "  as select from ${3:table_name} as t",
+      "{",
+      "  key t.${4:key_field}       as KeyField,",
+      "      t.${5:field}            as ${6:FieldName}",
+      "}"
+    ],
+    "description": "CDS view scaffold (Clean Core)"
+  },
+
+  "Targeted SELECT (no SELECT *)": {
+    "prefix": "select-targeted",
+    "body": [
+      "\" sapstack rule: no SELECT *, targeted fields only",
+      "SELECT ${1:field1, field2}",
+      "  FROM ${2:table_name}",
+      "  INTO TABLE @DATA(lt_${3:result})",
+      "  WHERE ${4:key_field} = @${5:lv_value}."
+    ],
+    "description": "Optimized SELECT (sapstack Clean Core compliant)"
+  },
+
+  "Authority-check": {
+    "prefix": "authority-check",
+    "body": [
+      "AUTHORITY-CHECK OBJECT '${1:S_AUTH_OBJECT}'",
+      "  ID '${2:FIELD}' FIELD ${3:lv_value}",
+      "  ID '${4:ACTVT}' FIELD '${5:03}'.",
+      "",
+      "IF sy-subrc <> 0.",
+      "  MESSAGE 'No authorization' TYPE 'E'.",
+      "ENDIF."
+    ],
+    "description": "Authority check (K-SOX / security required)"
+  }
+}

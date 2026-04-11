@@ -1182,3 +1182,75 @@ SXMB_MONI:
   name: Integration Engine Monitor (PI/PO)
   modules: [ABAP, BC]
   release: both
+
+# ──────────────────────────────────────────────────────────────
+# GTS — Global Trade Services (v1.4.0)
+# ──────────────────────────────────────────────────────────────
+# GTS는 /SAPSLL/ 네임스페이스 사용 — check-tcodes.sh가 base name만
+# 추출하므로 namespace 포함·제외 두 형태 모두 등록
+MENU_LEGALR3:
+  name: GTS Main Menu (/SAPSLL/ namespace)
+  modules: [GTS]
+  release: both
+COMPLR3:
+  name: GTS Compliance Workbench (/SAPSLL/ namespace)
+  modules: [GTS]
+  release: both
+CUS_CUHD_R3:
+  name: GTS Customs Document (/SAPSLL/ namespace)
+  modules: [GTS]
+  release: both
+PREF_CUST:
+  name: GTS Preference Determination (/SAPSLL/ namespace)
+  modules: [GTS]
+  release: both
+SPL_AUDIT:
+  name: GTS SPL Audit Log (/SAPSLL/ namespace)
+  modules: [GTS]
+  release: both
+MENU_LEGALSPL:
+  name: GTS SPL Configuration (/SAPSLL/ namespace)
+  modules: [GTS]
+  release: both
+
+# Namespace-full 형태 (문서 참조용, 스크립트는 위의 base name 사용)
+"/SAPSLL/MENU_LEGALR3":
+  name: GTS Main Menu
+  modules: [GTS]
+  release: both
+"/SAPSLL/COMPLR3":
+  name: Compliance Workbench
+  modules: [GTS]
+  release: both
+"/SAPSLL/CUS_CUHD_R3":
+  name: Customs Document
+  modules: [GTS]
+  release: both
+"/SAPSLL/LCLOG":
+  name: License Log
+  modules: [GTS]
+  release: both
+"/SAPSLL/PREF_CUST":
+  name: Preference Determination
+  modules: [GTS]
+  release: both
+"/SAPSLL/PRODUCT_R3":
+  name: Product Master (GTS)
+  modules: [GTS]
+  release: both
+"/SAPSLL/SPL_AUDIT":
+  name: SPL Audit Log
+  modules: [GTS]
+  release: both
+"/SAPSLL/CTSSPLAUD":
+  name: SPL Screening Monitor
+  modules: [GTS]
+  release: both
+"/SAPSLL/MENU_LEGALSPL":
+  name: SPL Configuration
+  modules: [GTS]
+  release: both
+"/SAPSLL/CTSCUST_R3":
+  name: Customs Document Display
+  modules: [GTS]
+  release: both

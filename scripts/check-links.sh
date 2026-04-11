@@ -76,6 +76,7 @@ while IFS= read -r md_file; do
 done < <(find . -name '*.md' -type f \
          -not -path './.git/*' \
          -not -path './node_modules/*' \
+         -not -name '.release-notes-*.md' \
          2>/dev/null)
 
 echo ""

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sapstack — SAP Note Resolver</title>
+  <meta name="description" content="sapstack 확정 SAP Note 카탈로그 검색 (50+ verified notes)">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>
+        <span class="logo">📚</span>
+        sapstack Note Resolver
+      </h1>
+      <p class="tagline">50+ verified SAP Notes for 14 modules · Korean &amp; Global</p>
+      <nav>
+        <a href="https://github.com/BoxLogoDev/sapstack">GitHub</a>
+        <a href="https://github.com/BoxLogoDev/sapstack/blob/main/docs/tutorial.md">튜토리얼</a>
+        <a href="https://github.com/BoxLogoDev/sapstack/blob/main/docs/glossary.md">용어집</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="search">
+      <input
+        type="search"
+        id="search-input"
+        placeholder="키워드로 검색 (예: korea, migration, ACDOCA, 전자세금계산서)"
+        autofocus
+      >
+      <div class="category-filter">
+        <button class="filter active" data-category="all">전체</button>
+        <button class="filter" data-category="migration">Migration</button>
+        <button class="filter" data-category="korea">🇰🇷 Korea</button>
+        <button class="filter" data-category="dump">Dump</button>
+        <button class="filter" data-category="performance">Performance</button>
+        <button class="filter" data-category="security">Security</button>
+        <button class="filter" data-category="config">Config</button>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="stat-value" id="total-count">0</div>
+        <div class="stat-label">확정 Notes</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="filtered-count">0</div>
+        <div class="stat-label">검색 결과</div>
+      </div>
+    </section>
+
+    <section class="results" id="results">
+      <div class="loading">데이터 로딩 중...</div>
+    </section>
+
+    <footer>
+      <p>
+        <strong>원본 데이터</strong>: <code>data/sap-notes.yaml</code> ·
+        <strong>라이선스</strong>: MIT ·
+        <strong>버전</strong>: v1.4.0
+      </p>
+      <p class="warning">
+        ⚠️ 이 사이트는 sapstack 데이터셋 기반 <strong>참조 도구</strong>입니다. 실제 Note 내용은
+        <a href="https://launchpad.support.sap.com/">SAP Support Portal</a>에서 확인하세요.
+      </p>
+    </footer>
+  </main>
+
+  <script src="./script.js"></script>
+</body>
+</html>

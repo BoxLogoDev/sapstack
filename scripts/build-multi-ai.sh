@@ -1,35 +1,28 @@
 #!/usr/bin/env bash
-# build-multi-ai.sh — sapstack 호환 레이어 파일 자동 빌드 (MVP, v1.3.0)
+# build-multi-ai.sh — sapstack 호환 레이어 자동 생성/검증 (v1.4.0)
 #
-# 목적: plugins/*/SKILL.md (원본)와 CLAUDE.md (Universal Rules)에서 핵심을 추출해
-#       각 AI 도구 네이티브 파일을 자동 생성/갱신합니다.
+# 기능:
+#   - 호환 레이어 파일 존재·버전·플러그인 수 일관성 검증
+#   - 플러그인 목록·버전 블록을 자동 생성해 sync block에 주입
+#   - --check: diff만 출력 (CI 모드)
+#   - --write: 실제 파일 갱신
 #
-# 현재 구현은 MVP 수준입니다:
-#   - 기존 호환 레이어 파일들의 헤더 Universal Rules 블록을 동기화
-#   - 13개 플러그인 목록 자동 주입
-#   - 버전 번호 동기화
-#
-# v1.4.0에서 확장 예정:
-#   - SKILL.md 본문을 파싱해 호환 레이어 본문도 동기화
-#   - 템플릿 엔진 기반 변환
-#   - 양방향 diff 검증
-#
-# 사용법:
-#   ./scripts/build-multi-ai.sh             # 빌드 실행
-#   ./scripts/build-multi-ai.sh --check     # 변경이 필요한지만 확인 (CI용)
-#   ./scripts/build-multi-ai.sh --verbose   # 상세 출력
+# 자동 생성되는 "sync block"은 파일 내에서
+# <!-- BEGIN sapstack-auto: plugin-list --> ... <!-- END sapstack-auto: plugin-list -->
+# 로 둘러싸인 영역입니다. 이 마커 밖은 수동 편집 보존됩니다.
 
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-CHECK_ONLY=0
+MODE="check"
 VERBOSE=0
 
 for arg in "$@"; do
   case "$arg" in
-    --check) CHECK_ONLY=1 ;;
+    --check) MODE="check" ;;
+    --write) MODE="write" ;;
     --verbose) VERBOSE=1 ;;
   esac
 done
@@ -44,18 +37,76 @@ log() {
 # 1. 메타데이터 추출
 # ────────────────────────────────────────────────────
 VERSION=$(grep -E '^\s*"version"' package.json | head -1 | sed 's/.*: "\([^"]*\)".*/\1/')
-log "sapstack version: $VERSION"
-
 PLUGIN_COUNT=$(find plugins -maxdepth 1 -mindepth 1 -type d | wc -l)
-log "plugin count: $PLUGIN_COUNT"
-
 AGENT_COUNT=$(find agents -maxdepth 1 -name '*.md' -type f 2>/dev/null | wc -l)
 COMMAND_COUNT=$(find commands -maxdepth 1 -name '*.md' -type f 2>/dev/null | wc -l)
 
-log "agents: $AGENT_COUNT, commands: $COMMAND_COUNT"
+log "version=$VERSION plugins=$PLUGIN_COUNT agents=$AGENT_COUNT commands=$COMMAND_COUNT"
 
 # ────────────────────────────────────────────────────
-# 2. 호환 레이어 파일 목록
+# 2. 플러그인 목록 생성 (stats.md 블록)
+# ────────────────────────────────────────────────────
+generate_stats_block() {
+  cat <<EOF
+<!-- BEGIN sapstack-auto: stats -->
+- **sapstack 버전**: v${VERSION}
+- **플러그인**: ${PLUGIN_COUNT}개
+- **서브에이전트**: ${AGENT_COUNT}개
+- **슬래시 커맨드**: ${COMMAND_COUNT}개
+<!-- END sapstack-auto: stats -->
+EOF
+}
+
+# ────────────────────────────────────────────────────
+# 3. sync block 주입/갱신
+# ────────────────────────────────────────────────────
+inject_block() {
+  local file="$1"
+  local block_name="$2"
+  local new_content="$3"
+
+  if [[ ! -f "$file" ]]; then
+    return 1
+  fi
+
+  local begin="<!-- BEGIN sapstack-auto: ${block_name} -->"
+  local end="<!-- END sapstack-auto: ${block_name} -->"
+
+  if ! grep -qF "$begin" "$file"; then
+    log "no block '$block_name' in $file — skipping"
+    return 0
+  fi
+
+  local tmp_file
+  tmp_file=$(mktemp)
+  awk -v begin="$begin" -v end="$end" -v new="$new_content" '
+    BEGIN { in_block=0 }
+    $0 == begin { print; print new; in_block=1; next }
+    $0 == end   { in_block=0; print; next }
+    !in_block { print }
+  ' "$file" > "$tmp_file"
+
+  if diff -q "$file" "$tmp_file" >/dev/null 2>&1; then
+    log "$file — no changes"
+    rm -f "$tmp_file"
+    return 0
+  fi
+
+  if [[ "$MODE" == "write" ]]; then
+    mv "$tmp_file" "$file"
+    echo "✏️  updated: $file"
+  else
+    echo "📝 diff needed: $file (run with --write to apply)"
+    if (( VERBOSE )); then
+      diff "$file" "$tmp_file" || true
+    fi
+    rm -f "$tmp_file"
+    return 2
+  fi
+}
+
+# ────────────────────────────────────────────────────
+# 4. 호환 레이어 파일 검증
 # ────────────────────────────────────────────────────
 COMPAT_FILES=(
   "AGENTS.md"
@@ -70,54 +121,52 @@ for file in "${COMPAT_FILES[@]}"; do
   if [[ ! -f "$file" ]]; then
     echo "❌ 누락: $file"
     MISSING=$((MISSING + 1))
-  else
-    log "found: $file"
   fi
 done
 
 if (( MISSING > 0 )); then
-  echo "❌ 호환 레이어 파일 ${MISSING}개 누락 — 수동 생성 필요"
+  echo "❌ 호환 레이어 파일 ${MISSING}개 누락"
   exit 1
 fi
 
 # ────────────────────────────────────────────────────
-# 3. 버전 일관성 확인
+# 5. 버전 일관성
 # ────────────────────────────────────────────────────
 MARKETPLACE_VERSION=$(grep -E '^\s*"version"' .claude-plugin/marketplace.json | head -1 | sed 's/.*: "\([^"]*\)".*/\1/')
-
 if [[ "$VERSION" != "$MARKETPLACE_VERSION" ]]; then
-  echo "❌ 버전 불일치:"
-  echo "   package.json:     $VERSION"
-  echo "   marketplace.json: $MARKETPLACE_VERSION"
-  if (( CHECK_ONLY )); then
-    exit 1
-  fi
+  echo "❌ 버전 불일치: package.json=$VERSION vs marketplace.json=$MARKETPLACE_VERSION"
+  exit 1
 fi
 
 # ────────────────────────────────────────────────────
-# 4. 호환 레이어가 버전을 참조하는지 점검 (optional warning)
+# 6. 플러그인 수 일관성
 # ────────────────────────────────────────────────────
-for file in "${COMPAT_FILES[@]}"; do
-  if grep -q "v1\." "$file" 2>/dev/null; then
-    if ! grep -q "v${VERSION}" "$file"; then
-      echo "⚠️  $file — 구버전 참조 가능 (현재 v${VERSION})"
+MARKETPLACE_PLUGINS=$(grep -c '"id":' .claude-plugin/marketplace.json || echo 0)
+if [[ "$MARKETPLACE_PLUGINS" != "$PLUGIN_COUNT" ]]; then
+  echo "❌ 플러그인 수 불일치: dir=$PLUGIN_COUNT vs marketplace=$MARKETPLACE_PLUGINS"
+  exit 1
+fi
+
+# ────────────────────────────────────────────────────
+# 7. stats 블록 주입 (있는 파일에만)
+# ────────────────────────────────────────────────────
+STATS_BLOCK=$(generate_stats_block)
+DIFF_COUNT=0
+for file in "${COMPAT_FILES[@]}" "README.md" "docs/multi-ai-compatibility.md"; do
+  [[ ! -f "$file" ]] && continue
+  stats_content=$(echo "$STATS_BLOCK" | awk '/BEGIN/{flag=1;next}/END/{flag=0}flag')
+  if inject_block "$file" "stats" "$stats_content"; then
+    :
+  else
+    rc=$?
+    if [[ $rc == 2 ]]; then
+      DIFF_COUNT=$((DIFF_COUNT + 1))
     fi
   fi
 done
 
 # ────────────────────────────────────────────────────
-# 5. 플러그인 목록 일관성
-# ────────────────────────────────────────────────────
-MARKETPLACE_PLUGINS=$(grep -c '"id":' .claude-plugin/marketplace.json || echo 0)
-if [[ "$MARKETPLACE_PLUGINS" != "$PLUGIN_COUNT" ]]; then
-  echo "❌ 플러그인 수 불일치: 디렉토리 ${PLUGIN_COUNT}, marketplace.json ${MARKETPLACE_PLUGINS}"
-  if (( CHECK_ONLY )); then
-    exit 1
-  fi
-fi
-
-# ────────────────────────────────────────────────────
-# 6. 결과 리포트
+# 8. 결과 리포트
 # ────────────────────────────────────────────────────
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -127,10 +176,18 @@ echo "✅ 호환 레이어 파일:     ${#COMPAT_FILES[@]}개 모두 존재"
 echo "✅ 플러그인:             ${PLUGIN_COUNT}개"
 echo "✅ 서브에이전트:         ${AGENT_COUNT}개"
 echo "✅ 슬래시 커맨드:        ${COMMAND_COUNT}개"
+echo "✅ 버전 일관성:          package.json == marketplace.json == $VERSION"
+if [[ "$MODE" == "check" ]]; then
+  if (( DIFF_COUNT > 0 )); then
+    echo "📝 Drift 발견:           ${DIFF_COUNT}개 파일 (--write 로 갱신)"
+  else
+    echo "✅ Sync block:           drift 없음"
+  fi
+fi
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-if (( CHECK_ONLY )); then
-  echo "check-only 모드 — 변경 없음"
+if [[ "$MODE" == "check" && $DIFF_COUNT -gt 0 ]]; then
+  exit 1
 fi
 
 exit 0
