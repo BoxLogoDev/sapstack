@@ -41,3 +41,6 @@ $RECYCLE.BIN/
 # Claude Code runtime
 .claude/cache/
 .claude/.last_session_context
+
+# Release notes temporary files
+.release-notes-*.md
