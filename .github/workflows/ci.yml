@@ -30,8 +30,20 @@ jobs:
       - name: Check hardcoding (strict)
         run: ./scripts/check-hardcoding.sh --strict
 
-      - name: Check T-code registry (warning-only)
-        run: ./scripts/check-tcodes.sh
+      - name: Check T-code registry (strict)
+        run: ./scripts/check-tcodes.sh --strict
+
+      - name: Check Korean references (strict)
+        run: ./scripts/check-ko-references.sh --strict
+
+      - name: Check internal markdown links
+        run: ./scripts/check-links.sh
+
+      - name: Check ECC vs S/4HANA split (warning)
+        run: ./scripts/check-ecc-s4-split.sh
+
+      - name: Build multi-AI compatibility layer (check-only)
+        run: ./scripts/build-multi-ai.sh --check
 
       - name: Smoke test — resolve-note
         run: |

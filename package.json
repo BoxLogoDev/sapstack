@@ -1,7 +1,7 @@
 {
   "name": "sapstack",
-  "version": "1.2.0",
-  "description": "Universal SAP skills and agents for AI coding assistants (Claude Code, Codex, Copilot, Cursor) — 13 modules, data-driven validation, Korean localization",
+  "version": "1.3.0",
+  "description": "Universal SAP skills, agents, and commands for 6 AI coding assistants — 13 modules, 9 subagents, 10 commands, 273 T-codes, Korean full translations",
   "license": "MIT",
   "author": "BoxLogoDev",
   "keywords": [

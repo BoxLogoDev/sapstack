@@ -28,6 +28,52 @@ if [[ ! -f "$TCODES_YAML" ]]; then
   exit 1
 fi
 
+# False positive allowlist — 정규식이 잘못 매칭하는 식별자들
+# (클래스명, 예외명, 인포타입 번호, 예시 값, 프로그램명 등 — T-code 아님)
+declare -A FALSE_POSITIVES=(
+  [CL_EXITHANDLER]=1
+  [DBIF_RSQL_SQL_ERROR]=1
+  [CONVT_CODEPAGE]=1
+  [MESSAGE_TYPE_X]=1
+  [COMPUTE_INT_ZERODIVIDE]=1
+  [OBJECTS_OBJREF_NOT_ASSIGNED]=1
+  [RAISE_EXCEPTION]=1
+  [TIME_LIMIT_EXCEEDED]=1
+  [TIME_OUT]=1
+  [TSV_TNEW_PAGE_ALLOC_FAILED]=1
+  [MEMORY_NO_MORE_PAGING]=1
+  [CONNE_IMPORT_WRONG_BUFFER_LENGTH]=1
+  [KR01]=1
+  [KR02]=1
+  [KR03]=1
+  [IT0001]=1
+  [IT0002]=1
+  [IT0006]=1
+  [IT0007]=1
+  [IT0008]=1
+  [IT0014]=1
+  [IT0015]=1
+  [LFA1-BKVID]=1
+  [LFA1]=1
+  [LFB1]=1
+  [KNA1]=1
+  [MT940]=1
+  [SAPUI5]=1
+  [SHA256]=1
+  [PT_BPC10]=1
+  [RHINTE00]=1
+  [RPTIME00]=1
+  [RPTQTA00]=1
+  [TM00]=1
+  [TM04]=1
+  [CH1]=1
+  [KF00]=1
+  [KZS2]=1
+  [OT83]=1
+  [OX19]=1
+  [RM07MDOC]=1
+)
+
 # 1. 확정 T-code 목록 추출 (YAML 최상위 키)
 #    키는 `^[A-Z][A-Z0-9._-]*:` 패턴으로 라인 시작
 KNOWN_TCODES=$(grep -E '^[A-Z][A-Z0-9._-]*:$' "$TCODES_YAML" | sed 's/:$//' | sort -u)
@@ -64,6 +110,11 @@ scan_file() {
 
   while IFS= read -r tcode; do
     [[ -z "$tcode" ]] && continue
+
+    # False positive 제외
+    if [[ -n "${FALSE_POSITIVES[$tcode]:-}" ]]; then
+      continue
+    fi
 
     # 이미 보고된 것은 스킵
     if [[ -n "${SEEN_UNKNOWN[$tcode]:-}" ]]; then

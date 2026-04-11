@@ -122,6 +122,316 @@ notes:
     category: security
     url: https://launchpad.support.sap.com/#/notes/1794432
 
+  # ──────────────────────────────────────────
+  # v1.3.0 확장 — Migration & Simplification
+  # ──────────────────────────────────────────
+  - id: "2185390"
+    title: "S/4HANA Migration — Customer-Vendor Integration (CVI)"
+    keywords: [BP, business partner, CVI, customer, vendor, migration]
+    modules: [FI, SD, MM]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2185390
+
+  - id: "2270580"
+    title: "S/4HANA Conversion — Central Finance Considerations"
+    keywords: [central finance, CFIN, migration, ACDOCA]
+    modules: [FI, CO]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2270580
+
+  - id: "2500371"
+    title: "Material Number Length Extension (S/4HANA)"
+    keywords: [material, MATNR, 40 characters, S/4HANA, simplification]
+    modules: [MM, PP, SD]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2500371
+
+  - id: "2728291"
+    title: "S/4HANA — Removed Transactions and Reports"
+    keywords: [deprecated, removed, transactions, migration, simplification]
+    modules: [ALL]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2728291
+
+  # ──────────────────────────────────────────
+  # FI / CO
+  # ──────────────────────────────────────────
+  - id: "2344026"
+    title: "Universal Journal (ACDOCA) — Field Mapping Guide"
+    keywords: [ACDOCA, universal journal, BSEG, FI, CO]
+    modules: [FI, CO]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2344026
+
+  - id: "1976487"
+    title: "Foreign Currency Valuation — S/4HANA Differences (FAGL_FC_VAL)"
+    keywords: [FAGL_FC_VAL, FC valuation, foreign currency, S/4HANA]
+    modules: [FI]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/1976487
+
+  - id: "1779478"
+    title: "GR/IR Clearing (F.13) Tolerance Settings"
+    keywords: [GR/IR, F.13, clearing, tolerance, MR11]
+    modules: [FI, MM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/1779478
+
+  - id: "2165213"
+    title: "Asset Accounting — S/4HANA New Implementation"
+    keywords: [asset, AA, AFAB, new asset accounting, S/4HANA]
+    modules: [FI, AA]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2165213
+
+  # ──────────────────────────────────────────
+  # MM / SD / PP
+  # ──────────────────────────────────────────
+  - id: "2267808"
+    title: "MATDOC Replaces MKPF/MSEG in S/4HANA"
+    keywords: [MATDOC, MKPF, MSEG, S/4HANA, material document]
+    modules: [MM]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2267808
+
+  - id: "2296559"
+    title: "Credit Management — FSCM Migration (FD32 → UKM_BP)"
+    keywords: [credit, FD32, UKM_BP, FSCM, S/4HANA, migration]
+    modules: [FI, SD]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2296559
+
+  - id: "2227963"
+    title: "MRP Live — HANA Push-down Optimization"
+    keywords: [MRP, MRP Live, MD01N, HANA, performance]
+    modules: [PP]
+    release: s4_only
+    category: performance
+    url: https://launchpad.support.sap.com/#/notes/2227963
+
+  - id: "1844277"
+    title: "Output Management — BRF+ vs NAST in S/4HANA"
+    keywords: [output, BRF+, NAST, NACE, S/4HANA, output management]
+    modules: [SD, MM]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/1844277
+
+  # ──────────────────────────────────────────
+  # HCM / SuccessFactors
+  # ──────────────────────────────────────────
+  - id: "2145114"
+    title: "HCM for S/4HANA (H4S4) — Deployment Guide"
+    keywords: [HCM, H4S4, S/4HANA, payroll, deployment]
+    modules: [HCM]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2145114
+
+  - id: "2296801"
+    title: "Employee Central Integration with SAP ERP"
+    keywords: [SuccessFactors, EC, Employee Central, integration, CPI]
+    modules: [HCM, SFSF]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2296801
+
+  # ──────────────────────────────────────────
+  # ABAP / Performance
+  # ──────────────────────────────────────────
+  - id: "2498770"
+    title: "ABAP for HANA — Code Pushdown Best Practices"
+    keywords: [ABAP, HANA, pushdown, CDS, AMDP, performance]
+    modules: [ABAP]
+    release: s4_only
+    category: performance
+    url: https://launchpad.support.sap.com/#/notes/2498770
+
+  - id: "2138575"
+    title: "RAP (RESTful ABAP Programming) — Getting Started"
+    keywords: [RAP, RESTful, ABAP, BOPF, Fiori, CDS]
+    modules: [ABAP, BTP]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2138575
+
+  - id: "1594697"
+    title: "SELECT FOR ALL ENTRIES — Performance Guidelines"
+    keywords: [SELECT, FOR ALL ENTRIES, performance, ABAP, SQL]
+    modules: [ABAP]
+    release: both
+    category: performance
+    url: https://launchpad.support.sap.com/#/notes/1594697
+
+  - id: "1785535"
+    title: "ST22 Dump Analysis — Best Practices"
+    keywords: [ST22, dump, runtime error, analysis, ABAP]
+    modules: [ABAP, BASIS, BC]
+    release: both
+    category: dump
+    url: https://launchpad.support.sap.com/#/notes/1785535
+
+  - id: "1835730"
+    title: "DBIF_RSQL_SQL_ERROR — HANA Specific Causes"
+    keywords: [DBIF_RSQL_SQL_ERROR, HANA, dump, SQL error, lock]
+    modules: [ABAP, BC]
+    release: both
+    category: dump
+    url: https://launchpad.support.sap.com/#/notes/1835730
+
+  # ──────────────────────────────────────────
+  # BASIS / BC / Transport
+  # ──────────────────────────────────────────
+  - id: "2065380"
+    title: "STMS Import Error Analysis — Return Code Guide"
+    keywords: [STMS, transport, import, return code, tp, error]
+    modules: [BASIS, BC]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2065380
+
+  - id: "2070597"
+    title: "Kernel Upgrade Procedure (SUM / SAPInst)"
+    keywords: [kernel, upgrade, SUM, SAPInst, patch]
+    modules: [BASIS, BC]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2070597
+
+  - id: "2256002"
+    title: "PFCG Role Maintenance — Authorization Design Guide"
+    keywords: [PFCG, role, authorization, SoD, security]
+    modules: [BASIS, BC]
+    release: both
+    category: security
+    url: https://launchpad.support.sap.com/#/notes/2256002
+
+  - id: "1982490"
+    title: "HANA Performance Troubleshooting — SM50 / ST05"
+    keywords: [HANA, performance, SM50, ST05, SQL trace]
+    modules: [BASIS, BC, ABAP]
+    release: s4_only
+    category: performance
+    url: https://launchpad.support.sap.com/#/notes/1982490
+
+  # ──────────────────────────────────────────
+  # Korea Localization (한국 특화)
+  # ──────────────────────────────────────────
+  - id: "2844534"
+    title: "Korea eTax Invoice (DRC) — Integration Setup"
+    keywords: [korea, e-tax invoice, 전자세금계산서, DRC, 한국]
+    modules: [FI]
+    release: s4_only
+    category: korea
+    url: https://launchpad.support.sap.com/#/notes/2844534
+
+  - id: "2645815"
+    title: "Korea Withholding Tax — Configuration Guide"
+    keywords: [korea, withholding tax, 원천세, 한국, CVI KR]
+    modules: [FI]
+    release: both
+    category: korea
+    url: https://launchpad.support.sap.com/#/notes/2645815
+
+  - id: "2783093"
+    title: "Korea Payroll — Year-End Adjustment (연말정산)"
+    keywords: [korea, payroll, 연말정산, year-end, 한국, 근로소득]
+    modules: [HCM]
+    release: both
+    category: korea
+    url: https://launchpad.support.sap.com/#/notes/2783093
+
+  - id: "1814087"
+    title: "Korean Unicode SAPGUI — 한글 깨짐 증상 해결"
+    keywords: [korea, unicode, SAPGUI, 한글, 깨짐, NLS_LANG]
+    modules: [BASIS, BC]
+    release: both
+    category: korea
+    url: https://launchpad.support.sap.com/#/notes/1814087
+
+  - id: "2567451"
+    title: "Korea Business Place (Branch) Configuration"
+    keywords: [korea, business place, 사업장, 한국, branch, BUPLA]
+    modules: [FI]
+    release: both
+    category: korea
+    url: https://launchpad.support.sap.com/#/notes/2567451
+
+  # ──────────────────────────────────────────
+  # BTP / Cloud / Integration
+  # ──────────────────────────────────────────
+  - id: "2637517"
+    title: "SAP BTP — Integration Suite Basics"
+    keywords: [BTP, integration suite, CPI, iFlow]
+    modules: [BTP]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2637517
+
+  - id: "2533767"
+    title: "OData Services — S/4HANA Best Practices"
+    keywords: [OData, V2, V4, S/4HANA, Fiori, BTP]
+    modules: [BTP, ABAP]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2533767
+
+  - id: "2925499"
+    title: "Cloud Connector — Setup and Troubleshooting"
+    keywords: [cloud connector, SCC, BTP, on-premise, integration]
+    modules: [BTP, BC]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2925499
+
+  # ──────────────────────────────────────────
+  # Security
+  # ──────────────────────────────────────────
+  - id: "1723881"
+    title: "SAP Security Baseline — On-Premise Hardening"
+    keywords: [security, baseline, hardening, kernel, patch]
+    modules: [BASIS, BC]
+    release: both
+    category: security
+    url: https://launchpad.support.sap.com/#/notes/1723881
+
+  - id: "2018937"
+    title: "Password Policy — Modern Authentication"
+    keywords: [password, policy, authentication, security, SNC]
+    modules: [BASIS, BC]
+    release: both
+    category: security
+    url: https://launchpad.support.sap.com/#/notes/2018937
+
+  # ──────────────────────────────────────────
+  # Period Close / Month-End
+  # ──────────────────────────────────────────
+  - id: "1863061"
+    title: "Month-End Close — Standard Sequence Guide"
+    keywords: [month end, period close, closing, sequence, F.13, FAGL_FC_VAL, AFAB]
+    modules: [FI, CO]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/1863061
+
+  - id: "2420495"
+    title: "Year-End Close — Balance Carry Forward (FAGLGVTR)"
+    keywords: [year end, balance carry forward, FAGLGVTR, F.16]
+    modules: [FI]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2420495
+
 # ──────────────────────────────────────────────────────────────
 # 메타 정보
 # ──────────────────────────────────────────────────────────────

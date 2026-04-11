@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/BoxLogoDev/sapstack/discussions
+    about: 일반 질문, 아이디어 공유, 커뮤니티 논의
+  - name: 📖 FAQ 먼저 확인
+    url: https://github.com/BoxLogoDev/sapstack/blob/main/docs/faq.md
+    about: 30개의 자주 묻는 질문
+  - name: 🛠 트러블슈팅
+    url: https://github.com/BoxLogoDev/sapstack/blob/main/docs/troubleshooting.md
+    about: sapstack 자체 문제 해결 가이드
+  - name: 📚 튜토리얼
+    url: https://github.com/BoxLogoDev/sapstack/blob/main/docs/tutorial.md
+    about: 15분 튜토리얼

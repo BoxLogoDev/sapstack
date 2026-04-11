@@ -724,7 +724,461 @@ PT01:
   name: Create Work Schedule
   modules: [HCM]
   release: both
+PT50:
+  name: Quota Overview (Time Management)
+  modules: [HCM]
+  release: both
 CAT2:
   name: Time Sheet Data Entry
   modules: [HCM]
+  release: both
+PE01:
+  name: Maintain Payroll Schemas
+  modules: [HCM]
+  release: both
+PE02:
+  name: Maintain Payroll PCRs
+  modules: [HCM]
+  release: both
+PE03:
+  name: Maintain Features (HR)
+  modules: [HCM]
+  release: both
+PP01:
+  name: Maintain Organization Plan (OM)
+  modules: [HCM]
+  release: both
+PO13:
+  name: Maintain Position
+  modules: [HCM]
+  release: both
+PPOCE:
+  name: Create Org Structure (Enjoy)
+  modules: [HCM]
+  release: both
+PPOME:
+  name: Change Org Structure (Enjoy)
+  modules: [HCM]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# FI Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+F-33:
+  name: Post Bill of Exchange Usage (Customer)
+  modules: [FI]
+  release: both
+F-36:
+  name: Bill of Exchange Payment (Vendor)
+  modules: [FI]
+  release: both
+F-49:
+  name: Customer Noted Item
+  modules: [FI]
+  release: both
+F-54:
+  name: Clear Vendor Down Payment
+  modules: [FI]
+  release: both
+F-55:
+  name: Post Vendor Noted Item (Guarantee)
+  modules: [FI]
+  release: both
+F.81:
+  name: Reverse Accrual/Deferral
+  modules: [FI]
+  release: both
+FBS1:
+  name: Post Accrual/Deferral Document
+  modules: [FI]
+  release: both
+FCH5:
+  name: Create Check
+  modules: [FI]
+  release: both
+FCH6:
+  name: Change Check Information
+  modules: [FI]
+  release: both
+FD02:
+  name: Change Customer (Accounting)
+  modules: [FI, SD]
+  release: both
+FBCJ:
+  name: Cash Journal Posting
+  modules: [FI]
+  release: both
+OKB9:
+  name: Default Account Assignment (CO)
+  modules: [CO, FI]
+  release: both
+UKM_MY_LIMIT:
+  name: Credit Limit (S/4 FSCM)
+  modules: [FI, SD]
+  release: s4_only
+S_ALR_87012085:
+  name: AP Aging Report
+  modules: [FI]
+  release: both
+S_ALR_87012078:
+  name: AR Aging Report
+  modules: [FI]
+  release: both
+S_ALR_87011963:
+  name: Asset Balance Report
+  modules: [FI, AA]
+  release: both
+FAGL_FC_TRANS:
+  name: Foreign Currency Translation (S/4)
+  modules: [FI]
+  release: s4_only
+
+# ──────────────────────────────────────────────────────────────
+# MM Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+MM01:
+  name: Create Material Master
+  modules: [MM]
+  release: both
+MM02:
+  name: Change Material Master
+  modules: [MM]
+  release: both
+MM03:
+  name: Display Material Master
+  modules: [MM]
+  release: both
+XK01:
+  name: Create Vendor (Central)
+  modules: [MM, FI]
+  release: ecc_only
+  note: S/4에서는 BP로 통합
+XK02:
+  name: Change Vendor (Central)
+  modules: [MM, FI]
+  release: ecc_only
+XK03:
+  name: Display Vendor (Central)
+  modules: [MM, FI]
+  release: ecc_only
+MK01:
+  name: Create Vendor (Purchasing)
+  modules: [MM]
+  release: ecc_only
+ME11:
+  name: Create Info Record
+  modules: [MM]
+  release: both
+ME51N:
+  name: Create Purchase Requisition
+  modules: [MM]
+  release: both
+ME52N:
+  name: Change Purchase Requisition
+  modules: [MM]
+  release: both
+ME53N:
+  name: Display Purchase Requisition
+  modules: [MM]
+  release: both
+ME58:
+  name: Ordering Purchase Requisitions
+  modules: [MM]
+  release: both
+MB5S:
+  name: GR/IR Balance Analysis
+  modules: [MM]
+  release: ecc_only
+  note: S/4HANA에서는 GRIR Fiori 앱
+MB53:
+  name: Display Plant Stock Availability
+  modules: [MM]
+  release: both
+MI01:
+  name: Create Physical Inventory Document
+  modules: [MM]
+  release: both
+MI04:
+  name: Enter Inventory Count
+  modules: [MM]
+  release: both
+MI07:
+  name: Post Physical Inventory
+  modules: [MM]
+  release: both
+MI09:
+  name: Enter Count without Document
+  modules: [MM]
+  release: both
+MI20:
+  name: Physical Inventory Differences
+  modules: [MM]
+  release: both
+ME2O:
+  name: Subcontracting Stock Monitor
+  modules: [MM]
+  release: both
+LT0A:
+  name: Create Transfer Order (WM)
+  modules: [MM, WM]
+  release: both
+MSC1N:
+  name: Create Batch
+  modules: [MM]
+  release: both
+MSC3N:
+  name: Display Batch
+  modules: [MM]
+  release: both
+MRBR:
+  name: Release Blocked Invoices (Invoice Verification)
+  modules: [MM]
+  release: both
+MIR4:
+  name: Display Invoice Document
+  modules: [MM, FI]
+  release: both
+MIR6:
+  name: Invoice Overview
+  modules: [MM, FI]
+  release: both
+MR8M:
+  name: Cancel Invoice Document
+  modules: [MM, FI]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# SD Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+XD01:
+  name: Create Customer (Central)
+  modules: [SD, FI]
+  release: ecc_only
+XD02:
+  name: Change Customer (Central)
+  modules: [SD, FI]
+  release: ecc_only
+XD03:
+  name: Display Customer (Central)
+  modules: [SD, FI]
+  release: ecc_only
+VD01:
+  name: Create Customer (Sales)
+  modules: [SD]
+  release: ecc_only
+VOV8:
+  name: Define Sales Order Type
+  modules: [SD]
+  release: both
+VL02N:
+  name: Change Outbound Delivery
+  modules: [SD]
+  release: both
+VL09:
+  name: Cancel Goods Issue for Delivery
+  modules: [SD]
+  release: both
+VL10A:
+  name: Delivery Due List (Sales Orders)
+  modules: [SD]
+  release: both
+VL10B:
+  name: Delivery Due List (Purchase Orders)
+  modules: [SD]
+  release: both
+VB01:
+  name: Create Rebate Agreement
+  modules: [SD]
+  release: both
+VB02:
+  name: Change Rebate Agreement
+  modules: [SD]
+  release: both
+VB07:
+  name: Settle Rebate
+  modules: [SD]
+  release: both
+VCH1:
+  name: Create Output Condition Record
+  modules: [SD]
+  release: both
+PR00:
+  name: Price Conditions (SD)
+  modules: [SD]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# PP Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+CS03:
+  name: Display BOM
+  modules: [PP]
+  release: both
+CA03:
+  name: Display Routing
+  modules: [PP]
+  release: both
+CA11:
+  name: Create Reference Operation Set
+  modules: [PP]
+  release: both
+CR11:
+  name: Display Capacity
+  modules: [PP]
+  release: both
+COR1:
+  name: Create Process Order
+  modules: [PP]
+  release: both
+COR2:
+  name: Change Process Order
+  modules: [PP]
+  release: both
+COR6N:
+  name: Process Order Confirmation
+  modules: [PP]
+  release: both
+MD01N:
+  name: MRP Run (S/4 Compact)
+  modules: [PP]
+  release: s4_only
+MD61:
+  name: Create Planned Independent Requirements
+  modules: [PP]
+  release: both
+MD62:
+  name: Change Planned Independent Requirements
+  modules: [PP]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# TR Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+FF67:
+  name: Manual Bank Statement
+  modules: [TR]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# BASIS / BC Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+DB02:
+  name: Database Monitor
+  modules: [BASIS, BC]
+  release: both
+ST01:
+  name: System Trace (Authorization)
+  modules: [BASIS, BC]
+  release: both
+ST12:
+  name: Single Transaction Analysis
+  modules: [BASIS, BC]
+  release: both
+STMS_IMPORT:
+  name: Transport Import Queue
+  modules: [BASIS, BC]
+  release: both
+SE06:
+  name: Set Up Transport Organizer
+  modules: [BASIS, BC]
+  release: both
+SCC3:
+  name: Client Copy Log
+  modules: [BASIS, BC]
+  release: both
+SCC7:
+  name: Post-Client Import Processing
+  modules: [BASIS, BC]
+  release: both
+SCC8:
+  name: Client Export
+  modules: [BASIS, BC]
+  release: both
+SCCL:
+  name: Local Client Copy
+  modules: [BASIS, BC]
+  release: both
+SU24:
+  name: Maintain Authorization Defaults
+  modules: [BASIS, BC]
+  release: both
+SFW5:
+  name: Switch Framework Customizing (Business Function)
+  modules: [BASIS, BC]
+  release: both
+RZ10:
+  name: Edit Profile (Parameters)
+  modules: [BASIS, BC]
+  release: both
+RZ11:
+  name: Maintain Profile Parameters
+  modules: [BASIS, BC]
+  release: both
+SE91:
+  name: Message Maintenance
+  modules: [BASIS, BC, ABAP]
+  release: both
+SLICENSE:
+  name: System License Administration
+  modules: [BASIS, BC]
+  release: both
+SLG1:
+  name: Application Log
+  modules: [BASIS, BC]
+  release: both
+SICK:
+  name: Installation Check
+  modules: [BASIS, BC]
+  release: both
+RSUSR002:
+  name: Users by Complex Selection Criteria
+  modules: [BASIS, BC]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# ABAP Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+SE01:
+  name: Transport Organizer (Extended)
+  modules: [ABAP]
+  release: both
+SE78:
+  name: Graphics Management (SmartForm)
+  modules: [ABAP]
+  release: both
+SO10:
+  name: Standard Text Maintenance
+  modules: [ABAP]
+  release: both
+SMARTFORMS:
+  name: SAP Smart Forms
+  modules: [ABAP]
+  release: both
+SFP:
+  name: Adobe Form Builder
+  modules: [ABAP]
+  release: both
+WE02:
+  name: IDoc Display
+  modules: [ABAP, BC]
+  release: both
+WE05:
+  name: IDoc Lists
+  modules: [ABAP, BC]
+  release: both
+WE19:
+  name: IDoc Test Tool
+  modules: [ABAP, BC]
+  release: both
+WE60:
+  name: IDoc Documentation
+  modules: [ABAP, BC]
+  release: both
+BD87:
+  name: Process IDoc Status
+  modules: [ABAP, BC]
+  release: both
+SXMB_MONI:
+  name: Integration Engine Monitor (PI/PO)
+  modules: [ABAP, BC]
   release: both

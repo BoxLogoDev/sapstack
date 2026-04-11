@@ -1,0 +1,176 @@
+# sapstack — config.yaml JSON Schema
+#
+# 이 파일은 사용자의 .sapstack/config.yaml 구조를 검증합니다.
+# scripts/validate-config.sh가 이 스키마로 config.yaml을 파싱해 오류를 보고합니다.
+#
+# JSON Schema Draft 2020-12 호환.
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://github.com/BoxLogoDev/sapstack/blob/main/.sapstack/config.schema.yaml"
+title: "sapstack user environment profile"
+type: object
+
+required:
+  - system
+  - organization
+  - preferences
+
+additionalProperties: false
+
+properties:
+  system:
+    type: object
+    required: [release, deployment]
+    additionalProperties: false
+    properties:
+      release:
+        type: string
+        enum:
+          - ECC_6_EHP4
+          - ECC_6_EHP5
+          - ECC_6_EHP6
+          - ECC_6_EHP7
+          - ECC_6_EHP8
+          - S4HANA_1511
+          - S4HANA_1610
+          - S4HANA_1709
+          - S4HANA_1809
+          - S4HANA_1909
+          - S4HANA_2020
+          - S4HANA_2021
+          - S4HANA_2022
+          - S4HANA_2023
+          - S4HANA_2024
+      deployment:
+        type: string
+        enum: [on_premise, rise, cloud_pe, private_cloud]
+      database:
+        type: string
+        enum: [hana, oracle, db2, mssql, sybase_ase, maxdb]
+      kernel:
+        type: string
+        pattern: "^[0-9]+\\.[0-9]+$"
+      unicode:
+        type: boolean
+
+  organization:
+    type: object
+    required: [primary_company_code]
+    additionalProperties: false
+    properties:
+      primary_company_code:
+        type: string
+        minLength: 1
+        description: "실제 회사코드 — 공유 저장소에 커밋 금지"
+      fiscal_year_variant:
+        type: string
+        enum: [K4, V3, V6, V9]
+        description: "K4 = 달력 (1-12월), V3 = non-calendar"
+      local_currency:
+        type: string
+        pattern: "^[A-Z]{3}$"
+        description: "ISO 4217 통화 코드 (KRW, USD, EUR, JPY 등)"
+      group_currency:
+        type: string
+        pattern: "^[A-Z]{3}$"
+      accounting_standard:
+        type: string
+        enum: [K_IFRS, IFRS, US_GAAP, LOCAL_GAAP, J_GAAP]
+      industry:
+        type: string
+        enum:
+          - MANUFACTURING
+          - RETAIL
+          - FINANCE
+          - PUBLIC
+          - UTILITIES
+          - OIL_GAS
+          - PHARMACEUTICAL
+          - AUTOMOTIVE
+          - HIGH_TECH
+          - CHEMICAL
+          - TELECOM
+          - LOGISTICS
+          - OTHER
+
+  landscape:
+    type: object
+    additionalProperties: false
+    properties:
+      dev: { $ref: "#/$defs/system_instance" }
+      qas: { $ref: "#/$defs/system_instance" }
+      stg: { $ref: "#/$defs/system_instance" }
+      prd: { $ref: "#/$defs/system_instance" }
+
+  korea:
+    type: object
+    additionalProperties: false
+    properties:
+      e_tax_invoice:
+        type: boolean
+      e_tax_invoice_provider:
+        type: string
+        enum: [sap_drc, ecount, bizplay, smartbill, douzone, custom, none]
+      withholding_tax:
+        type: boolean
+      cvi_kr:
+        type: boolean
+      closed_network:
+        type: boolean
+        description: "망분리(폐쇄망) 환경 여부"
+      k_sox:
+        type: boolean
+        description: "한국 상장사 내부회계관리제도 대상"
+
+  project:
+    type: object
+    additionalProperties: false
+    properties:
+      phase:
+        type: string
+        enum: [run_operation, new_implementation, migration, upgrade, rollout]
+      migration_path:
+        type: string
+        enum: [brownfield, greenfield, selective]
+      migration_target:
+        type: string
+      custom_focus:
+        type: array
+        items:
+          type: string
+          enum: [FI, CO, TR, MM, SD, PP, HCM, SFSF, ABAP, BTP, BASIS, BC]
+      add_ons:
+        type: array
+        items:
+          type: string
+
+  preferences:
+    type: object
+    required: [language]
+    additionalProperties: false
+    properties:
+      language:
+        type: string
+        enum: [ko, en, auto]
+      verbosity:
+        type: string
+        enum: [concise, standard, verbose]
+      include_menu_path:
+        type: boolean
+      only_confirmed_notes:
+        type: boolean
+        default: true
+
+$defs:
+  system_instance:
+    type: object
+    additionalProperties: false
+    properties:
+      sid:
+        type: string
+        minLength: 3
+        maxLength: 3
+        pattern: "^[A-Z0-9]{3}$"
+      client:
+        type: string
+        pattern: "^[0-9]{3}$"

@@ -45,7 +45,74 @@
 
 ---
 
-## 🎯 v1.2.0 — Precision & Scale
+## ✅ v1.3.0 — Depth & Ecosystem (현재)
+
+**테마**: 깊이 있는 생태계 완성
+
+### 데이터 자산 대폭 확장
+- [x] tcodes.yaml 168 → 273개
+- [x] sap-notes.yaml 11 → 50+
+- [x] check-tcodes --strict CI
+
+### 에이전트 생태계 완성 (5 → 9)
+- [x] sap-sd-consultant
+- [x] sap-co-consultant
+- [x] sap-pp-analyzer
+- [x] sap-integration-advisor
+
+### 커맨드 생태계 확장 (5 → 10)
+- [x] sap-quarter-close, sap-year-end, sap-transport-debug, sap-korean-tax-invoice-debug, sap-performance-check
+
+### Multi-AI 확장 (4 → 6)
+- [x] Continue.dev, Aider
+- [x] Copilot 파일 타입별 instruction 분할
+- [x] build-multi-ai.sh 검증 스크립트
+
+### 한국어 전문 번역 (2 → 8)
+- [x] sap-co, sap-tr, sap-mm, sap-sd, sap-pp, sap-hcm
+
+### Quality Gates (4 → 7)
+- [x] check-ko-references, check-links, check-ecc-s4-split
+
+### 사용자 경험
+- [x] tutorial.md (15분 튜토리얼)
+- [x] scenarios/ (5개 실전 Q&A)
+- [x] faq.md (30개)
+- [x] glossary.md (150+ 용어)
+- [x] troubleshooting.md
+
+### 커뮤니티 & 거버넌스
+- [x] Issue templates (bug, feature, new-module)
+- [x] PR template (품질 게이트 강제)
+- [x] CODEOWNERS
+- [x] CODE_OF_CONDUCT.md + SECURITY.md
+
+### 설정
+- [x] config.schema.yaml
+- [x] validate-config.sh
+
+---
+
+## 🎯 v1.4.0 — Industry & Automation
+
+**테마**: Industry Solution + 자동화
+
+### 계획
+- [ ] **한국어 전문 번역 완성** — 나머지 5개 모듈 (sfsf, s4mig, btp, basis, bc)
+- [ ] **Industry Solution 플러그인**:
+  - [ ] `sap-is-retail` — 리테일 특화
+  - [ ] `sap-is-utilities` — 유틸리티
+  - [ ] `sap-gts` — Global Trade Services (한국 수출입 중요)
+  - [ ] `sap-ibp` — Integrated Business Planning
+- [ ] **자동 빌드 스크립트 완성** — `scripts/build-multi-ai.sh`가 실제로 SKILL.md에서 호환 레이어를 생성
+- [ ] **`check-links --strict`** + **`check-ecc-s4-split --strict`** 전환
+- [ ] **Continue.dev end-to-end 테스트 + 예제**
+- [ ] **Aider 워크플로 가이드**
+- [ ] **GitHub Actions reusable workflow** — 다른 저장소가 재사용 가능한 SAP CI
+
+---
+
+## 🎯 v1.2.0 — Precision & Scale (과거)
 
 **테마: 정확도 및 자동 검증 강화**
 

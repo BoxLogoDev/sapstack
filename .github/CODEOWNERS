@@ -1,0 +1,88 @@
+# CODEOWNERS — sapstack
+#
+# 이 파일은 각 경로별 기본 리뷰어를 지정합니다.
+# GitHub이 PR 생성 시 자동으로 리뷰 요청을 보냅니다.
+#
+# 문법: <path-pattern> <@user-or-team>
+# 참고: https://docs.github.com/en/repositories/managing-your-repositories-settings-and-features/customizing-your-repository/about-code-owners
+
+# 기본 소유자 (모든 파일) — 대체 없을 시
+*                                       @BoxLogoDev
+
+# ──────────────────────────────────────────────────────────────
+# Core Financials
+# ──────────────────────────────────────────────────────────────
+/plugins/sap-fi/                        @BoxLogoDev
+/plugins/sap-co/                        @BoxLogoDev
+/plugins/sap-tr/                        @BoxLogoDev
+
+# ──────────────────────────────────────────────────────────────
+# Logistics
+# ──────────────────────────────────────────────────────────────
+/plugins/sap-mm/                        @BoxLogoDev
+/plugins/sap-sd/                        @BoxLogoDev
+/plugins/sap-pp/                        @BoxLogoDev
+
+# ──────────────────────────────────────────────────────────────
+# Human Resources
+# ──────────────────────────────────────────────────────────────
+/plugins/sap-hcm/                       @BoxLogoDev
+/plugins/sap-sfsf/                      @BoxLogoDev
+
+# ──────────────────────────────────────────────────────────────
+# Technology
+# ──────────────────────────────────────────────────────────────
+/plugins/sap-abap/                      @BoxLogoDev
+/plugins/sap-s4-migration/              @BoxLogoDev
+/plugins/sap-btp/                       @BoxLogoDev
+/plugins/sap-basis/                     @BoxLogoDev
+/plugins/sap-bc/                        @BoxLogoDev
+
+# ──────────────────────────────────────────────────────────────
+# 에이전트 · 커맨드
+# ──────────────────────────────────────────────────────────────
+/agents/                                @BoxLogoDev
+/commands/                              @BoxLogoDev
+
+# ──────────────────────────────────────────────────────────────
+# 데이터 자산 (높은 중요도)
+# ──────────────────────────────────────────────────────────────
+/data/tcodes.yaml                       @BoxLogoDev
+/data/sap-notes.yaml                    @BoxLogoDev
+
+# ──────────────────────────────────────────────────────────────
+# 품질 게이트 스크립트 (높은 중요도)
+# ──────────────────────────────────────────────────────────────
+/scripts/                               @BoxLogoDev
+
+# ──────────────────────────────────────────────────────────────
+# CI / 인프라
+# ──────────────────────────────────────────────────────────────
+/.github/workflows/                     @BoxLogoDev
+/.github/CODEOWNERS                     @BoxLogoDev
+
+# ──────────────────────────────────────────────────────────────
+# Multi-AI 호환 레이어
+# ──────────────────────────────────────────────────────────────
+/AGENTS.md                              @BoxLogoDev
+/CLAUDE.md                              @BoxLogoDev
+/CONVENTIONS.md                         @BoxLogoDev
+/.github/copilot-instructions.md        @BoxLogoDev
+/.github/instructions/                  @BoxLogoDev
+/.cursor/rules/                         @BoxLogoDev
+/.continue/                             @BoxLogoDev
+
+# ──────────────────────────────────────────────────────────────
+# 문서
+# ──────────────────────────────────────────────────────────────
+/docs/                                  @BoxLogoDev
+/README.md                              @BoxLogoDev
+/CONTRIBUTING.md                        @BoxLogoDev
+/CHANGELOG.md                           @BoxLogoDev
+
+# ──────────────────────────────────────────────────────────────
+# 보안 / 법적
+# ──────────────────────────────────────────────────────────────
+/LICENSE                                @BoxLogoDev
+/CODE_OF_CONDUCT.md                     @BoxLogoDev
+/SECURITY.md                            @BoxLogoDev
