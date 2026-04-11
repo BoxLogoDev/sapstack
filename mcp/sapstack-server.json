@@ -1,16 +1,16 @@
 {
   "$schema": "https://schema.modelcontextprotocol.io/server/v1",
   "name": "sapstack",
-  "version": "1.4.0",
-  "description": "SAP operations advisory knowledge base — 14 modules, 9 agents, 10 commands, 279 T-codes",
+  "version": "1.5.0",
+  "description": "SAP operations advisory + Evidence Loop session manager — 14 modules, 9 agents, 10+ commands, 279 T-codes, 20 symptom index entries, turn-aware sessions",
   "author": "BoxLogoDev",
   "license": "MIT",
   "homepage": "https://github.com/BoxLogoDev/sapstack",
 
   "capabilities": {
     "resources": {
-      "subscribe": false,
-      "listChanged": false
+      "subscribe": true,
+      "listChanged": true
     },
     "prompts": {
       "listChanged": false
@@ -24,7 +24,7 @@
     {
       "uri": "sapstack://rules/universal",
       "name": "sapstack Universal Rules",
-      "description": "8 universal rules that all SAP answers must follow",
+      "description": "Universal rules + Standard Response Format (dual mode: Quick Advisory + Evidence Loop)",
       "mimeType": "text/markdown"
     },
     {
@@ -40,10 +40,40 @@
       "mimeType": "application/yaml"
     },
     {
+      "uri": "sapstack://data/symptom-index",
+      "name": "Symptom Index (NEW in v1.5.0)",
+      "description": "20 natural-language symptom → module/T-code mappings, multilingual (ko/en + de/ja seed)",
+      "mimeType": "application/yaml"
+    },
+    {
       "uri": "sapstack://skill/{module}",
       "name": "Module SKILL.md",
-      "description": "14 SAP module skills: fi, co, tr, mm, sd, pp, hcm, sfsf, abap, s4-migration, btp, basis, bc, gts",
+      "description": "14 SAP module skills + sap-session (Evidence Loop orchestrator)",
       "mimeType": "text/markdown"
+    },
+    {
+      "uri": "sapstack://schema/{schema}",
+      "name": "Evidence Loop Schemas (NEW in v1.5.0)",
+      "description": "5 JSON Schemas: evidence-bundle, followup-request, hypothesis, verdict, session-state",
+      "mimeType": "application/yaml"
+    },
+    {
+      "uri": "sapstack://session/{session_id}",
+      "name": "Evidence Loop Session State (NEW in v1.5.0)",
+      "description": "Read current state of a session: turns, bundles, hypotheses, verdicts, audit trail",
+      "mimeType": "application/yaml"
+    },
+    {
+      "uri": "sapstack://session/{session_id}/bundle/{bundle_id}",
+      "name": "Session Evidence Bundle",
+      "description": "Read a specific evidence bundle's items",
+      "mimeType": "application/yaml"
+    },
+    {
+      "uri": "sapstack://sessions/list",
+      "name": "Active Sessions Index",
+      "description": "List all sessions in the workspace with status and last_updated",
+      "mimeType": "application/json"
     }
   ],
 
@@ -82,6 +112,20 @@
       "arguments": [
         { "name": "issue", "description": "MM issue", "required": true }
       ]
+    },
+    {
+      "name": "sap-session-turn2-hypothesis",
+      "description": "Evidence Loop Turn 2 — generate 2-4 falsifiable hypotheses with follow-up request (NEW in v1.5.0)",
+      "arguments": [
+        { "name": "session_id", "description": "Existing session id", "required": true }
+      ]
+    },
+    {
+      "name": "sap-session-turn4-verify",
+      "description": "Evidence Loop Turn 4 — verdict with mandatory fix+rollback plans (NEW in v1.5.0)",
+      "arguments": [
+        { "name": "session_id", "description": "Existing session id", "required": true }
+      ]
     }
   ],
 
@@ -110,11 +154,107 @@
     },
     {
       "name": "list_plugins",
-      "description": "List all 14 sapstack plugin modules",
+      "description": "List all sapstack plugin modules (14 + sap-session)",
       "inputSchema": {
         "type": "object",
         "properties": {}
       }
+    },
+    {
+      "name": "resolve_symptom",
+      "description": "Fuzzy-match natural language symptom against data/symptom-index.yaml (NEW in v1.5.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "description": "Symptom description in any supported language" },
+          "language": { "type": "string", "enum": ["ko", "en", "de", "ja"], "default": "ko" },
+          "country": { "type": "string", "enum": ["kr", "de", "us", "jp", "none"], "default": "none" },
+          "top_n": { "type": "integer", "minimum": 1, "maximum": 10, "default": 5 }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "start_session",
+      "description": "Start a new Evidence Loop session (NEW in v1.5.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symptom": { "type": "string", "description": "Initial symptom description" },
+          "reporter_role": { "type": "string", "enum": ["end_user", "operator", "consultant"], "default": "operator" },
+          "country_iso": { "type": "string" },
+          "release": { "type": "string" },
+          "deployment": { "type": "string", "enum": ["on_premise", "private_cloud", "public_cloud"] },
+          "client": { "type": "string", "pattern": "^[0-9]{3}$" },
+          "language": { "type": "string", "enum": ["ko", "en", "de", "ja"], "default": "ko" }
+        },
+        "required": ["symptom"]
+      }
+    },
+    {
+      "name": "add_evidence",
+      "description": "Add an evidence bundle to an existing session (NEW in v1.5.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": { "type": "string", "pattern": "^sess-[0-9]{8}-[a-z0-9]{6}$" },
+          "bundle_yaml": { "type": "string", "description": "Inline YAML conforming to evidence-bundle.schema.yaml" }
+        },
+        "required": ["session_id", "bundle_yaml"]
+      }
+    },
+    {
+      "name": "next_turn",
+      "description": "Run the next Evidence Loop turn (Hypothesis or Verify) for a session (NEW in v1.5.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": { "type": "string", "pattern": "^sess-[0-9]{8}-[a-z0-9]{6}$" },
+          "force_hypothesize": { "type": "boolean", "default": false }
+        },
+        "required": ["session_id"]
+      }
+    },
+    {
+      "name": "list_sessions",
+      "description": "List all Evidence Loop sessions in workspace with status filters (NEW in v1.5.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["intake", "hypothesizing", "awaiting_evidence", "verifying", "resolved", "escalated", "abandoned", "reopened", "any"], "default": "any" },
+          "country_iso": { "type": "string" },
+          "limit": { "type": "integer", "default": 20 }
+        }
+      }
+    },
+    {
+      "name": "validate_session_file",
+      "description": "Validate a session YAML file against its schema (NEW in v1.5.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string", "description": "Relative path to YAML file under .sapstack/sessions/" },
+          "schema": { "type": "string", "enum": ["session-state", "evidence-bundle", "hypothesis", "followup-request", "verdict"] }
+        },
+        "required": ["path", "schema"]
+      }
     }
-  ]
+  ],
+
+  "sapstack": {
+    "stage": "partial",
+    "implementation": {
+      "manifest": "complete",
+      "runtime_entry": "mcp/server.ts (Slice 7 scaffolding)",
+      "dependency_strategy": "minimal — @modelcontextprotocol/sdk only",
+      "session_storage": "file system (.sapstack/sessions/) — no database",
+      "schema_validation": "ajv against schemas/*.schema.yaml"
+    },
+    "runtime_tbd_in": "v1.6.0 — TypeScript implementation + npm package",
+    "v1_5_0_notes": [
+      "Manifest defines the complete contract for v1.6.0 runtime.",
+      "Current JSON is used by: Claude Desktop, Cursor, and other MCP-aware clients that read manifests for discovery.",
+      "The session-related resources and tools assume client is running in a workspace with .sapstack/ directory access."
+    ]
+  }
 }

@@ -1,0 +1,306 @@
+# data/tcode-pronunciation.yaml
+# SAP T-code 현장 발음 사전
+#
+# 목적:
+#   엔드유저/운영자가 음성이나 텍스트로 표현하는 T-code의 한국어 발음을
+#   매칭 엔진이 T-code 원형으로 정규화할 수 있게 한다.
+#
+# 사용처:
+#   - web/triage.js, mcp/server.ts의 extractTcodes() 보완
+#   - symptom-index.yaml의 symptom_ko_variants 검증 시 참조
+#
+# 발음 표기 원칙:
+#   - 한국 SAP 컨설턴트/키 유저의 일상 발화 기준
+#   - 숫자는 한국어 숫자명으로 ("100"→"백", "22"→"이십이")
+#   - 영문자는 한국 음차 ("F"→"에프", "SE"→"에스이")
+#   - 같은 T-code에 여러 발음이 있으면 모두 수록 (지역·세대 편차)
+#
+# 주의:
+#   이 파일은 "감사 공식 발음"이 아니라 "커뮤니케이션용 발음"입니다.
+#   공식 T-code 레지스트리는 data/tcodes.yaml을 참조하세요.
+
+schema_version: "1.0.0"
+generated: 2026-04-12
+license: MIT
+notes: |
+  v1.5.0 시드 — 40개 핵심 T-code. 커뮤니티 기여로 확장 예정.
+  일본어/독일어 발음은 v1.7+ 계획.
+
+pronunciations:
+  # ═══════════════════════════════════════════════
+  # FI — Financial Accounting
+  # ═══════════════════════════════════════════════
+  - tcode: F110
+    module: FI
+    ko: ["에프백십", "에프-백-십", "에프 일일공", "에프원원제로"]
+    meaning: "페이먼트런 (Payment Run, 지급실행)"
+    also_called: ["페이먼트런", "페이런"]
+
+  - tcode: FB01
+    module: FI
+    ko: ["에프비공일", "에프-비-공-일", "에프비제로원"]
+    meaning: "전표 포스팅 (Journal entry posting)"
+
+  - tcode: FB03
+    module: FI
+    ko: ["에프비공삼", "에프비제로쓰리"]
+    meaning: "전표 조회 (Document display)"
+
+  - tcode: FB60
+    module: FI
+    ko: ["에프비육공", "에프비육십"]
+    meaning: "벤더 인보이스 엔트리 (Enter vendor invoice)"
+
+  - tcode: FBL1N
+    module: FI
+    ko: ["에프비엘원엔", "에프비엘일엔"]
+    meaning: "벤더 라인 아이템 (Vendor line items, 에이피 잔액)"
+
+  - tcode: FBL3N
+    module: FI
+    ko: ["에프비엘삼엔"]
+    meaning: "GL 라인 아이템 (GL line items)"
+
+  - tcode: FBL5N
+    module: FI
+    ko: ["에프비엘오엔"]
+    meaning: "커스터머 라인 아이템 (Customer line items, 에이알 잔액)"
+
+  - tcode: FBZP
+    module: FI
+    ko: ["에프비지피", "에프-비-지-피"]
+    meaning: "뱅크 디터미네이션 + 페이먼트 세팅 전체"
+
+  - tcode: F.05
+    module: FI
+    ko: ["에프점공오", "에프닷제로파이브"]
+    meaning: "외화평가 (Foreign Currency Valuation, FCV)"
+
+  - tcode: F.13
+    module: FI
+    ko: ["에프점일삼"]
+    meaning: "GR/IR 자동 클리어링"
+
+  - tcode: OB52
+    module: FI
+    ko: ["오비오이", "오비오십이"]
+    meaning: "포스팅 피리어드 컨트롤 (Posting period control)"
+
+  - tcode: OB08
+    module: FI
+    ko: ["오비공팔", "오비제로에잇"]
+    meaning: "환율 유지 (Exchange rates)"
+
+  - tcode: OBA1
+    module: FI
+    ko: ["오비에이원"]
+    meaning: "환율 유형 구성"
+
+  # ═══════════════════════════════════════════════
+  # CO
+  # ═══════════════════════════════════════════════
+  - tcode: KS01
+    module: CO
+    ko: ["케이에스공일"]
+    meaning: "코스트 센터 생성"
+
+  - tcode: KA01
+    module: CO
+    ko: ["케이에이공일"]
+    meaning: "코스트 엘리먼트 생성"
+
+  - tcode: KO01
+    module: CO
+    ko: ["케이오공일"]
+    meaning: "인터널 오더 생성"
+
+  - tcode: KO88
+    module: CO
+    ko: ["케이오팔팔"]
+    meaning: "세틀먼트 실행 (Settlement)"
+
+  # ═══════════════════════════════════════════════
+  # MM
+  # ═══════════════════════════════════════════════
+  - tcode: MIGO
+    module: MM
+    ko: ["미고", "엠아이고"]
+    meaning: "GR/GI 입출고 처리"
+    also_called: ["미고 친다 = MIGO 실행"]
+
+  - tcode: MIRO
+    module: MM
+    ko: ["미로", "엠아이알오"]
+    meaning: "인보이스 버리피케이션 (송장검증)"
+
+  - tcode: ME21N
+    module: MM
+    ko: ["엠이이십일엔", "엠이이일엔"]
+    meaning: "PO(구매발주) 생성"
+
+  - tcode: ME23N
+    module: MM
+    ko: ["엠이이삼엔"]
+    meaning: "PO 디스플레이"
+
+  - tcode: MMBE
+    module: MM
+    ko: ["엠엠비이", "엠엠-비-이"]
+    meaning: "스탁 오버뷰 (자재별 재고 현황)"
+
+  - tcode: MB51
+    module: MM
+    ko: ["엠비오일", "엠비오십일"]
+    meaning: "자재 도큐먼트 리스트"
+
+  - tcode: MB52
+    module: MM
+    ko: ["엠비오이", "엠비오십이"]
+    meaning: "스탁 리스트 (플랜트별 재고)"
+
+  - tcode: MR11
+    module: MM
+    ko: ["엠알십일", "엠알일일"]
+    meaning: "GR/IR 수동 클리어링"
+
+  # ═══════════════════════════════════════════════
+  # SD
+  # ═══════════════════════════════════════════════
+  - tcode: VA01
+    module: SD
+    ko: ["브이에이공일", "비이에이공일"]
+    meaning: "에스오(판매주문) 생성"
+
+  - tcode: VA03
+    module: SD
+    ko: ["브이에이공삼"]
+    meaning: "에스오 디스플레이"
+
+  - tcode: VL01N
+    module: SD
+    ko: ["브이엘공일엔"]
+    meaning: "딜리버리 생성"
+
+  - tcode: VF01
+    module: SD
+    ko: ["브이에프공일"]
+    meaning: "빌링 생성"
+
+  - tcode: VK11
+    module: SD
+    ko: ["브이케이십일"]
+    meaning: "프라이싱 컨디션 생성"
+
+  - tcode: XD03
+    module: SD
+    ko: ["엑스디공삼"]
+    meaning: "커스터머 마스터 디스플레이"
+
+  # ═══════════════════════════════════════════════
+  # Master Data
+  # ═══════════════════════════════════════════════
+  - tcode: XK01
+    module: FI
+    ko: ["엑스케이공일"]
+    meaning: "벤더 마스터 생성"
+
+  - tcode: XK02
+    module: FI
+    ko: ["엑스케이공이", "엑스케이오이"]
+    meaning: "벤더 마스터 수정"
+
+  - tcode: XK03
+    module: FI
+    ko: ["엑스케이공삼"]
+    meaning: "벤더 마스터 디스플레이"
+
+  - tcode: BP
+    module: FI
+    ko: ["비피", "비-피"]
+    meaning: "Business Partner (S/4 통합 마스터)"
+
+  # ═══════════════════════════════════════════════
+  # BASIS / ABAP
+  # ═══════════════════════════════════════════════
+  - tcode: ST22
+    module: BASIS
+    ko: ["에스티이십이", "에스티이이", "에스티투투"]
+    meaning: "ABAP 런타임 덤프 (Runtime dump)"
+
+  - tcode: SM21
+    module: BASIS
+    ko: ["에스엠이십일", "에스엠이일"]
+    meaning: "시스템 로그"
+
+  - tcode: SM50
+    module: BASIS
+    ko: ["에스엠오십", "에스엠오공"]
+    meaning: "워크 프로세스 오버뷰"
+
+  - tcode: SM37
+    module: BASIS
+    ko: ["에스엠삼칠", "에스엠삼세븐"]
+    meaning: "백그라운드 잡 오버뷰"
+
+  - tcode: SM59
+    module: BASIS
+    ko: ["에스엠오구", "에스엠오나인"]
+    meaning: "RFC 데스티네이션"
+
+  - tcode: SE16N
+    module: BASIS
+    ko: ["에스이십육엔", "에스이일육엔", "에스이십육"]
+    meaning: "테이블 디스플레이 (브라우저)"
+
+  - tcode: SE09
+    module: BASIS
+    ko: ["에스이공구"]
+    meaning: "트랜스포트 오거나이저"
+
+  - tcode: STMS
+    module: BASIS
+    ko: ["에스티엠에스", "에스-티-엠-에스"]
+    meaning: "트랜스포트 관리 시스템"
+
+  - tcode: SNOTE
+    module: BASIS
+    ko: ["에스노트", "에스-노트", "노트 트랜잭션"]
+    meaning: "SAP Note 적용"
+
+  - tcode: SU01
+    module: BASIS
+    ko: ["에스유공일", "에스유제로원"]
+    meaning: "사용자 마스터 (User maintenance)"
+
+  - tcode: PFCG
+    module: BASIS
+    ko: ["피에프씨지", "피-에프-씨-지"]
+    meaning: "롤 유지 (Role maintenance)"
+
+  - tcode: SU53
+    module: BASIS
+    ko: ["에스유오삼", "에스유오쓰리"]
+    meaning: "마지막 권한 체크 (Auth error 디버그)"
+
+  # ═══════════════════════════════════════════════
+  # Korea-specific
+  # ═══════════════════════════════════════════════
+  - tcode: EDOC_COCKPIT
+    module: BC
+    ko: ["이닥 코핏", "이-닥 코-핏", "EDOC 코핏"]
+    meaning: "전자세금계산서 통합 코핏 (한국 특화)"
+
+  - tcode: STRUST
+    module: BASIS
+    ko: ["에스트러스트", "에스-트러스트"]
+    meaning: "인증서 관리 (Certificate management)"
+
+meta:
+  total: 41
+  languages: [ko]
+  planned:
+    ja: "v1.7 — 日本語発音追加 (エフヒャクジュウ style)"
+    de: "v1.7 — German phonetics"
+  contribution_notes: |
+    발음은 현장/지역/세대별로 편차가 있으니 실제 들어본 variants는 ko 배열에
+    자유롭게 추가하세요. 발음이 둘 이상이면 가장 흔한 것을 첫 번째에 두세요.

@@ -1,0 +1,528 @@
+# data/symptom-index.yaml
+# Symptom Index — 자연어 증상 ↔ SAP 모듈·T-code·초기 체크 매핑
+#
+# 목적:
+#   엔드유저/운영자가 입력한 자연어 증상을 빠르게 매칭하여
+#   sap-session-start가 Turn 1 INTAKE에서 적절한 힌트를 자동 로드하도록 함.
+#
+# 사용처:
+#   - sap-session-start 커맨드가 fuzzy 매칭
+#   - web/triage.html 정적 포털이 브라우저에서 로드하여 1차 진단
+#   - MCP 서버의 resolve_symptom 도구 (Slice 7)
+#
+# 스키마:
+#   각 엔트리는 id와 다국어 symptom 필드, 관련 모듈/T-code, 전형적 원인,
+#   수집이 필요한 증거 종류, 국가별 로컬라이제이션 힌트를 포함.
+#
+# 다국어:
+#   v0.1은 ko + en 기본. Slice 6에서 de/ja 추가.
+#   symptom_{iso}는 없으면 symptom_en으로 폴백.
+
+schema_version: "1.0.0"
+generated: 2026-04-12
+source: sapstack authors
+license: MIT
+
+symptoms:
+  # ═══════════════════════════════════════════════
+  # F110 — Payment Run (3건)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-f110-no-payment-method
+    symptom_ko: "F110 돌리는데 벤더 하나만 'No valid payment method' 뜨는 경우"
+    symptom_ko_variants:
+      - "F110 지급실행 실패 — 특정 벤더"
+      - "에프백십 No payment method 에러"
+      - "페이먼트런 벤더 하나만 에러"
+      - "페이런 돌렸는데 벤더 안 잡혀요"
+    symptom_en: "F110 fails with 'No valid payment method found for vendor'"
+    symptom_de: "F110 schlägt fehl mit 'Keine gültige Zahlungsmethode für Lieferant gefunden'"
+    symptom_ja: "F110実行時に「この仕入先に有効な支払方法が見つかりません」エラー"
+    likely_modules: [FI, TR]
+    first_check_tcodes: [F110, XK03, FBZP, SE16N]
+    typical_causes:
+      - "벤더 마스터에 ZWELS(페이먼트 메소드, LFB1) 비어있음 — 제일 흔함"
+      - "최근에 누가 XK02로 ZWELS 바꿨거나 지운 경우 (CDHDR·CDPOS로 변경이력 확인)"
+      - "FBZP 뱅크 디터미네이션(Bank Determination)에 해당 페이먼트 메소드(T/C 등)가 빠져있음"
+      - "회사코드별로 페이먼트 메소드 활성화 안 돼있음"
+    evidence_needed:
+      - { type: transaction_log, target: "F110 run log", priority: critical }
+      - { type: table_export, target: "LFB1 for vendor", priority: critical }
+      - { type: table_export, target: "CDHDR CDPOS for LFB1 changes in last 24h", priority: high }
+      - { type: screenshot, target: "FBZP Bank Determination", priority: medium }
+    localized_checks:
+      kr:
+        - "한국 국내 벤더: Payment Method 'T' (이체) 필수"
+        - "전자세금계산서 승인번호 매칭 별도 확인"
+      de:
+        - "SEPA IBAN/BIC 체크 필요"
+      us:
+        - "Payment Method 'A' (ACH) 또는 'W' (Wire)"
+        - "1099 벤더 여부 확인 (원천징수)"
+      jp:
+        - "源泉徴収 설정 영향도 확인"
+        - "銀行コード体系 (全銀フォーマット) 確認"
+        - "電子記録債権 (でんさいネット) 連携有無"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-f110-proposal-no-items
+    symptom_ko: "F110 Proposal 돌려도 대상 건이 하나도 안 잡혀요 (No items selected)"
+    symptom_ko_variants:
+      - "페이먼트런 Proposal이 비었어요"
+      - "F110 Proposal 대상 0건"
+      - "에프백십 돌렸는데 아무것도 안 잡혀요"
+    symptom_en: "F110 Proposal runs but selects no items"
+    likely_modules: [FI]
+    first_check_tcodes: [F110, FBL1N, OB29]
+    typical_causes:
+      - "오픈 아이템의 Due Date가 런 데이트(Run Date)를 넘어서 선택에서 빠진 경우"
+      - "페이먼트 블록(ZAHLS) 걸려있음 — LFB1 또는 BSIK-ZLSPR 확인"
+      - "스페셜 GL 인디케이터(UMSKZ) 때문에 선택에서 제외됨"
+      - "Document Splitting(문서분할)으로 일부만 오픈된 상태"
+    evidence_needed:
+      - { type: transaction_log, target: "F110 Parameters + Log", priority: critical }
+      - { type: table_export, target: "FBL1N for affected vendor", priority: critical }
+    severity: medium
+    recurrence: common
+
+  - id: sym-f110-dme-creation-failed
+    symptom_ko: "F110 Payment 단계에서 DME 파일이 안 만들어져요"
+    symptom_ko_variants:
+      - "페이먼트런 DME 생성 실패"
+      - "F110 돌리면 DME에서 튕겨요"
+      - "페이런 마지막에 파일 안 떨어져요"
+    symptom_en: "F110 fails at Payment stage when creating DME file"
+    likely_modules: [FI, TR, BC]
+    first_check_tcodes: [F110, DMEE, OBPM1, OBPM4]
+    typical_causes:
+      - "페이먼트 메소드에 DMEE 포맷이 안 붙어있음"
+      - "DMEE Tree 자체에 오류 (OBPM1에서 검증)"
+      - "한국 은행별(KEB·국민·신한·우리·하나) 커스텀 포맷 버전이 안 맞음"
+      - "하우스뱅크(HBKID) Account ID에 DMEE 참조 누락"
+    evidence_needed:
+      - { type: transaction_log, target: "F110 Payment run log", priority: critical }
+      - { type: screenshot, target: "DMEE tree for payment method", priority: high }
+    localized_checks:
+      kr:
+        - "KEB, 국민, 신한, 우리, 하나 등 은행별 DMEE Tree 분리 여부 확인"
+        - "전자세금계산서 연동 커스텀 확장 여부"
+    severity: high
+    recurrence: occasional
+
+  # ═══════════════════════════════════════════════
+  # MM — Materials Management (3건)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-migo-posting-error
+    symptom_ko: "MIGO에서 입고 치는데 M7 에러 떠서 포스팅이 안 돼요"
+    symptom_ko_variants:
+      - "미고 포스팅 에러"
+      - "MIGO 계상 안 됨"
+      - "지알 치는데 M7 메시지"
+      - "입고 잡는데 에러 뜨네요"
+      - "MIGO M7 뜨는데 원인이 뭐죠"
+    symptom_en: "MIGO goods receipt posting fails with M7 message"
+    symptom_de: "MIGO Warenannahme-Buchung schlägt fehl mit M7-Nachricht"
+    symptom_ja: "MIGO入庫計上時にM7系メッセージでエラー"
+    likely_modules: [MM, FI]
+    first_check_tcodes: [MIGO, ME23N, OMJJ, OBYC]
+    typical_causes:
+      - "무브먼트 타입(BWART, 이동유형) 설정이 없거나 잘못됨 — OMJJ 확인"
+      - "어카운트 디터미네이션(OBYC)에서 Valuation Class ↔ GL 매핑이 빠짐"
+      - "피오(PO)의 어카운트 어사인먼트 카테고리가 안 맞음"
+      - "재고 계정(BSX·WRX·GBB) 세팅 오류 — 트랜잭션 키별 확인"
+    evidence_needed:
+      - { type: screenshot, target: "MIGO error message", priority: critical }
+      - { type: transaction_log, target: "OBYC for movement type", priority: high }
+      - { type: screenshot, target: "ME23N → Account assignment", priority: high }
+    localized_checks:
+      kr:
+        - "재고 계정은 한국 회계기준(K-IFRS) 분류 확인"
+        - "원재료/재공품/완제품 계정 구분"
+      de:
+        - "Bewertungsklasse (OMWB) prüfen"
+        - "Konten-Modifikation WRX vs BSX"
+      us:
+        - "Check Account Determination by Valuation Grouping Code"
+        - "Verify Movement Type to Account Key mapping (OBYC)"
+      jp:
+        - "評価クラスと勘定科目の紐付け (OMWB) 確認"
+        - "輸入品の場合は関税・通関手数料の配賦先"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: ["549489"]
+
+  - id: sym-mmbe-stock-mismatch
+    symptom_ko: "MMBE 재고가 실물이랑 안 맞아요"
+    symptom_ko_variants:
+      - "자재 재고 안 맞음"
+      - "MMBE 수량 차이"
+      - "스탁이 이상해요"
+      - "MB52랑 실사랑 다름"
+      - "머티리얼 재고 틀려요"
+    symptom_en: "MMBE shows stock quantity mismatch vs physical count"
+    likely_modules: [MM, PP]
+    first_check_tcodes: [MMBE, MB51, MB52, MI31, SE16N]
+    typical_causes:
+      - "역전표(102, 122 등 무브먼트 타입) 탔을 가능성"
+      - "다른 플랜트나 스토락(Storage Location)으로 잘못 포스팅됨"
+      - "배치(Batch)나 스페셜 스탁 수량이 누락됨"
+      - "컨사인먼트 스탁(K)인데 일반 재고로 안 잡히는 경우"
+    evidence_needed:
+      - { type: screenshot, target: "MMBE for material", priority: critical }
+      - { type: table_export, target: "MSEG for MBLNR", priority: critical }
+      - { type: table_export, target: "MCHB by plant", priority: medium }
+    severity: medium
+    recurrence: common
+
+  - id: sym-miro-tax-code-mismatch
+    symptom_ko: "MIRO 송장검증 돌리는데 택스 코드가 안 맞아요"
+    symptom_ko_variants:
+      - "미로에서 세금코드 에러"
+      - "MIRO VAT 불일치"
+      - "송장검증 택스코드 다름"
+      - "인보이스 VAT 튕겨요"
+    symptom_en: "MIRO invoice verification shows tax code mismatch"
+    likely_modules: [MM, FI]
+    first_check_tcodes: [MIRO, FTXP, OBCL]
+    typical_causes:
+      - "피오(PO)의 택스 코드랑 송장의 택스 코드가 다름"
+      - "FTXP에서 세율 바뀐 후 예전 피오가 그대로 남아있는 경우"
+      - "Jurisdiction Code 불일치(US) 또는 한국 부가세 10%(V0/V1) vs 영세율(V2) 구분 실수"
+    evidence_needed:
+      - { type: screenshot, target: "MIRO error", priority: critical }
+      - { type: transaction_log, target: "FTXP for tax code", priority: high }
+    localized_checks:
+      kr:
+        - "부가세 10% (V0/V1) vs 영세율(V2) 구분"
+        - "전자세금계산서 승인번호 연동 여부"
+      us:
+        - "Jurisdiction Code (BSEG-TXJCD) 일치 확인"
+    severity: medium
+    recurrence: occasional
+
+  # ═══════════════════════════════════════════════
+  # FI — Financial Accounting (2건)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-period-close-open-posting
+    symptom_ko: "월마감 했는데 이전 기간에 전표가 들어가거나, 열려있는데 안 들어가요"
+    symptom_ko_variants:
+      - "OB52 때문에 포스팅 안 돼요"
+      - "피리어드 컨트롤 이상함"
+      - "월마감 후 포스팅 문제"
+      - "마감 D+3인데 이전달 전표 튕겨요"
+    symptom_en: "Period close issue — postings allowed/blocked in wrong period"
+    likely_modules: [FI]
+    first_check_tcodes: [OB52, FBL3N, SE16N]
+    typical_causes:
+      - "OB52 피리어드 컨트롤 변수 이름/기간 설정 잘못됨"
+      - "스페셜 피리어드(13-16) 사용 여부 확인 필요"
+      - "Posting Period Variant가 회사코드에 제대로 매핑 안 됨 (OBBP)"
+    evidence_needed:
+      - { type: screenshot, target: "OB52 current state", priority: critical }
+      - { type: transaction_log, target: "Attempted posting error", priority: critical }
+    severity: high
+    recurrence: frequent
+
+  - id: sym-foreign-currency-valuation-anomaly
+    symptom_ko: "F.5D 외화평가(FCV) 돌렸는데 숫자가 이상해요"
+    symptom_ko_variants:
+      - "환평가 결과 이상"
+      - "F.5D 이상치"
+      - "외화평가 D-1에 튀어요"
+      - "FCV 결과 확인 필요"
+    symptom_en: "F.5D foreign currency valuation shows unexpected results"
+    likely_modules: [FI]
+    first_check_tcodes: [F.5D, OBA1, OB08, FAGLB03]
+    typical_causes:
+      - "환율 유형(OBA1) 잘못 세팅됨"
+      - "환율 테이블(OB08) 해당 일자 누락 또는 값 이상"
+      - "GL 계정에 'Only balances in local currency' 체크 박힘"
+      - "Valuation Method(OBB8) 설정 검토 필요"
+    evidence_needed:
+      - { type: transaction_log, target: "F.5D log", priority: critical }
+      - { type: table_export, target: "OB08 for period", priority: high }
+    severity: high
+    recurrence: occasional
+
+  # ═══════════════════════════════════════════════
+  # SD — Sales & Distribution (2건)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-vf01-billing-incomplete
+    symptom_ko: "VF01로 빌링 생성하는데 '불완전' 상태로 저장돼요"
+    symptom_ko_variants:
+      - "빌링 불완전 상태"
+      - "VF01 인컴플릿"
+      - "청구서 안 완성됨"
+      - "빌링 도큐 상태 이상"
+    symptom_en: "VF01 billing document saved as incomplete"
+    likely_modules: [SD, FI]
+    first_check_tcodes: [VF01, VF03, V.23, OVA2]
+    typical_causes:
+      - "필수 필드(Customer PO number 등) 안 채워짐"
+      - "프라이싱(Pricing) 컨디션 누락"
+      - "크레딧 체크(FD32/UKM_CASE)에 잡힘"
+      - "어카운팅 디터미네이션 누락 — GL 계정 매핑 확인"
+    evidence_needed:
+      - { type: screenshot, target: "VF01 error list", priority: critical }
+      - { type: transaction_log, target: "Incomplete log from V.23", priority: high }
+    severity: medium
+    recurrence: common
+
+  - id: sym-va01-credit-block
+    symptom_ko: "VA01로 에스오(판매주문) 넣는데 크레딧 블록 걸려서 진행이 안 돼요"
+    symptom_ko_variants:
+      - "판매오더 크레딧 블록"
+      - "VA01 신용체크 걸림"
+      - "에스오 크레딧에 잡혔어요"
+      - "여신한도 넘어서 블록"
+    symptom_en: "VA01 sales order blocked by credit check"
+    likely_modules: [SD, FI]
+    first_check_tcodes: [VA01, FD32, VKM1, OVA8]
+    typical_causes:
+      - "고객 크레딧 한도 초과 (UKM_COMMITMENTS)"
+      - "신용 체크 룰 최근에 바뀜"
+      - "Credit Management 마이그레이션 진행 중 (FI-AR-CR → FSCM-CR)"
+    evidence_needed:
+      - { type: screenshot, target: "VA01 credit block message", priority: critical }
+      - { type: table_export, target: "FD32/UKM_CASE for customer", priority: high }
+    severity: medium
+    recurrence: common
+
+  # ═══════════════════════════════════════════════
+  # ABAP / Dumps (2건)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-st22-dump-in-production
+    symptom_ko: "프로덕션(PRD)에서 ABAP 덤프 뜨네요 (ST22)"
+    symptom_ko_variants:
+      - "운영계 덤프"
+      - "ST22 런타임 에러"
+      - "에스티이십이 잡혔어요"
+      - "프로덕션에서 런타임 에러"
+      - "덤프 났어요"
+    symptom_en: "ABAP runtime dump in production (ST22)"
+    symptom_de: "ABAP-Laufzeitfehler im Produktivsystem (ST22)"
+    symptom_ja: "本番環境でABAPランタイムダンプ発生 (ST22)"
+    likely_modules: [ABAP, BASIS]
+    first_check_tcodes: [ST22, SE24, SLG1, SM21]
+    typical_causes:
+      - "표준 기능 노트(SAP Note) 미적용 — SNOTE로 확인"
+      - "Z 커스텀 코드에서 null pointer / divide by zero"
+      - "DB 인컨시스턴시(index rebuild 필요할 수 있음)"
+      - "메모리 부족 — TSV_TNEW_PAGE_ALLOC_FAILED 계열"
+    evidence_needed:
+      - { type: dump_st22, target: "Full dump text", priority: critical }
+      - { type: system_log_sm21, target: "SM21 around dump time", priority: high }
+    severity: critical
+    recurrence: occasional
+
+  - id: sym-tsv-tnew-page-alloc
+    symptom_ko: "TSV_TNEW_PAGE_ALLOC_FAILED 덤프가 계속 떠요"
+    symptom_ko_variants:
+      - "TSV 덤프 반복"
+      - "TSV_TNEW 반복"
+      - "메모리 덤프 계속 떠요"
+      - "페이지 얼록 실패"
+    symptom_en: "Repeated TSV_TNEW_PAGE_ALLOC_FAILED dumps"
+    likely_modules: [ABAP, BASIS]
+    first_check_tcodes: [ST22, ST06, SM50, RZ10]
+    typical_causes:
+      - "인터널 테이블(internal table)에서 메모리 과다 사용 — 큰 SELECT 의심"
+      - "em/max_size_MB 프로파일 파라미터 부족"
+      - "abap/heap_area_dia 부족"
+    evidence_needed:
+      - { type: dump_st22, target: "TSV dump", priority: critical }
+      - { type: work_process_sm50, target: "SM50 during dump", priority: high }
+    severity: critical
+    recurrence: occasional
+    related_sap_notes: ["649327", "1612283"]
+
+  # ═══════════════════════════════════════════════
+  # BASIS — Transport, Authorization (2건)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-transport-import-failed
+    symptom_ko: "트포 임포트가 RC=8/12로 떨어져요 (STMS)"
+    symptom_ko_variants:
+      - "트랜스포트 임포트 실패"
+      - "STMS RC=8"
+      - "트포 안 올라가요"
+      - "TR 임포트 에러"
+      - "트포 떨어졌어요"
+    symptom_en: "STMS transport import failed (RC=8 or 12)"
+    likely_modules: [BASIS, ABAP]
+    first_check_tcodes: [STMS, SE09, SE10]
+    typical_causes:
+      - "크로스 트포 종속성(RC=8) — 이전 트포 먼저 올려야 함"
+      - "신택스 에러(RC=8) — 해당 트포의 코드 문제"
+      - "트포 순서가 뒤바뀐 경우 (E070/E071 확인)"
+      - "권한 부족(RC=12)"
+    evidence_needed:
+      - { type: screenshot, target: "STMS import log", priority: critical }
+      - { type: transaction_log, target: "SLOG import log text", priority: critical }
+    severity: high
+    recurrence: frequent
+
+  - id: sym-authorization-missing
+    symptom_ko: "T-code 실행하려는데 'You have no authorization' 떠요"
+    symptom_ko_variants:
+      - "권한 없음 에러"
+      - "롤 없어요"
+      - "T-code 권한 안 돼요"
+      - "노 오쏘라이제이션"
+      - "권한 튕겨요"
+    symptom_en: "T-code execution fails with 'You have no authorization'"
+    likely_modules: [BASIS]
+    first_check_tcodes: [SU53, PFCG, SUIM, SU01]
+    typical_causes:
+      - "롤(PFCG)에 S_TCODE 오브젝트가 안 들어있음"
+      - "컴포짓 롤(Composite Role)에서 서브롤 할당 누락"
+      - "Organizational Level(회사코드, 플랜트 등) 값이 안 맞음"
+      - "SU01에서 사용자 유효기간 만료"
+    evidence_needed:
+      - { type: screenshot, target: "SU53 after error", priority: critical }
+      - { type: screenshot, target: "PFCG role assignment", priority: high }
+    severity: medium
+    recurrence: frequent
+
+  # ═══════════════════════════════════════════════
+  # Performance (2건)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-tcode-slow-response
+    symptom_ko: "특정 T-code가 평소보다 현저히 느려요"
+    symptom_ko_variants:
+      - "T-code 느림"
+      - "화면 안 떠요 / 오래 걸려요"
+      - "리스폰스 느림"
+      - "응답 느려요"
+      - "특정 트랜잭션 느림"
+    symptom_en: "Specific T-code response time significantly degraded"
+    likely_modules: [BASIS, ABAP]
+    first_check_tcodes: [ST05, SAT, ST12, DB02, ST03N]
+    typical_causes:
+      - "DB 인덱스 누락이거나 통계가 stale — DB02/DBACOCKPIT 확인"
+      - "큰 테이블 풀 스캔 — ST05로 트레이스"
+      - "락 웨이트(Lock wait) — DB02/SM12 확인"
+      - "메모리 페이징 — ST06"
+    evidence_needed:
+      - { type: short_dump_trace, target: "ST05 or SAT trace", priority: critical }
+      - { type: screenshot, target: "ST03N workload", priority: medium }
+    severity: medium
+    recurrence: common
+
+  - id: sym-background-job-long-running
+    symptom_ko: "백그라운드 잡이 예상보다 오래 걸리거나 멈춰있어요"
+    symptom_ko_variants:
+      - "SM37 잡 안 끝남"
+      - "배치 잡 멈춤"
+      - "백그라운드 잡 행(hang)"
+      - "잡 돌다 멈췄어요"
+    symptom_en: "Background job running longer than expected or stuck"
+    likely_modules: [BASIS]
+    first_check_tcodes: [SM37, SM50, SM12, ST22]
+    typical_causes:
+      - "SM12에 락 웨이트가 잡혀있음"
+      - "외부 시스템 연동 대기 — RFC/HTTP 타임아웃"
+      - "ABAP 덤프 났는데 SM37에는 반영 안 됨"
+      - "데이터 볼륨이 평소보다 급증"
+    evidence_needed:
+      - { type: screenshot, target: "SM37 job log", priority: critical }
+      - { type: work_process_sm50, target: "SM50 WP snapshot", priority: high }
+    severity: medium
+    recurrence: common
+
+  # ═══════════════════════════════════════════════
+  # Korea-specific (1건)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-kr-etax-invoice-submission-failed
+    symptom_ko: "전자세금계산서 국세청 전송 실패해요 (EDOC_COCKPIT)"
+    symptom_ko_variants:
+      - "이택스 전송 실패"
+      - "전자세금계산서 Hometax 에러"
+      - "EDOC 코-핏 에러"
+      - "국세청 연동 안 돼요"
+      - "세금계산서 승인번호 안 떨어짐"
+    symptom_en: "Korean e-Tax Invoice submission to NTS failed"
+    likely_modules: [FI, BC]
+    first_check_tcodes: [EDOC_COCKPIT, SM59, STRUST, SLG1]
+    typical_causes:
+      - "STRUST 인증서 만료 또는 체인 누락"
+      - "SM59 RFC 데스티네이션 접속 실패 — 국세청 Hometax 쪽"
+      - "세금계산서 포맷 불일치 (승인번호 체계 바뀐 경우)"
+      - "공인인증서 갱신하고 사설 키(PSE) 전환 안 된 경우"
+    evidence_needed:
+      - { type: screenshot, target: "EDOC_COCKPIT error detail", priority: critical }
+      - { type: transaction_log, target: "SLG1 EDOC_KR logs", priority: critical }
+      - { type: screenshot, target: "STRUST certificate chain", priority: high }
+    localized_checks:
+      kr:
+        - "국세청 Hometax 점검 시간 (일 03:00-04:00 KST) 확인"
+        - "사업자등록번호 (STCD1) 10자리 유효성"
+        - "RFC Destination 사설 키 경로 (PSE) 확인"
+    severity: critical
+    recurrence: occasional
+
+  # ═══════════════════════════════════════════════
+  # Integration (1건)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-idoc-processing-failure
+    symptom_ko: "아이독 상태 51(Application Error)이 왕창 쌓이고 있어요"
+    symptom_ko_variants:
+      - "IDoc 51 다수 발생"
+      - "아이독 처리 실패"
+      - "WE02에 51 쌓임"
+      - "아이독 쌓여요"
+      - "IDoc 어플리케이션 에러"
+    symptom_en: "Multiple IDocs in status 51 (Application Error)"
+    likely_modules: [BASIS, FI, SD, MM]
+    first_check_tcodes: [WE02, WE19, BD87, SM58]
+    typical_causes:
+      - "파트너 프로파일(WE20) 세팅 누락"
+      - "수신 쪽 마스터 데이터 부재 — 벤더·자재·고객 등록 확인"
+      - "포트(WE21) 설정 오류"
+      - "커스텀 펑션 모듈 런타임 에러"
+    evidence_needed:
+      - { type: screenshot, target: "WE02 error detail", priority: critical }
+      - { type: transaction_log, target: "Affected IDoc XML", priority: critical }
+    severity: high
+    recurrence: common
+
+meta:
+  total: 20
+  languages: [ko, en, de, ja]
+  language_coverage:
+    ko: 20         # 전체 (원본)
+    en: 20         # 전체
+    de: 3          # F110, MIGO, ST22 (시드 — 커뮤니티 확장 대상)
+    ja: 3          # 동일
+  coverage:
+    FI: 5
+    MM: 3
+    SD: 2
+    BASIS: 4
+    ABAP: 2
+    TR: 2
+    BC: 2
+  localization_consultants_planned:
+    kr: present (built-in)
+    de: planned v1.7 (sap-de-localization-consultant)
+    us: planned v1.7 (sap-us-sox-consultant)
+    jp: planned v1.7 (sap-jp-localization-consultant)
+  notes: |
+    이 인덱스는 v1.5.0 dog-food 용 초기 시드입니다. 실제 운영 케이스를 수집하면서
+    반기마다 증상 엔트리를 확장할 예정입니다.
+
+    v1.5.0에서 de/ja는 **3개 엔트리에만 시드**되었습니다. 나머지 17개 엔트리의
+    de/ja 번역은 커뮤니티 컨트리뷰션 대상입니다. 번역 가이드: docs/i18n/symptom-index.md.
+
+    매칭 알고리즘은 web/triage.js와 sap-session-start에서 독립적으로 구현되지만
+    둘 다 같은 결과를 내야 합니다. 매칭은 fuzzy — tokenize + n-gram 유사도 기본.
+    symptom_{lang}가 없으면 symptom_en으로 자동 폴백합니다.

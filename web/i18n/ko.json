@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "lang": "ko",
+    "name": "한국어",
+    "flag": "🇰🇷",
+    "completeness": 1.0
+  },
+  "triage": {
+    "title": "sapstack Triage",
+    "tagline": "증상을 적어주세요 · 1차 진단 힌트 + 운영자 에스컬레이션",
+    "step1_title": "언어 & 지역",
+    "step1_lang": "언어",
+    "step1_country": "국가 (로컬라이제이션)",
+    "step2_title": "증상을 설명해주세요",
+    "step2_hint": "어떤 화면에서 무엇을 하려고 할 때, 어떤 메시지가 나왔는지를 <strong>간단하게 한 문단</strong>으로 적어주세요. SAP 용어를 몰라도 괜찮습니다.",
+    "step2_placeholder": "예: F110 돌렸는데 벤더 100234 하나만 No valid payment method 뜨네요. 어제까진 멀쩡했어요.",
+    "step2_quick_label": "빠른 예시:",
+    "step2_submit": "진단 힌트 받기 →",
+    "step3_title": "매칭된 증상",
+    "step3_summary_n": "{n}개 증상이 매칭되었습니다. 가장 관련 있는 순서로 정렬되어 있습니다.",
+    "step3_no_match": "매칭된 증상이 없습니다.",
+    "step3_no_match_help": "그래도 도움이 필요하시죠? 아래 4단계에서 운영자에게 증상을 그대로 전달할 수 있습니다.",
+    "step4_title": "운영자에게 에스컬레이션",
+    "step4_hint": "위 진단으로 해결이 어렵다면, 운영자에게 세션 시작 페이로드를 전달하세요. 이 포털은 SAP 시스템에 직접 연결하지 않습니다.",
+    "step4_payload_label": "운영자에게 복사해 전달할 페이로드",
+    "step4_copy": "📋 클립보드에 복사",
+    "step4_download": "💾 .md 파일로 저장",
+    "step4_privacy": "🔒 <strong>개인정보 주의</strong>: 페이로드에 주민번호·카드번호·비밀번호가 포함되지 않았는지 복사 전 확인하세요.",
+    "copied_ok": "✅ 복사 완료",
+    "confidence_label": "신뢰도",
+    "confidence_high": "높음",
+    "confidence_medium": "중간",
+    "confidence_low": "낮음",
+    "card_escalate": "→ 이 증상으로 운영자 에스컬레이션",
+    "card_localized_label": "지역 특화 체크",
+    "warn_empty_symptom": "증상을 한 문장 이상 입력해주세요."
+  },
+  "session_viewer": {
+    "title": "sapstack Session Viewer",
+    "tagline": "Evidence Loop 세션 상태를 읽기 전용으로 공유",
+    "load_title": "세션 상태 파일 열기",
+    "load_hint": "운영자가 공유해준 <code>state.yaml</code> 파일을 드래그하거나 파일 선택 버튼을 누르세요.",
+    "drop_zone_text": "state.yaml을 여기에 드래그하거나",
+    "file_select": "파일 선택",
+    "demo_label": "또는 데모 세션:",
+    "demo_button": "F110 dog-food 시나리오 열기",
+    "timeline_title": "Turn 타임라인",
+    "hypotheses_title": "가설 & 판정",
+    "verdicts_title": "Verdict & Fix/Rollback",
+    "audit_title": "Audit Trail"
+  }
+}

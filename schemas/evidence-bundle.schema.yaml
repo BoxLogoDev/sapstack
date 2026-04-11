@@ -1,0 +1,215 @@
+# schemas/evidence-bundle.schema.yaml
+# Evidence Bundle — 운영자가 한 번에 수집/업로드하는 증거 모음
+#
+# 목적:
+#   Evidence Loop의 입력 규약. Turn 1(Intake)과 Turn 3(Collect)에서
+#   운영자가 업로드하는 "한 덩어리의 증거"를 정의한다.
+#
+# 관련 파일:
+#   - schemas/session-state.schema.yaml  (세션이 여러 Bundle을 순서대로 담음)
+#   - schemas/followup-request.schema.yaml  (AI가 "다음 Bundle에 포함할 것" 요청)
+#
+# 설계 원칙:
+#   1. 라이브 접근 가정 없음 — 모든 데이터는 사람이 가져온 것
+#   2. 출처(source)는 반드시 명시 — 나중에 감사 추적 가능해야 함
+#   3. 개인정보·민감정보 필드는 redacted 플래그로 마킹
+#   4. 파일은 상대 경로로 참조 (.sapstack/sessions/{id}/files/ 하위)
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://boxlogodev.github.io/sapstack/schemas/evidence-bundle.schema.yaml"
+title: "Evidence Bundle"
+description: "A single operator-submitted batch of SAP evidence for one turn of an Evidence Loop session"
+type: object
+required: [bundle_id, session_id, turn_number, collected_at, collected_by, items]
+additionalProperties: false
+
+properties:
+  bundle_id:
+    type: string
+    pattern: "^evb-[0-9]{8}-[a-z0-9]{6}$"
+    description: "Unique bundle id, e.g. evb-20260411-a7k3qz"
+
+  session_id:
+    type: string
+    pattern: "^sess-[0-9]{8}-[a-z0-9]{6}$"
+    description: "Parent session id"
+
+  turn_number:
+    type: integer
+    minimum: 1
+    description: "Which turn of the loop this bundle belongs to (1-based)"
+
+  collected_at:
+    type: string
+    format: date-time
+    description: "ISO 8601 timestamp when the operator finished collecting this bundle"
+
+  collected_by:
+    type: object
+    required: [role]
+    properties:
+      role:
+        type: string
+        enum: [end_user, operator, consultant, basis, auditor]
+        description: "Who collected this evidence. end_user triggers extra redaction policy."
+      handle:
+        type: string
+        description: "Optional handle/alias — no real names, org policy dependent"
+      sap_user_redacted:
+        type: boolean
+        default: true
+        description: "If true, any SY-UNAME values inside items must be masked"
+
+  sap_context:
+    type: object
+    description: "SAP environment profile this evidence belongs to. Matches .sapstack/config.yaml"
+    properties:
+      release:
+        type: string
+        enum: [ECC6_EhP7, ECC6_EhP8, S4_2020, S4_2021, S4_2022, S4_2023, S4_2024, RISE, PublicCloud, Unknown]
+      deployment:
+        type: string
+        enum: [on_premise, private_cloud, public_cloud, unknown]
+      client:
+        type: string
+        pattern: "^[0-9]{3}$"
+        description: "SAP client, e.g. 100, 200, 300"
+      company_code:
+        type: string
+        description: "Do NOT hardcode in skills — but operators may specify here for routing"
+      country_iso:
+        type: string
+        pattern: "^[a-z]{2}$"
+        description: "ISO 3166-1 alpha-2 for localization routing (kr, de, us, jp, ...)"
+      language:
+        type: string
+        enum: [ko, en, de, ja, zh, vi, id, fr, es]
+        default: ko
+
+  items:
+    type: array
+    minItems: 1
+    maxItems: 50
+    description: "Individual evidence items — screenshots, table dumps, logs, messages"
+    items:
+      $ref: "#/$defs/EvidenceItem"
+
+  notes:
+    type: string
+    maxLength: 4000
+    description: "Free-text note from the collector — what they tried, what happened"
+
+$defs:
+  EvidenceItem:
+    type: object
+    required: [item_id, kind, source]
+    additionalProperties: false
+    properties:
+      item_id:
+        type: string
+        pattern: "^evi-[0-9]{3}$"
+        description: "Sequential id inside the bundle, e.g. evi-001"
+
+      kind:
+        type: string
+        enum:
+          - screenshot          # PNG/JPG of SAP GUI or Fiori
+          - table_export        # SE16N / custom ALV export (CSV/XLSX)
+          - transaction_log     # F110/MIGO/MIRO execution log
+          - dump_st22           # Runtime dump ST22 text
+          - system_log_sm21     # SM21 excerpt
+          - work_process_sm50   # SM50 snapshot
+          - short_dump_trace    # ST05/SAT trace
+          - fiori_page_html     # Fiori HTML source (browser save-as)
+          - message_text        # Error/warning message copy-paste
+          - email_thread        # Ticket/email thread (ServiceNow/Jira)
+          - custom_note         # Operator's free-text observation
+        description: "Type of evidence — drives downstream parsing"
+
+      source:
+        type: object
+        required: [type]
+        properties:
+          type:
+            type: string
+            enum: [tcode, table, report, fiori_app, ticket, screenshot_tool, other]
+          tcode:
+            type: string
+            description: "e.g. F110, SE16N, ST22 — validated against data/tcodes.yaml"
+          table:
+            type: string
+            description: "e.g. BKPF, MSEG, VBAK"
+          fiori_app_id:
+            type: string
+            description: "e.g. F0022 (Manage Journal Entries)"
+          ticket_id:
+            type: string
+          url:
+            type: string
+            description: "Internal ticketing URL — never an SAP backend URL"
+
+      path:
+        type: string
+        description: "Relative path inside .sapstack/sessions/{id}/files/ — never absolute"
+        pattern: "^[a-zA-Z0-9._/-]+$"
+
+      inline_content:
+        type: string
+        maxLength: 20000
+        description: "For small text items (dumps, messages) — embedded instead of file"
+
+      content_hash:
+        type: string
+        pattern: "^sha256:[a-f0-9]{64}$"
+        description: "SHA-256 of file content or inline_content for integrity"
+
+      redacted_fields:
+        type: array
+        items: { type: string }
+        description: "List of field names that were masked before submission (e.g. SY-UNAME, BUKRS)"
+
+      captured_at:
+        type: string
+        format: date-time
+
+      tags:
+        type: array
+        items: { type: string }
+        description: "Free-form tags e.g. ['f110', 'proposal-stage', 'krw']"
+
+# ─────────────────────────────────────────────────────────────
+# Example (informational, not validated):
+#
+# bundle_id: evb-20260411-a7k3qz
+# session_id: sess-20260411-m2p9xt
+# turn_number: 1
+# collected_at: 2026-04-11T09:22:15+09:00
+# collected_by:
+#   role: operator
+#   sap_user_redacted: true
+# sap_context:
+#   release: S4_2022
+#   deployment: on_premise
+#   client: "100"
+#   country_iso: kr
+#   language: ko
+# items:
+#   - item_id: evi-001
+#     kind: transaction_log
+#     source: { type: tcode, tcode: F110 }
+#     inline_content: |
+#       Run 2026-04-11 / Identification KR01
+#       Status: Proposal run ended with errors
+#       Error: No valid payment method found for vendor 100234
+#     captured_at: 2026-04-11T09:20:00+09:00
+#     tags: [f110, proposal-failed]
+#   - item_id: evi-002
+#     kind: table_export
+#     source: { type: table, table: LFB1 }
+#     path: files/lfb1-vendor-100234.csv
+#     content_hash: sha256:3f2a...e9
+#     redacted_fields: [STCD1, STCD2]
+# notes: |
+#   월마감 직전 정기 F110 실행. 어제까지 정상이었음.
+#   벤더 100234 하나만 실패, 나머지 147건은 정상.
+# ─────────────────────────────────────────────────────────────

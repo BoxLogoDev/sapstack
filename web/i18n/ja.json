@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "lang": "ja",
+    "name": "日本語",
+    "flag": "🇯🇵",
+    "completeness": 0.15,
+    "notes": "Seed translation — contributions welcome. Missing keys fall back to en.json."
+  },
+  "triage": {
+    "title": "sapstack トリアージ",
+    "tagline": "症状を記入してください · 一次診断ヒント + 運用者へのエスカレーション",
+    "step1_title": "言語と地域",
+    "step1_lang": "言語",
+    "step1_country": "国 (ローカライズ)",
+    "step2_title": "症状を説明してください",
+    "step2_submit": "診断ヒントを取得 →",
+    "step3_title": "一致した症状",
+    "step4_title": "運用者へエスカレーション",
+    "step4_copy": "📋 クリップボードにコピー",
+    "copied_ok": "✅ コピー完了",
+    "confidence_label": "信頼度",
+    "confidence_high": "高",
+    "confidence_medium": "中",
+    "confidence_low": "低"
+  },
+  "session_viewer": {
+    "title": "sapstack セッションビューア",
+    "tagline": "Evidence Loop セッションを読み取り専用で共有"
+  }
+}

@@ -1,0 +1,187 @@
+# schemas/hypothesis.schema.yaml
+# Hypothesis — AI가 현재 증거로부터 도출한 "이게 원인일 가능성" 한 덩어리
+#
+# 설계 원칙:
+#   1. Falsifiability 강제 — 각 가설은 "어떤 관찰이 나오면 기각되는지" 반드시 명시
+#   2. Confidence는 0.0~1.0 연속값 + 3단계 카테고리 중복 표시 (운영자 가독성)
+#   3. 하나의 Hypothesis는 반드시 다음 Follow-up Request에 매핑되어야 함
+#   4. 증거와의 연결은 evidence_refs로 추적 — 어느 bundle의 어느 item이 근거인지
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://boxlogodev.github.io/sapstack/schemas/hypothesis.schema.yaml"
+title: "Hypothesis"
+description: "A single falsifiable explanation the AI proposes for the observed SAP issue"
+type: object
+required: [hypothesis_id, session_id, turn_number, statement, confidence, confidence_tier, falsification_evidence]
+additionalProperties: false
+
+properties:
+  hypothesis_id:
+    type: string
+    pattern: "^h-[0-9]{3}$"
+    description: "Sequential within a session (h-001, h-002, ...)"
+
+  session_id:
+    type: string
+    pattern: "^sess-[0-9]{8}-[a-z0-9]{6}$"
+
+  turn_number:
+    type: integer
+    minimum: 2
+    description: "Hypotheses are born in Hypothesis turns (2, 4, 6, ...)"
+
+  parent_hypothesis_id:
+    type: string
+    pattern: "^h-[0-9]{3}$"
+    description: "If this is a refinement of a previous hypothesis after partial verification"
+
+  statement:
+    type: string
+    maxLength: 500
+    description: |
+      The causal claim in one paragraph, operator-facing.
+      Must be a concrete, technical statement — not vague.
+      BAD:  "벤더 설정 문제일 수 있음"
+      GOOD: "벤더 100234의 LFB1.ZWELS(지급방법)이 공란 — F110이 지급방법을 결정하지 못해 Proposal 단계에서 실패"
+
+  technical_chain:
+    type: array
+    description: "Step-by-step causal chain: ['A causes B', 'B causes C', ...]"
+    items:
+      type: string
+      maxLength: 300
+    minItems: 1
+    maxItems: 8
+
+  confidence:
+    type: number
+    minimum: 0.0
+    maximum: 1.0
+    description: "Bayesian-ish confidence based on current evidence (0 = refuted, 1 = certain)"
+
+  confidence_tier:
+    type: string
+    enum: [high, medium, low]
+    description: "Operator-facing tier. high >= 0.7, medium 0.4-0.7, low < 0.4"
+
+  impacted_modules:
+    type: array
+    items:
+      type: string
+      enum: [FI, CO, TR, MM, SD, PP, HCM, SFSF, ABAP, BASIS, BC, GTS, BTP, S4MIG]
+    description: "SAP modules this hypothesis touches — drives which consultants to involve"
+
+  impacted_areas:
+    type: array
+    items: { type: string }
+    description: "Free-form tags e.g. ['payment-run', 'vendor-master', 'korean-bank-format']"
+
+  evidence_refs:
+    type: array
+    description: "Bundle items this hypothesis is based on"
+    items:
+      type: object
+      required: [bundle_id, item_id, interpretation]
+      properties:
+        bundle_id: { type: string, pattern: "^evb-[0-9]{8}-[a-z0-9]{6}$" }
+        item_id: { type: string, pattern: "^evi-[0-9]{3}$" }
+        interpretation:
+          type: string
+          maxLength: 300
+          description: "How this item supports the hypothesis — AI's reading of the evidence"
+
+  falsification_evidence:
+    type: array
+    minItems: 1
+    description: |
+      MANDATORY. What observation would REFUTE this hypothesis?
+      This is the Popperian guard against self-deception.
+      Each entry should be something a follow-up check can actually observe.
+    items:
+      type: object
+      required: [if_observed, then]
+      properties:
+        if_observed:
+          type: string
+          maxLength: 300
+          description: "Observable fact, e.g. 'LFB1.ZWELS has value T'"
+        then:
+          type: string
+          enum: [refute, weaken, confirm, strengthen]
+          description: "Effect on this hypothesis"
+
+  related_sap_notes:
+    type: array
+    items:
+      type: string
+      description: "SAP Note IDs from data/sap-notes.yaml, e.g. '2932027'"
+
+  related_tcodes:
+    type: array
+    items: { type: string }
+    description: "T-codes from data/tcodes.yaml that are relevant"
+
+  consultant_agents_to_involve:
+    type: array
+    items:
+      type: string
+      enum:
+        - sap-fi-consultant
+        - sap-co-consultant
+        - sap-mm-consultant
+        - sap-sd-consultant
+        - sap-pp-analyzer
+        - sap-abap-reviewer
+        - sap-basis-troubleshooter
+        - sap-s4-migration-advisor
+        - sap-integration-advisor
+    description: "Which existing sapstack subagents should be invoked for deeper analysis"
+
+  status:
+    type: string
+    enum: [proposed, under_verification, confirmed, refuted, superseded]
+    default: proposed
+
+  status_reason:
+    type: string
+    description: "Why the hypothesis moved to its current status"
+
+  localization_notes:
+    type: object
+    description: "Country-specific angles on this hypothesis"
+    additionalProperties:
+      type: string
+    # Example: { kr: "한국 은행 코드는 IBAN 불필요", de: "ELSTER reporting unaffected" }
+
+# ─────────────────────────────────────────────────────────────
+# Example (informational):
+#
+# hypothesis_id: h-001
+# session_id: sess-20260411-m2p9xt
+# turn_number: 2
+# statement: |
+#   벤더 100234의 LFB1.ZWELS(지급방법) 필드가 공란이어서,
+#   F110 Proposal 단계에서 "No valid payment method" 에러로 실패.
+# technical_chain:
+#   - "F110 Proposal은 LFB1-ZWELS를 읽어 지급방법 후보를 결정"
+#   - "ZWELS가 공란이면 Bank Determination 이전 단계에서 드롭됨"
+#   - "에러 메시지 'No valid payment method found for vendor'가 출력됨"
+# confidence: 0.75
+# confidence_tier: high
+# impacted_modules: [FI, TR]
+# impacted_areas: [payment-run, vendor-master]
+# evidence_refs:
+#   - bundle_id: evb-20260411-a7k3qz
+#     item_id: evi-001
+#     interpretation: "F110 로그에 'No valid payment method' 에러가 명시됨"
+# falsification_evidence:
+#   - if_observed: "LFB1.ZWELS에 값 'T' 또는 다른 문자 존재"
+#     then: refute
+#   - if_observed: "다른 벤더들도 같은 에러를 냄"
+#     then: weaken
+# related_tcodes: [F110, XK03, FBZP]
+# consultant_agents_to_involve: [sap-fi-consultant]
+# status: proposed
+# localization_notes:
+#   kr: "한국 벤더는 IBAN 대신 은행코드+계좌번호. ZWELS가 'T'(이체)이어야 정상"
+# ─────────────────────────────────────────────────────────────

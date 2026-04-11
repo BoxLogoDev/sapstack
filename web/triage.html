@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sapstack — 증상 셀프 트리아지</title>
+  <meta name="description" content="SAP 사용 중 발생한 증상을 기록하고 1차 진단 힌트를 받습니다. 해결이 어려우면 운영자에게 에스컬레이션.">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./triage.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>
+        <span class="logo">🩺</span>
+        sapstack Triage
+      </h1>
+      <p class="tagline">증상을 적어주세요 · 1차 진단 힌트 + 운영자 에스컬레이션</p>
+      <nav>
+        <a href="./index.html">Note Resolver</a>
+        <a href="./session.html">세션 조회</a>
+        <a href="https://github.com/BoxLogoDev/sapstack">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Step 1: 언어/국가 선택 -->
+    <section class="triage-step" id="step-locale">
+      <h2><span class="step-badge">1</span> 언어 & 지역</h2>
+      <div class="locale-row">
+        <label>
+          <span>언어</span>
+          <select id="lang-select">
+            <option value="ko" selected>🇰🇷 한국어</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="de" disabled>🇩🇪 Deutsch (v1.6)</option>
+            <option value="ja" disabled>🇯🇵 日本語 (v1.6)</option>
+          </select>
+        </label>
+        <label>
+          <span>국가 (로컬라이제이션)</span>
+          <select id="country-select">
+            <option value="kr" selected>🇰🇷 대한민국</option>
+            <option value="de">🇩🇪 독일</option>
+            <option value="us">🇺🇸 미국</option>
+            <option value="jp">🇯🇵 일본</option>
+            <option value="none">- 지정 안 함 -</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <!-- Step 2: 증상 입력 -->
+    <section class="triage-step" id="step-symptom">
+      <h2><span class="step-badge">2</span> 증상을 설명해주세요</h2>
+      <p class="hint">
+        어떤 화면에서 무엇을 하려고 할 때, 어떤 메시지가 나왔는지를
+        <strong>간단하게 한 문단</strong>으로 적어주세요. SAP 용어를 몰라도 괜찮습니다.
+      </p>
+      <textarea
+        id="symptom-text"
+        rows="5"
+        placeholder="예: F110 돌렸는데 벤더 100234 하나만 No valid payment method 뜨네요. 어제까진 멀쩡했어요."
+      ></textarea>
+      <div class="quick-hints">
+        <span class="label">빠른 예시:</span>
+        <button class="example-chip" data-text="F110 돌렸는데 'No valid payment method' 뜨는 벤더가 있어요">F110 페이먼트 메소드 에러</button>
+        <button class="example-chip" data-text="미고에서 입고 치는데 M7 에러 뜨고 포스팅이 안 돼요">MIGO 포스팅 에러</button>
+        <button class="example-chip" data-text="월마감 D+3인데 OB52 열어둔 기간인데도 전표가 튕겨요">OB52 피리어드 이슈</button>
+        <button class="example-chip" data-text="ST22에 TSV_TNEW_PAGE_ALLOC_FAILED 덤프가 계속 떠요">ST22 TSV 덤프 반복</button>
+        <button class="example-chip" data-text="전자세금계산서 국세청 전송이 실패해요 (EDOC_COCKPIT)">전자세금계산서 전송 실패</button>
+        <button class="example-chip" data-text="트포 임포트가 RC=8로 떨어졌어요">트포 임포트 RC=8</button>
+      </div>
+      <button id="triage-submit" class="primary-btn">진단 힌트 받기 →</button>
+    </section>
+
+    <!-- Step 3: 결과 -->
+    <section class="triage-step" id="step-results" hidden>
+      <h2><span class="step-badge">3</span> 매칭된 증상</h2>
+      <div id="results-summary" class="results-summary"></div>
+      <div id="results-list"></div>
+    </section>
+
+    <!-- Step 4: 에스컬레이션 -->
+    <section class="triage-step" id="step-escalation" hidden>
+      <h2><span class="step-badge">4</span> 운영자에게 에스컬레이션</h2>
+      <p class="hint">
+        위 진단으로 해결이 어렵다면, 운영자에게 세션 시작 페이로드를 전달하세요.
+        이 포털은 SAP 시스템에 직접 연결하지 않습니다 — 운영자가 Claude Code의
+        <code>/sap-session-start</code> 커맨드로 세션을 시작합니다.
+      </p>
+      <div class="escalation-box">
+        <label for="handoff-payload">운영자에게 복사해 전달할 페이로드</label>
+        <textarea id="handoff-payload" rows="12" readonly></textarea>
+        <div class="escalation-actions">
+          <button id="copy-payload" class="primary-btn">📋 클립보드에 복사</button>
+          <button id="download-payload" class="secondary-btn">💾 .md 파일로 저장</button>
+        </div>
+        <p class="privacy-note">
+          🔒 <strong>개인정보 주의</strong>: 페이로드에 주민번호·카드번호·비밀번호가
+          포함되지 않았는지 복사 전 확인하세요. sapstack은 증상 텍스트를 외부로
+          전송하지 않으며, 모든 매칭은 브라우저 안에서 수행됩니다.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <p>
+        <strong>원본 데이터</strong>: <code>data/symptom-index.yaml</code> ·
+        <strong>라이선스</strong>: MIT ·
+        <strong>버전</strong>: v1.5.0
+      </p>
+      <p class="warning">
+        ⚠️ 이 포털은 <strong>참조·에스컬레이션 도구</strong>입니다. SAP 시스템과 직접
+        연결되지 않으며, 모든 분석은 당신의 브라우저 안에서 로컬로 수행됩니다.
+      </p>
+    </footer>
+  </main>
+
+  <script src="./triage.js"></script>
+</body>
+</html>

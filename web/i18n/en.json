@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "lang": "en",
+    "name": "English",
+    "flag": "🇬🇧",
+    "completeness": 1.0
+  },
+  "triage": {
+    "title": "sapstack Triage",
+    "tagline": "Describe the symptom · First-pass hints + operator escalation",
+    "step1_title": "Language & Region",
+    "step1_lang": "Language",
+    "step1_country": "Country (localization)",
+    "step2_title": "Describe the symptom",
+    "step2_hint": "Write <strong>a short paragraph</strong> about what you were trying to do, and what message appeared. You don't need to know SAP terminology.",
+    "step2_placeholder": "Example: Ran F110 payment run, vendor 100234 alone failed with 'No valid payment method'. Was working yesterday.",
+    "step2_quick_label": "Quick examples:",
+    "step2_submit": "Get diagnostic hints →",
+    "step3_title": "Matched symptoms",
+    "step3_summary_n": "Found {n} matching symptoms, sorted by relevance.",
+    "step3_no_match": "No matching symptoms found.",
+    "step3_no_match_help": "Still need help? Use step 4 to forward your symptom to an operator as-is.",
+    "step4_title": "Escalate to operator",
+    "step4_hint": "If the hints above don't resolve your issue, forward the session-start payload to an operator. This portal does not connect to any SAP system.",
+    "step4_payload_label": "Payload to copy and share with the operator",
+    "step4_copy": "📋 Copy to clipboard",
+    "step4_download": "💾 Save as .md",
+    "step4_privacy": "🔒 <strong>Privacy notice</strong>: Before copying, verify the payload does not contain any personal IDs, card numbers, or passwords.",
+    "copied_ok": "✅ Copied",
+    "confidence_label": "Confidence",
+    "confidence_high": "high",
+    "confidence_medium": "medium",
+    "confidence_low": "low",
+    "card_escalate": "→ Escalate this symptom to an operator",
+    "card_localized_label": "Regional checks",
+    "warn_empty_symptom": "Please enter at least one sentence describing the symptom."
+  },
+  "session_viewer": {
+    "title": "sapstack Session Viewer",
+    "tagline": "Share Evidence Loop session state read-only",
+    "load_title": "Open session state file",
+    "load_hint": "Drag the <code>state.yaml</code> file shared by an operator or click the file picker button.",
+    "drop_zone_text": "Drag state.yaml here, or",
+    "file_select": "Pick file",
+    "demo_label": "Or demo session:",
+    "demo_button": "Open F110 dog-food scenario",
+    "timeline_title": "Turn timeline",
+    "hypotheses_title": "Hypotheses & verdicts",
+    "verdicts_title": "Verdict & Fix/Rollback",
+    "audit_title": "Audit trail"
+  }
+}

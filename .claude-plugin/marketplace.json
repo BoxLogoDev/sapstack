@@ -1,7 +1,7 @@
 {
   "name": "sapstack",
-  "version": "1.4.0",
-  "description": "SAP Operations Advisory Platform for 6 AI coding assistants — 14 modules, 9 subagents, 10 commands, 279 T-codes, 100% Korean, MCP-ready",
+  "version": "1.5.0",
+  "description": "SAP Operations Advisory Platform + Evidence Loop session manager — 15 plugins, 9 subagents, 13 commands, 279 T-codes, 20 symptoms, 58 synonyms, Korean field language layer, 7 AI tools (Claude Code, Codex CLI, Kiro IDE, Copilot, Cursor, Continue.dev, Aider), MCP-ready",
   "author": "BoxLogoDev",
   "license": "MIT",
   "repository": "https://github.com/BoxLogoDev/sapstack",
@@ -131,6 +131,17 @@
       "path": "plugins/sap-gts",
       "keywords": ["GTS","global trade","export","import","customs","HS code","HSK","sanctioned party","SPL","embargo","license","preference","FTA","KORUS","RCEP","UNI-PASS","관세청","수출","수입","수출신고","수입신고","HS코드","통관","원산지","Letter of Credit","L/C","KOSTI","전략물자"],
       "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-session",
+      "name": "SAP Evidence Loop Session (v1.5.0)",
+      "version": "0.1.0",
+      "description": "Turn-aware advisory sessions — hypothesis/verify loops without live SAP access. Orchestrates the other 14 plugins and 9 agents. Enables end-user web triage with operator escalation.",
+      "path": "plugins/sap-session",
+      "keywords": ["evidence-loop","session","hypothesis","verify","rollback","operator-workflow","cross-module","orchestration","human-in-the-loop","triage","escalation","turn-aware","end-user"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": true },
+      "stage": "experimental",
+      "depends_on": ["sap-fi","sap-co","sap-mm","sap-sd","sap-tr","sap-basis","sap-abap"]
     }
   ]
 }

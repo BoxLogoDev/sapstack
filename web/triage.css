@@ -1,0 +1,387 @@
+/* triage.css — sapstack 엔드유저 셀프 트리아지 포털 전용 스타일
+ * 기존 style.css를 베이스로 하고 triage 전용 요소만 추가
+ */
+
+/* Triage step sections */
+.triage-step {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.triage-step h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.15rem;
+  color: #f0f6fc;
+  margin-bottom: 1rem;
+}
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #238636;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.triage-step .hint {
+  color: #8b949e;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+/* Locale row */
+.locale-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.locale-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.locale-row label span {
+  font-size: 0.85rem;
+  color: #8b949e;
+}
+
+.locale-row select {
+  padding: 0.6rem 0.85rem;
+  background: #0d1117;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.locale-row select:focus {
+  border-color: #58a6ff;
+}
+
+.locale-row select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Symptom textarea */
+#symptom-text {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  background: #0d1117;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  line-height: 1.6;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: vertical;
+  min-height: 120px;
+}
+
+#symptom-text:focus {
+  border-color: #58a6ff;
+}
+
+/* Quick hint chips */
+.quick-hints {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.quick-hints .label {
+  font-size: 0.8rem;
+  color: #8b949e;
+  margin-right: 0.3rem;
+}
+
+.example-chip {
+  padding: 0.3rem 0.7rem;
+  background: #21262d;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  transition: all 0.15s;
+}
+
+.example-chip:hover {
+  background: #30363d;
+  border-color: #58a6ff;
+  color: #f0f6fc;
+}
+
+/* Buttons */
+.primary-btn {
+  margin-top: 1rem;
+  padding: 0.75rem 1.4rem;
+  background: #238636;
+  color: #ffffff;
+  border: 1px solid #2ea043;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.primary-btn:hover {
+  background: #2ea043;
+}
+
+.primary-btn:disabled {
+  background: #30363d;
+  border-color: #30363d;
+  cursor: not-allowed;
+  color: #8b949e;
+}
+
+.secondary-btn {
+  margin-top: 1rem;
+  padding: 0.75rem 1.4rem;
+  background: #21262d;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.secondary-btn:hover {
+  background: #30363d;
+  border-color: #58a6ff;
+}
+
+/* Results */
+.results-summary {
+  padding: 0.85rem 1rem;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #8b949e;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.results-summary strong {
+  color: #f0f6fc;
+}
+
+.symptom-card {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 1.1rem 1.2rem;
+  margin-bottom: 0.85rem;
+  transition: border-color 0.15s;
+}
+
+.symptom-card:hover {
+  border-color: #58a6ff;
+}
+
+.symptom-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.symptom-card-title {
+  color: #f0f6fc;
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.confidence-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.confidence-badge.high { background: #238636; color: #ffffff; }
+.confidence-badge.medium { background: #d29922; color: #0d1117; }
+.confidence-badge.low { background: #6e7681; color: #ffffff; }
+
+.symptom-meta {
+  font-size: 0.83rem;
+  color: #8b949e;
+  margin-bottom: 0.6rem;
+}
+
+.module-pill {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 3px;
+  color: #58a6ff;
+  font-family: 'SF Mono', monospace;
+  font-size: 0.75rem;
+  margin-right: 0.3rem;
+}
+
+.tcode-pill {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 3px;
+  color: #f0883e;
+  font-family: 'SF Mono', monospace;
+  font-size: 0.72rem;
+  margin-right: 0.25rem;
+}
+
+.typical-causes {
+  margin: 0.6rem 0 0.4rem;
+  padding-left: 1.2rem;
+  color: #c9d1d9;
+  font-size: 0.85rem;
+}
+
+.typical-causes li {
+  margin-bottom: 0.2rem;
+}
+
+.localized-checks {
+  margin-top: 0.6rem;
+  padding: 0.55rem 0.8rem;
+  background: #161b22;
+  border-left: 3px solid #f0883e;
+  border-radius: 2px;
+  font-size: 0.82rem;
+}
+
+.localized-checks-label {
+  color: #f0883e;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.localized-checks ul {
+  list-style: none;
+  padding-left: 0.6rem;
+}
+
+.localized-checks li::before {
+  content: "• ";
+  color: #f0883e;
+}
+
+.escalate-btn {
+  margin-top: 0.75rem;
+  padding: 0.45rem 0.9rem;
+  background: transparent;
+  color: #58a6ff;
+  border: 1px solid #58a6ff;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.escalate-btn:hover {
+  background: #58a6ff;
+  color: #0d1117;
+}
+
+/* Escalation box */
+.escalation-box {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 1rem 1.1rem;
+}
+
+.escalation-box label {
+  display: block;
+  font-size: 0.85rem;
+  color: #8b949e;
+  margin-bottom: 0.4rem;
+}
+
+#handoff-payload {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  background: #161b22;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.escalation-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.privacy-note {
+  margin-top: 0.9rem;
+  padding: 0.65rem 0.85rem;
+  background: #1c1f26;
+  border-left: 3px solid #d29922;
+  border-radius: 2px;
+  color: #c9d1d9;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.privacy-note strong {
+  color: #d29922;
+}
+
+/* No match */
+.no-match {
+  padding: 1.3rem;
+  text-align: center;
+  color: #8b949e;
+  background: #0d1117;
+  border: 1px dashed #30363d;
+  border-radius: 6px;
+}
+
+.no-match strong {
+  color: #f0f6fc;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .locale-row { flex-direction: column; }
+  .triage-step { padding: 1.1rem; }
+  .symptom-card-header { flex-direction: column; gap: 0.5rem; }
+  .escalation-actions { flex-direction: column; }
+  .escalation-actions button { width: 100%; }
+}

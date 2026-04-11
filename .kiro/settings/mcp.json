@@ -1,0 +1,43 @@
+{
+  "//": [
+    "sapstack MCP server registration for Kiro IDE (v1.5.0+)",
+    "",
+    "Purpose:",
+    "  Exposes sapstack's knowledge base and Evidence Loop session tools to Kiro.",
+    "  Works on a local sapstack clone — no live SAP connection is ever made.",
+    "",
+    "Prerequisites:",
+    "  1. Clone sapstack into your workspace (or as a submodule)",
+    "  2. cd sapstack/mcp && npm install && npm run build",
+    "  3. Save this file — Kiro auto-reconnects on save",
+    "",
+    "Auto-approval policy (Universal Rule #5 — simulate before production change):",
+    "  - Read-only tools are auto-approved for frictionless exploration",
+    "  - Write/mutation tools require manual confirmation every time",
+    "  - No wildcard '*' — defense in depth",
+    "",
+    "Environment variables:",
+    "  SAPSTACK_ROOT      — path to the sapstack repo (where plugins/, data/, schemas/ live)",
+    "  SAPSTACK_WORKSPACE — where .sapstack/sessions/ lives (usually same as workspace root)",
+    "  Adjust these if sapstack is a submodule — e.g. ${workspaceFolder}/sapstack"
+  ],
+  "mcpServers": {
+    "sapstack": {
+      "command": "node",
+      "args": ["${workspaceFolder}/sapstack/mcp/dist/server.js"],
+      "env": {
+        "SAPSTACK_ROOT": "${workspaceFolder}/sapstack",
+        "SAPSTACK_WORKSPACE": "${workspaceFolder}"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "resolve_sap_note",
+        "check_tcode",
+        "list_plugins",
+        "resolve_symptom",
+        "list_sessions"
+      ],
+      "disabledTools": []
+    }
+  }
+}

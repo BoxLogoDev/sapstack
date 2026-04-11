@@ -1,0 +1,252 @@
+# schemas/verdict.schema.yaml
+# Verdict — Verify 턴의 판정 결과
+#
+# 목적:
+#   Turn 4(Verify)의 산출물. 한 개 이상의 가설에 대해 확정/기각 판정을 내리고,
+#   확정된 경우 Fix + Rollback 플랜을 함께 제시한다.
+#
+# 강제 원칙:
+#   1. confirmed 상태가 되려면 반드시 fix_plan과 rollback_plan을 모두 포함해야 함
+#   2. Fix가 production change를 포함하면 reviewer_required 플래그가 true여야 함
+#   3. 관련 국가 로컬라이제이션 컨설턴트의 sign-off 필드 존재
+#   4. 세션은 Verdict가 나왔다고 바로 종료되지 않음 — 운영자 승인이 별도 단계
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://boxlogodev.github.io/sapstack/schemas/verdict.schema.yaml"
+title: "Verdict"
+description: "The outcome of a Verify turn: which hypotheses are confirmed/refuted, and the fix/rollback plans"
+type: object
+required: [verdict_id, session_id, turn_number, created_at, resolutions]
+additionalProperties: false
+
+properties:
+  verdict_id:
+    type: string
+    pattern: "^vdc-[0-9]{8}-[a-z0-9]{6}$"
+
+  session_id:
+    type: string
+    pattern: "^sess-[0-9]{8}-[a-z0-9]{6}$"
+
+  turn_number:
+    type: integer
+    minimum: 4
+    description: "Verdicts are produced in Verify turns (4, 6, 8, ...)"
+
+  created_at:
+    type: string
+    format: date-time
+
+  overall_state:
+    type: string
+    enum: [resolved, needs_next_loop, escalated, insufficient_evidence]
+    description: |
+      resolved: at least one hypothesis confirmed with fix/rollback plan
+      needs_next_loop: all proposed hypotheses refuted, AI emits new hypotheses
+      escalated: AI gives up, hands off to human consultant/basis
+      insufficient_evidence: operator could not collect enough, session paused
+
+  summary:
+    type: string
+    maxLength: 1000
+    description: "Operator-facing one-paragraph summary of the verdict"
+
+  resolutions:
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/Resolution"
+
+  next_turn_preview:
+    type: object
+    description: "If overall_state is needs_next_loop, what the next hypothesis turn will look at"
+    properties:
+      new_hypothesis_seeds:
+        type: array
+        items: { type: string }
+      additional_evidence_needed:
+        type: boolean
+
+  localization_signoffs:
+    type: array
+    description: "Country-specific consultants who reviewed this verdict"
+    items:
+      type: object
+      required: [country_iso, role, status]
+      properties:
+        country_iso: { type: string, pattern: "^[a-z]{2}$" }
+        role: { type: string }
+        status:
+          type: string
+          enum: [pending, signed_off, objected, not_applicable]
+        notes: { type: string }
+
+$defs:
+  Resolution:
+    type: object
+    required: [hypothesis_id, status]
+    additionalProperties: false
+    properties:
+      hypothesis_id:
+        type: string
+        pattern: "^h-[0-9]{3}$"
+
+      status:
+        type: string
+        enum: [confirmed, refuted, partial, inconclusive]
+
+      evidence_refs:
+        type: array
+        description: "Which evidence items (from later bundles) led to this verdict"
+        items:
+          type: object
+          properties:
+            bundle_id: { type: string, pattern: "^evb-[0-9]{8}-[a-z0-9]{6}$" }
+            item_id: { type: string, pattern: "^evi-[0-9]{3}$" }
+            finding:
+              type: string
+              maxLength: 300
+              description: "What we actually saw"
+
+      fix_plan:
+        type: object
+        description: "Required when status == confirmed. Step-by-step remediation."
+        required: [steps, reviewer_required]
+        properties:
+          audience:
+            type: string
+            enum: [end_user, operator, consultant, developer, basis]
+            description: "Who should execute the fix"
+          steps:
+            type: array
+            minItems: 1
+            items:
+              type: object
+              required: [step_number, description]
+              properties:
+                step_number: { type: integer, minimum: 1 }
+                description:
+                  type: string
+                  maxLength: 500
+                tcode: { type: string }
+                fiori_app: { type: string }
+                menu_path:
+                  type: string
+                  description: "Full SAP menu path — mandatory per Universal Rule #7"
+                simulation_first:
+                  type: boolean
+                  default: true
+                  description: "Per Universal Rule #5, production changes need simulation first"
+          reviewer_required:
+            type: boolean
+            description: |
+              true if the fix touches production config, master data, or transport.
+              When true, session cannot be closed until a named reviewer signs off.
+          transport_required:
+            type: boolean
+            description: "Per Universal Rule #4, any config change needs a transport"
+          transport_notes:
+            type: string
+          estimated_duration_minutes:
+            type: integer
+            minimum: 1
+
+      rollback_plan:
+        type: object
+        description: |
+          MANDATORY when status == confirmed and fix_plan exists.
+          No fix without rollback — that's a hard rule of sapstack.
+        required: [steps, trigger_conditions]
+        properties:
+          steps:
+            type: array
+            minItems: 1
+            items:
+              type: object
+              required: [step_number, description]
+              properties:
+                step_number: { type: integer, minimum: 1 }
+                description: { type: string, maxLength: 500 }
+                tcode: { type: string }
+                menu_path: { type: string }
+          trigger_conditions:
+            type: array
+            minItems: 1
+            description: "Observable conditions that tell the operator 'rollback now'"
+            items: { type: string }
+          max_rollback_window_minutes:
+            type: integer
+            description: "How long after fix application rollback is still safe"
+
+      prevention_plan:
+        type: object
+        description: "Optional. How to prevent recurrence."
+        properties:
+          recommendations:
+            type: array
+            items: { type: string }
+          monitoring_checks:
+            type: array
+            items:
+              type: object
+              properties:
+                name: { type: string }
+                frequency:
+                  type: string
+                  enum: [daily, weekly, monthly, quarterly, on_demand]
+                tcode: { type: string }
+
+      affected_sap_notes:
+        type: array
+        items: { type: string }
+
+# ─────────────────────────────────────────────────────────────
+# Example: F110 vendor payment method missing
+#
+# verdict_id: vdc-20260411-c4n8qw
+# session_id: sess-20260411-m2p9xt
+# turn_number: 4
+# created_at: 2026-04-11T10:05:00+09:00
+# overall_state: resolved
+# summary: |
+#   H1(벤더 LFB1.ZWELS 공란) 확정. 검증 Bundle의 CSV에서 ZWELS가 실제 비어있음을 확인.
+#   Fix: XK02로 지급방법 'T'(이체) 등록. Rollback: 변경 전 값이 공란이었으므로 XK02에서 다시 공란 저장.
+# resolutions:
+#   - hypothesis_id: h-001
+#     status: confirmed
+#     evidence_refs:
+#       - bundle_id: evb-20260411-d9p2xr
+#         item_id: evi-003
+#         finding: "LFB1 row BUKRS=1000 LIFNR=100234 ZWELS=(empty)"
+#     fix_plan:
+#       audience: operator
+#       steps:
+#         - step_number: 1
+#           description: "XK02 → 벤더 100234 → 회사코드 1000 → Payment transactions → ZWELS='T' 입력"
+#           tcode: XK02
+#           menu_path: "Accounting → Financial accounting → Accounts payable → Master records → Change"
+#           simulation_first: false
+#       reviewer_required: true
+#       transport_required: false
+#     rollback_plan:
+#       steps:
+#         - step_number: 1
+#           description: "XK02 → 벤더 100234 → 회사코드 1000 → ZWELS 공란 저장"
+#           tcode: XK02
+#       trigger_conditions:
+#         - "F110 재실행 시 다른 에러 발생"
+#         - "벤더 100234 원천세 계산 오류"
+#       max_rollback_window_minutes: 60
+#     prevention_plan:
+#       recommendations:
+#         - "벤더 마스터 생성 시 ZWELS 필수 입력 validation 추가 (OMSG)"
+#       monitoring_checks:
+#         - name: "매주 LFB1 ZWELS 공란 검사"
+#           frequency: weekly
+#           tcode: SE16N
+# localization_signoffs:
+#   - country_iso: kr
+#     role: sap-fi-consultant
+#     status: signed_off
+#     notes: "한국 은행 이체는 ZWELS='T' 적절"
+# ─────────────────────────────────────────────────────────────

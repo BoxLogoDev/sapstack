@@ -5,6 +5,193 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-04-12
+
+### Theme
+**"Evidence Loop — from advisor to diagnostic partner"** — sapstack이 단발
+조언봇에서 **턴 인식 진단 파트너**로 전환되는 릴리스. 라이브 SAP 접근 없이도
+Human-in-the-loop 비동기 루프가 동작하며, 엔드유저 셀프 트리아지 웹 포털
+(Surface C)이 추가되어 처음으로 **운영자 외 사용자에게 도달**한다.
+동시에 **한국 SAP 현장체 언어 레이어**를 도입해 "번역체" 대신 실제 발화
+스타일로 작성·매칭한다.
+
+### Added — Korean Field Language Layer (Slice 8)
+- **`data/synonyms.yaml`** — 58 용어 + 10 약어 + 15 업무 시점 표기 동의어 사전
+  - FI 20 / CO 8 / MM 12 / SD 10 / BASIS 8
+  - 각 엔트리에 ko.primary + ko.variants + en + de + ja + field_forms
+  - 예: "코스트 센터" = ["코스트센터", "원가센터", "CC", "KOSTL", "Cost Center"]
+- **`data/tcode-pronunciation.yaml`** — 41개 핵심 T-code의 한국어 현장 발음
+  ("에프백십" = F110, "엠아이고" = MIGO, "에스이십육엔" = SE16N)
+- **`plugins/sap-session/.../references/korean-field-language.md`** — 4개 원칙
+  (이중 병기, 발화체 수용, 약어 정착성, 업무 시점 표기) + 금기 표현 리스트
+- **`CLAUDE.md` Universal Rule #8** — "Use field language, not dictionary Korean"
+  - 첫 등장 이중 병기, 발화체 수용, T-code·약어 원형 유지, D-1·월마감 D+3
+- **매칭 엔진 synonym 확장** (triage.js + mcp/server.ts)
+  - 쿼리 토큰을 canonical로 정규화 후 모든 form으로 확장
+  - 2-3 그램 매칭으로 "코스트 센터" 같은 복합어 인식
+  - synonym 히트에 점수 가중 (사용자가 정확한 SAP 용어를 안다는 신호)
+
+### Changed — symptom-index.yaml 20건 전부 현장체 재작성
+- 모든 `symptom_ko`를 발화체로 리라이트 ("F110 돌렸는데 벤더 하나만 뜨네요")
+- 신규 필드 `symptom_ko_variants` — 각 증상에 4-5개 발화 변형
+- `typical_causes`에 이중 병기 적용 ("ZWELS(페이먼트 메소드, LFB1)")
+- triage.js 파서에 `symptom_ko_variants` 인식 추가
+- `typical_causes`도 매칭 대상에 포함
+
+### Changed — 현장체 전면 적용
+- `aidlc-docs/sapstack/f110-dog-food.md` 대화 예시 전부 현장체
+- `commands/sap-session-start.md`, `next-turn.md` 출력 예시 현장체
+- `web/triage.html` placeholder + 예시 칩 6개 현장체
+- `web/i18n/ko.json` placeholder 현장체
+
+### Added — Amazon Kiro IDE 통합 (Slice 9)
+- **`.kiro/settings/mcp.json`** — Kiro MCP 서버 등록 템플릿
+  - 읽기 툴 5개(`resolve_symptom`, `check_tcode`, `list_sessions`,
+    `resolve_sap_note`, `list_plugins`) autoApprove
+  - 쓰기 툴 4개는 명시적으로 수동 승인 유지 (Universal Rule #5)
+- **`.kiro/steering/sapstack-universal-rules.md`** (inclusion: always)
+  — `#[[file:CLAUDE.md]]` 참조로 Rule #1-#8 주입
+- **`.kiro/steering/sapstack-korean-field-language.md`** (inclusion: always)
+  — Rule #8 현장체 원칙 + `#[[file:data/synonyms.yaml]]` 주입
+- **`.kiro/steering/sapstack-evidence-loop.md`** (inclusion: fileMatch)
+  — `.sapstack/sessions/**/*.yaml` 편집 시 Turn-aware 포맷 주입
+- **`.kiro/steering/sapstack-symptom-context.md`** (inclusion: auto)
+  — SAP 증상 언급 시 20건 symptom-index 자동 로드
+- **`docs/kiro-quickstart.md`** — 5분 Quick Start
+- **`docs/kiro-integration.md`** — 전체 통합 아키텍처 + 5개 검증 시나리오
+
+### Changed — AGENTS.md 전면 갱신
+- v1.4.0 → v1.5.0 (Kiro·sap-session·Rule #8 반영)
+- "13 모듈" → "15 플러그인" (sap-gts + sap-session 추가)
+- 7개 Rule → **8개 Rule** (#8 현장체 원칙 추가)
+- Standard Response Format을 **Dual Mode** (Quick Advisory + Evidence Loop)로 확장
+- Evidence Loop 4턴 구조 요약 섹션 신설
+- Multi-AI 호환 표에 Kiro IDE 추가 (6 → 7 AI tools)
+
+### Changed — README.md
+- 배지: v1.4.0 → v1.5.0, "6 AI tools" → "7 AI tools", "Kiro ready" 신규
+- 30초 소개 섹션 Evidence Loop 강조
+- Quick Start에 Kiro 섹션 추가 (2번째 위치, Codex CLI 앞)
+- 14 modules → "14 modules + 1 meta (sap-session)"
+
+### Changed — marketplace.json
+- 기술 설명에 Kiro IDE 추가
+- 7 AI tools 명시
+
+### Design Principle — No Duplication via #[[file:...]] References
+Kiro steering 파일은 **원본 파일의 복사가 아닙니다**. 모두
+`#[[file:sapstack/...]]` 참조 문법으로 sapstack 원본을 실시간 주입합니다.
+이 덕분에:
+- sapstack을 `git pull`로 업데이트하면 steering도 자동 최신화
+- steering 파일의 "본문"은 50-100줄의 metadata shell
+- Drift 0, 동기화 부담 0
+- sapstack이 여러 Kiro 워크스페이스에 서브모듈로 공유 가능
+
+
+
+### Added — Evidence Loop 프레임워크
+- **5개 JSON Schema** (`schemas/`)
+  - `evidence-bundle.schema.yaml` — 운영자가 가져온 증거 모음
+  - `followup-request.schema.yaml` — AI→운영자 구조화된 체크리스트
+  - `hypothesis.schema.yaml` — 반증 조건 필수 가설
+  - `verdict.schema.yaml` — Fix + Rollback 필수 판정
+  - `session-state.schema.yaml` — 전체 세션 재개 가능 상태
+- **`plugins/sap-session/`** — Evidence Loop 오케스트레이터
+  - 기존 14개 플러그인과 9개 컨설턴트 에이전트 재사용 (새 에이전트 없음)
+  - 4턴 구조: INTAKE → HYPOTHESIS → COLLECT → VERIFY
+  - Falsifiability·Rollback·Localization 강제
+- **3개 새 커맨드** (`commands/`)
+  - `sap-session-start.md` — 새 세션 + Turn 1 INTAKE
+  - `sap-session-add-evidence.md` — Bundle 추가 + 체크 매핑
+  - `sap-session-next-turn.md` — 상태 기반 Turn 2/4 자동 실행
+
+### Added — Surface C (엔드유저 웹 포털)
+- **`web/triage.html`** + `triage.css` + `triage.js` — 정적 셀프 트리아지 포털
+  - 클라이언트 사이드 fuzzy 매칭 (브라우저 안에서만 작동)
+  - PII 자동 스캔 (주민번호·카드번호·패스워드)
+  - 운영자 에스컬레이션 Markdown 페이로드 생성 (클립보드 복사/다운로드)
+- **`web/session.html`** + `session.css` + `session.js` — 읽기 전용 세션 뷰어
+  - state.yaml 드래그앤드롭 로드
+  - 타임라인·가설·Verdict·Audit Trail 전체 표시
+  - F110 dog-food 데모 세션 내장
+  - 수정 UI 의도적 부재 (감사 요건)
+
+### Added — 데이터 자산
+- **`data/symptom-index.yaml`** — 20개 SAP 증상 ↔ 모듈/T-code 매핑
+  - F110 (3), MM (3), FI (2), SD (2), ABAP (2), BASIS (2), 성능 (2)
+  - 한국 특화 1건 (전자세금계산서)
+  - ko/en 20건, de/ja 시드 3건
+- **`data/symptom-index.yaml` 다국어 시드** (de/ja)
+
+### Added — MCP Server scaffolding
+- **`mcp/server.ts`** — TypeScript 엔트리, 읽기 전용 툴 작동
+- **`mcp/package.json`** — `@modelcontextprotocol/sdk` 의존
+- **`mcp/tsconfig.json`** + `README.md`
+- **`mcp/sapstack-server.json` 확장** — v1.4.0 → v1.5.0
+  - 새 resources: symptom-index, schema, session (동적)
+  - 새 tools: `resolve_symptom`, `list_sessions`, `start_session`(v1.6), `add_evidence`(v1.6), `next_turn`(v1.6), `validate_session_file`(v1.6)
+  - 새 prompts: Evidence Loop Turn 2/4 (v1.6)
+
+### Added — VS Code Extension 명령 계약 (stub 유지)
+- **`extension/package.json` 재정의**
+  - 10개 Evidence Loop 명령 contribute
+  - 3개 Tree View 선언 (sessions, followups, plugins)
+  - 5개 세션 YAML에 대한 `yamlValidation` 설정 (Red Hat YAML 확장만으로 즉시 동작)
+  - 9개 설정 키 (language, country, sessionsRoot, piiScanEnabled, ...)
+- **`extension/README.md`** 전면 개편 — v1.6.0 실장자용 계약 명세
+
+### Added — i18n 프레임워크
+- **`web/i18n/{ko,en,de,ja}.json`** — UI 문자열 분리
+  - ko/en 완전, de/ja 15% 시드
+  - 누락 키는 자동 en 폴백
+- **`docs/i18n/symptom-index.md`** — 번역 기여 가이드
+  - 독일어/일본어 SAP 공식 용어 체크리스트
+  - 새 국가 추가 절차 (5단계)
+
+### Added — 문서
+- **`aidlc-docs/sapstack/f110-dog-food.md`** — Mode 1(Quick Advisory) vs
+  Mode 2(Evidence Loop) 정면 비교 시나리오. 같은 F110 케이스에 대해 두 방식의
+  차이를 끝까지 추적.
+- **`aidlc-docs/sapstack/escalation-flow.md`** — 3 Surface 간 세션 이동 규약
+  (6개 전형 시나리오 + 보안 원칙)
+
+### Changed — CLAUDE.md Standard Response Format (옵션 B 병행 모드)
+- 기존 "Issue → Root Cause → Check → Fix → Prevention" 유지
+- **Mode 1 (Quick Advisory)**: 단순 질의용 (기존 포맷)
+- **Mode 2 (Evidence Loop)**: 복잡 진단용 (턴 인식 포맷)
+- Mode 선택 규칙 표 추가 — AI가 질문 성격으로 자동 판단
+
+### Changed — web/index.html nav
+- Note Resolver 랜딩에 Triage·Session Viewer 링크 추가
+
+### Changed — marketplace.json
+- sap-session 플러그인 등록 (총 15개)
+- 버전 v1.4.0 → v1.5.0
+
+### Design Principles (신규 확립)
+1. **No live SAP access** — 모든 데이터는 운영자가 수동으로 가져온 것
+2. **Falsifiability required** — 가설은 반증 조건 없이 존재 불가
+3. **Rollback-or-no-Fix** — Fix가 있으면 Rollback 필수
+4. **Audit trail append-only** — 모든 상태 변화 기록, 수정/삭제 금지
+5. **Three Surfaces** — CLI(A), IDE(B), Web(C)이 세션 ID로 연결
+6. **Localization as plugin** — 국가별 체크는 파일 하나로 추가
+7. **Static-first** — 엔드유저 웹은 서버 없이 정적 배포
+
+### Not Implemented in v1.5.0 (v1.6.0+ 계획)
+- MCP 서버 write-path 툴 (start_session/add_evidence/next_turn)
+- VS Code Extension TypeScript 실장
+- symptom-index의 de/ja 전체 번역 (17건 커뮤니티 기여 대상)
+- `/sap-session-resume`, `/sap-session-handoff`, `/sap-session-apply-fix` 커맨드
+- 세션 아카이브 자동화
+- URL 파라미터 기반 triage 공유 (시나리오 5)
+- `/sap-session-search` 관련 세션 링크
+
+### Migration from v1.4.0
+**Breaking**: 없음. 기존 14 플러그인·9 agents·10 commands 모두 **무변경**.
+CLAUDE.md 응답 포맷은 옵션 B(병행)이므로 기존 Quick Advisory 동작이 유지됩니다.
+
+---
+
 ## [1.4.0] - 2026-04-11
 
 ### Theme

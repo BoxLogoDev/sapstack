@@ -1,0 +1,62 @@
+{
+  "id": "sap-session",
+  "name": "SAP Evidence Loop Session",
+  "version": "0.1.0",
+  "description": "Turn-aware advisory sessions for SAP operations — hypothesis/verify loops without requiring live SAP access. Orchestrates existing sap-* plugins.",
+  "author": "BoxLogoDev",
+  "license": "MIT",
+  "homepage": "https://github.com/BoxLogoDev/sapstack",
+  "keywords": [
+    "evidence-loop",
+    "session",
+    "hypothesis",
+    "verify",
+    "rollback",
+    "operator-workflow",
+    "cross-module",
+    "orchestration",
+    "human-in-the-loop"
+  ],
+  "compatibility": {
+    "ecc": true,
+    "s4hana": true,
+    "btp": true,
+    "cloud_public": true
+  },
+  "stage": "experimental",
+  "introduced_in": "v1.5.0",
+  "depends_on": [
+    "sap-fi",
+    "sap-co",
+    "sap-mm",
+    "sap-sd",
+    "sap-tr",
+    "sap-basis",
+    "sap-abap"
+  ],
+  "reuses_agents": [
+    "sap-fi-consultant",
+    "sap-co-consultant",
+    "sap-mm-consultant",
+    "sap-sd-consultant",
+    "sap-pp-analyzer",
+    "sap-abap-reviewer",
+    "sap-basis-troubleshooter",
+    "sap-s4-migration-advisor",
+    "sap-integration-advisor"
+  ],
+  "schemas": [
+    "schemas/evidence-bundle.schema.yaml",
+    "schemas/followup-request.schema.yaml",
+    "schemas/hypothesis.schema.yaml",
+    "schemas/verdict.schema.yaml",
+    "schemas/session-state.schema.yaml"
+  ],
+  "design_principles": [
+    "No live SAP access assumed — operators bring evidence manually",
+    "Every hypothesis must be falsifiable (Popperian)",
+    "Every fix must ship with rollback",
+    "Session state is resumable across operators and surfaces",
+    "Three surfaces: operator CLI, operator VS Code extension, end-user web"
+  ]
+}

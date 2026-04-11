@@ -1,0 +1,283 @@
+# schemas/session-state.schema.yaml
+# Session State — Evidence Loop의 전체 세션 기록
+#
+# 목적:
+#   하나의 진단 세션의 모든 턴·bundle·hypothesis·verdict를 시간 순서로 보관.
+#   파일 시스템에 저장되어 세션 재개·감사 추적·조직 학습의 기반이 된다.
+#
+# 저장 위치:
+#   .sapstack/sessions/{session_id}/state.yaml
+#   .sapstack/sessions/{session_id}/files/...   (bundle 파일들)
+#
+# 재개 규약:
+#   state.yaml을 로드하면 마지막 턴·상태·pending follow-up을 그대로 복원.
+#   다른 운영자가 이어받아도 동일한 맥락에서 시작 가능.
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://boxlogodev.github.io/sapstack/schemas/session-state.schema.yaml"
+title: "Session State"
+description: "Complete serialized state of an Evidence Loop session — enables resume, audit, and cross-operator handoff"
+type: object
+required: [session_id, created_at, status, initial_symptom, turns]
+additionalProperties: false
+
+properties:
+  session_id:
+    type: string
+    pattern: "^sess-[0-9]{8}-[a-z0-9]{6}$"
+
+  schema_version:
+    type: string
+    const: "1.0.0"
+    description: "Version lock so future schema migrations are explicit"
+
+  created_at:
+    type: string
+    format: date-time
+
+  last_updated_at:
+    type: string
+    format: date-time
+
+  created_by:
+    type: object
+    required: [role]
+    properties:
+      role:
+        type: string
+        enum: [end_user, operator, consultant, basis, auditor]
+      handle:
+        type: string
+
+  originating_surface:
+    type: string
+    enum: [cli, vscode_extension, web_triage, mcp_client, email]
+    description: "Which Surface the session was born on (A/B/C)"
+
+  handoff_history:
+    type: array
+    description: "Record of every surface/role handoff — Surface A/B/C can pass sessions to each other"
+    items:
+      type: object
+      required: [at, from_surface, to_surface, reason]
+      properties:
+        at: { type: string, format: date-time }
+        from_surface: { type: string, enum: [cli, vscode_extension, web_triage, mcp_client, email] }
+        to_surface: { type: string, enum: [cli, vscode_extension, web_triage, mcp_client, email] }
+        from_role: { type: string }
+        to_role: { type: string }
+        reason: { type: string }
+
+  status:
+    type: string
+    enum:
+      - intake           # Waiting for first evidence bundle
+      - hypothesizing    # AI generating hypotheses
+      - awaiting_evidence # Follow-up request sent, waiting for operator
+      - verifying        # AI analyzing new bundle
+      - resolved         # Verdict confirmed, fix/rollback plans exist
+      - escalated        # Handed off to external expert
+      - abandoned        # Operator closed without resolution
+      - reopened         # Was closed, reopened for related issue
+    default: intake
+
+  initial_symptom:
+    type: object
+    required: [description, reporter_role, language]
+    properties:
+      description:
+        type: string
+        maxLength: 2000
+        description: "The original problem statement, ideally from the reporter's own words"
+      reporter_role:
+        type: string
+        enum: [end_user, operator, consultant, basis]
+      language:
+        type: string
+        enum: [ko, en, de, ja, zh, vi, id, fr, es]
+      country_iso:
+        type: string
+        pattern: "^[a-z]{2}$"
+      matched_symptom_index_entry:
+        type: string
+        description: "ID from data/symptom-index.yaml if symptom was matched at intake"
+
+  sap_context:
+    $ref: "https://boxlogodev.github.io/sapstack/schemas/evidence-bundle.schema.yaml#/properties/sap_context"
+
+  turns:
+    type: array
+    minItems: 1
+    description: "Chronological list of turns in this loop"
+    items:
+      $ref: "#/$defs/Turn"
+
+  current_turn_number:
+    type: integer
+    minimum: 1
+
+  pending_followup_request_id:
+    type: string
+    pattern: "^flr-[0-9]{8}-[a-z0-9]{6}$"
+    description: "If status=awaiting_evidence, the open Follow-up Request id"
+
+  hypotheses:
+    type: array
+    description: "Denormalized index — all hypotheses ever proposed in this session"
+    items:
+      $ref: "https://boxlogodev.github.io/sapstack/schemas/hypothesis.schema.yaml"
+
+  bundles:
+    type: array
+    description: "All evidence bundles in this session"
+    items:
+      $ref: "https://boxlogodev.github.io/sapstack/schemas/evidence-bundle.schema.yaml"
+
+  followup_requests:
+    type: array
+    items:
+      $ref: "https://boxlogodev.github.io/sapstack/schemas/followup-request.schema.yaml"
+
+  verdicts:
+    type: array
+    items:
+      $ref: "https://boxlogodev.github.io/sapstack/schemas/verdict.schema.yaml"
+
+  audit_trail:
+    type: array
+    description: "Immutable append-only log of every state change — for compliance"
+    items:
+      type: object
+      required: [at, action, actor]
+      properties:
+        at: { type: string, format: date-time }
+        action:
+          type: string
+          enum:
+            - session_created
+            - bundle_added
+            - hypothesis_proposed
+            - followup_requested
+            - evidence_collected
+            - hypothesis_confirmed
+            - hypothesis_refuted
+            - verdict_issued
+            - fix_applied
+            - rollback_applied
+            - escalated
+            - closed
+            - reopened
+            - handoff
+        actor:
+          type: object
+          properties:
+            role: { type: string }
+            handle: { type: string }
+            surface: { type: string }
+        ref_id:
+          type: string
+          description: "ID of the object this action relates to (bundle/hypothesis/verdict)"
+        note: { type: string }
+
+  tags:
+    type: array
+    items: { type: string }
+    description: "For organizational search — e.g. ['month-end', 'production', 'f110']"
+
+  related_sessions:
+    type: array
+    items:
+      type: string
+      pattern: "^sess-[0-9]{8}-[a-z0-9]{6}$"
+    description: "Other sessions related to this one (e.g. recurring issue tracking)"
+
+$defs:
+  Turn:
+    type: object
+    required: [turn_number, turn_type, started_at, status]
+    properties:
+      turn_number:
+        type: integer
+        minimum: 1
+      turn_type:
+        type: string
+        enum: [intake, hypothesis, collect, verify]
+        description: "One of the four turn types in the Evidence Loop"
+      started_at: { type: string, format: date-time }
+      completed_at: { type: string, format: date-time }
+      status:
+        type: string
+        enum: [pending, active, complete, abandoned]
+      surface:
+        type: string
+        enum: [cli, vscode_extension, web_triage, mcp_client, email]
+      artifact_refs:
+        type: object
+        description: "Which IDs from the parent session this turn produced"
+        properties:
+          bundle_ids:
+            type: array
+            items: { type: string, pattern: "^evb-[0-9]{8}-[a-z0-9]{6}$" }
+          hypothesis_ids:
+            type: array
+            items: { type: string, pattern: "^h-[0-9]{3}$" }
+          followup_request_id:
+            type: string
+            pattern: "^flr-[0-9]{8}-[a-z0-9]{6}$"
+          verdict_id:
+            type: string
+            pattern: "^vdc-[0-9]{8}-[a-z0-9]{6}$"
+      duration_minutes:
+        type: integer
+        minimum: 0
+
+# ─────────────────────────────────────────────────────────────
+# Minimal example (informational):
+#
+# session_id: sess-20260411-m2p9xt
+# schema_version: "1.0.0"
+# created_at: 2026-04-11T09:10:00+09:00
+# created_by: { role: operator, handle: "ops-kim" }
+# originating_surface: cli
+# status: awaiting_evidence
+# initial_symptom:
+#   description: "F110 Proposal 실패 — 벤더 100234 'No valid payment method'"
+#   reporter_role: operator
+#   language: ko
+#   country_iso: kr
+#   matched_symptom_index_entry: "sym-f110-no-payment-method"
+# sap_context:
+#   release: S4_2022
+#   deployment: on_premise
+#   client: "100"
+#   country_iso: kr
+#   language: ko
+# turns:
+#   - turn_number: 1
+#     turn_type: intake
+#     status: complete
+#     started_at: 2026-04-11T09:10:00+09:00
+#     completed_at: 2026-04-11T09:22:15+09:00
+#     surface: cli
+#     artifact_refs:
+#       bundle_ids: [evb-20260411-a7k3qz]
+#     duration_minutes: 12
+#   - turn_number: 2
+#     turn_type: hypothesis
+#     status: complete
+#     started_at: 2026-04-11T09:22:15+09:00
+#     completed_at: 2026-04-11T09:25:00+09:00
+#     surface: cli
+#     artifact_refs:
+#       hypothesis_ids: [h-001, h-002, h-003]
+#       followup_request_id: flr-20260411-b8m2nc
+#     duration_minutes: 3
+#   - turn_number: 3
+#     turn_type: collect
+#     status: active
+#     started_at: 2026-04-11T09:25:00+09:00
+#     surface: cli
+# current_turn_number: 3
+# pending_followup_request_id: flr-20260411-b8m2nc
+# tags: [month-end, production, f110, vendor-master]
+# ─────────────────────────────────────────────────────────────

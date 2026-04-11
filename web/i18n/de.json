@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "lang": "de",
+    "name": "Deutsch",
+    "flag": "🇩🇪",
+    "completeness": 0.15,
+    "notes": "Seed translation — contributions welcome. Missing keys fall back to en.json."
+  },
+  "triage": {
+    "title": "sapstack Triage",
+    "tagline": "Symptom beschreiben · Erste Hinweise + Eskalation an Operator",
+    "step1_title": "Sprache & Region",
+    "step1_lang": "Sprache",
+    "step1_country": "Land (Lokalisierung)",
+    "step2_title": "Symptom beschreiben",
+    "step2_submit": "Diagnose-Hinweise holen →",
+    "step3_title": "Passende Symptome",
+    "step4_title": "An Operator eskalieren",
+    "step4_copy": "📋 In Zwischenablage kopieren",
+    "copied_ok": "✅ Kopiert",
+    "confidence_label": "Vertrauen",
+    "confidence_high": "hoch",
+    "confidence_medium": "mittel",
+    "confidence_low": "niedrig"
+  },
+  "session_viewer": {
+    "title": "sapstack Session Viewer",
+    "tagline": "Evidence-Loop-Sitzungen schreibgeschützt teilen"
+  }
+}
