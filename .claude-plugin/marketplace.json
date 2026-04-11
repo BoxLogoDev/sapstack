@@ -1,0 +1,118 @@
+{
+  "name": "sapstack",
+  "version": "1.0.0",
+  "description": "Universal SAP skills and agents for Claude Code — all modules, any company",
+  "author": "BoxLogoDev",
+  "license": "MIT",
+  "repository": "https://github.com/BoxLogoDev/sapstack",
+  "plugins": [
+    {
+      "id": "sap-fi",
+      "name": "SAP Financial Accounting",
+      "version": "1.0.0",
+      "description": "GL, AP, AR, AA — posting, closing, tax, special G/L",
+      "path": "plugins/sap-fi",
+      "keywords": ["FI","GL","AP","AR","AA","FB01","F110","MIRO","OB52","period close","tax","special GL","GR/IR","asset","depreciation"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-co",
+      "name": "SAP Controlling",
+      "version": "1.0.0",
+      "description": "CCA, PCA, IO, product costing, CO-PA, allocation cycles",
+      "path": "plugins/sap-co",
+      "keywords": ["CO","cost center","profit center","internal order","KSU5","KO88","CK11N","CO-PA","assessment","distribution","settlement"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-tr",
+      "name": "SAP Treasury & Cash Management",
+      "version": "1.0.0",
+      "description": "Liquidity planning, cash position, payment run, bank statement",
+      "path": "plugins/sap-tr",
+      "keywords": ["TR","treasury","FF7A","FF7B","F110","liquidity","cash","MT940","FLQDB","FLQITEM","house bank","FI12","DME"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-mm",
+      "name": "SAP Materials Management",
+      "version": "1.0.0",
+      "description": "Procurement, inventory, GR/IR, invoice verification",
+      "path": "plugins/sap-mm",
+      "keywords": ["MM","MIGO","MIRO","ME21N","MB52","GR/IR","MR11","purchasing","inventory","stock","info record","outline agreement"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-sd",
+      "name": "SAP Sales & Distribution",
+      "version": "1.0.0",
+      "description": "Order-to-cash, billing, credit management, pricing",
+      "path": "plugins/sap-sd",
+      "keywords": ["SD","VA01","VF01","VF04","FD32","credit","billing","sales order","pricing","delivery","condition type","revenue recognition"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-pp",
+      "name": "SAP Production Planning",
+      "version": "1.0.0",
+      "description": "MRP, production orders, shop floor, capacity planning",
+      "path": "plugins/sap-pp",
+      "keywords": ["PP","MRP","MD01","CO01","MFBF","production order","BOM","routing","capacity","planned order","confirmation","backflush"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-hcm",
+      "name": "SAP HCM On-Premise",
+      "version": "1.0.0",
+      "description": "ECC HCM and H4S4 — PA, OM, Payroll, Time Management, FI posting",
+      "path": "plugins/sap-hcm",
+      "keywords": ["HCM","HR","PA30","infotype","payroll","PC00","time","PT60","org management","H4S4","wage type","schema","PCR","ESS","MSS"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-sfsf",
+      "name": "SAP SuccessFactors",
+      "version": "1.0.0",
+      "description": "Employee Central, ECP, Recruiting, LMS, Performance, People Analytics, SF integration",
+      "path": "plugins/sap-sfsf",
+      "keywords": ["SuccessFactors","SFSF","Employee Central","EC","ECP","Recruiting","Learning","Performance","RBP","OData","integration","cloud HR","MDF","business rules","position management"],
+      "compatibility": { "ecc": false, "s4hana": true, "btp": true }
+    },
+    {
+      "id": "sap-abap",
+      "name": "SAP ABAP Development",
+      "version": "1.0.0",
+      "description": "Classic ABAP, RAP, CDS views, BAdI, clean core, performance, short dump",
+      "path": "plugins/sap-abap",
+      "keywords": ["ABAP","SE38","SE24","BAdI","CDS","RAP","dump","ST22","clean core","OData","function module","ALV","enhancement","user exit","ATC"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": true }
+    },
+    {
+      "id": "sap-s4-migration",
+      "name": "SAP S/4HANA Migration",
+      "version": "1.0.0",
+      "description": "ECC to S/4HANA: brownfield, greenfield, BP migration, custom code adaptation",
+      "path": "plugins/sap-s4-migration",
+      "keywords": ["migration","S/4HANA","brownfield","greenfield","SUM","DMO","readiness check","BP migration","simplification","ATC","custom code","ACDOCA"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-btp",
+      "name": "SAP Business Technology Platform",
+      "version": "1.0.0",
+      "description": "BTP extensions, CAP, Fiori Elements, OData, Integration Suite",
+      "path": "plugins/sap-btp",
+      "keywords": ["BTP","CAP","Fiori","OData","integration suite","extension","side-by-side","RAP","CAPM","XSUAA","destination","Cloud Foundry","Kyma"],
+      "compatibility": { "ecc": false, "s4hana": true, "btp": true }
+    },
+    {
+      "id": "sap-basis",
+      "name": "SAP BASIS Administration",
+      "version": "1.0.0",
+      "description": "System administration, transport management, performance, security",
+      "path": "plugins/sap-basis",
+      "keywords": ["BASIS","STMS","SM50","ST05","SCC4","transport","performance","authorization","PFCG","SU53","SM21","SM36","SM37"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    }
+  ]
+}

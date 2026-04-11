@@ -1,0 +1,19 @@
+{
+  "name": "sapstack",
+  "version": "1.0.0",
+  "description": "Universal SAP skills and agents for Claude Code — all modules, any company",
+  "license": "MIT",
+  "author": "BoxLogoDev",
+  "keywords": [
+    "sap", "abap", "s4hana", "claude-code", "skills", "agents", "plugins",
+    "fi", "co", "tr", "mm", "sd", "pp", "hcm", "successfactors", "btp", "basis"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BoxLogoDev/sapstack"
+  },
+  "bugs": {
+    "url": "https://github.com/BoxLogoDev/sapstack/issues"
+  },
+  "homepage": "https://github.com/BoxLogoDev/sapstack#readme"
+}
