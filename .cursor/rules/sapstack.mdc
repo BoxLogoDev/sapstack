@@ -1,0 +1,66 @@
+---
+description: sapstack — SAP operations advisory rules (13 modules, Korean + global)
+globs:
+  - "**/*.md"
+  - "**/*.abap"
+  - "**/*.yaml"
+alwaysApply: true
+---
+
+# sapstack Rules for Cursor
+
+This rule applies whenever Cursor is editing files in this repository. It enforces SAP advisory best practices across all conversations.
+
+## Universal Rules
+
+1. **NEVER hardcode** company codes, G/L accounts, cost centers, or org units. Ask the user or read from `.sapstack/config.yaml`.
+2. **ALWAYS ask for environment** before answering: SAP release, deployment model, industry, company code.
+3. **ALWAYS distinguish ECC vs S/4HANA** behavior explicitly (BSEG vs ACDOCA, FD32 vs UKM_BP, F.05 vs FAGL_FC_VAL).
+4. **Transport request required** for any config change.
+5. **Simulate before actual run** — AFAB, F.13, FAGL_FC_VAL, KSU5, MR11, F110 must use Test Run first.
+6. **Never recommend SE16N** data edits in production.
+7. **Always provide T-code + SPRO menu path**.
+
+## Response Format
+
+```
+## 🔍 Issue
+## 🧠 Root Cause
+## ✅ Check (T-code + Table/Field)
+## 🛠 Fix (numbered steps)
+## 🛡 Prevention
+## 📖 SAP Note (only if verified in data/sap-notes.yaml)
+```
+
+## Knowledge Sources
+
+- `plugins/sap-<module>/skills/sap-<module>/SKILL.md` — module knowledge (English source of truth)
+- `plugins/sap-<module>/skills/sap-<module>/references/ko/` — Korean guides
+- `data/tcodes.yaml` — authoritative T-code registry (never mention unlisted T-codes)
+- `data/sap-notes.yaml` — verified SAP Note catalog (never cite unverified numbers)
+- `agents/*.md` — specialized prompts (reusable)
+
+## 13 Modules
+
+sap-fi, sap-co, sap-tr (Financials) | sap-mm, sap-sd, sap-pp (Logistics) | sap-hcm, sap-sfsf (HR) | sap-abap, sap-s4-migration, sap-btp, sap-basis, **sap-bc** (Technology + Korean specialization)
+
+**BC = Basis in Korean SAP industry.** Use `sap-bc` for Korean-context Basis topics (한글 Unicode, 망분리, 전자세금계산서, K-SOX). Use `sap-basis` for global English Basis topics. Both are the same functional area; only the localization layer differs.
+
+## ABAP Code Generation
+
+- No `SELECT *` — targeted fields only
+- No SELECT inside LOOP — use FOR ALL ENTRIES or JOIN
+- Clean Core: no modifications to standard SAP objects, use BAdI/Enhancement/CDS
+- S/4HANA: no BSEG, MKPF/MSEG, CALL TRANSACTION in background jobs
+- Every BAPI call checks RETURN table for E/A messages
+- AUTHORITY-CHECK on sensitive data access
+- Korean personal data (주민번호, 연락처) must be masked in logs
+
+## Quality Gates
+
+Before committing: run `scripts/lint-frontmatter.sh`, `scripts/check-marketplace.sh`, `scripts/check-hardcoding.sh --strict`, `scripts/check-tcodes.sh`.
+
+## See Also
+
+- `README.md`, `CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md` — sibling compatibility layers
+- `docs/multi-ai-compatibility.md` — cross-AI usage guide

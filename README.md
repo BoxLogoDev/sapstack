@@ -1,7 +1,8 @@
-# sapstack — SAP Skills & Agents for Claude Code
+# sapstack — SAP Skills & Agents for AI Coding Assistants
 
-Production-ready Claude Code plugin collection covering **all SAP modules**,
-applicable to **any company** running SAP ECC 6.0 or S/4HANA.
+Production-ready plugin collection covering **all SAP modules**, applicable to **any company** running SAP ECC 6.0 or S/4HANA.
+
+**Works with**: Claude Code (native) · OpenAI Codex CLI · GitHub Copilot · Cursor — 동일한 지식을 여러 AI 도구에서 일관되게 활용 가능합니다. 자세히는 [`docs/multi-ai-compatibility.md`](docs/multi-ai-compatibility.md) 참조.
 
 No company-specific hardcoding — every skill dynamically adapts to the user's environment.
 
@@ -75,8 +76,21 @@ Install all plugins at once:
 | `sap-abap` | ABAP, SE38, BAdI, CDS, RAP, ST22, clean core, ATC | ABAP Development — classic + RAP |
 | `sap-s4-migration` | migration, brownfield, readiness check, BP migration, SUM | ECC → S/4HANA Migration |
 | `sap-btp` | BTP, CAP, Fiori, OData, Integration Suite, XSUAA | SAP BTP Development |
-| `sap-basis` | BASIS, STMS, transport, PFCG, SM50, performance | BASIS Administration (Global) |
-| `sap-bc` 🇰🇷 | BC, 베이시스, 한국, Solman, 전자세금계산서, 망분리, KISA, K-SOX | **한국 BC 컨설턴트 특화** — Basis 심화 + 한국 현장 |
+| `sap-basis` | BASIS, STMS, transport, PFCG, SM50, performance | BASIS Administration — **Global / English** |
+| `sap-bc` 🇰🇷 | BC, 베이시스, 한국, Solman, 전자세금계산서, 망분리, KISA, K-SOX | **Basis — 한국 버전** (동일 영역, 한국 현장 맥락) |
+
+> **💡 sap-basis vs sap-bc 관계**
+>
+> **BC = Basis 입니다.** 한국 SAP 업계에서 "BC 컨설턴트"는 "Basis Consultant"와 완전히 같은 의미로 쓰이며, SAP 공식 모듈 코드 체계에서도 BC = Basis Components입니다. 즉 **sap-bc는 sap-basis의 한국 현장 특화 버전**입니다.
+>
+> | 구분 | `sap-basis` | `sap-bc` |
+> |------|-----------|----------|
+> | 언어 | 영문 | 한국어 (본문), 영문 키워드 병기 |
+> | 대상 | 글로벌 Basis 컨설턴트 | 한국 BC 컨설턴트 |
+> | 주제 | Transport, 권한, 성능, Kernel 등 공통 Basis | 공통 Basis + **한글 Unicode·망분리·전자세금계산서·K-SOX·한국 SAPNet OSS** |
+> | 자동 활성화 | `BASIS`, `STMS`, `PFCG` 등 영문 키워드 | `BC`, `베이시스`, `한국`, `Solman`, `망분리` 등 |
+>
+> 두 파일은 **서로 배타적이지 않고 보완적**입니다. 글로벌 프로젝트면 `sap-basis`만, 한국 현장이면 `sap-bc`를 추가로 설치하면 됩니다. 같은 Basis 이슈에 대해 한국 Localization 맥락이 필요할 때 `sap-bc`가 자동으로 보강됩니다.
 
 ---
 
@@ -160,12 +174,30 @@ echo ".sapstack/config.yaml" >> .gitignore   # 민감정보 보호
 13개 모듈을 유지보수 가능한 품질로 관리하기 위한 **자동 검증** 파이프라인.
 
 ```bash
-./scripts/lint-frontmatter.sh      # name/description/tools 검증
-./scripts/check-marketplace.sh     # marketplace.json 무결성
-./scripts/check-hardcoding.sh      # 회사코드/계정 하드코딩 탐지
+./scripts/lint-frontmatter.sh          # name/description/tools 검증
+./scripts/check-marketplace.sh         # marketplace.json 무결성
+./scripts/check-hardcoding.sh --strict # 회사코드/계정 하드코딩 (STRICT — v1.2.0+)
+./scripts/check-tcodes.sh              # T-code 레지스트리 검증 (v1.2.0+)
+./scripts/resolve-note.sh <키워드>     # SAP Note 검색 도구 (v1.2.0+)
 ```
 
 GitHub Actions CI (`.github/workflows/ci.yml`)가 main 푸시·PR에서 자동 실행합니다.
+
+### 🗃 데이터 자산 (v1.2.0 신규)
+
+v1.2.0부터 **확정된 데이터셋**을 모든 에이전트/커맨드가 공유하여 "추측 없이 답변"하는 근거를 제공합니다.
+
+| 파일 | 역할 |
+|------|------|
+| `data/tcodes.yaml` | 확정된 T-code 레지스트리 — SKILL.md에서 미등록 T-code가 언급되면 `check-tcodes.sh`가 경고 |
+| `data/sap-notes.yaml` | 확정된 SAP Note 카탈로그 — AI는 이 리스트에 없는 Note 번호를 추정 금지 |
+
+```bash
+# SAP Note 검색 예시
+./scripts/resolve-note.sh korea         # 한국 localization 관련 Note
+./scripts/resolve-note.sh migration     # 마이그레이션 관련
+./scripts/resolve-note.sh CONVT_CODEPAGE  # 특정 덤프 유형
+```
 
 ---
 
@@ -179,16 +211,75 @@ plugins/<module>/skills/<module>/references/ko/quick-guide.md
 ```
 
 ### sap-bc — 한국 BC 컨설턴트 특화 플러그인
-글로벌 `sap-basis`는 영문 Basis 주제를 다루고, `sap-bc`는 **한국 현장**에 집중합니다:
+
+**BC = Basis** (한국 업계 관용어)입니다. 글로벌 `sap-basis`는 영문 Basis 주제를 다루고, `sap-bc`는 **같은 Basis 영역의 한국 현장 특화 버전**입니다:
 - Solution Manager Korea, HANA 한국 로케일
-- 한글 Unicode 이슈, SAPGUI 한글 깨짐
+- 한글 Unicode 이슈, SAPGUI 한글 깨짐 (CONVT_CODEPAGE)
 - 전자세금계산서 연동 (STRUST 공인인증서)
-- 망분리 환경 Kernel 업그레이드
-- K-SOX 내부통제 권한 관리
-- 한국 SAPNet OSS 사용법
+- 망분리(폐쇄망) 환경 Kernel 업그레이드 절차
+- K-SOX 상장사 내부통제 권한 관리
+- 한국 SAPNet OSS 한국어 지원 활용법
+
+### 🇰🇷 본문 한국어 전문 번역 (v1.2.0 신규)
+`sap-fi`와 `sap-abap`은 **전체 본문 한국어 번역**이 `references/ko/SKILL-ko.md`로 제공됩니다. 나머지 모듈은 `references/ko/quick-guide.md` 퀵가이드가 있습니다. 한국어 번역본 추가는 [CONTRIBUTING.md](CONTRIBUTING.md) 참조.
 
 ### 한국어 답변 설정
 `.sapstack/config.yaml`에서 `preferences.language: ko`로 설정하면 모든 sapstack 산출물이 한국어로 응답합니다.
+
+---
+
+## 🤖 여러 AI 도구에서 sapstack 사용 (v1.2.0 신규)
+
+sapstack은 Claude Code 전용이 아닙니다. **동일한 지식 베이스를 여러 AI 도구에서** 사용할 수 있도록 호환 레이어 파일을 제공합니다.
+
+| AI 도구 | 진입점 파일 (sapstack에 이미 포함) | 사용법 |
+|---------|-----------------------------------|--------|
+| **Claude Code** | `plugins/*/skills/*/SKILL.md` | `/plugin marketplace add ...` |
+| **OpenAI Codex CLI** | [`AGENTS.md`](AGENTS.md) | `git submodule add` 후 자동 로드 |
+| **GitHub Copilot** | [`.github/copilot-instructions.md`](.github/copilot-instructions.md) | 저장소 복사 시 자동 인식 |
+| **Cursor** | [`.cursor/rules/sapstack.mdc`](.cursor/rules/sapstack.mdc) | `alwaysApply: true` 룰 |
+
+자세한 설치·사용 예시는 [`docs/multi-ai-compatibility.md`](docs/multi-ai-compatibility.md)를 참조하세요. 핵심 아이디어는 **"원본 1개(Claude Code SKILL.md) + 호환 레이어 N개"**로, 어떤 AI를 쓰든 Universal Rules·Response Format·지식 품질이 일관됩니다.
+
+### 빠른 시작 — Codex CLI 예시
+```bash
+# 1. sapstack을 프로젝트에 import
+git submodule add https://github.com/BoxLogoDev/sapstack sapstack
+cd sapstack && git checkout v1.2.0
+
+# 2. Codex CLI로 질문 (AGENTS.md 자동 로드)
+codex "sap-fi-consultant 프롬프트 규칙을 따라 MIRO 세금코드 이슈를 진단해줘.
+환경: S/4HANA 2023, on-premise, 회사코드 KR01"
+```
+
+---
+
+## ✅ 설치 후 빠른 검증
+
+v1.2.0 설치 후 sapstack이 정상 동작하는지 확인하려면:
+
+```bash
+# 1. 저장소 clone (또는 submodule)
+git clone https://github.com/BoxLogoDev/sapstack
+cd sapstack
+
+# 2. 품질 게이트 전부 실행
+./scripts/lint-frontmatter.sh       # 0 errors 기대
+./scripts/check-marketplace.sh      # 13 plugins, 0 errors 기대
+./scripts/check-hardcoding.sh --strict  # 0 errors 기대
+./scripts/check-tcodes.sh           # 미등록 T-code는 경고만
+
+# 3. SAP Note resolver 테스트
+./scripts/resolve-note.sh korea
+./scripts/resolve-note.sh migration ACDOCA
+./scripts/resolve-note.sh CONVT_CODEPAGE
+
+# 4. (Claude Code) Plugin 설치 테스트
+# /plugin marketplace add https://github.com/BoxLogoDev/sapstack
+# /plugin install sap-fi@sapstack sap-bc@sapstack
+```
+
+위 4단계가 모두 성공하면 sapstack이 올바르게 동작 중입니다.
 
 ---
 

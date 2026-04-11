@@ -27,5 +27,13 @@ jobs:
       - name: Check marketplace.json integrity
         run: ./scripts/check-marketplace.sh
 
-      - name: Check hardcoding (warnings only)
-        run: ./scripts/check-hardcoding.sh
+      - name: Check hardcoding (strict)
+        run: ./scripts/check-hardcoding.sh --strict
+
+      - name: Check T-code registry (warning-only)
+        run: ./scripts/check-tcodes.sh
+
+      - name: Smoke test — resolve-note
+        run: |
+          ./scripts/resolve-note.sh korea | head -5
+          ./scripts/resolve-note.sh migration | head -5

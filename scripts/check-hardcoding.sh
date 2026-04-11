@@ -102,9 +102,17 @@ done < <(find plugins agents commands docs -name '*.md' -type f 2>/dev/null)
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "검사 파일: $CHECKED"
-echo "경고: $ERRORS"
+if (( STRICT )); then
+  echo "오류: $ERRORS (strict 모드)"
+else
+  echo "경고: $ERRORS"
+fi
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# 현재는 경고만 — CI 실패로는 만들지 않음 (v1.1.0)
-# v1.2.0에서 strict mode로 전환 예정
+# strict 모드: 경고 1개라도 있으면 실패
+if (( STRICT )); then
+  exit $ERRORS
+fi
+
+# 기본(warning-only): 항상 통과
 exit 0

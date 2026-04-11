@@ -5,6 +5,71 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-04-11
+
+### Theme
+**"Scale-ready: 데이터 기반 검증 + 다중 AI 호환 + 한국어화"** — sapstack을 Claude Code 전용에서 **범용 SAP 운영 자문 플랫폼**으로 확장. 지식 자산을 데이터셋으로 추출하고, 호환 레이어로 Codex/Copilot/Cursor도 지원하며, 한국어 전문 번역본을 도입.
+
+### Added — Data Assets
+- **`data/tcodes.yaml`** — 168개 확정 T-code 레지스트리 (모듈별, ECC/S4 release 구분, 주의 메모 포함)
+- **`data/sap-notes.yaml`** — 확정된 SAP Note 카탈로그 (migration, Korea localization, dumps, performance, security 카테고리)
+- **`scripts/check-tcodes.sh`** — SKILL.md의 T-code를 데이터셋과 대조 (warning-only, v1.3.0에서 strict 전환 예정)
+- **`scripts/resolve-note.sh`** — 키워드로 SAP Note 검색 (awk 기반, bash-only, jq 불필요)
+
+### Added — New Subagents
+- **`agents/sap-basis-troubleshooter`** — Basis 장애 라우팅 (덤프/WP행/Transport/RFC/Update/Lock/성능/Kernel 플로우별 체크리스트)
+- **`agents/sap-mm-consultant`** — MM 전반 (구매·재고·GR/IR·송장검증·계정결정·외주·한국 특화)
+
+### Added — Multi-AI Compatibility Layer ⭐
+- **`AGENTS.md`** — OpenAI Codex CLI 호환 지침 (Universal Rules + 지식 소스 위치)
+- **`.github/copilot-instructions.md`** — GitHub Copilot 프로젝트 지침
+- **`.cursor/rules/sapstack.mdc`** — Cursor `alwaysApply: true` 룰
+- **`docs/multi-ai-compatibility.md`** — 5개 AI 도구에서 sapstack 쓰는 법 (설치, 사용 예시, 한계 비교표)
+
+### Added — Korean Full Translations
+- **`plugins/sap-fi/skills/sap-fi/references/ko/SKILL-ko.md`** — sap-fi 본문 한국어 전문 번역
+- **`plugins/sap-abap/skills/sap-abap/references/ko/SKILL-ko.md`** — sap-abap 본문 한국어 전문 번역 (코드 예제는 원본 유지)
+
+### Changed — Quality Gates
+- **`check-hardcoding.sh --strict`** 모드 구현 완료 + CI에서 기본 사용 (경고 → 오류 변환)
+- CI에 `check-tcodes.sh` 추가 (warning-only)
+- CI에 `resolve-note.sh` 스모크 테스트 추가
+
+### Changed — Documentation
+- **README** 대폭 확장:
+  - "Multi-AI 도구 지원" 섹션 추가 (Claude Code/Codex/Copilot/Cursor 비교표)
+  - "sap-basis vs sap-bc 관계" 명확화 — **BC = Basis 한국 버전**임을 표로 명시
+  - "데이터 자산" 섹션 (v1.2.0 신규)
+  - "설치 후 빠른 검증" 가이드
+  - 한국어 전문 번역본 소개
+- **`docs/architecture.md`** — "sap-basis vs sap-bc 관계" 상세 섹션 추가 (분리 이유, 설치 권장, 보완재 관계)
+- README title: "SAP Skills & Agents for Claude Code" → "SAP Skills & Agents for AI Coding Assistants"
+- `package.json`, `marketplace.json` description 업데이트 (multi-AI 명시)
+
+### Philosophy
+- **데이터 자산 분리**: 지식(SKILL.md)과 데이터(tcodes/notes YAML)를 분리하여 업데이트 주기·책임자 분리
+- **원본 1개 + 호환 레이어 N개**: SKILL.md가 source of truth, AGENTS.md/copilot/cursor는 얇은 변환 레이어
+- **BC = Basis 명시**: 한국 업계 용어와 SAP 공식 모듈 코드를 일치시켜 혼동 제거
+
+### Statistics
+- 신규 파일: 14개
+- 수정 파일: 5개 (package.json, marketplace.json, README.md, CHANGELOG.md, docs/architecture.md, check-hardcoding.sh, .github/workflows/ci.yml)
+- 총 플러그인: 13 (변동 없음)
+- 확정 T-code: 168개 (데이터셋 초기)
+- 확정 SAP Note: 11개 (데이터셋 초기)
+- 서브에이전트: 3 → 5
+- 호환 레이어: 1(Claude) → 4(Claude/Codex/Copilot/Cursor)
+
+### Known Limitations / Deferred to v1.3.0
+- `check-tcodes.sh`는 warning-only 모드 (strict 전환은 75건 미등록 T-code 데이터셋 확장 후)
+- 13개 모듈 중 11개는 여전히 영문 본문 — 한국어 전문 번역은 2개 시범
+- Continue.dev, Aider 호환 레이어 미지원
+- `scripts/build-multi-ai.sh` 자동 빌드 스크립트 미구현
+
+[1.2.0]: https://github.com/BoxLogoDev/sapstack/releases/tag/v1.2.0
+
+---
+
 ## [1.1.0] - 2026-04-11
 
 ### Theme

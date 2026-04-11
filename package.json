@@ -1,7 +1,7 @@
 {
   "name": "sapstack",
-  "version": "1.1.0",
-  "description": "Universal SAP skills and agents for Claude Code — 13 modules, active advisors, context persistence, quality gates",
+  "version": "1.2.0",
+  "description": "Universal SAP skills and agents for AI coding assistants (Claude Code, Codex, Copilot, Cursor) — 13 modules, data-driven validation, Korean localization",
   "license": "MIT",
   "author": "BoxLogoDev",
   "keywords": [

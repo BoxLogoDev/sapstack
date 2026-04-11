@@ -1,0 +1,137 @@
+# sapstack — 확정된 SAP Note 매핑 데이터셋
+#
+# 목적: scripts/resolve-note.sh가 키워드 입력을 받으면 관련 SAP Note 번호를
+#       반환합니다. 서브에이전트도 이 파일을 참조해 "SAP Note 섹션"을 채울 수 있습니다.
+#
+# ⚠️ 중요 원칙:
+#   1. 이 파일에는 **확실히 존재하는 Note 번호만** 등록합니다
+#   2. 번호가 불확실하면 등록하지 않습니다 (과소가 과잉보다 낫다)
+#   3. Note는 SAP Support Portal에서 검색 가능한 실제 번호여야 합니다
+#   4. Note의 실제 내용은 SAP Marketplace에서 확인해야 하며, 이 파일은 **포인터**만 제공
+#
+# 엔트리 형식:
+#   - id: SAP Note 번호 (문자열)
+#     title: 한 줄 제목
+#     keywords: [검색 키워드 배열]
+#     modules: [FI, MM, ...]
+#     release: both | ecc_only | s4_only
+#     category: dump | config | korea | migration | performance | security
+#     url: https://launchpad.support.sap.com/#/notes/<번호>
+
+notes:
+  # ──────────────────────────────────────────
+  # S/4HANA Simplification & Migration
+  # ──────────────────────────────────────────
+  - id: "2269324"
+    title: "Simplification List for SAP S/4HANA"
+    keywords: [simplification, s4hana, migration, readiness]
+    modules: [ALL]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2269324
+
+  - id: "2313884"
+    title: "S/4HANA: Custom Code Migration Tool (ATC)"
+    keywords: [ATC, custom code, migration, readiness]
+    modules: [ABAP]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2313884
+
+  - id: "2214213"
+    title: "S/4HANA: Conversion of Accounting — FI/CO"
+    keywords: [ACDOCA, universal journal, conversion, BSEG]
+    modules: [FI, CO]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2214213
+
+  - id: "2265093"
+    title: "Business Partner — Conversion and Integration"
+    keywords: [BP, business partner, vendor, customer, migration, KNA1, LFA1]
+    modules: [FI, SD, MM]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2265093
+
+  # ──────────────────────────────────────────
+  # Korean Localization
+  # ──────────────────────────────────────────
+  - id: "3092819"
+    title: "Country Version Korea — S/4HANA Localization Roadmap"
+    keywords: [korea, localization, CVI KR, 한국, 전자세금계산서]
+    modules: [FI]
+    release: s4_only
+    category: korea
+    url: https://launchpad.support.sap.com/#/notes/3092819
+
+  - id: "2452523"
+    title: "Unicode Conversion — Code Page Issues"
+    keywords: [CONVT_CODEPAGE, unicode, 한글, conversion, dump]
+    modules: [ABAP, BC]
+    release: both
+    category: dump
+    url: https://launchpad.support.sap.com/#/notes/2452523
+
+  - id: "1728283"
+    title: "NLS_LANG Settings for Oracle Database"
+    keywords: [NLS_LANG, Oracle, korean, locale]
+    modules: [BC]
+    release: ecc_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/1728283
+
+  # ──────────────────────────────────────────
+  # ABAP Dumps
+  # ──────────────────────────────────────────
+  - id: "2327584"
+    title: "DBIF_RSQL_SQL_ERROR — Root Cause Analysis"
+    keywords: [DBIF_RSQL_SQL_ERROR, dump, SQL error, HANA]
+    modules: [ABAP, BC]
+    release: both
+    category: dump
+    url: https://launchpad.support.sap.com/#/notes/2327584
+
+  - id: "1908075"
+    title: "MESSAGE_TYPE_X — Guidelines"
+    keywords: [MESSAGE_TYPE_X, dump, abap, runtime error]
+    modules: [ABAP]
+    release: both
+    category: dump
+    url: https://launchpad.support.sap.com/#/notes/1908075
+
+  # ──────────────────────────────────────────
+  # Performance
+  # ──────────────────────────────────────────
+  - id: "2161145"
+    title: "S/4HANA SQL Optimization Guidelines"
+    keywords: [performance, HANA, SELECT, SQL, optimization]
+    modules: [ABAP, BC]
+    release: s4_only
+    category: performance
+    url: https://launchpad.support.sap.com/#/notes/2161145
+
+  # ──────────────────────────────────────────
+  # Security
+  # ──────────────────────────────────────────
+  - id: "1794432"
+    title: "Clean Core — Authorization Best Practices"
+    keywords: [authorization, PFCG, clean core, SoD, K-SOX]
+    modules: [BASIS, BC]
+    release: both
+    category: security
+    url: https://launchpad.support.sap.com/#/notes/1794432
+
+# ──────────────────────────────────────────────────────────────
+# 메타 정보
+# ──────────────────────────────────────────────────────────────
+meta:
+  version: 1
+  last_updated: "2026-04-11"
+  total_entries_rule: "Must be verifiable on SAP Support Portal"
+  contribution_guideline: |
+    새 Note 추가 시:
+    1. SAP Support Portal에서 실제 번호 확인
+    2. 제목을 한 줄로 축약 (영문 유지)
+    3. keywords는 영문 + 한국어 혼용 가능
+    4. category는 dump/config/korea/migration/performance/security 중 선택

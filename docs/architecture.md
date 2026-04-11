@@ -215,11 +215,34 @@ sapstack/
 - 회사별 설정(`BUKRS=KR01` 등)은 `.sapstack/config.yaml`로만 전달
 - 이 분리가 오픈소스 가치를 유지합니다
 
-### 4. 한국 관점 분리
+### 4. 한국 관점 분리 (글로벌 vs 로컬)
 - **글로벌 영문**: `sap-basis` 등
 - **한국 현장**: `sap-bc` (BC 컨설턴트 관점)
-- **한국어 요약**: 각 모듈의 `references/ko/`
-- 영문 본문을 번역하지 않아 키워드 매칭이 일관됩니다
+- **한국어 요약**: 각 모듈의 `references/ko/quick-guide.md`
+- **한국어 전문**: `sap-fi`, `sap-abap`의 `references/ko/SKILL-ko.md` (v1.2.0 신규)
+- 영문 SKILL.md 본문을 **번역하지 않고 유지** → 키워드 매칭 일관성
+
+#### 특별 케이스: sap-basis vs sap-bc
+두 플러그인은 **동일한 Basis 영역**을 다루지만 **지역·언어 층**이 다릅니다.
+
+> **BC = Basis 입니다.** 한국 SAP 업계에서 "BC 컨설턴트 = Basis Consultant"로 동의어이며, SAP 공식 모듈 코드 체계에서도 `BC = Basis Components`입니다. `sap-bc`는 `sap-basis`의 한국 현장 특화 버전이라고 이해하면 됩니다.
+
+| 차원 | `sap-basis` | `sap-bc` |
+|------|------------|----------|
+| 기능 영역 | SAP Basis (시스템 관리·Transport·권한·성능·Kernel) | **동일한 SAP Basis** |
+| 본문 언어 | 영문 | 한국어 (본문) + 영문 키워드 병기 |
+| 대상 독자 | 글로벌 영문 Basis 컨설턴트 | 한국 SI 현장 BC 컨설턴트 |
+| 자동 활성화 키워드 | BASIS, STMS, PFCG, SM50, ST22 (영문) | BC, 베이시스, 한국, Solman, 전자세금계산서, 망분리, KISA, K-SOX, 한글 |
+| 추가 주제 | 글로벌 공통 Basis | **+ 한국 Localization**: 한글 Unicode(CONVT_CODEPAGE), 망분리 Kernel 업그레이드, 전자세금계산서 STRUST, K-SOX 권한 재인증, 한국 SAPNet OSS |
+| 설치 권장 | 글로벌 프로젝트 | 한국 프로젝트 (+ sap-basis도 같이 설치하면 완전) |
+
+**왜 하나로 합치지 않았나?**
+1. **키워드 활성화 정확성**: 영문과 한국어 트리거가 한 파일에 섞이면 관련 없는 맥락이 주입될 수 있음
+2. **유지보수 분리**: 한국 localization 변경(전자세금계산서 법규, KISA 가이드)이 글로벌 Basis 문서에 영향을 주지 않음
+3. **기여자 구분**: 글로벌 Basis 전문가와 한국 BC 컨설턴트가 각자 담당 파일만 수정하면 됨
+4. **설치 선택권**: 영문만 쓰는 조직은 `sap-basis`만 설치, 한국 현장은 둘 다 설치
+
+**결론**: `sap-bc`는 `sap-basis`의 **대체재가 아니라 보완재**입니다. 한국 프로젝트는 **두 플러그인 모두 설치**하면 글로벌 표준 + 한국 특화를 모두 얻습니다.
 
 ---
 
