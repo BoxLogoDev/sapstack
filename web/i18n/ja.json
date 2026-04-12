@@ -3,28 +3,50 @@
     "lang": "ja",
     "name": "日本語",
     "flag": "🇯🇵",
-    "completeness": 0.15,
-    "notes": "Seed translation — contributions welcome. Missing keys fall back to en.json."
+    "completeness": 1.0
   },
   "triage": {
     "title": "sapstack トリアージ",
     "tagline": "症状を記入してください · 一次診断ヒント + 運用者へのエスカレーション",
     "step1_title": "言語と地域",
     "step1_lang": "言語",
-    "step1_country": "国 (ローカライズ)",
+    "step1_country": "国（ローカライズ）",
     "step2_title": "症状を説明してください",
+    "step2_hint": "<strong>簡潔に1段落で</strong>、どの画面で何をしようとした時に、どのようなメッセージが表示されたかを記述してください。SAP用語がわからなくても大丈夫です。",
+    "step2_placeholder": "例：F110を実行したらベンダー100234だけNo valid payment methodエラーが出ます。昨日は正常でした。",
+    "step2_quick_label": "クイック例：",
     "step2_submit": "診断ヒントを取得 →",
     "step3_title": "一致した症状",
+    "step3_summary_n": "{n}件の症状が一致しました。関連度順に並んでいます。",
+    "step3_no_match": "一致する症状が見つかりませんでした。",
+    "step3_no_match_help": "まだサポートが必要ですか？以下のステップ4で症状をそのまま運用者に送信できます。",
     "step4_title": "運用者へエスカレーション",
+    "step4_hint": "上記の診断で解決が難しい場合、セッション開始ペイロードを運用者に送信してください。このポータルはSAPシステムに直接接続しません。",
+    "step4_payload_label": "運用者へコピーするペイロード",
     "step4_copy": "📋 クリップボードにコピー",
+    "step4_download": "💾 .mdファイルとして保存",
+    "step4_privacy": "🔒 <strong>プライバシー注意</strong>：コピー前に、ペイロードにマイナンバー・カード番号・パスワードが含まれていないことをご確認ください。",
     "copied_ok": "✅ コピー完了",
     "confidence_label": "信頼度",
     "confidence_high": "高",
     "confidence_medium": "中",
-    "confidence_low": "低"
+    "confidence_low": "低",
+    "card_escalate": "→ この症状で運用者にエスカレーション",
+    "card_localized_label": "地域固有のチェック",
+    "warn_empty_symptom": "症状を1文以上入力してください。"
   },
   "session_viewer": {
     "title": "sapstack セッションビューア",
-    "tagline": "Evidence Loop セッションを読み取り専用で共有"
+    "tagline": "Evidence Loopセッション状態を読み取り専用で共有",
+    "load_title": "セッション状態ファイルを開く",
+    "load_hint": "運用者が共有した<code>state.yaml</code>ファイルをドラッグするか、ファイル選択ボタンを押してください。",
+    "drop_zone_text": "state.yamlをここにドラッグするか",
+    "file_select": "ファイル選択",
+    "demo_label": "またはデモ：",
+    "demo_button": "F110デモシナリオを開く",
+    "timeline_title": "Turnタイムライン",
+    "hypotheses_title": "仮説と判定",
+    "verdicts_title": "Verdict & Fix/Rollback",
+    "audit_title": "監査証跡"
   }
 }

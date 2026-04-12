@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "lang": "vi",
+    "name": "Tiếng Việt",
+    "flag": "🇻🇳",
+    "completeness": 1.0
+  },
+  "triage": {
+    "title": "sapstack Phân loại",
+    "tagline": "Mô tả triệu chứng · Gợi ý chẩn đoán ban đầu + Chuyển tiếp cho vận hành viên",
+    "step1_title": "Ngôn ngữ & Khu vực",
+    "step1_lang": "Ngôn ngữ",
+    "step1_country": "Quốc gia (bản địa hóa)",
+    "step2_title": "Mô tả vấn đề của bạn",
+    "step2_hint": "Hãy viết <strong>ngắn gọn trong một đoạn</strong> về: bạn đang ở màn hình nào, làm gì thì xuất hiện thông báo gì. Không biết thuật ngữ SAP cũng không sao.",
+    "step2_placeholder": "Ví dụ: Chạy F110 thì nhà cung cấp 100234 báo lỗi No valid payment method, hôm qua vẫn bình thường.",
+    "step2_quick_label": "Ví dụ nhanh:",
+    "step2_submit": "Nhận gợi ý chẩn đoán →",
+    "step3_title": "Triệu chứng khớp",
+    "step3_summary_n": "Tìm thấy {n} triệu chứng khớp, sắp xếp theo mức độ liên quan.",
+    "step3_no_match": "Không tìm thấy triệu chứng khớp.",
+    "step3_no_match_help": "Vẫn cần trợ giúp? Ở bước 4 bên dưới, bạn có thể gửi triệu chứng trực tiếp cho vận hành viên.",
+    "step4_title": "Chuyển tiếp cho vận hành viên",
+    "step4_hint": "Nếu chẩn đoán trên không giải quyết được, hãy gửi payload khởi tạo phiên cho vận hành viên. Cổng này không kết nối trực tiếp với hệ thống SAP.",
+    "step4_payload_label": "Payload để sao chép cho vận hành viên",
+    "step4_copy": "📋 Sao chép vào clipboard",
+    "step4_download": "💾 Lưu file .md",
+    "step4_privacy": "🔒 <strong>Lưu ý bảo mật</strong>: Trước khi sao chép, hãy kiểm tra payload không chứa số CMND, số thẻ ngân hàng hoặc mật khẩu.",
+    "copied_ok": "✅ Đã sao chép",
+    "confidence_label": "Độ tin cậy",
+    "confidence_high": "Cao",
+    "confidence_medium": "Trung bình",
+    "confidence_low": "Thấp",
+    "card_escalate": "→ Chuyển tiếp triệu chứng này cho vận hành viên",
+    "card_localized_label": "Kiểm tra đặc thù khu vực",
+    "warn_empty_symptom": "Vui lòng nhập ít nhất một câu mô tả triệu chứng."
+  },
+  "session_viewer": {
+    "title": "sapstack Trình xem phiên",
+    "tagline": "Chia sẻ trạng thái phiên Evidence Loop ở chế độ chỉ đọc",
+    "load_title": "Mở file trạng thái phiên",
+    "load_hint": "Kéo thả file <code>state.yaml</code> do vận hành viên chia sẻ, hoặc nhấn nút chọn file.",
+    "drop_zone_text": "Kéo state.yaml vào đây, hoặc",
+    "file_select": "Chọn file",
+    "demo_label": "Hoặc xem demo:",
+    "demo_button": "Mở kịch bản F110 mẫu",
+    "timeline_title": "Timeline các Turn",
+    "hypotheses_title": "Giả thuyết & Phán định",
+    "verdicts_title": "Phán quyết & Sửa/Hoàn tác",
+    "audit_title": "Nhật ký kiểm toán"
+  }
+}

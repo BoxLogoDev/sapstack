@@ -37,7 +37,8 @@ symptoms:
       - "페이런 돌렸는데 벤더 안 잡혀요"
     symptom_en: "F110 fails with 'No valid payment method found for vendor'"
     symptom_de: "F110 schlägt fehl mit 'Keine gültige Zahlungsmethode für Lieferant gefunden'"
-    symptom_ja: "F110実行時に「この仕入先に有効な支払方法が見つかりません」エラー"
+    symptom_zh: "F110运行时某供应商出现'未找到有效付款方式'错误"
+    symptom_ja: "F110実行時に特定仕入先で「有効な支払方法が見つかりません」エラー"
     likely_modules: [FI, TR]
     first_check_tcodes: [F110, XK03, FBZP, SE16N]
     typical_causes:
@@ -74,6 +75,8 @@ symptoms:
       - "F110 Proposal 대상 0건"
       - "에프백십 돌렸는데 아무것도 안 잡혀요"
     symptom_en: "F110 Proposal runs but selects no items"
+    symptom_zh: "F110 提案运行但未选中任何项目"
+    symptom_ja: "F110 提案実行時に対象項目がゼロ件"
     likely_modules: [FI]
     first_check_tcodes: [F110, FBL1N, OB29]
     typical_causes:
@@ -94,6 +97,8 @@ symptoms:
       - "F110 돌리면 DME에서 튕겨요"
       - "페이런 마지막에 파일 안 떨어져요"
     symptom_en: "F110 fails at Payment stage when creating DME file"
+    symptom_zh: "F110 付款阶段未能创建DME文件"
+    symptom_ja: "F110支払実行のDMEファイル生成段階で失敗"
     likely_modules: [FI, TR, BC]
     first_check_tcodes: [F110, DMEE, OBPM1, OBPM4]
     typical_causes:
@@ -125,7 +130,8 @@ symptoms:
       - "MIGO M7 뜨는데 원인이 뭐죠"
     symptom_en: "MIGO goods receipt posting fails with M7 message"
     symptom_de: "MIGO Warenannahme-Buchung schlägt fehl mit M7-Nachricht"
-    symptom_ja: "MIGO入庫計上時にM7系メッセージでエラー"
+    symptom_zh: "MIGO入库时出现M7错误，无法过账"
+    symptom_ja: "MIGO入庫計上時にM7エラーで過账失敗"
     likely_modules: [MM, FI]
     first_check_tcodes: [MIGO, ME23N, OMJJ, OBYC]
     typical_causes:
@@ -163,6 +169,8 @@ symptoms:
       - "MB52랑 실사랑 다름"
       - "머티리얼 재고 틀려요"
     symptom_en: "MMBE shows stock quantity mismatch vs physical count"
+    symptom_zh: "MMBE库存数量与实际不符"
+    symptom_ja: "MMBE在庫数量と実物の不一致"
     likely_modules: [MM, PP]
     first_check_tcodes: [MMBE, MB51, MB52, MI31, SE16N]
     typical_causes:
@@ -185,6 +193,8 @@ symptoms:
       - "송장검증 택스코드 다름"
       - "인보이스 VAT 튕겨요"
     symptom_en: "MIRO invoice verification shows tax code mismatch"
+    symptom_zh: "MIRO发票验证中税码不匹配"
+    symptom_ja: "MIRO送状検証時に税コードが不一致"
     likely_modules: [MM, FI]
     first_check_tcodes: [MIRO, FTXP, OBCL]
     typical_causes:
@@ -215,6 +225,8 @@ symptoms:
       - "월마감 후 포스팅 문제"
       - "마감 D+3인데 이전달 전표 튕겨요"
     symptom_en: "Period close issue — postings allowed/blocked in wrong period"
+    symptom_zh: "月结后，凭证无法正常过账到相应期间"
+    symptom_ja: "月次決算後、伝票が正期間に過账されない"
     likely_modules: [FI]
     first_check_tcodes: [OB52, FBL3N, SE16N]
     typical_causes:
@@ -235,6 +247,8 @@ symptoms:
       - "외화평가 D-1에 튀어요"
       - "FCV 결과 확인 필요"
     symptom_en: "F.5D foreign currency valuation shows unexpected results"
+    symptom_zh: "F.5D外币评估(FCV)结果异常"
+    symptom_ja: "F.5D外貨評価(FCV)の結果が異常"
     likely_modules: [FI]
     first_check_tcodes: [F.5D, OBA1, OB08, FAGLB03]
     typical_causes:

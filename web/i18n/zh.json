@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "lang": "zh",
+    "name": "中文",
+    "flag": "🇨🇳",
+    "completeness": 1.0
+  },
+  "triage": {
+    "title": "sapstack 分诊",
+    "tagline": "请描述症状 · 初步诊断提示 + 运维人员升级",
+    "step1_title": "语言和地区",
+    "step1_lang": "语言",
+    "step1_country": "国家（本地化）",
+    "step2_title": "描述您的问题",
+    "step2_hint": "请用<strong>简短的一段话</strong>描述：在哪个界面、尝试执行什么操作时出现了什么消息。不了解SAP术语也没关系。",
+    "step2_placeholder": "例：运行F110时供应商100234出现No valid payment method错误，昨天还正常。",
+    "step2_quick_label": "快速示例：",
+    "step2_submit": "获取诊断提示 →",
+    "step3_title": "匹配的症状",
+    "step3_summary_n": "匹配到 {n} 个症状，按相关性排序。",
+    "step3_no_match": "未匹配到症状。",
+    "step3_no_match_help": "仍需帮助？在下方第4步可以将症状直接发送给运维人员。",
+    "step4_title": "升级给运维人员",
+    "step4_hint": "如果以上诊断无法解决问题，请将会话启动负载发送给运维人员。此门户不直接连接SAP系统。",
+    "step4_payload_label": "复制给运维人员的负载",
+    "step4_copy": "📋 复制到剪贴板",
+    "step4_download": "💾 保存为 .md 文件",
+    "step4_privacy": "🔒 <strong>隐私提醒</strong>：复制前请确认负载中不包含身份证号、银行卡号或密码。",
+    "copied_ok": "✅ 复制成功",
+    "confidence_label": "置信度",
+    "confidence_high": "高",
+    "confidence_medium": "中",
+    "confidence_low": "低",
+    "card_escalate": "→ 使用此症状升级给运维人员",
+    "card_localized_label": "地区特定检查",
+    "warn_empty_symptom": "请至少输入一句症状描述。"
+  },
+  "session_viewer": {
+    "title": "sapstack 会话查看器",
+    "tagline": "以只读方式共享 Evidence Loop 会话状态",
+    "load_title": "打开会话状态文件",
+    "load_hint": "请拖放运维人员共享的 <code>state.yaml</code> 文件，或点击文件选择按钮。",
+    "drop_zone_text": "将 state.yaml 拖到此处，或",
+    "file_select": "选择文件",
+    "demo_label": "或查看演示：",
+    "demo_button": "打开 F110 示例场景",
+    "timeline_title": "Turn 时间线",
+    "hypotheses_title": "假设与判定",
+    "verdicts_title": "判决 & 修复/回滚",
+    "audit_title": "审计追踪"
+  }
+}

@@ -43,6 +43,8 @@ terms:
       variants: ["GL", "총계정원장", "일반원장", "General Ledger", "지-엘"]
     de: { primary: "Hauptbuch" }
     ja: { primary: "総勘定元帳", variants: ["GL"] }
+    zh: { primary: "总账", variants: ["总分类账", "GL"] }
+    vi: { primary: "Sổ cái chung", variants: ["GL", "Sổ tổng"] }
     related_tcodes: [FB01, FBL3N, FAGLB03, S_ALR_87012277]
 
   - canonical: cost_center
@@ -54,6 +56,8 @@ terms:
       variants: ["코스트센터", "원가센터", "원가 센터", "CC", "씨씨", "KOSTL", "코스트센타"]
     de: { primary: "Kostenstelle" }
     ja: { primary: "原価センタ", variants: ["コストセンタ", "CC"] }
+    zh: { primary: "成本中心", variants: ["原价中心", "CC"] }
+    vi: { primary: "Trung tâm chi phí", variants: ["Tâm chi phí", "CC"] }
     related_tcodes: [KS01, KS02, KS03, KSH1, KSB1]
 
   - canonical: profit_center
@@ -65,6 +69,8 @@ terms:
       variants: ["프라핏센터", "프로핏센터", "이익센터", "이익 센터", "PC", "피씨", "PRCTR"]
     de: { primary: "Profitcenter" }
     ja: { primary: "利益センタ", variants: ["プロフィットセンタ", "PC"] }
+    zh: { primary: "利润中心", variants: ["收益中心", "PC"] }
+    vi: { primary: "Trung tâm lợi nhuận", variants: ["Tâm lợi nhuận", "PC"] }
     related_tcodes: [KE51, KE52, KE53, KE5Z]
 
   - canonical: company_code
@@ -76,6 +82,8 @@ terms:
       variants: ["컴파니 코드", "컴파니코드", "회사 코드", "BUKRS", "법인코드", "법인 코드"]
     de: { primary: "Buchungskreis" }
     ja: { primary: "会社コード", variants: ["カンパニーコード"] }
+    zh: { primary: "公司代码", variants: ["公司编码", "BUKRS"] }
+    vi: { primary: "Mã công ty", variants: ["Mã công ty", "BUKRS"] }
     related_tcodes: [OBY6, OX02]
 
   - canonical: document
@@ -87,6 +95,8 @@ terms:
       variants: ["도큐먼트", "document", "Belnr", "도큐", "전표번호"]
     de: { primary: "Beleg", variants: ["Buchungsbeleg"] }
     ja: { primary: "伝票", variants: ["ドキュメント"] }
+    zh: { primary: "凭证", variants: ["会计凭证", "单据"] }
+    vi: { primary: "Chứng từ", variants: ["Chứng từ kế toán"] }
     related_tcodes: [FB03, FB02, FBRA]
 
   - canonical: posting
@@ -98,6 +108,8 @@ terms:
       variants: ["계상", "기표", "전기", "posting", "전표계상", "입력"]
     de: { primary: "Buchung" }
     ja: { primary: "計上", variants: ["ポスティング", "転記"] }
+    zh: { primary: "过账", variants: ["记账", "登记"] }
+    vi: { primary: "Ghi sổ", variants: ["Ghi chép", "Hạch toán"] }
     related_tcodes: [FB01, FB50]
     notes: |
       "계상"은 한국 회계 전통 용어, "포스팅"은 SAP 현장 실용어.
@@ -112,6 +124,8 @@ terms:
       variants: ["피리어드", "기간", "회계기간", "period", "PERIO", "포스팅피리어드"]
     de: { primary: "Buchungsperiode" }
     ja: { primary: "転記期間", variants: ["ピリオド"] }
+    zh: { primary: "过账期间", variants: ["记账期间", "会计期间"] }
+    vi: { primary: "Kỳ ghi sổ", variants: ["Kỳ kế toán", "Khoảng thời gian"] }
     related_tcodes: [OB52, OBBP, S_ALR_87003642]
 
   - canonical: vendor
@@ -123,6 +137,8 @@ terms:
       variants: ["벤더마스터", "거래처", "supplier", "공급처", "공급자", "LIFNR", "업체", "매입처"]
     de: { primary: "Lieferant", variants: ["Kreditor"] }
     ja: { primary: "仕入先", variants: ["ベンダー", "サプライヤー"] }
+    zh: { primary: "供应商", variants: ["卖方", "供应者"] }
+    vi: { primary: "Nhà cung cấp", variants: ["Bên bán", "Nhà cung"] }
     related_tcodes: [XK01, XK02, XK03, BP, FK03]
     notes: |
       S/4HANA에서는 Business Partner(BP)로 통합. 현장은 여전히 "벤더"가 압도적.

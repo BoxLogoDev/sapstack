@@ -3,28 +3,50 @@
     "lang": "de",
     "name": "Deutsch",
     "flag": "🇩🇪",
-    "completeness": 0.15,
-    "notes": "Seed translation — contributions welcome. Missing keys fall back to en.json."
+    "completeness": 1.0
   },
   "triage": {
     "title": "sapstack Triage",
-    "tagline": "Symptom beschreiben · Erste Hinweise + Eskalation an Operator",
+    "tagline": "Symptom beschreiben · Erste Diagnosehinweise + Eskalation an Operator",
     "step1_title": "Sprache & Region",
     "step1_lang": "Sprache",
     "step1_country": "Land (Lokalisierung)",
     "step2_title": "Symptom beschreiben",
-    "step2_submit": "Diagnose-Hinweise holen →",
+    "step2_hint": "Beschreiben Sie in <strong>einem kurzen Absatz</strong>, auf welchem Bildschirm Sie was versucht haben und welche Meldung erschienen ist. SAP-Fachbegriffe müssen Sie nicht kennen.",
+    "step2_placeholder": "Beispiel: Bei F110 bekommt Lieferant 100234 die Meldung 'No valid payment method'. Gestern lief es noch.",
+    "step2_quick_label": "Schnellbeispiele:",
+    "step2_submit": "Diagnosehinweise holen →",
     "step3_title": "Passende Symptome",
+    "step3_summary_n": "{n} Symptome gefunden, sortiert nach Relevanz.",
+    "step3_no_match": "Keine passenden Symptome gefunden.",
+    "step3_no_match_help": "Trotzdem Hilfe nötig? In Schritt 4 können Sie das Symptom direkt an den Operator weiterleiten.",
     "step4_title": "An Operator eskalieren",
+    "step4_hint": "Falls die obige Diagnose nicht ausreicht, leiten Sie den Session-Start-Payload an den Operator weiter. Dieses Portal verbindet sich nicht direkt mit SAP.",
+    "step4_payload_label": "Payload zum Kopieren an den Operator",
     "step4_copy": "📋 In Zwischenablage kopieren",
+    "step4_download": "💾 Als .md-Datei speichern",
+    "step4_privacy": "🔒 <strong>Datenschutzhinweis</strong>: Prüfen Sie vor dem Kopieren, ob der Payload keine Personalausweisnummern, Kartennummern oder Passwörter enthält.",
     "copied_ok": "✅ Kopiert",
     "confidence_label": "Vertrauen",
     "confidence_high": "hoch",
     "confidence_medium": "mittel",
-    "confidence_low": "niedrig"
+    "confidence_low": "niedrig",
+    "card_escalate": "→ Mit diesem Symptom an Operator eskalieren",
+    "card_localized_label": "Regionale Prüfungen",
+    "warn_empty_symptom": "Bitte geben Sie mindestens einen Satz als Symptom ein."
   },
   "session_viewer": {
     "title": "sapstack Session Viewer",
-    "tagline": "Evidence-Loop-Sitzungen schreibgeschützt teilen"
+    "tagline": "Evidence-Loop-Sitzungsstatus schreibgeschützt teilen",
+    "load_title": "Sitzungsstatus-Datei öffnen",
+    "load_hint": "Ziehen Sie die vom Operator freigegebene <code>state.yaml</code>-Datei hierher oder klicken Sie auf Datei auswählen.",
+    "drop_zone_text": "state.yaml hierher ziehen oder",
+    "file_select": "Datei auswählen",
+    "demo_label": "Oder Demo ansehen:",
+    "demo_button": "F110 Demo-Szenario öffnen",
+    "timeline_title": "Turn-Timeline",
+    "hypotheses_title": "Hypothesen & Bewertung",
+    "verdicts_title": "Urteil & Fix/Rollback",
+    "audit_title": "Audit-Trail"
   }
 }
