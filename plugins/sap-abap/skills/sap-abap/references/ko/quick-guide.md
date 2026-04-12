@@ -53,7 +53,7 @@
 ```
 /sap-abap-review <파일경로 또는 객체명>
 ```
-→ `sap-abap-reviewer` 서브에이전트가 Clean Core + HANA + ATC 기준으로 리뷰
+→ `sap-abap-developer` 서브에이전트가 Clean Core + HANA + ATC 기준으로 리뷰
 
 ## 📖 참조
 - `../clean-core-patterns.md`

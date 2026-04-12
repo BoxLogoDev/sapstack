@@ -86,7 +86,7 @@
       ]
     },
     {
-      "name": "sap-abap-reviewer",
+      "name": "sap-abap-developer",
       "description": "ABAP code reviewer — Clean Core, HANA optimization, ATC",
       "arguments": [
         { "name": "code", "description": "ABAP code to review", "required": true }
@@ -100,7 +100,7 @@
       ]
     },
     {
-      "name": "sap-basis-troubleshooter",
+      "name": "sap-basis-consultant",
       "description": "Basis issue routing — dumps, WP hang, transport",
       "arguments": [
         { "name": "symptom", "description": "Observed symptom", "required": true }

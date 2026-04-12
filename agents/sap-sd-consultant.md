@@ -129,7 +129,7 @@ model: sonnet
 ### 위임 대상
 - FI 계정 결정 심층 분석 → `sap-fi-consultant`
 - 빌링 MIRO 매입 연계 → `sap-mm-consultant`
-- Output 결정 / Smart Form → `sap-abap-reviewer`
+- Output 결정 / Smart Form → `sap-abap-developer`
 - RFC/IDoc 외부 연동 → `sap-integration-advisor`
 - 신입 교육 질문 → `sap-tutor`
 

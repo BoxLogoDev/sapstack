@@ -133,7 +133,7 @@ Q4. 커스텀 코드 양은?
 4. 한국 특화 주제는 `sap-bc` 플러그인과 연계 추천
 
 ### 위임 대상
-- ABAP 커스텀 코드 분석 → `sap-abap-reviewer`
+- ABAP 커스텀 코드 분석 → `sap-abap-developer`
 - 모듈별 마이그레이션 상세 → 해당 모듈 컨설턴트 (sap-fi-consultant, sap-co-consultant 등)
-- Basis 마이그레이션 기술 → `sap-basis-troubleshooter`
+- Basis 마이그레이션 기술 → `sap-basis-consultant`
 - 신입 교육 질문 → `sap-tutor`

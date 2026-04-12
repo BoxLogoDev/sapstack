@@ -1,5 +1,5 @@
 ---
-description: ABAP 코드를 sap-abap-reviewer 서브에이전트에 위임해 Clean Core, HANA 최적화, ATC 기준으로 리뷰합니다. 파일 경로 또는 객체 이름을 인수로 받습니다.
+description: ABAP 코드를 sap-abap-developer 서브에이전트에 위임해 Clean Core, HANA 최적화, ATC 기준으로 리뷰합니다. 파일 경로 또는 객체 이름을 인수로 받습니다.
 argument-hint: [파일경로 또는 객체명]
 ---
 
@@ -18,8 +18,8 @@ argument-hint: [파일경로 또는 객체명]
    - 관련 파일의 import/include 추적
    - DDIC 의존성 확인 (TABLES, TYPE, STRUCTURE)
 
-3. **sap-abap-reviewer 서브에이전트에 위임**
-   - Task 도구로 `sap-abap-reviewer` 호출
+3. **sap-abap-developer 서브에이전트에 위임**
+   - Task 도구로 `sap-abap-developer` 호출
    - 코드 전문 전달
    - 한국 현장 맥락(K-SOX, 개인정보보호법) 포함 요청
 
@@ -58,6 +58,6 @@ argument-hint: [파일경로 또는 객체명]
 ```
 
 ## 참조
-- `agents/sap-abap-reviewer.md`
+- `agents/sap-abap-developer.md`
 - `plugins/sap-abap/skills/sap-abap/references/clean-core-patterns.md`
 - `plugins/sap-abap/skills/sap-abap/references/code-review-checklist.md`

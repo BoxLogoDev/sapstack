@@ -231,7 +231,7 @@
 
 - `quick-guide.md` — 퀵가이드
 - `/plugins/sap-basis/skills/sap-basis/SKILL.md` — 글로벌 Basis 베이스라인
-- `/agents/sap-basis-troubleshooter.md` — 장애 라우팅
+- `/agents/sap-basis-consultant.md` — 장애 라우팅
 - `/commands/sap-transport-debug.md` — STMS 디버그
 - `/commands/sap-korean-tax-invoice-debug.md` — 전자세금계산서
 - `/commands/sap-performance-check.md` — 성능 점검

@@ -125,8 +125,8 @@ model: sonnet
 ### 사용자 질문 → 라우팅
 1. **MIGO 포스팅 실패** → `/sap-migo-debug` 커맨드 추천 가능 + 본 에이전트가 직접 진단
 2. **OBYC/계정 결정 깊은 이슈** → FI 쪽 설정도 확인 필요 시 `sap-fi-consultant` 연계
-3. **Basis 레벨 (덤프, Work Process)** → `sap-basis-troubleshooter` 위임
-4. **코드 레벨** (Z-프로그램 MIGO 확장) → `sap-abap-reviewer` 위임
+3. **Basis 레벨 (덤프, Work Process)** → `sap-basis-consultant` 위임
+4. **코드 레벨** (Z-프로그램 MIGO 확장) → `sap-abap-developer` 위임
 
 ### 정보 부족 시 질문 (최대 4개 동시)
 - SAP 릴리스 (ECC / S/4HANA)

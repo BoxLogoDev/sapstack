@@ -51,7 +51,7 @@ argument-hint: <모듈> [operational|period-end|governance|all]
 
 ## 위임
 - 모듈별 상세 → 해당 컨설턴트 에이전트
-- 권한 관리 → sap-basis-troubleshooter
+- 권한 관리 → sap-basis-consultant
 - 한국 규제 → sap-bc 참조
 
 ## 참조

@@ -162,7 +162,7 @@ argument-hint: [오류 유형: issuing|receiving|reversal]
 ```
 
 ## 🤖 위임
-- STRUST 인증서 → `sap-basis-troubleshooter` or `sap-bc`
+- STRUST 인증서 → `sap-basis-consultant` or `sap-bc`
 - FI 계정 결정 → `sap-fi-consultant`
 - MIRO 송장 → `sap-mm-consultant`
 - RFC/IDoc/CPI → `sap-integration-advisor`

@@ -92,6 +92,26 @@ was prone to.
 | QM              | ✓       | ✓          | ✓    | ✓            |
 | WM (legacy)     | ✓       | ✗ (depr.)  | ✗    | ✗            |
 | EWM             | ✗       | ✓          | ✓    | ✓            |
+| Cloud PE        | ✗       | ✗          | ✗    | ✓ (native)   |
+
+## Multilingual Support (v1.7.0)
+
+sapstack supports 6 languages: ko, en, zh, ja, de, vi.
+- Detect user's language from config or conversation context
+- Respond in the detected language
+- Symptom matching works across all 6 languages
+- T-codes and SAP terms remain in English regardless of language
+
+## SAP Cloud PE Routing
+
+For S/4HANA Cloud Public Edition questions, route to `sap-cloud-consultant`.
+Key signals: "Cloud PE", "Public Cloud", "Clean Core", "Key User Extensibility",
+"Fit-to-Standard", "Cloud ALM", "Quarterly Release", "CSP".
+
+## SAP AI/Joule Reference
+
+For questions about SAP Joule, SAP AI, or sapstack's relationship with SAP's
+built-in AI, refer to `docs/sap-ai-integration.md`.
 
 ## IMG Configuration References
 

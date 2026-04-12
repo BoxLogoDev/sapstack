@@ -185,7 +185,7 @@ argument-hint: [회사코드] [회계연도]
 - 복잡 FI 이슈 → `sap-fi-consultant`
 - CO 원가 조정 → `sap-co-consultant`
 - 자산 전문 → `sap-fi-consultant` (AA)
-- 감사 대응 ABAP 추적 → `sap-abap-reviewer`
+- 감사 대응 ABAP 추적 → `sap-abap-developer`
 
 ## 참조
 - `/commands/sap-fi-closing.md` — 월결산

@@ -195,8 +195,8 @@ Layer 1~5 모두
 ```
 
 ## 🤖 위임
-- Basis/Kernel 심층 → `sap-basis-troubleshooter`
-- ABAP 코드 리뷰 → `sap-abap-reviewer`
+- Basis/Kernel 심층 → `sap-basis-consultant`
+- ABAP 코드 리뷰 → `sap-abap-developer`
 - 한국 현장 (망분리·한글) → `sap-bc`
 - DB/HANA 심층 → 별도 DBA
 

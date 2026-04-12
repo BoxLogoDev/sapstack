@@ -11,12 +11,12 @@ AFAB test run에서 DBIF_RSQL_SQL_ERROR 덤프가 납니다.
 
 ## 🤖 추천 위임
 **2개 에이전트 병렬**:
-- `sap-basis-troubleshooter` — 덤프 분석 레이어
+- `sap-basis-consultant` — 덤프 분석 레이어
 - `sap-fi-consultant` — AFAB 설정 레이어
 
 또는 명시적:
 ```
-ST22로 덤프를 읽고 원인을 식별해줘. sap-basis-troubleshooter 플로우 사용.
+ST22로 덤프를 읽고 원인을 식별해줘. sap-basis-consultant 플로우 사용.
 ```
 
 ### 체계적 진단
@@ -78,6 +78,6 @@ ALTER SYSTEM CLEAR SQL PLAN CACHE
 - **병렬 에이전트 위임** — 한 이슈에 여러 관점 동시 분석
 
 ## 🔗 관련
-- `/agents/sap-basis-troubleshooter.md` — 덤프 분석 플로우
+- `/agents/sap-basis-consultant.md` — 덤프 분석 플로우
 - `/agents/sap-fi-consultant.md` — AFAB 전용
 - `data/sap-notes.yaml` — dump 카테고리

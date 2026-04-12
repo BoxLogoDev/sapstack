@@ -163,9 +163,9 @@ grep -i error <logfile>
 ```
 
 ## 🤖 위임
-- Kernel/OS 레벨 → `sap-basis-troubleshooter`
+- Kernel/OS 레벨 → `sap-basis-consultant`
 - 한국 Unicode 이슈 → `sap-bc` 플러그인
-- ABAP 구문 오류 → `sap-abap-reviewer`
+- ABAP 구문 오류 → `sap-abap-developer`
 
 ## 참조
 - `plugins/sap-basis/skills/sap-basis/SKILL.md`

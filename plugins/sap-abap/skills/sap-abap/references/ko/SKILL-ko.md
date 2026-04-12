@@ -331,5 +331,5 @@ Clean Core / S/4HANA 호환성:
 - `../code-review-checklist.md` — 전체 ABAP 코드 리뷰 체크리스트
 - `quick-guide.md` — 한국어 퀵가이드
 - `../../../../sap-bc/skills/sap-bc/SKILL.md` — 한국 BC 관점 (ABAP 덤프 한국 맥락)
-- `/agents/sap-abap-reviewer.md` — ABAP 리뷰 서브에이전트
+- `/agents/sap-abap-developer.md` — ABAP 리뷰 서브에이전트
 - `/commands/sap-abap-review.md` — 코드 리뷰 슬래시 커맨드

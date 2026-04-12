@@ -24,7 +24,7 @@
 **테마: 3축 구조로 재구축**
 
 ### 축 1: Active Advisors
-- [x] 서브에이전트 3종 (sap-fi-consultant, sap-abap-reviewer, sap-s4-migration-advisor)
+- [x] 서브에이전트 3종 (sap-fi-consultant, sap-abap-developer, sap-s4-migration-advisor)
 - [x] 슬래시 커맨드 5종 (sap-fi-closing, sap-abap-review, sap-s4-readiness, sap-migo-debug, sap-payment-run-debug)
 - [x] `sap-bc` 플러그인 (한국 BC 컨설턴트 특화)
 
@@ -170,7 +170,7 @@
 - [ ] **SAP Note resolver** — 키워드 → 확정된 Note 번호 매핑 데이터셋 (`data/sap-notes.yaml`)
 - [ ] **ECC vs S/4HANA 표기 검증** — SKILL.md에서 두 릴리스 차이점이 명시적으로 표기됐는지 자동 검사
 - [ ] **추가 서브에이전트 2종**:
-  - `sap-basis-troubleshooter` — STMS/SM50/ST22 덤프 라우팅
+  - `sap-basis-consultant` — STMS/SM50/ST22 덤프 라우팅
   - `sap-mm-consultant` — 구매/재고/GR-IR
 - [ ] **`check-hardcoding.sh --strict`** CI 기본 활성화
 - [ ] 한국어 quick-guide를 **13개 → 전체 본문 한국어 병렬 버전**으로 확장 (2개 모듈 시범)

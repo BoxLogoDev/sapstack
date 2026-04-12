@@ -306,6 +306,6 @@ DEV에서 개발 → SE10 Release → STMS에 Queue 등장
 ## 15. 관련
 - `quick-guide.md`
 - `/plugins/sap-bc/skills/sap-bc/SKILL.md` — 한국 현장 특화 Basis
-- `/agents/sap-basis-troubleshooter.md` — 장애 라우팅 에이전트
+- `/agents/sap-basis-consultant.md` — 장애 라우팅 에이전트
 - `/commands/sap-transport-debug.md` — STMS 디버그
 - `/commands/sap-performance-check.md` — 성능 점검

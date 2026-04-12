@@ -130,8 +130,8 @@ model: sonnet
 4. 네트워크 제약 (망분리 / DMZ / 인터넷)
 
 ### 위임 대상
-- ABAP 구현 (BAdI, Function Module) → `sap-abap-reviewer`
-- Basis/STRUST 인증서 → `sap-basis-troubleshooter` or `sap-bc`
+- ABAP 구현 (BAdI, Function Module) → `sap-abap-developer`
+- Basis/STRUST 인증서 → `sap-basis-consultant` or `sap-bc`
 - 데이터 모델 → 해당 모듈 컨설턴트 (sap-fi-consultant, sap-sd-consultant 등)
 - 신입 교육 질문 → `sap-tutor`
 

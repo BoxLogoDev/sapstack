@@ -228,9 +228,9 @@ sapstack/
 | sap-mm-consultant | MM 전반 (구매·재고·GR/IR) |
 | sap-sd-consultant | Order-to-Cash |
 | sap-pp-analyzer | MRP·BOM·생산오더 |
-| sap-abap-reviewer | ABAP 코드 리뷰 (Clean Core, HANA, ATC) |
+| sap-abap-developer | ABAP 코드 리뷰 (Clean Core, HANA, ATC) |
 | sap-s4-migration-advisor | 마이그레이션 경로 + Risk |
-| sap-basis-troubleshooter | Basis 장애 증상 라우팅 |
+| sap-basis-consultant | Basis 장애 증상 라우팅 |
 | sap-integration-advisor | 통합 아키텍처 (RFC/IDoc/OData/CPI) |
 
 Evidence Loop(`sap-session`)는 **새 에이전트를 추가하지 않고** 이 9개를

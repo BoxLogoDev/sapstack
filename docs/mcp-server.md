@@ -22,9 +22,9 @@
 
 ### 제공 프롬프트 (Prompts)
 - `sap-fi-consultant` — FI 컨설턴트 에이전트
-- `sap-abap-reviewer` — ABAP 리뷰어
+- `sap-abap-developer` — ABAP 리뷰어
 - `sap-s4-migration-advisor` — S/4 마이그레이션 어드바이저
-- `sap-basis-troubleshooter` — Basis 트러블슈터
+- `sap-basis-consultant` — Basis 트러블슈터
 - `sap-mm-consultant` — MM 컨설턴트
 
 ### 제공 도구 (Tools)

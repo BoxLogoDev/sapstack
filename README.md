@@ -4,9 +4,9 @@
 
 ### Enterprise SAP Operations Platform for AI Coding Assistants
 
-**19 plugins · 15 agents · 18 commands · 52 IMG guides · 40 best practices · 340+ T-codes · 7 AI tools**
+**20 plugins · 16 agents · 18 commands · 55+ IMG guides · 43+ best practices · 6 languages · SAP AI ready**
 
-[![Version](https://img.shields.io/badge/version-1.6.0-blue.svg)](https://github.com/BoxLogoDev/sapstack/releases/tag/v1.6.0)
+[![Version](https://img.shields.io/badge/version-1.7.0-blue.svg)](https://github.com/BoxLogoDev/sapstack/releases/tag/v1.7.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![CI](https://img.shields.io/badge/CI-passing-brightgreen.svg)](https://github.com/BoxLogoDev/sapstack/actions)
 [![Korean](https://img.shields.io/badge/Korean-Field%20Language-red.svg)](plugins/sap-session/skills/sap-session/references/korean-field-language.md)
@@ -215,8 +215,8 @@ Turn 4 VERIFY     → 가설 확정/기각 + Fix Plan + 필수 Rollback Plan
 | `sap-pm-consultant` 🆕 | PM 설비보전 | 장비·보전오더·MTBF/MTTR |
 | `sap-qm-consultant` 🆕 | QM 품질관리 | 검사·사용결정·ISO/GMP |
 | `sap-ewm-consultant` 🆕 | EWM/WM 창고관리 | Wave·RF·피킹·WM마이그레이션 |
-| `sap-abap-reviewer` | ABAP 코드 리뷰 | 코드 품질·Clean Core |
-| `sap-basis-troubleshooter` | Basis 장애 라우팅 | 덤프·WP행·Transport |
+| `sap-abap-developer` | ABAP 코드 리뷰 | 코드 품질·Clean Core |
+| `sap-basis-consultant` | Basis 장애 라우팅 | 덤프·WP행·Transport |
 | `sap-s4-migration-advisor` | S/4HANA 경로 추천 | 마이그레이션 질문 |
 | `sap-integration-advisor` | 통합 아키텍처 | RFC·IDoc·OData·CPI |
 

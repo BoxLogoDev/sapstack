@@ -118,7 +118,7 @@ MIRO 송장 입력 시 세금코드(MWSKZ)가 자동으로 결정되지 않음
 이 ABAP 코드 리뷰해줘: Z_SALES_REPORT.abap
 ```
 
-Claude가 `sap-abap-reviewer` 에이전트에 자동 위임:
+Claude가 `sap-abap-developer` 에이전트에 자동 위임:
 1. 독립 컨텍스트에서 코드 읽기
 2. Clean Core · HANA 최적화 · ATC 기준 체크리스트
 3. Critical / Warning / Good 분류 결과
@@ -136,8 +136,8 @@ Task 도구로 sap-fi-consultant에 이 결산 이슈를 위임해줘: ...
 | `sap-mm-consultant` | MM 전반 |
 | `sap-sd-consultant` | SD 전반 |
 | `sap-pp-analyzer` | PP 생산계획 |
-| `sap-abap-reviewer` | ABAP 코드 리뷰 |
-| `sap-basis-troubleshooter` | Basis 장애 |
+| `sap-abap-developer` | ABAP 코드 리뷰 |
+| `sap-basis-consultant` | Basis 장애 |
 | `sap-s4-migration-advisor` | S/4 마이그레이션 |
 | `sap-integration-advisor` | RFC/IDoc/OData/CPI |
 

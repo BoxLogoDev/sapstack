@@ -78,7 +78,7 @@ MIRO 포스팅 시 MWSKZ(세금코드) 필드가 자동 결정되지 않음
 ```
 
 **일어나는 일**:
-1. Claude가 `sap-abap-reviewer` 서브에이전트에 Task 도구로 위임
+1. Claude가 `sap-abap-developer` 서브에이전트에 Task 도구로 위임
 2. 독립 컨텍스트에서 Clean Core / HANA / ATC 기준 분석
 3. Critical / Warning / Good 분류 결과 반환
 

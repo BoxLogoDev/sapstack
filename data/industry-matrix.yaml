@@ -22,8 +22,8 @@ manufacturing:
     EWM: { importance: medium, agent: sap-ewm-consultant, note: "대형 물류센터" }
     HCM: { importance: medium, agent: sap-hcm-consultant, note: "3교대 근무 관리" }
     TR: { importance: low, agent: sap-tr-consultant }
-    ABAP: { importance: high, agent: sap-abap-reviewer, note: "MES 연동 커스텀 개발" }
-    BASIS: { importance: medium, agent: sap-basis-troubleshooter }
+    ABAP: { importance: high, agent: sap-abap-developer, note: "MES 연동 커스텀 개발" }
+    BASIS: { importance: medium, agent: sap-basis-consultant }
     BTP: { importance: low }
     GTS: { importance: low, note: "수출입 기업만" }
 
@@ -43,8 +43,8 @@ retail:
     PM: { importance: low, agent: sap-pm-consultant, note: "물류 설비" }
     HCM: { importance: medium, agent: sap-hcm-consultant, note: "매장 인력 관리" }
     TR: { importance: low, agent: sap-tr-consultant }
-    ABAP: { importance: high, agent: sap-abap-reviewer, note: "POS/EDI 연동" }
-    BASIS: { importance: medium, agent: sap-basis-troubleshooter }
+    ABAP: { importance: high, agent: sap-abap-developer, note: "POS/EDI 연동" }
+    BASIS: { importance: medium, agent: sap-basis-consultant }
     BTP: { importance: medium, note: "이커머스 연동" }
     GTS: { importance: medium, note: "해외 직구/수입" }
 
@@ -58,8 +58,8 @@ financial_services:
     TR: { importance: critical, agent: sap-tr-consultant, note: "자금관리, 금융상품, 리스크" }
     HCM: { importance: high, agent: sap-hcm-consultant, note: "대규모 인력, 성과급" }
     MM: { importance: medium, agent: sap-mm-consultant, note: "간접 구매(IT, 사무용품)" }
-    BASIS: { importance: critical, agent: sap-basis-troubleshooter, note: "보안, 감사, SoD" }
-    ABAP: { importance: medium, agent: sap-abap-reviewer, note: "코어뱅킹 인터페이스" }
+    BASIS: { importance: critical, agent: sap-basis-consultant, note: "보안, 감사, SoD" }
+    ABAP: { importance: medium, agent: sap-abap-developer, note: "코어뱅킹 인터페이스" }
     BTP: { importance: medium, note: "디지털 채널" }
     SD: { importance: low, note: "일부 상품 판매" }
     PP: { importance: none }

@@ -558,9 +558,9 @@ server.setRequestHandler(ListPromptsRequestSchema, async () => {
   return {
     prompts: [
       { name: "sap-fi-consultant", description: "FI consultant systematic diagnosis" },
-      { name: "sap-abap-reviewer", description: "ABAP code review (Clean Core, HANA)" },
+      { name: "sap-abap-developer", description: "ABAP code review (Clean Core, HANA)" },
       { name: "sap-s4-migration-advisor", description: "S/4HANA migration advisory" },
-      { name: "sap-basis-troubleshooter", description: "Basis issue routing" },
+      { name: "sap-basis-consultant", description: "Basis issue routing" },
       { name: "sap-mm-consultant", description: "MM procurement/inventory" },
       { name: "sap-session-turn2-hypothesis", description: "Evidence Loop Turn 2 (v1.5.0)" },
       { name: "sap-session-turn4-verify", description: "Evidence Loop Turn 4 (v1.5.0)" },

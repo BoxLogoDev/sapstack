@@ -99,7 +99,7 @@ sapstack/
 │   └── config.example.yaml       # 환경 프로필 템플릿
 ├── agents/                       # 서브에이전트 (신규 v1.1)
 │   ├── sap-fi-consultant.md
-│   ├── sap-abap-reviewer.md
+│   ├── sap-abap-developer.md
 │   └── sap-s4-migration-advisor.md
 ├── commands/                     # 슬래시 커맨드 (신규 v1.1)
 │   ├── sap-fi-closing.md
@@ -254,5 +254,5 @@ v1.2.0 이후 로드맵은 [`roadmap.md`](./roadmap.md) 참조.
 - SAP Note 정적 resolver (키워드 → Note 번호)
 - T-code validator (모든 SKILL의 T-code가 실제 SAP 영역에서 유효한지)
 - OData/REST client helper (BTP 연동)
-- 추가 서브에이전트 (sap-basis-troubleshooter, sap-mm-consultant 등)
+- 추가 서브에이전트 (sap-basis-consultant, sap-mm-consultant 등)
 - CI에 `check-hardcoding --strict` 활성화

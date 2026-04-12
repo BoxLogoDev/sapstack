@@ -111,11 +111,18 @@ language: [ko, en]
 | CO | `sap-co-consultant` |
 | MM | `sap-mm-consultant` |
 | SD | `sap-sd-consultant` |
-| PP | `sap-pp-analyzer` |
-| ABAP | `sap-abap-reviewer` |
-| BASIS | `sap-basis-troubleshooter` |
+| PP | `sap-pp-consultant` |
+| PM | `sap-pm-consultant` |
+| QM | `sap-qm-consultant` |
+| WM/EWM | `sap-ewm-consultant` |
+| HCM | `sap-hcm-consultant` |
+| TR | `sap-tr-consultant` |
+| Cloud PE | `sap-cloud-consultant` |
+| ABAP | `sap-abap-developer` |
+| BASIS | `sap-basis-consultant` |
 | S4MIG | `sap-s4-migration-advisor` |
 | 통합/CPI/IDoc | `sap-integration-advisor` |
+| 신입 교육 | `sap-tutor` |
 
 여러 모듈이 관련되면 **병렬 호출**하고, 각 에이전트의 Verdict를 종합해
 최종 `verdict.resolutions[]`를 구성합니다. (Cross-module review 패턴)

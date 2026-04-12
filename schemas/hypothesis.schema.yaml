@@ -131,8 +131,8 @@ properties:
         - sap-mm-consultant
         - sap-sd-consultant
         - sap-pp-analyzer
-        - sap-abap-reviewer
-        - sap-basis-troubleshooter
+        - sap-abap-developer
+        - sap-basis-consultant
         - sap-s4-migration-advisor
         - sap-integration-advisor
     description: "Which existing sapstack subagents should be invoked for deeper analysis"

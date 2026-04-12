@@ -141,7 +141,7 @@ model: sonnet
 - 자재 재고 / GR-IR → `sap-mm-consultant`
 - 원가 / CO-PC / Variance → `sap-co-consultant`
 - MES 연동 RFC/IDoc → `sap-integration-advisor`
-- Work Center ABAP 확장 → `sap-abap-reviewer`
+- Work Center ABAP 확장 → `sap-abap-developer`
 - 신입 교육 질문 → `sap-tutor`
 
 ## 금지 사항

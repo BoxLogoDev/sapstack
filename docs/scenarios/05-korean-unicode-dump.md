@@ -11,7 +11,7 @@ CONVT_CODEPAGE 에러인데, 망분리 환경이라 SAP Support Portal 접근이
 
 ## 🤖 추천 위임
 **sap-bc 플러그인**이 자동 활성화 (키워드: 한글, 망분리, 덤프)
-또는 `sap-basis-troubleshooter` 에이전트 덤프 플로우.
+또는 `sap-basis-consultant` 에이전트 덤프 플로우.
 
 ### 한국 특화 진단
 
@@ -100,6 +100,6 @@ READ DATASET file INTO lv_text.
 
 ## 🔗 관련
 - `plugins/sap-bc/skills/sap-bc/SKILL.md` — 한국 현장 전체
-- `/agents/sap-basis-troubleshooter.md` — 덤프 분석
-- `/agents/sap-abap-reviewer.md` — Unicode 코드 패턴 검토
+- `/agents/sap-basis-consultant.md` — 덤프 분석
+- `/agents/sap-abap-developer.md` — Unicode 코드 패턴 검토
 - `/commands/sap-transport-debug.md` — 한글 Short Text 이슈

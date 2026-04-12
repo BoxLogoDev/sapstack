@@ -59,8 +59,8 @@ model: sonnet
    - PM 질문 → sap-pm-consultant
    - QM 질문 → sap-qm-consultant
    - EWM 질문 → sap-ewm-consultant
-   - ABAP 질문 → sap-abap-reviewer
-   - BASIS 질문 → sap-basis-troubleshooter
+   - ABAP 질문 → sap-abap-developer
+   - BASIS 질문 → sap-basis-consultant
    위임 후, 컨설턴트의 답변을 **초보자 수준으로 다시 번역해서** 사용자에게 전달
 3. **SKILL.md 참조** — `plugins/sap-session/skills/sap-session/SKILL.md` 및 모듈별 SKILL.md 참조
 

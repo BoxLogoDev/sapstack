@@ -110,7 +110,7 @@ model: sonnet
 
 ### 참고 예시
 - `agents/sap-fi-consultant.md`
-- `agents/sap-abap-reviewer.md`
+- `agents/sap-abap-developer.md`
 - `agents/sap-s4-migration-advisor.md`
 
 ---
