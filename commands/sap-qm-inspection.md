@@ -76,7 +76,7 @@ argument-hint: [검사로트번호|자재번호|검사유형] [GR|생산|출하]
 - 이력추적 (Batch traceability)
 
 ## 위임
-- sap-qm-inspector — 상세 QM 분석
+- sap-qm-consultant — 상세 QM 분석
 - sap-mm-consultant — 입고/차단재고 처리
 - sap-pp-consultant — 공정검사 연계
 - sap-sd-consultant — 출하검사 + 인증서 발행

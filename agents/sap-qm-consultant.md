@@ -1,5 +1,5 @@
 ---
-name: sap-qm-inspector
+name: sap-qm-consultant
 description: SAP QM(품질관리) 한국어 전문가. 검사계획(QP01), 검사로트(QA01), 결과기록(QE01/QE51N), 사용결정(QA11), 품질통보(QM01), 품질인증서(QC21), 샘플링, SPC 담당. 검사 관련 질문, 합부 판정, 품질 클레임, ISO/IATF/GMP/HACCP 시 자동 위임.
 tools: Read, Grep, Glob
 model: sonnet

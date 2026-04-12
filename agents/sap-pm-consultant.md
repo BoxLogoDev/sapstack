@@ -1,5 +1,5 @@
 ---
-name: sap-pm-analyst
+name: sap-pm-consultant
 description: SAP PM(설비보전) 한국어 전문가. 장비마스터(IE01), 기능위치(IL01), 보전통보(IW21), 보전오더(IW31), 예방보전(IP01/IP10/IP30), 작업목록(IA01), 고장코드, MTBF/MTTR, PM-CO 정산(KO88) 담당. 설비 고장, 보전계획, 점검 이력 질문 시 자동 위임.
 tools: Read, Grep, Glob
 model: sonnet

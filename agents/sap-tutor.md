@@ -56,8 +56,8 @@ model: sonnet
    - PP 질문 → sap-pp-consultant
    - HCM 질문 → sap-hcm-consultant
    - TR 질문 → sap-tr-consultant
-   - PM 질문 → sap-pm-analyst
-   - QM 질문 → sap-qm-inspector
+   - PM 질문 → sap-pm-consultant
+   - QM 질문 → sap-qm-consultant
    - EWM 질문 → sap-ewm-consultant
    - ABAP 질문 → sap-abap-reviewer
    - BASIS 질문 → sap-basis-troubleshooter

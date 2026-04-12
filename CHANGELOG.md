@@ -55,8 +55,8 @@ IMG 구성 가이드, 3-Tier Best Practice, 엔터프라이즈 시나리오, 업
 - **`sap-tutor`** — SAP 신입사원 교육 튜터 (각 컨설턴트에게 질문 위임 + 초보자 수준 번역)
 - **`sap-hcm-consultant`** — HCM 한국어 컨설턴트 (4대보험, 원천징수, 퇴직연금)
 - **`sap-tr-consultant`** — TR 한국어 컨설턴트 (유동성, 은행 연동, DMEE)
-- **`sap-pm-analyst`** — PM 한국어 전문가 (장비, 보전오더, MTBF/MTTR)
-- **`sap-qm-inspector`** — QM 한국어 전문가 (검사, 사용결정, ISO/GMP)
+- **`sap-pm-consultant`** — PM 한국어 전문가 (장비, 보전오더, MTBF/MTTR)
+- **`sap-qm-consultant`** — QM 한국어 전문가 (검사, 사용결정, ISO/GMP)
 - **`sap-ewm-consultant`** — EWM/WM 한국어 컨설턴트 (Wave, RF, 마이그레이션)
 - **`/sap-img-guide`** — IMG 구성 가이드 조회 커맨드
 - **`/sap-master-data-check`** — 마스터데이터 사전검증

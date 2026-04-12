@@ -13,8 +13,8 @@ manufacturing:
   modules:
     PP: { importance: critical, agent: sap-pp-consultant, note: "MRP/BOM/Routing — 생산 핵심" }
     MM: { importance: critical, agent: sap-mm-consultant, note: "원자재 조달, 재고 관리" }
-    QM: { importance: critical, agent: sap-qm-inspector, note: "품질 검사, ISO/IATF" }
-    PM: { importance: critical, agent: sap-pm-analyst, note: "설비 보전, 예방 정비" }
+    QM: { importance: critical, agent: sap-qm-consultant, note: "품질 검사, ISO/IATF" }
+    PM: { importance: critical, agent: sap-pm-consultant, note: "설비 보전, 예방 정비" }
     FI: { importance: high, agent: sap-fi-consultant, note: "제조원가, 재무제표" }
     CO: { importance: high, agent: sap-co-consultant, note: "제품원가, 차이 분석" }
     SD: { importance: high, agent: sap-sd-consultant, note: "완제품 출하, 납품" }
@@ -38,9 +38,9 @@ retail:
     WM: { importance: high, agent: sap-ewm-consultant, note: "ECC 레거시 창고" }
     FI: { importance: high, agent: sap-fi-consultant, note: "매출채권, 매입채무" }
     CO: { importance: medium, agent: sap-co-consultant, note: "채널별 수익성" }
-    QM: { importance: medium, agent: sap-qm-inspector, note: "식품 HACCP" }
+    QM: { importance: medium, agent: sap-qm-consultant, note: "식품 HACCP" }
     PP: { importance: low, agent: sap-pp-consultant, note: "PB 상품 생산 시에만" }
-    PM: { importance: low, agent: sap-pm-analyst, note: "물류 설비" }
+    PM: { importance: low, agent: sap-pm-consultant, note: "물류 설비" }
     HCM: { importance: medium, agent: sap-hcm-consultant, note: "매장 인력 관리" }
     TR: { importance: low, agent: sap-tr-consultant }
     ABAP: { importance: high, agent: sap-abap-reviewer, note: "POS/EDI 연동" }

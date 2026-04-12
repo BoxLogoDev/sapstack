@@ -53,10 +53,10 @@ argument-hint: [장비번호|통보번호|고장증상]
 - Turn 4: 최종 진단 + Fix/Rollback
 
 ## 위임
-- sap-pm-analyst — 상세 PM 분석
+- sap-pm-consultant — 상세 PM 분석
 - sap-co-consultant — 보전 비용 분석
 - sap-mm-consultant — 예비부품 재고 확인
-- sap-qm-inspector — 품질 연관 고장 시
+- sap-qm-consultant — 품질 연관 고장 시
 
 ## 참조
 - `plugins/sap-pm/skills/sap-pm/SKILL.md`

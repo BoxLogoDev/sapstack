@@ -63,7 +63,7 @@ argument-hint: [vendor|customer|material|equipment|all] [회사코드]
 - FI 마스터 → sap-fi-consultant
 - MM 마스터 → sap-mm-consultant
 - SD 마스터 → sap-sd-consultant
-- PM 마스터 → sap-pm-analyst
+- PM 마스터 → sap-pm-consultant
 
 ## 참조
 - `data/master-data-rules.yaml`

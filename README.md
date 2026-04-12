@@ -212,8 +212,8 @@ Turn 4 VERIFY     → 가설 확정/기각 + Fix Plan + 필수 Rollback Plan
 | `sap-sd-consultant` | SD 판매유통 | 주문·배송·빌링·여신 |
 | `sap-pp-consultant` | PP 생산계획 | MRP·BOM·생산오더 (이전: pp-analyzer) |
 | `sap-hcm-consultant` 🆕 | HCM 인사관리 | 급여·근태·4대보험·연말정산 |
-| `sap-pm-analyst` 🆕 | PM 설비보전 | 장비·보전오더·MTBF/MTTR |
-| `sap-qm-inspector` 🆕 | QM 품질관리 | 검사·사용결정·ISO/GMP |
+| `sap-pm-consultant` 🆕 | PM 설비보전 | 장비·보전오더·MTBF/MTTR |
+| `sap-qm-consultant` 🆕 | QM 품질관리 | 검사·사용결정·ISO/GMP |
 | `sap-ewm-consultant` 🆕 | EWM/WM 창고관리 | Wave·RF·피킹·WM마이그레이션 |
 | `sap-abap-reviewer` | ABAP 코드 리뷰 | 코드 품질·Clean Core |
 | `sap-basis-troubleshooter` | Basis 장애 라우팅 | 덤프·WP행·Transport |
