@@ -432,6 +432,106 @@ notes:
     category: config
     url: https://launchpad.support.sap.com/#/notes/2420495
 
+  # ──────────────────────────────────────────
+  # PM (Plant Maintenance)
+  # ──────────────────────────────────────────
+  - id: "2217030"
+    title: "PM/CS — Equipment Master: Relevant fields for Equipment change documents"
+    keywords: [equipment, change document, IE02, PM]
+    modules: [PM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2217030
+
+  - id: "1411339"
+    title: "Counter-based maintenance — Troubleshooting guide"
+    keywords: [counter, preventive maintenance, IP30, IP10, PM]
+    modules: [PM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/1411339
+
+  - id: "2044644"
+    title: "Maintenance Order settlement — Common issues and solutions"
+    keywords: [settlement, KO88, maintenance order, PM, CO]
+    modules: [PM, CO]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2044644
+
+  # ──────────────────────────────────────────
+  # QM (Quality Management)
+  # ──────────────────────────────────────────
+  - id: "1073498"
+    title: "QM — Inspection lot creation: Overview of settings"
+    keywords: [inspection lot, QA01, automatic creation, QM]
+    modules: [QM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/1073498
+
+  - id: "1685738"
+    title: "QM — Usage decision with follow-up actions"
+    keywords: [usage decision, QA11, follow-up, stock posting, QM]
+    modules: [QM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/1685738
+
+  - id: "2162729"
+    title: "Quality Notification — 8D report integration"
+    keywords: [quality notification, QM01, 8D, corrective action, QM]
+    modules: [QM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2162729
+
+  # ──────────────────────────────────────────
+  # WM / EWM (Warehouse Management)
+  # ──────────────────────────────────────────
+  - id: "2314085"
+    title: "S/4HANA — WM functions and Stock Room Management"
+    keywords: [WM, stock room, S/4HANA, migration, deprecated]
+    modules: [WM, EWM]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2314085
+
+  - id: "2463157"
+    title: "EWM — Embedded EWM in S/4HANA: Configuration guide"
+    keywords: [EWM, embedded, S/4HANA, warehouse, configuration]
+    modules: [EWM]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2463157
+
+  - id: "1776203"
+    title: "EWM — RF Framework troubleshooting"
+    keywords: [RF, framework, scanner, EWM, RFUI]
+    modules: [EWM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/1776203
+
+  # ──────────────────────────────────────────
+  # HCM (Human Capital Management)
+  # ──────────────────────────────────────────
+  - id: "1622126"
+    title: "Payroll Korea — 4 major insurance calculation"
+    keywords: [payroll, Korea, 4대보험, insurance, HCM]
+    modules: [HCM]
+    release: both
+    category: korea
+    url: https://launchpad.support.sap.com/#/notes/1622126
+
+  - id: "2612789"
+    title: "H4S4 — SAP HCM for S/4HANA activation"
+    keywords: [H4S4, HCM, S/4HANA, activation, migration]
+    modules: [HCM]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2612789
+
 # ──────────────────────────────────────────────────────────────
 # 메타 정보
 # ──────────────────────────────────────────────────────────────

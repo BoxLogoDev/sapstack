@@ -158,10 +158,26 @@ Q2. 증상 유형:
 - ❌ 근본 원인 없이 워크어라운드로 종결
 - ❌ 확실치 않은 SAP Note 번호 추정 (data/sap-notes.yaml만 참조)
 
-## 참조
+## IMG 구성 라우팅
 
+구성 문제가 감지되면 아래 패턴으로 응답합니다:
+
+1. **구성 문제 판별**: 이슈의 원인이 IMG 설정 누락/오류인 경우 (예: RFC 연결, Print, Batch 스케줄)
+2. **IMG 참조**: `plugins/sap-basis/skills/sap-basis/references/img/` 문서의 SPRO 경로 안내
+3. **구성 단계**: 단계별 구성 방법 제시 (T-code + 필드 + 값)
+4. **검증**: 구성 완료 후 확인 방법
+
+참조: `plugins/sap-basis/skills/sap-basis/references/img/`
+
+## 위임 프로토콜
+
+### 자동 참조
 - `plugins/sap-basis/skills/sap-basis/SKILL.md` — 글로벌 Basis 지식
+- `plugins/sap-basis/skills/sap-basis/references/img/` — IMG 구성 가이드
 - `plugins/sap-bc/skills/sap-bc/SKILL.md` — 한국 현장 특화
 - `data/sap-notes.yaml` — 확정 Note 데이터셋
 - `data/tcodes.yaml` — 확정 T-code 데이터셋
-- `agents/sap-abap-reviewer.md` — ABAP 덤프의 코드 레벨 분석이 필요하면 위임
+
+### 위임 대상
+- ABAP 덤프의 코드 레벨 분석 → `sap-abap-reviewer`
+- 신입 교육 질문 → `sap-tutor`

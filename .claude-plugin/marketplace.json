@@ -1,7 +1,7 @@
 {
   "name": "sapstack",
-  "version": "1.5.0",
-  "description": "SAP Operations Advisory Platform + Evidence Loop session manager — 15 plugins, 9 subagents, 13 commands, 279 T-codes, 20 symptoms, 58 synonyms, Korean field language layer, 7 AI tools (Claude Code, Codex CLI, Kiro IDE, Copilot, Cursor, Continue.dev, Aider), MCP-ready",
+  "version": "1.6.0",
+  "description": "SAP Operations Advisory Platform — 19 plugins (incl. PM/QM/WM/EWM), 15 subagents, 18 commands, IMG configuration guides, 3-tier Best Practices, Enterprise scenarios, Industry guides (Manufacturing/Retail/Financial), 340+ T-codes, 80+ symptoms, Korean field language, 7 AI tools, MCP-ready",
   "author": "BoxLogoDev",
   "license": "MIT",
   "repository": "https://github.com/BoxLogoDev/sapstack",
@@ -131,6 +131,42 @@
       "path": "plugins/sap-gts",
       "keywords": ["GTS","global trade","export","import","customs","HS code","HSK","sanctioned party","SPL","embargo","license","preference","FTA","KORUS","RCEP","UNI-PASS","관세청","수출","수입","수출신고","수입신고","HS코드","통관","원산지","Letter of Credit","L/C","KOSTI","전략물자"],
       "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-pm",
+      "name": "SAP Plant Maintenance",
+      "version": "1.0.0",
+      "description": "Equipment master, functional location, maintenance order, notification, preventive maintenance, breakdown analysis, MTBF/MTTR",
+      "path": "plugins/sap-pm",
+      "keywords": ["PM","plant maintenance","설비보전","설비관리","equipment","IE01","IE02","IE03","maintenance order","IW31","IW32","notification","IW21","preventive","IP01","IP10","IP30","breakdown","고장","MTBF","MTTR","task list","IA01","functional location","IL01"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-qm",
+      "name": "SAP Quality Management",
+      "version": "1.0.0",
+      "description": "Inspection lot, inspection plan, results recording, usage decision, quality notification, quality certificate, sampling, SPC",
+      "path": "plugins/sap-qm",
+      "keywords": ["QM","quality","품질관리","품질검사","inspection lot","QA01","inspection plan","QP01","usage decision","QA11","quality notification","QM01","certificate","QC01","MIC","sampling","SPC","vendor evaluation"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+    },
+    {
+      "id": "sap-wm",
+      "name": "SAP Warehouse Management",
+      "version": "1.0.0",
+      "description": "Warehouse structure, storage type/bin, transfer order, putaway/picking strategies, physical inventory in WM. Legacy ECC module — deprecated in S/4HANA (use EWM).",
+      "path": "plugins/sap-wm",
+      "keywords": ["WM","warehouse","창고관리","storage bin","저장위치","transfer order","이관오더","LT01","LT03","putaway","적치","picking","피킹","storage type","저장유형","quant","LAGP","LQUA"],
+      "compatibility": { "ecc": true, "s4hana": false, "btp": false }
+    },
+    {
+      "id": "sap-ewm",
+      "name": "SAP Extended Warehouse Management",
+      "version": "1.0.0",
+      "description": "Warehouse process types, warehouse order, wave management, packing, RF framework, physical inventory, resource/labor management, yard management. Modern replacement for WM.",
+      "path": "plugins/sap-ewm",
+      "keywords": ["EWM","extended warehouse","확장창고관리","warehouse order","창고오더","wave","파도","/SCWM/MON","packing","패킹","RF","핸드헬드","putaway strategy","적치전략","yard","야드","embedded EWM","decentralized EWM"],
+      "compatibility": { "ecc": false, "s4hana": true, "btp": false }
     },
     {
       "id": "sap-session",

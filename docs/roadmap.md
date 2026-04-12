@@ -111,22 +111,53 @@
 
 ---
 
-## 🎯 v1.5.0 — Native Runtime
+## ✅ v1.6.0 — Enterprise SAP Operations Platform (완료)
+
+**테마**: SAP 운영 전체 라이프사이클 플랫폼
+
+### 신규 모듈
+- [x] `sap-pm` — Plant Maintenance (설비보전)
+- [x] `sap-qm` — Quality Management (품질관리)
+- [x] `sap-wm` — Warehouse Management (창고관리, ECC 레거시)
+- [x] `sap-ewm` — Extended Warehouse Management (확장창고관리)
+
+### IMG Configuration Framework
+- [x] 11개 모듈 45+ IMG 구성 가이드 (SPRO 경로, 구성 단계, 검증)
+- [x] `scripts/check-img-references.sh` 검증 스크립트
+
+### Best Practice Framework (3-Tier)
+- [x] 7 공통 BP (권한관리, 이관관리, 마스터데이터, 기간마감, 변경관리, 아카이빙)
+- [x] 11개 모듈 × 3 Tier = 33 모듈별 BP
+- [x] `scripts/check-best-practices.sh` 검증 스크립트
+
+### Enterprise & Industry
+- [x] 6 엔터프라이즈 문서 (다중회사코드, SSC, IC, 글로벌롤아웃, 시스템랜드스케이프, 연동제약)
+- [x] 3 업종별 가이드 (제조업, 유통업, 금융업)
+- [x] `data/industry-matrix.yaml` + `scripts/check-industry-refs.sh`
+
+### 에이전트 & 커맨드
+- [x] 6 신규 에이전트 (sap-tutor, hcm, tr, pm, qm, ewm)
+- [x] 5 신규 커맨드 (img-guide, master-data-check, bp-review, pm-diagnosis, qm-inspection)
+- [x] sap-pp-analyzer → sap-pp-consultant 이름 변경
+- [x] 기존 9개 에이전트 IMG 역량 보강
+
+### 데이터 자산
+- [x] tcodes 279 → 340+, symptom-index 18 → 62, sap-notes 46 → 57
+- [x] `period-end-sequence.yaml`, `master-data-rules.yaml`, `industry-matrix.yaml`
+
+---
+
+## 🎯 v1.7.0 — Native Runtime
 
 **테마**: 매니페스트에서 실제 동작으로
 
 ### 계획
-- [ ] **MCP Server 네이티브 TypeScript 구현** — Claude Desktop·Zed 등 직접 지원
-- [ ] **VS Code Extension 실제 구현** — 5 commands, ABAP snippets 확장, quick picker
-- [ ] **build-multi-ai.sh 완전 자동화** — SKILL.md → AGENTS/copilot/cursor/continue/aider 전체 재생성
+- [ ] **MCP Server write-path 구현** — start_session, add_evidence, next_turn
+- [ ] **VS Code Extension 실제 구현** — 5 commands, ABAP snippets, quick picker
+- [ ] **NPM 패키지** — `npx @boxlogodev/sapstack-mcp`
 - [ ] **Web UI 확장** — T-code 탭, Plugin 카탈로그 탭, 다크/라이트 테마
 - [ ] **PWA** — 오프라인 사용 가능 Web UI
-- [ ] **Industry Solution 추가**:
-  - [ ] `sap-is-retail` — 리테일 특화
-  - [ ] `sap-is-utilities` — 유틸리티
-  - [ ] `sap-ibp` — Integrated Business Planning
-- [ ] **Continue.dev / Aider 통합 테스트 자동화**
-- [ ] **NPM 패키지** — `npx @boxlogodev/sapstack-mcp`
+- [ ] **build-multi-ai.sh 완전 자동화**
 
 ---
 

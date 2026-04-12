@@ -88,3 +88,41 @@ was prone to.
 | ABAP classic    | ✓       | ✓          | ✓    | ✗ (RAP only) |
 | BASIS           | ✓       | ✓          | △    | ✗            |
 | BTP             | ✗       | ✓          | ✓    | ✓            |
+| PM              | ✓       | ✓          | ✓    | ✗            |
+| QM              | ✓       | ✓          | ✓    | ✓            |
+| WM (legacy)     | ✓       | ✗ (depr.)  | ✗    | ✗            |
+| EWM             | ✗       | ✓          | ✓    | ✓            |
+
+## IMG Configuration References
+
+When a user's issue stems from IMG misconfiguration, route to:
+`plugins/sap-{module}/skills/sap-{module}/references/img/`
+
+Each IMG guide contains SPRO paths, step-by-step configuration,
+field values, ECC vs S/4 differences, and verification steps.
+
+## Best Practice References
+
+sapstack follows a 3-Tier Best Practice framework:
+- **Tier 1 Operational**: Daily/weekly operations (`references/best-practices/operational.md`)
+- **Tier 2 Period-End**: Month/quarter/year-end closing (`references/best-practices/period-end.md`)
+- **Tier 3 Governance**: Audit, compliance, K-SOX (`references/best-practices/governance.md`)
+
+Cross-module BP: `docs/best-practices/`
+
+## Enterprise Scenarios
+
+For multi-company code, SSC, intercompany, global rollout scenarios:
+`docs/enterprise/`
+
+## Industry-Specific Guidance
+
+For manufacturing, retail, financial services differences:
+`docs/industry/`
+Industry module matrix: `data/industry-matrix.yaml`
+
+## SAP Tutor Agent
+
+For beginner/new employee questions, route to `sap-tutor` agent.
+The tutor delegates complex questions to module-specific consultants
+and translates answers to beginner-friendly language.

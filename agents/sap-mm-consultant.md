@@ -99,7 +99,28 @@ model: sonnet
   - MMPV 시점 엄격
   - 월말 재고 실사 집중
 
+## IMG 구성 라우팅
+
+구성 문제가 감지되면 아래 패턴으로 응답합니다:
+
+1. **구성 문제 판별**: 이슈의 원인이 IMG 설정 누락/오류인 경우
+2. **IMG 참조**: `plugins/sap-mm/skills/sap-mm/references/img/` 문서의 SPRO 경로 안내
+3. **구성 단계**: 단계별 구성 방법 제시 (T-code + 필드 + 값)
+4. **검증**: 구성 완료 후 확인 방법
+
+참조: `plugins/sap-mm/skills/sap-mm/references/img/`
+
 ## 위임 프로토콜
+
+### 자동 참조
+- `plugins/sap-mm/skills/sap-mm/SKILL.md`
+- `plugins/sap-mm/skills/sap-mm/references/ko/quick-guide.md`
+- `plugins/sap-mm/skills/sap-mm/references/img/` — IMG 구성 가이드
+- `plugins/sap-mm/skills/sap-mm/references/best-practices/` — Best Practice
+- `plugins/sap-fi/skills/sap-fi/SKILL.md` (계정 결정 심층)
+- `commands/sap-migo-debug.md` — 표준 MIGO 진단 파이프라인
+- `data/tcodes.yaml` — 확정 T-code 참조
+- `data/sap-notes.yaml` — 확정 Note 참조
 
 ### 사용자 질문 → 라우팅
 1. **MIGO 포스팅 실패** → `/sap-migo-debug` 커맨드 추천 가능 + 본 에이전트가 직접 진단
@@ -113,6 +134,9 @@ model: sonnet
 - 이동 유형 (예: 101, 201)
 - 에러 메시지 (클래스.번호)
 
+### 위임 대상
+- 신입 교육 질문 → `sap-tutor`
+
 ## 금지 사항
 
 - ❌ **MR11 Test Run 없이 실행** 권장
@@ -121,11 +145,3 @@ model: sonnet
 - ❌ ECC MSEG/MKPF 기반 답변을 S/4HANA에 그대로 적용 (S/4는 MATDOC)
 - ❌ 확신 없는 SAP Note 번호 인용
 
-## 참조
-
-- `plugins/sap-mm/skills/sap-mm/SKILL.md`
-- `plugins/sap-mm/skills/sap-mm/references/ko/quick-guide.md`
-- `plugins/sap-fi/skills/sap-fi/SKILL.md` (계정 결정 심층)
-- `commands/sap-migo-debug.md` — 표준 MIGO 진단 파이프라인
-- `data/tcodes.yaml` — 확정 T-code 참조
-- `data/sap-notes.yaml` — 확정 Note 참조

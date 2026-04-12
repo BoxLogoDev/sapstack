@@ -1254,3 +1254,336 @@ MENU_LEGALSPL:
   name: Customs Document Display
   modules: [GTS]
   release: both
+
+# ──────────────────────────────────────────────────────────────
+# PM (Plant Maintenance)
+# ──────────────────────────────────────────────────────────────
+IE01:
+  name: Create Equipment
+  modules: [PM]
+  release: both
+IE02:
+  name: Change Equipment
+  modules: [PM]
+  release: both
+IE03:
+  name: Display Equipment
+  modules: [PM]
+  release: both
+IL01:
+  name: Create Functional Location
+  modules: [PM]
+  release: both
+IL02:
+  name: Change Functional Location
+  modules: [PM]
+  release: both
+IL03:
+  name: Display Functional Location
+  modules: [PM]
+  release: both
+IW21:
+  name: Create PM Notification
+  modules: [PM]
+  release: both
+IW22:
+  name: Change PM Notification
+  modules: [PM]
+  release: both
+IW23:
+  name: Display PM Notification
+  modules: [PM]
+  release: both
+IW28:
+  name: PM Notification List (Change)
+  modules: [PM]
+  release: both
+IW29:
+  name: PM Notification List (Display)
+  modules: [PM]
+  release: both
+IW31:
+  name: Create Maintenance Order
+  modules: [PM]
+  release: both
+IW32:
+  name: Change Maintenance Order
+  modules: [PM]
+  release: both
+IW33:
+  name: Display Maintenance Order
+  modules: [PM]
+  release: both
+IW38:
+  name: Maintenance Order List (Change)
+  modules: [PM]
+  release: both
+IW39:
+  name: Maintenance Order List (Display)
+  modules: [PM]
+  release: both
+IW65:
+  name: Measurement Document List
+  modules: [PM]
+  release: both
+IP01:
+  name: Create Maintenance Plan
+  modules: [PM]
+  release: both
+IP02:
+  name: Change Maintenance Plan
+  modules: [PM]
+  release: both
+IP03:
+  name: Display Maintenance Plan
+  modules: [PM]
+  release: both
+IP10:
+  name: Schedule Maintenance Plan
+  modules: [PM]
+  release: both
+IP11:
+  name: Maintenance Strategy (Display/Change)
+  modules: [PM]
+  release: both
+IP30:
+  name: Deadline Monitoring
+  modules: [PM]
+  release: both
+IA01:
+  name: Create General Task List
+  modules: [PM]
+  release: both
+IA05:
+  name: Task List for Functional Location
+  modules: [PM]
+  release: both
+CR01:
+  name: Create Work Center
+  modules: [PM, PP]
+  release: both
+CR02:
+  name: Change Work Center
+  modules: [PM, PP]
+  release: both
+CR03:
+  name: Display Work Center
+  modules: [PM, PP]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# QM (Quality Management)
+# ──────────────────────────────────────────────────────────────
+QA01:
+  name: Create Inspection Lot (Manual)
+  modules: [QM]
+  release: both
+QA02:
+  name: Change Inspection Lot
+  modules: [QM]
+  release: both
+QA03:
+  name: Display Inspection Lot
+  modules: [QM]
+  release: both
+QA11:
+  name: Record Usage Decision
+  modules: [QM]
+  release: both
+QA12:
+  name: Change Usage Decision
+  modules: [QM]
+  release: both
+QA13:
+  name: Display Usage Decision
+  modules: [QM]
+  release: both
+QA32:
+  name: Usage Decision (Mass Processing)
+  modules: [QM]
+  release: both
+QE01:
+  name: Results Recording (Single)
+  modules: [QM]
+  release: both
+QE51N:
+  name: Results Recording (Multiple)
+  modules: [QM]
+  release: both
+QM01:
+  name: Create Quality Notification
+  modules: [QM]
+  release: both
+QM02:
+  name: Change Quality Notification
+  modules: [QM]
+  release: both
+QM03:
+  name: Display Quality Notification
+  modules: [QM]
+  release: both
+QP01:
+  name: Create Inspection Plan
+  modules: [QM]
+  release: both
+QP02:
+  name: Change Inspection Plan
+  modules: [QM]
+  release: both
+QP03:
+  name: Display Inspection Plan
+  modules: [QM]
+  release: both
+QS21:
+  name: Master Inspection Characteristic (Create)
+  modules: [QM]
+  release: both
+QS31:
+  name: Inspection Method (Create)
+  modules: [QM]
+  release: both
+QDV1:
+  name: Sampling Procedure (Create)
+  modules: [QM]
+  release: both
+QDR1:
+  name: Dynamic Modification Rule (Create)
+  modules: [QM]
+  release: both
+QC01:
+  name: Certificate Profile (Create)
+  modules: [QM]
+  release: both
+QC21:
+  name: Create Quality Certificate
+  modules: [QM]
+  release: both
+QI01:
+  name: Quality Info Record (Create)
+  modules: [QM, MM]
+  release: both
+QI02:
+  name: Quality Info Record (Change)
+  modules: [QM, MM]
+  release: both
+QI03:
+  name: Quality Info Record (Display)
+  modules: [QM, MM]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# WM (Warehouse Management — ECC Legacy)
+# ──────────────────────────────────────────────────────────────
+LS01N:
+  name: Create Storage Bin
+  modules: [WM]
+  release: ecc_only
+  note: Deprecated in S/4HANA — use EWM
+LS02N:
+  name: Change Storage Bin
+  modules: [WM]
+  release: ecc_only
+LS03N:
+  name: Display Storage Bin
+  modules: [WM]
+  release: ecc_only
+LT01:
+  name: Create Transfer Order (Manually)
+  modules: [WM]
+  release: ecc_only
+LT03:
+  name: Display Transfer Order
+  modules: [WM]
+  release: ecc_only
+LT06:
+  name: Confirm Transfer Order
+  modules: [WM]
+  release: ecc_only
+LT0E:
+  name: Create TO for Material Document
+  modules: [WM]
+  release: ecc_only
+LT0G:
+  name: Create TO for Delivery
+  modules: [WM]
+  release: ecc_only
+LB01:
+  name: Create Transfer Requirement
+  modules: [WM]
+  release: ecc_only
+LB10:
+  name: Transfer Requirement List
+  modules: [WM]
+  release: ecc_only
+LI01N:
+  name: Create WM Physical Inventory Document
+  modules: [WM]
+  release: ecc_only
+LI02N:
+  name: Change WM PI Document
+  modules: [WM]
+  release: ecc_only
+LI03N:
+  name: Display WM PI Document
+  modules: [WM]
+  release: ecc_only
+LS24:
+  name: Quants per Storage Bin
+  modules: [WM]
+  release: ecc_only
+
+# ──────────────────────────────────────────────────────────────
+# EWM (Extended Warehouse Management)
+# ──────────────────────────────────────────────────────────────
+"/SCWM/MON":
+  name: Warehouse Monitor
+  modules: [EWM]
+  release: both
+"/SCWM/WAVE":
+  name: Wave Management
+  modules: [EWM]
+  release: both
+"/SCWM/PACK":
+  name: Packing
+  modules: [EWM]
+  release: both
+"/SCWM/RFUI":
+  name: RF Framework UI
+  modules: [EWM]
+  release: both
+"/SCWM/PI":
+  name: Physical Inventory (EWM)
+  modules: [EWM]
+  release: both
+"/SCWM/PRDO":
+  name: Production Supply
+  modules: [EWM]
+  release: both
+"/SCWM/ADGI":
+  name: Post Goods Receipt (EWM)
+  modules: [EWM]
+  release: both
+"/SCWM/ADGO":
+  name: Post Goods Issue (EWM)
+  modules: [EWM]
+  release: both
+"/SCWM/LS01":
+  name: Create Storage Bin (EWM)
+  modules: [EWM]
+  release: both
+"/SCWM/LS03":
+  name: Display Storage Bin (EWM)
+  modules: [EWM]
+  release: both
+"/SCWM/RSRC":
+  name: Resource Management
+  modules: [EWM]
+  release: both
+"/SCWM/YM":
+  name: Yard Management
+  modules: [EWM]
+  release: both
+"/SCWM/MFS":
+  name: Material Flow System
+  modules: [EWM]
+  release: both

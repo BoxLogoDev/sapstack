@@ -495,22 +495,948 @@ symptoms:
     severity: high
     recurrence: common
 
+  # ═══════════════════════════════════════════════════════════════
+  # CO — Controlling (5건)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: sym-co-assessment-error
+    symptom_ko: "KSU5 배부 주기 오류 (sender/receiver 불일치)"
+    symptom_ko_variants:
+      - "KSU5 배부 주기 실패"
+      - "어세스먼트 sender receiver 다름"
+      - "배부 순환 오류"
+      - "KSU5 에러"
+    symptom_en: "KSU5 assessment cycle error (sender/receiver mismatch)"
+    likely_modules: [CO]
+    first_check_tcodes: [KSU5, RKEB, CCSSBA, KS01]
+    typical_causes:
+      - "배부 순환(Cycle)에 정의된 Sender/Receiver가 실제 코스트 센터와 불일치"
+      - "순환(Cycle)이 동시에 2개 버전으로 활성화돼 있음"
+      - "원가요소 할당 구조가 순환과 맞지 않음"
+    evidence_needed:
+      - { type: screenshot, target: "KSU5 error detail", priority: critical }
+      - { type: table_export, target: "CCSSBA for cycle definition", priority: high }
+    severity: high
+    recurrence: occasional
+
+  - id: sym-co-settlement-error
+    symptom_ko: "KO88 내부오더 정산 실패"
+    symptom_ko_variants:
+      - "내부오더 정산 에러"
+      - "KO88 돌았는데 안 됨"
+      - "인터널 오더 정산 실패"
+      - "오더 세틀먼트 안 돼요"
+    symptom_en: "KO88 internal order settlement fails"
+    likely_modules: [CO]
+    first_check_tcodes: [KO88, KO01, COBL, AUFK]
+    typical_causes:
+      - "내부오더 상태가 Settlement 불가 상태 (이미 정산됨 또는 삭제 예정)"
+      - "정산 규칙(Settlement Rule) 정의 누락"
+      - "정산 배분자(Allocation Target)가 존재하지 않음"
+    evidence_needed:
+      - { type: transaction_log, target: "KO88 settlement log", priority: critical }
+      - { type: table_export, target: "AUFK for order status", priority: high }
+    severity: high
+    recurrence: common
+
+  - id: sym-co-copa-variance
+    symptom_ko: "CO-PA 차이 분석 불일치"
+    symptom_ko_variants:
+      - "코파 수익 다름"
+      - "CO-PA 차이 분석"
+      - "씨오피에이 수익성 불일치"
+      - "COPA 복제 재계산 다름"
+    symptom_en: "CO-PA profitability analysis variance mismatch"
+    likely_modules: [CO]
+    first_check_tcodes: [KE30, KEPM, COBL, KE50]
+    typical_causes:
+      - "CO-PA 평가 방법(Valuation Method)이 FI-GL과 다름"
+      - "센터 추적(Tracing Factor) 배분이 불완전"
+      - "CO-PA 주기별 전송(Transfer) 미완료"
+    evidence_needed:
+      - { type: screenshot, target: "KE30 variance report", priority: critical }
+      - { type: table_export, target: "CE1XXXX actual vs plan", priority: high }
+    severity: medium
+    recurrence: occasional
+
+  - id: sym-co-cost-element-missing
+    symptom_ko: "원가요소 미생성 오류"
+    symptom_ko_variants:
+      - "코스트 엘리먼트 안 만들어짐"
+      - "원가요소 자동 생성 실패"
+      - "KSTAR 없어요"
+      - "비용 항목 미등록"
+    symptom_en: "Cost element not created automatically"
+    likely_modules: [CO, FI]
+    first_check_tcodes: [KA01, KSTAR, FAGLB03, OKB9]
+    typical_causes:
+      - "GL 계정 마스터에 'Cost Element Grouping' 배정 안 됨"
+      - "Auto Create Cost Element (OKB9) 활성화 안 돼있음"
+      - "GL 계정이 진짜 비용성 계정이 아님 (자산·부채 계정)"
+    evidence_needed:
+      - { type: screenshot, target: "KA01 cost element search result", priority: high }
+      - { type: table_export, target: "SKB1 GL account master", priority: high }
+    severity: medium
+    recurrence: common
+
+  - id: sym-co-period-lock
+    symptom_ko: "OKP1 CO 기간 잠금 후 전기 시도"
+    symptom_ko_variants:
+      - "CO 기간 잠금"
+      - "OKP1 시간 잠금"
+      - "코스팅 피리어드 락"
+      - "CO 기간 컨트롤 막혔어요"
+    symptom_en: "OKP1 CO period lock prevents posting"
+    likely_modules: [CO]
+    first_check_tcodes: [OKP1, KA05, KEPM, COBL]
+    typical_causes:
+      - "OKP1에서 해당 회계년도·기간·모듈(CO) 조합이 잠금 상태"
+      - "누군가 Period Lock을 해제하지 않고 Finalization 진행함"
+      - "Test Run 중 실수로 기간을 locked로 설정"
+    evidence_needed:
+      - { type: screenshot, target: "OKP1 current lock status", priority: critical }
+      - { type: transaction_log, target: "Posting error message", priority: high }
+    severity: high
+    recurrence: occasional
+
+  # ═══════════════════════════════════════════════════════════════
+  # PP — Production Planning (5건)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: sym-pp-mrp-exception
+    symptom_ko: "MD04 MRP 예외 메시지 (01/07/22/25)"
+    symptom_ko_variants:
+      - "MRP 예외"
+      - "MD04 예외 메시지"
+      - "자재계획 예외"
+      - "MRP 에멘션"
+    symptom_en: "MD04 MRP exception messages (01/07/22/25)"
+    likely_modules: [PP, MM]
+    first_check_tcodes: [MD04, MD01, MD02, MDPP]
+    typical_causes:
+      - "MRP 타입이 'Forecast'로 설정돼 있음 (자동 계획 불가)"
+      - "Safety Stock이나 Reorder Point 설정이 부족"
+      - "MRP 요소(MRP Element)가 비활성화되거나 결과가 누적되지 않음"
+    evidence_needed:
+      - { type: screenshot, target: "MD04 exception list", priority: critical }
+      - { type: table_export, target: "MARC for MRP type", priority: high }
+    severity: medium
+    recurrence: common
+
+  - id: sym-pp-order-confirmation-error
+    symptom_ko: "CO11N 생산 확인 실패"
+    symptom_ko_variants:
+      - "생산 확인 못 함"
+      - "CO11N 에러"
+      - "프로덕션 컨펌 실패"
+      - "시간 기입 오류"
+    symptom_en: "CO11N production confirmation fails"
+    likely_modules: [PP]
+    first_check_tcodes: [CO11N, CO09, PP01, AFVGD]
+    typical_causes:
+      - "작업(Operation)의 상태가 이미 'Confirmed' 또는 'Completed'"
+      - "생산량(Actual Quantity)이 작업 계획량을 초과"
+      - "활동 타입(Activity Type)에 계획된 인원·시간이 없음"
+    evidence_needed:
+      - { type: screenshot, target: "CO11N error detail", priority: critical }
+      - { type: table_export, target: "AFVGD for operation status", priority: high }
+    severity: high
+    recurrence: common
+
+  - id: sym-pp-capacity-overload
+    symptom_ko: "CM25 용량 과부하 경고"
+    symptom_ko_variants:
+      - "용량 오버로드"
+      - "CM25 경고"
+      - "설비 과부하"
+      - "캐퍼시티 부족"
+    symptom_en: "CM25 capacity overload warning"
+    likely_modules: [PP]
+    first_check_tcodes: [CM25, CR01, CR21, CRBD]
+    typical_causes:
+      - "일정(Schedule)된 작업(Operation)들이 리소스(설비·작업센터) 용량 초과"
+      - "작업센터 용량(Available Capacity) 정의가 너무 낮음"
+      - "납기(Due Date)가 너무 몰려있음 (계획 병목)"
+    evidence_needed:
+      - { type: screenshot, target: "CM25 overload detail", priority: medium }
+      - { type: table_export, target: "CRCO capacity for work center", priority: high }
+    severity: medium
+    recurrence: common
+
+  - id: sym-pp-bom-explosion-fail
+    symptom_ko: "CS13 BOM 폭발 실패"
+    symptom_ko_variants:
+      - "BOM 익스플로전 안 됨"
+      - "CS13 에러"
+      - "빌오엠 폭발 실패"
+      - "원재료 구성 오류"
+    symptom_en: "CS13 BOM explosion fails"
+    likely_modules: [PP, MM]
+    first_check_tcodes: [CS13, CS01, CS02, STPO]
+    typical_causes:
+      - "BOM 구성 요소(Component)에 원재료가 존재하지 않음"
+      - "BOM의 유효일자(Validity Date) 범위가 해당 기간을 포함하지 않음"
+      - "선택항목(Alternative Item)이 BOM에 설정되어 있으나 선택되지 않음"
+    evidence_needed:
+      - { type: screenshot, target: "CS13 error detail", priority: critical }
+      - { type: table_export, target: "STPO for component", priority: high }
+    severity: high
+    recurrence: occasional
+
+  - id: sym-pp-cogi-auto-gm
+    symptom_ko: "COGI 자동 입출고 오류"
+    symptom_ko_variants:
+      - "COGI 자동화 실패"
+      - "완성검사 입출고 안 됨"
+      - "COGI 미 처리"
+      - "자동 이동 오류"
+    symptom_en: "COGI automatic goods movement error"
+    likely_modules: [PP, MM]
+    first_check_tcodes: [COGI, CO01, MIGO, OMJJ]
+    typical_causes:
+      - "Confirmation 수량이 자재 스탁과 매칭 안 됨"
+      - "무브먼트 타입(BWART) 설정이 자동 이동을 지원하지 않음"
+      - "어카운트 어사인먼트 카테고리(AAC) 누락"
+    evidence_needed:
+      - { type: transaction_log, target: "COGI execution log", priority: critical }
+      - { type: screenshot, target: "MIGO after COGI attempt", priority: high }
+    severity: high
+    recurrence: occasional
+
+  # ═══════════════════════════════════════════════════════════════
+  # SD — Sales & Distribution (5건)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: sym-sd-incomplete-log
+    symptom_ko: "VA02 불완전 로그 차단"
+    symptom_ko_variants:
+      - "판매주문 불완전"
+      - "VA02 인컴플릿 메시지"
+      - "에스오 상태 불완전"
+      - "SO 저장 실패"
+    symptom_en: "VA02 blocks order save with incomplete status"
+    likely_modules: [SD]
+    first_check_tcodes: [VA02, VA01, V.23, VBAK]
+    typical_causes:
+      - "필수 조건 데이터(조건·배송·청구 주소 등) 누락"
+      - "자재 결정(Material Determination) 미완료"
+      - "신용 체크에 'Block with incomplete' 설정돼있음"
+    evidence_needed:
+      - { type: screenshot, target: "VA02 incomplete list", priority: critical }
+      - { type: table_export, target: "VBAK order header status", priority: high }
+    severity: medium
+    recurrence: common
+
+  - id: sym-sd-pricing-error
+    symptom_ko: "VA01 가격결정 오류 (조건 미적용)"
+    symptom_ko_variants:
+      - "판매주문 가격 안 적용"
+      - "VA01 프라이싱 에러"
+      - "가결정 조건 미포함"
+      - "SO 조건 누락"
+    symptom_en: "VA01 pricing error (conditions not applied)"
+    likely_modules: [SD]
+    first_check_tcodes: [VA01, VK11, V/08, KONV]
+    typical_causes:
+      - "고객·자재별 조건(Condition) 정의 누락"
+      - "조건 유효일자(Validity) 범위가 오늘 날짜를 포함하지 않음"
+      - "프라이싱 프로시저(Pricing Procedure)가 올바르지 않음"
+    evidence_needed:
+      - { type: screenshot, target: "VA01 pricing analysis", priority: critical }
+      - { type: table_export, target: "KONP for conditions", priority: high }
+    severity: medium
+    recurrence: common
+
+  - id: sym-sd-output-not-issued
+    symptom_ko: "VF01 빌링 후 출력물 미발행"
+    symptom_ko_variants:
+      - "송장 안 떨어져요"
+      - "청구서 인쇄 안 됨"
+      - "VF01 문서 발행 안 됨"
+      - "출력 타입 미실행"
+    symptom_en: "VF01 billing created but output document not issued"
+    likely_modules: [SD, BC]
+    first_check_tcodes: [VF01, VF03, NACE, OVA6]
+    typical_causes:
+      - "청구서 출력 타입(Output Type) 정의 누락 또는 미활성화"
+      - "고객 마스터(KNA1)에서 출력 방식이 '보류중(Pending)'으로 설정"
+      - "스풀 요청(Spool Request)이 실패했으나 에러 메시지가 숨겨짐"
+    evidence_needed:
+      - { type: screenshot, target: "VF03 output tab", priority: high }
+      - { type: transaction_log, target: "NACE output execution log", priority: critical }
+    severity: medium
+    recurrence: occasional
+
+  - id: sym-sd-credit-block
+    symptom_ko: "VKM1 여신 차단 해제 불가"
+    symptom_ko_variants:
+      - "신용 블록 풀기 안 됨"
+      - "VKM1 에러"
+      - "여신한도 초과 해제 못 함"
+      - "크레딧 매니지먼트 잠금"
+    symptom_en: "VKM1 credit block cannot be released"
+    likely_modules: [SD, FI]
+    first_check_tcodes: [VKM1, FD32, UKM_CASE, FD10N]
+    typical_causes:
+      - "Credit Management 시스템(S/4HANA)에서 여신 결정(Credit Decision)이 '반거절'로 기록됨"
+      - "여신한도 할당량이 부족하고, 해제 권한이 없는 사용자"
+      - "고객 신용 평가 점수(Credit Score) 기준 미충족"
+    evidence_needed:
+      - { type: screenshot, target: "VKM1 release attempt", priority: critical }
+      - { type: table_export, target: "UKM_CASE for decision history", priority: high }
+    severity: high
+    recurrence: occasional
+
+  - id: sym-sd-delivery-split
+    symptom_ko: "VL01N 딜리버리 예기치 않은 분할"
+    symptom_ko_variants:
+      - "납품 분할"
+      - "VL01N 분할됨"
+      - "D/N 여러 개 생성"
+      - "배송 지시 나뉨"
+    symptom_en: "VL01N delivery unexpectedly split into multiple documents"
+    likely_modules: [SD]
+    first_check_tcodes: [VL01N, VA03, LIKP, LIPS]
+    typical_causes:
+      - "배송 분할 규칙(Delivery Split Profile)이 자동 분할 설정"
+      - "제품 특성(Part-of) 또는 스토리지 위치가 다름"
+      - "나라별 배송 규칙(Route, Country) 차이"
+    evidence_needed:
+      - { type: screenshot, target: "VL01N shipment overview", priority: high }
+      - { type: table_export, target: "LIKP for multiple deliveries", priority: high }
+    severity: medium
+    recurrence: common
+
+  # ═══════════════════════════════════════════════════════════════
+  # HCM — Human Capital Management (4건)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: sym-hcm-payroll-error
+    symptom_ko: "PC00_M99 급여 실행 오류 (wage type reject)"
+    symptom_ko_variants:
+      - "급여 계산 에러"
+      - "페이롤 실행 실패"
+      - "임금 타입 거부"
+      - "PC00 wage type 에러"
+    symptom_en: "PC00_M99 payroll run error (wage type rejected)"
+    likely_modules: [HCM]
+    first_check_tcodes: [PC00_M99, PT01, PT50, MOLGA]
+    typical_causes:
+      - "임금 타입(Wage Type)에 필요한 기본 데이터(급여 구성·공제·세금) 누락"
+      - "급여 규칙(Payroll Rules) 국가별(KR/DE/US) 미설정"
+      - "고용 형태(Employment Type)와 임금 스키마(Wage Schema) 미매칭"
+    evidence_needed:
+      - { type: screenshot, target: "PC00_M99 error log", priority: critical }
+      - { type: table_export, target: "T511K wage type schema", priority: high }
+    severity: high
+    recurrence: occasional
+
+  - id: sym-hcm-time-quota-mismatch
+    symptom_ko: "PT60 근태 평가 잔여 연차 불일치"
+    symptom_ko_variants:
+      - "휴가 잔액 차이"
+      - "PT60 연차 오류"
+      - "시간 할당량 불일치"
+      - "퀘타 평가 에러"
+    symptom_en: "PT60 time evaluation shows remaining leave quota mismatch"
+    likely_modules: [HCM]
+    first_check_tcodes: [PT60, PT65, PTEQ, PIQAP]
+    typical_causes:
+      - "휴가 유형(Leave Type) 정의가 급여 년도 경계와 맞지 않음"
+      - "인사 이동(Transfer, Promotion) 후 할당량 수동 조정 누락"
+      - "장기 부재(Long-term Absence) 처리 중 중복 인식"
+    evidence_needed:
+      - { type: screenshot, target: "PT60 evaluation result", priority: critical }
+      - { type: table_export, target: "PIQAP quota master", priority: high }
+    severity: medium
+    recurrence: occasional
+
+  - id: sym-hcm-org-assignment
+    symptom_ko: "PA30 IT0001 조직 배정 불일치"
+    symptom_ko_variants:
+      - "조직 배정 오류"
+      - "PA30 IT0001"
+      - "O/U 배정 다름"
+      - "조직 단위 불일치"
+    symptom_en: "PA30 IT0001 organizational assignment mismatch"
+    likely_modules: [HCM]
+    first_check_tcodes: [PA30, PA01, PA20, SECU]
+    typical_causes:
+      - "조직 단위(Org Unit), 직책(Job) 정의가 유효 기간 범위를 벗어남"
+      - "인사 이동 기록(PA30 IT0001) 중 생략된 기간 발견"
+      - "다중 할당(Multiple Assignment) 설정 충돌"
+    evidence_needed:
+      - { type: screenshot, target: "PA30 IT0001 history", priority: critical }
+      - { type: table_export, target: "HRP1001 for org structure", priority: high }
+    severity: medium
+    recurrence: occasional
+
+  - id: sym-hcm-four-insurance
+    symptom_ko: "4대보험 신고 금액 불일치"
+    symptom_ko_variants:
+      - "보험료 계산 오류"
+      - "네 가지 보험료 다름"
+      - "사회보험 신고 금액"
+      - "4대보험 차이"
+    symptom_en: "Four social insurances (Korea) notification amount mismatch"
+    likely_modules: [HCM]
+    first_check_tcodes: [PA01, PC00_M99, MOLGA, PT01]
+    typical_causes:
+      - "급여 계산 중 사회보험료 공제(Health/Pension/Employment/Industrial Injury Insurance) 비율 오류"
+      - "근로자 구분(Regular/Temporary) 오류로 인한 보험 미적용"
+      - "최저보증금액(Minimum Wage) 미적용"
+    evidence_needed:
+      - { type: screenshot, target: "Payroll insurance detail line", priority: critical }
+      - { type: table_export, target: "T511T tax/insurance master", priority: high }
+    severity: high
+    recurrence: occasional
+
+  # ═══════════════════════════════════════════════════════════════
+  # PM — Plant Maintenance (6건)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: sym-pm-order-settlement-fail
+    symptom_ko: "KO88 PM 오더 정산 실패"
+    symptom_ko_variants:
+      - "보전오더 정산 못 함"
+      - "유지보수 오더 세틀먼트"
+      - "KO88 PM"
+      - "작업지시서 정산 실패"
+    symptom_en: "KO88 PM order settlement fails"
+    likely_modules: [PM, CO]
+    first_check_tcodes: [KO88, IW52, COBL, AUFK]
+    typical_causes:
+      - "보전 오더(Maintenance Order) 상태가 Settlement 불가 (이미 정산됨 또는 삭제 예정)"
+      - "PM 오더 정산 규칙(Settlement) 정의 미설정"
+      - "실제 비용(Actual Cost)이 계획 비용(Plan Cost)과 심하게 차이남"
+    evidence_needed:
+      - { type: transaction_log, target: "KO88 settlement log", priority: critical }
+      - { type: table_export, target: "AUFK PM order status", priority: high }
+    severity: high
+    recurrence: common
+
+  - id: sym-pm-breakdown-notification
+    symptom_ko: "IW21 긴급 고장 통보 처리"
+    symptom_ko_variants:
+      - "고장 통보"
+      - "IW21 처리"
+      - "긴급 정비 요청"
+      - "브레이크다운 노티피케이션"
+    symptom_en: "IW21 equipment breakdown notification processing"
+    likely_modules: [PM]
+    first_check_tcodes: [IW21, IW23, QMEL, IE02]
+    typical_causes:
+      - "Notification Type(IW21)이 자동으로 Maintenance Order를 생성하지 않음"
+      - "설비(Equipment) 또는 기능위치(FuncLoc) 정의 누락"
+      - "응급 순위(Priority) 설정 오류로 인한 할당 지연"
+    evidence_needed:
+      - { type: screenshot, target: "IW21 notification status", priority: high }
+      - { type: table_export, target: "QMEL notification header", priority: high }
+    severity: high
+    recurrence: occasional
+
+  - id: sym-pm-preventive-overdue
+    symptom_ko: "IP30 예방보전 기한 초과 알림"
+    symptom_ko_variants:
+      - "정기점검 기한 초과"
+      - "IP30 오버듀"
+      - "예방정비 스케줄"
+      - "PM 기한"
+    symptom_en: "IP30 preventive maintenance schedule overdue"
+    likely_modules: [PM]
+    first_check_tcodes: [IP30, IP01, IP10, IVPLAN]
+    typical_causes:
+      - "예방보전 계획(Maintenance Plan)의 주기(Cycle) 또는 기한이 현실과 맞지 않음"
+      - "설비 고장으로 인한 가동 중단 — 설비 기간 조정 필요"
+      - "정기점검 오더 생성 기한(Advanced Create Time) 설정 부족"
+    evidence_needed:
+      - { type: screenshot, target: "IP30 overdue list", priority: high }
+      - { type: table_export, target: "IVPLAN maintenance plan", priority: high }
+    severity: medium
+    recurrence: common
+
+  - id: sym-pm-equipment-status
+    symptom_ko: "IE02 장비 상태 변경 불가"
+    symptom_ko_variants:
+      - "설비 상태 변경 실패"
+      - "IE02 에러"
+      - "장비 생명주기"
+      - "Equipment Status Lock"
+    symptom_en: "IE02 equipment status change fails"
+    likely_modules: [PM]
+    first_check_tcodes: [IE02, IE01, EQKTXHDR, EQKTXDATA]
+    typical_causes:
+      - "설비의 현재 상태(Equipment Status)에서 대상 상태로의 전환이 허용되지 않음 (상태 다이어그램 제약)"
+      - "활성 보전 오더가 설비에 할당되어 있어 변경 불가"
+      - "설비가 회계 폐기 상태로 이미 기록됨"
+    evidence_needed:
+      - { type: screenshot, target: "IE02 status change attempt", priority: critical }
+      - { type: table_export, target: "EQKTXHDR equipment status history", priority: high }
+    severity: medium
+    recurrence: occasional
+
+  - id: sym-pm-counter-reading
+    symptom_ko: "IW65 카운터 읽기 오류 (마이너스/역전)"
+    symptom_ko_variants:
+      - "카운터 리딩 에러"
+      - "IW65 음수"
+      - "계량기 역전"
+      - "메터 판독 불가"
+    symptom_en: "IW65 counter reading error (negative/reversal)"
+    likely_modules: [PM]
+    first_check_tcodes: [IW65, IW64, EQUI, EQCT]
+    typical_causes:
+      - "카운터 판독값(Counter Reading)이 이전 값보다 낮아짐 (운영자 오류 또는 카운터 초기화)"
+      - "카운터 정밀도(Rounding) 설정 오류로 마이너스 값이 발생"
+      - "카운터 유형(Counter Type) 정의가 누적값(Cumulative)이 아님"
+    evidence_needed:
+      - { type: screenshot, target: "IW65 counter entry error", priority: critical }
+      - { type: table_export, target: "EQCT counter master", priority: high }
+    severity: medium
+    recurrence: common
+
+  - id: sym-pm-service-entry
+    symptom_ko: "ML81N 서비스 입력 시트 오류"
+    symptom_ko_variants:
+      - "서비스 엔트리 실패"
+      - "ML81N 에러"
+      - "부외 서비스 입력"
+      - "Service Entry Sheet Error"
+    symptom_en: "ML81N service entry sheet error"
+    likely_modules: [PM, MM]
+    first_check_tcodes: [ML81N, ML81, ML85, SEREC]
+    typical_causes:
+      - "서비스 구매 오더(Service PO) 항목의 수량 또는 금액이 입력 시트와 불일치"
+      - "부외처리(External Service) 설정이 안 돼있음"
+      - "송장(Invoice) 번호가 중복으로 입력됨"
+    evidence_needed:
+      - { type: screenshot, target: "ML81N entry detail", priority: critical }
+      - { type: table_export, target: "SEREC service entry", priority: high }
+    severity: medium
+    recurrence: occasional
+
+  # ═══════════════════════════════════════════════════════════════
+  # QM — Quality Management (5건)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: sym-qm-inspection-lot-stuck
+    symptom_ko: "QA03 검사로트 미처리 (REL 상태 멈춤)"
+    symptom_ko_variants:
+      - "검사로트 REL"
+      - "QA03 상태"
+      - "검사 로트 못 풀어요"
+      - "IL 릴리즈 안 됨"
+    symptom_en: "QA03 inspection lot stuck in REL status"
+    likely_modules: [QM]
+    first_check_tcodes: [QA03, QA01, QALS, QAMR]
+    typical_causes:
+      - "검사 특성(Inspection Characteristic)의 평가 결과가 '검사 중단' 상태"
+      - "부적합(Non-Conformance) 통보(Quality Notification)가 open 상태"
+      - "사용 결정(Usage Decision, UD)이 정의되지 않았으나 필수로 설정"
+    evidence_needed:
+      - { type: screenshot, target: "QA03 status detail", priority: critical }
+      - { type: table_export, target: "QALS inspection result", priority: high }
+    severity: high
+    recurrence: common
+
+  - id: sym-qm-usage-decision-block
+    symptom_ko: "QA11 사용결정 후 재고 미전환"
+    symptom_ko_variants:
+      - "사용결정 후 재고"
+      - "QA11 블록"
+      - "UD 후 스탁 미전환"
+      - "Usage Decision 재고 처리"
+    symptom_en: "QA11 usage decision fails to convert stock"
+    likely_modules: [QM, MM]
+    first_check_tcodes: [QA11, QA01, QALS, QAMR]
+    typical_causes:
+      - "사용 결정(Usage Decision)이 '격리'(Blocked) 상태로 설정됨"
+      - "스탁 전환(Stock Transfer) 매개변수(Parameter) 미정의"
+      - "재고 이동(Movement Type) 자동화 설정 누락"
+    evidence_needed:
+      - { type: screenshot, target: "QA11 usage decision detail", priority: critical }
+      - { type: table_export, target: "QAMR result header", priority: high }
+    severity: high
+    recurrence: occasional
+
+  - id: sym-qm-notification-workflow
+    symptom_ko: "QM01 품질통보 워크플로 중단"
+    symptom_ko_variants:
+      - "품질통보 처리 안 됨"
+      - "QM01 워크플로우"
+      - "부적합 통보 멈춤"
+      - "Quality Notification 블로킹"
+    symptom_en: "QM01 quality notification workflow interruption"
+    likely_modules: [QM]
+    first_check_tcodes: [QM01, QM02, QM03, SWWL]
+    typical_causes:
+      - "Workflow가 정의되지 않았거나 비활성화 상태"
+      - "통보 우선순위(Priority) 또는 불일치 사항(Defect) 분류가 올바르지 않아 라우팅 실패"
+      - "담당자(Responsible) 역할 할당 누락"
+    evidence_needed:
+      - { type: screenshot, target: "QM01 notification status", priority: critical }
+      - { type: transaction_log, target: "SWWL workflow log", priority: high }
+    severity: medium
+    recurrence: occasional
+
+  - id: sym-qm-plan-not-assigned
+    symptom_ko: "QA01 검사계획 자동 미할당"
+    symptom_ko_variants:
+      - "검사계획 못 받음"
+      - "QA01 할당 안 됨"
+      - "IP 자동 할당"
+      - "Inspection Plan 미포함"
+    symptom_en: "QA01 inspection plan not automatically assigned"
+    likely_modules: [QM, MM]
+    first_check_tcodes: [QA01, QA06, QPLA, QA08]
+    typical_causes:
+      - "자재(Material)·공급업체(Vendor) 별로 검사계획(Inspection Plan) 정의 누락"
+      - "검사계획 유효 기간(Validity) 범위가 현재 날짜를 포함하지 않음"
+      - "검사 로트 생성(Lot Creation) 규칙에서 자동 할당이 비활성화됨"
+    evidence_needed:
+      - { type: screenshot, target: "QA01 plan search result", priority: high }
+      - { type: table_export, target: "QPLA inspection plan header", priority: high }
+    severity: medium
+    recurrence: common
+
+  - id: sym-qm-certificate-error
+    symptom_ko: "QC21 인증서 생성 실패"
+    symptom_ko_variants:
+      - "CoA 생성 못 함"
+      - "QC21 에러"
+      - "시험성적서 생성 실패"
+      - "Certificate of Analysis 오류"
+    symptom_en: "QC21 Certificate of Analysis generation fails"
+    likely_modules: [QM]
+    first_check_tcodes: [QC21, QC22, QCMA, QCALC]
+    typical_causes:
+      - "CoA 템플릿(Template) 정의 누락 또는 해당 자재에 미할당"
+      - "검사 결과 데이터(QAMR)가 완전하지 않음"
+      - "CoA 계산 규칙(MIC: Master Inspection Characteristic) 오류"
+    evidence_needed:
+      - { type: screenshot, target: "QC21 generation error", priority: critical }
+      - { type: table_export, target: "QCMA CoA master", priority: high }
+    severity: medium
+    recurrence: occasional
+
+  # ═══════════════════════════════════════════════════════════════
+  # WM/EWM — Warehouse Management (5건)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: sym-wm-to-confirmation-error
+    symptom_ko: "LT06 TO 확인 오류"
+    symptom_ko_variants:
+      - "Transfer Order 확인 실패"
+      - "LT06 에러"
+      - "이관오더 컨펌 못 함"
+      - "TO Confirmation 블로킹"
+    symptom_en: "LT06 Transfer Order confirmation error"
+    likely_modules: [WM, MM]
+    first_check_tcodes: [LT06, LT01, LTAK, LTAP]
+    typical_causes:
+      - "TO 항목(Line Item)의 원본 위치(Source Bin)에 실제 재고가 없음"
+      - "대상 위치(Destination Bin) 용량 제약으로 인한 거부"
+      - "재고 회계(Inventory Accounting) 차이로 인한 포스팅 실패"
+    evidence_needed:
+      - { type: screenshot, target: "LT06 confirmation error", priority: critical }
+      - { type: table_export, target: "LTAP line items", priority: high }
+    severity: high
+    recurrence: common
+
+  - id: sym-ewm-wave-release-fail
+    symptom_ko: "/SCWM/WAVE 릴리즈 실패"
+    symptom_ko_variants:
+      - "파도 릴리즈 못 함"
+      - "Wave Release 에러"
+      - "EWM 웨이브 처리"
+      - "/SCWM/WAVE 블로킹"
+    symptom_en: "/SCWM/WAVE wave release fails"
+    likely_modules: [EWM]
+    first_check_tcodes: ["/SCWM/WAVE", "/SCWM/MON", "/SCWM/WHSE", "/SCWM/BOD"]
+    typical_causes:
+      - "파도(Wave) 요청의 자재나 수량이 현재 재고와 맞지 않음"
+      - "피킹 전략(Picking Strategy) 정의 오류"
+      - "하역 작업(Putaway/Picking) 리소스 부족"
+    evidence_needed:
+      - { type: screenshot, target: "/SCWM/WAVE release detail", priority: critical }
+      - { type: transaction_log, target: "EWM execution log", priority: high }
+    severity: high
+    recurrence: occasional
+
+  - id: sym-ewm-putaway-strategy
+    symptom_ko: "적치 전략에 의한 잘못된 빈 할당"
+    symptom_ko_variants:
+      - "보관 위치 오류"
+      - "Putaway 전략 오류"
+      - "EWM 빈 할당"
+      - "저장 위치 불일치"
+    symptom_en: "EWM putaway strategy results in incorrect bin assignment"
+    likely_modules: [EWM]
+    first_check_tcodes: ["/SCWM/CONFIG", "/SCWM/ZONE", "/SCWM/PUTAWAY", "/SCWM/MON"]
+    typical_causes:
+      - "Putaway 규칙(Rule)에서 '최적 빈(Best Fit)' 알고리즘이 불필요한 빈을 선택"
+      - "Zone 구성이나 Aisle 정의가 현실 창고 레이아웃과 맞지 않음"
+      - "자재별 보관 정책(Storage Policy) 미설정"
+    evidence_needed:
+      - { type: screenshot, target: "/SCWM/MON bin assignment detail", priority: high }
+      - { type: table_export, target: "EWM putaway master", priority: high }
+    severity: medium
+    recurrence: common
+
+  - id: sym-ewm-rf-scan-error
+    symptom_ko: "RF 스캔 불일치 (바코드 ↔ 자재)"
+    symptom_ko_variants:
+      - "핸드헬드 스캔 오류"
+      - "RF 불일치"
+      - "바코드 매핑 오류"
+      - "리더 스캔 다름"
+    symptom_en: "EWM RF scan mismatch (barcode vs material)"
+    likely_modules: [EWM]
+    first_check_tcodes: ["/SCWM/RF", "/SCWM/BARCODE", "/SCWM/LABEL", "/SCWM/MON"]
+    typical_causes:
+      - "바코드(Barcode) 정의와 실제 물품의 바코드 불일치"
+      - "RF 스캐너 설정에서 자재 검증 로직 오류"
+      - "바코드 기한(Validity Date) 범위 만료"
+    evidence_needed:
+      - { type: screenshot, target: "/SCWM/RF scan log", priority: critical }
+      - { type: table_export, target: "EWM barcode master", priority: high }
+    severity: medium
+    recurrence: common
+
+  - id: sym-ewm-stock-discrepancy
+    symptom_ko: "EWM-ERP 재고 불일치"
+    symptom_ko_variants:
+      - "EWM 재고 차이"
+      - "EWM ERP 싱크 오류"
+      - "창고 재고 불일치"
+      - "Stock Discrepancy"
+    symptom_en: "EWM-ERP stock discrepancy"
+    likely_modules: [EWM, MM]
+    first_check_tcodes: ["/SCWM/MON", "/SCWM/CNT", "MMBE", "/SCWM/REPL"]
+    typical_causes:
+      - "EWM 실사(Physical Count)가 완료됐으나 ERP와 동기화되지 않음"
+      - "ERP로부터 EWM으로의 입출고 전송 지연"
+      - "이중 기록(Double Posting) — EWM과 ERP에서 각각 계상됨"
+    evidence_needed:
+      - { type: screenshot, target: "/SCWM/MON stock vs MMBE", priority: critical }
+      - { type: transaction_log, target: "EWM-ERP sync log", priority: high }
+    severity: high
+    recurrence: occasional
+
+  # ═══════════════════════════════════════════════════════════════
+  # TR — Treasury (3건)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: sym-tr-bank-statement-mismatch
+    symptom_ko: "FF_5 은행명세서 잔액 불일치"
+    symptom_ko_variants:
+      - "은행 잔액 다름"
+      - "FF_5 대조"
+      - "은행 대사"
+      - "Bank Statement Reconciliation"
+    symptom_en: "FF_5 bank statement balance mismatch"
+    likely_modules: [TR, FI]
+    first_check_tcodes: [FF_5, FF.5, FF_6, FBRA]
+    typical_causes:
+      - "은행에서 처리된 거래(fees, interest)가 SAP에 아직 계상되지 않음"
+      - "미결(Outstanding) 수표가 아직 은행에 제출되지 않음"
+      - "환전(Exchange Rate) 차이"
+    evidence_needed:
+      - { type: screenshot, target: "FF_5 reconciliation detail", priority: critical }
+      - { type: table_export, target: "BSEG bank transaction items", priority: high }
+    severity: medium
+    recurrence: common
+
+  - id: sym-tr-liquidity-forecast
+    symptom_ko: "FF7B 유동성 예측 오류"
+    symptom_ko_variants:
+      - "현금 예측 계산 오류"
+      - "FF7B 리스크"
+      - "Liquidity Forecast"
+      - "현금흐름 예측"
+    symptom_en: "FF7B liquidity forecast calculation error"
+    likely_modules: [TR]
+    first_check_tcodes: [FF7B, FF.7, FLFX, FLERRF]
+    typical_causes:
+      - "현금 흐름(Cash Flow) 예측 매개변수 설정 오류"
+      - "외화(Foreign Currency) 환율 업데이트 지연"
+      - "신용한도(Credit Limit) 정의 누락"
+    evidence_needed:
+      - { type: screenshot, target: "FF7B forecast result", priority: high }
+      - { type: table_export, target: "FLERRF forecast parameter", priority: high }
+    severity: medium
+    recurrence: occasional
+
+  - id: sym-tr-dmee-format
+    symptom_ko: "DMEE 지급 파일 형식 오류"
+    symptom_ko_variants:
+      - "DMEE 포맷"
+      - "지급 파일 생성 실패"
+      - "DMEE 에러"
+      - "지급 형식"
+    symptom_en: "DMEE payment file format error"
+    likely_modules: [TR, FI]
+    first_check_tcodes: [DMEE, F110, OBPM1, OBPM4]
+    typical_causes:
+      - "DMEE 포맷 정의(Tree)의 필드 매핑이 잘못됨"
+      - "국가별 은행 포맷 변경(예: 한국 은행들의 연 2회 포맷 업데이트)"
+      - "문자 인코딩(Character Set) 문제"
+    evidence_needed:
+      - { type: screenshot, target: "DMEE error detail", priority: critical }
+      - { type: transaction_log, target: "F110 DME generation log", priority: high }
+    severity: high
+    recurrence: occasional
+
+  # ═══════════════════════════════════════════════════════════════
+  # Integration (3건)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: sym-int-rfc-timeout
+    symptom_ko: "RFC 호출 시간 초과 (SM58)"
+    symptom_ko_variants:
+      - "알에프씨 타임아웃"
+      - "RFC Timeout"
+      - "원격 함수 호출 지연"
+      - "SM58 실패"
+    symptom_en: "RFC call timeout (SM58)"
+    likely_modules: [BASIS, BC]
+    first_check_tcodes: [SM58, SM59, RZ10, RZ11]
+    typical_causes:
+      - "RFC Destination(SM59) 연결 대상 시스템이 다운되거나 느림"
+      - "RFC 타임아웃 값(rdmsr02, rdmsr03) 설정이 너무 짧음"
+      - "네트워크 지연 또는 방화벽 설정 문제"
+    evidence_needed:
+      - { type: screenshot, target: "SM58 failed RFC", priority: critical }
+      - { type: transaction_log, target: "SM59 RFC destination", priority: high }
+    severity: high
+    recurrence: occasional
+
+  - id: sym-int-odata-auth-fail
+    symptom_ko: "OData 서비스 인증 실패 (403/401)"
+    symptom_ko_variants:
+      - "OData 403 Forbidden"
+      - "오데이타 401 Unauthorized"
+      - "API 인증 실패"
+      - "OData Gateway Error"
+    symptom_en: "OData service authentication fails (403/401)"
+    likely_modules: [BC, BASIS]
+    first_check_tcodes: [SEGW, SICF, SU53, SM59]
+    typical_causes:
+      - "OData 서비스에 할당된 권한이 없음 (401)"
+      - "OData 서비스가 비활성화 상태이거나 존재하지 않음 (403)"
+      - "SSL 인증서 오류 또는 만료"
+    evidence_needed:
+      - { type: screenshot, target: "OData error response", priority: critical }
+      - { type: transaction_log, target: "SEGW service metadata", priority: high }
+    severity: high
+    recurrence: occasional
+
+  - id: sym-int-cpi-iflow-error
+    symptom_ko: "CPI iFlow 처리 실패"
+    symptom_ko_variants:
+      - "SAP CPI iFlow"
+      - "통합 플로우 오류"
+      - "CPI 처리"
+      - "Integration Flow Failed"
+    symptom_en: "CPI iFlow processing fails"
+    likely_modules: [BC, BTP]
+    first_check_tcodes: ["/iwcb/moni", "/iwcb/mon_cpi", "/iwcb/launch", "SM59"]
+    typical_causes:
+      - "iFlow의 메시지 매핑(Message Mapping) 오류"
+      - "수신 시스템(Target System)의 RFC 또는 REST 엔드포인트 연결 실패"
+      - "승인(Authorization) — CPI와 ERP 간 사용자 권한 불일치"
+    evidence_needed:
+      - { type: screenshot, target: "/iwcb/moni iFlow error detail", priority: critical }
+      - { type: transaction_log, target: "CPI message log", priority: high }
+    severity: high
+    recurrence: occasional
+
+  # ═══════════════════════════════════════════════════════════════
+  # Korea-specific (3건)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: sym-kr-four-insurance-calc
+    symptom_ko: "4대보험 정산 금액 오차"
+    symptom_ko_variants:
+      - "보험료 차이"
+      - "4대보험 오류"
+      - "사회보험료 계산"
+      - "보험 정산 불일치"
+    symptom_en: "Korean four social insurances settlement amount error"
+    likely_modules: [HCM, FI]
+    first_check_tcodes: [PC00_M99, PT01, MOLGA, PA01]
+    typical_causes:
+      - "건강보험(Health Insurance) 보험료 계산 기준 오류 (최저보증금액 미반영)"
+      - "고용보험(Employment Insurance) 사업주 부담금 누락"
+      - "산재보험(Industrial Injury) 업종 코드 오류"
+    evidence_needed:
+      - { type: screenshot, target: "Payroll insurance calculation detail", priority: critical }
+      - { type: table_export, target: "T511T insurance master", priority: high }
+    severity: high
+    recurrence: occasional
+
+  - id: sym-kr-unipass-reject
+    symptom_ko: "UNI-PASS 수출신고 반려"
+    symptom_ko_variants:
+      - "유니패스 반려"
+      - "수출 신고 실패"
+      - "통관 오류"
+      - "UNI-PASS Error"
+    symptom_en: "Korea UNI-PASS export declaration rejection"
+    likely_modules: [SD, FI, BC]
+    first_check_tcodes: [SM59, STRUST, SLG1, VF01]
+    typical_causes:
+      - "수출신고 필수 항목(상품 설명, HS code, Origin Country) 누락"
+      - "UNI-PASS 연동 인증서(Certificate) 만료 또는 오류"
+      - "관세청 시스템 점검시간 (야간 시간대) 재전송 필요"
+    evidence_needed:
+      - { type: screenshot, target: "UNI-PASS error response", priority: critical }
+      - { type: transaction_log, target: "SLG1 UNIPASS interface log", priority: high }
+    severity: high
+    recurrence: occasional
+
+  - id: sym-kr-strategic-material
+    symptom_ko: "전략물자 허가 연계 오류"
+    symptom_ko_variants:
+      - "전략물자 수출 허가"
+      - "TTBK 연동 오류"
+      - "전자통관"
+      - "Strategic Material Export Control"
+    symptom_en: "Korea strategic material export license linkage error"
+    likely_modules: [SD, FI, BC]
+    first_check_tcodes: [SM59, STRUST, VF01, EDOC_COCKPIT]
+    typical_causes:
+      - "전략물자 수출 허가번호 입력 누락 (VF01 빌링 시)"
+      - "TTBK(기술거래·비금속광물수출협회) 시스템 연동 미설정"
+      - "수출 승인 기간 만료 후 재신청 필요"
+    evidence_needed:
+      - { type: screenshot, target: "Strategic material export detail", priority: critical }
+      - { type: transaction_log, target: "EDOC/TTBK interface log", priority: high }
+    severity: high
+    recurrence: occasional
+
 meta:
-  total: 20
-  languages: [ko, en, de, ja]
+  total: 83
+  languages: [ko, en]
   language_coverage:
-    ko: 20         # 전체 (원본)
-    en: 20         # 전체
-    de: 3          # F110, MIGO, ST22 (시드 — 커뮤니티 확장 대상)
-    ja: 3          # 동일
+    ko: 83         # 전체 (원본)
+    en: 83         # 전체
   coverage:
     FI: 5
     MM: 3
-    SD: 2
+    SD: 7
     BASIS: 4
     ABAP: 2
-    TR: 2
+    TR: 5
     BC: 2
+    CO: 5
+    PP: 5
+    HCM: 4
+    PM: 6
+    QM: 5
+    WM: 2
+    EWM: 3
+    KB: 0
   localization_consultants_planned:
     kr: present (built-in)
     de: planned v1.7 (sap-de-localization-consultant)

@@ -1,0 +1,148 @@
+# sapstack — 마스터데이터 필수 필드 검증 규칙
+#
+# 목적: 기간마감 전 마스터데이터 완전성 사전 검증
+# 참조: docs/best-practices/master-data-governance.md
+#
+# 각 규칙은 마스터 유형별 필수 필드와 검증 로직을 정의
+# severity: error (마감 차단), warning (경고만)
+
+vendor_master:
+  description: 공급업체 마스터 (LFA1/LFB1/LFM1/LFBK)
+  check_tcode: XK03
+  rules:
+    - field: LFB1-AKONT
+      name: 통제계정 (Reconciliation Account)
+      severity: error
+      reason: 미설정 시 AP 전표 전기 불가
+
+    - field: LFB1-ZTERM
+      name: 지급조건 (Payment Terms)
+      severity: error
+      reason: F110 지급실행 시 만기일 계산 불가
+
+    - field: LFB1-ZWELS
+      name: 지급방법 (Payment Method)
+      severity: error
+      reason: F110 지급실행 시 지급 방법 결정 불가
+
+    - field: LFBK-BANKL
+      name: 은행키 (Bank Key)
+      severity: error
+      reason: 지급 시 계좌 정보 필수
+
+    - field: LFBK-BANKN
+      name: 은행 계좌번호
+      severity: error
+      reason: 지급 시 계좌 정보 필수
+
+    - field: LFA1-STCD1
+      name: 사업자등록번호 (Tax Number 1)
+      severity: error
+      reason: 한국 전자세금계산서 발행 필수
+      korea_only: true
+
+customer_master:
+  description: 고객 마스터 (KNA1/KNB1/KNVV/KNKK)
+  check_tcode: XD03
+  rules:
+    - field: KNB1-AKONT
+      name: 통제계정 (Reconciliation Account)
+      severity: error
+      reason: AR 전표 전기 불가
+
+    - field: KNB1-ZTERM
+      name: 지급조건 (Payment Terms)
+      severity: warning
+      reason: 미설정 시 즉시 만기 적용
+
+    - field: KNVV-VKORG
+      name: 판매조직 (Sales Organization)
+      severity: error
+      reason: 판매오더 생성 불가
+
+    - field: KNVV-VTWEG
+      name: 유통채널 (Distribution Channel)
+      severity: error
+      reason: 판매영역 미완성
+
+    - field: KNKK-KLIMK
+      name: 여신한도 (Credit Limit)
+      severity: warning
+      reason: 미설정 시 여신 차단 가능
+
+material_master:
+  description: 자재 마스터 (MARA/MARC/MBEW/MVKE)
+  check_tcode: MM03
+  rules:
+    - field: MARA-MTART
+      name: 자재유형 (Material Type)
+      severity: error
+      reason: 자재 분류 기본값
+
+    - field: MARA-MEINS
+      name: 기본단위 (Base UoM)
+      severity: error
+      reason: 모든 수량 계산의 기준
+
+    - field: MARC-DISMM
+      name: MRP 유형 (MRP Type)
+      severity: warning
+      reason: 미설정 시 MRP 실행 대상 제외
+
+    - field: MARC-DISPO
+      name: MRP 관리자 (MRP Controller)
+      severity: warning
+      reason: MRP 결과 담당자 미지정
+
+    - field: MBEW-VPRSV
+      name: 가격 제어 (Price Control — S/V)
+      severity: error
+      reason: 재고 평가 기준 — S(표준가) 또는 V(이동평균가)
+
+    - field: MBEW-BKLAS
+      name: 평가클래스 (Valuation Class)
+      severity: error
+      reason: OBYC 계정결정에 필수 — 미설정 시 GL 전기 실패
+
+    - field: MVKE-VKORG
+      name: 판매조직 뷰
+      severity: warning
+      reason: 판매 뷰 없으면 판매오더 생성 불가 (SD 사용 시)
+
+equipment_master:
+  description: 장비 마스터 (EQUI)
+  check_tcode: IE03
+  rules:
+    - field: EQUI-EQART
+      name: 장비 카테고리
+      severity: warning
+      reason: 보전 보고서 분류 기준
+
+    - field: EQUI-KOSTL
+      name: 원가센터
+      severity: error
+      reason: 보전오더 정산 대상 미지정
+
+    - field: EQUI-TPLNR
+      name: 기능위치
+      severity: warning
+      reason: 위치 기반 보전 이력 추적 불가
+
+gl_account:
+  description: GL 계정 마스터 (SKA1/SKB1)
+  check_tcode: FS00
+  rules:
+    - field: SKA1-KTOKS
+      name: 계정그룹 (Account Group)
+      severity: error
+      reason: 계정 분류 기준
+
+    - field: SKB1-MWSKZ
+      name: 세금카테고리 (Tax Category)
+      severity: warning
+      reason: 미설정 시 세금코드 입력 불가 (필요 시)
+
+    - field: SKB1-FSTAG
+      name: 필드상태그룹 (Field Status Group)
+      severity: error
+      reason: 전표 입력 시 필드 표시/숨김/필수 제어

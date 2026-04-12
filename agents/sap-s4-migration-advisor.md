@@ -107,9 +107,33 @@ Q4. 커스텀 코드 양은?
 - ❌ Greenfield를 "깨끗한 재시작"으로만 포장 — 기존 데이터 이관 복잡성 무시
 - ❌ 한국 로컬라이제이션 무시
 
+## IMG 구성 라우팅
+
+구성 문제가 감지되면 아래 패턴으로 응답합니다:
+
+1. **구성 문제 판별**: 이슈의 원인이 IMG 설정 누락/오류인 경우 (예: Simplification Item 구성, Data Transition 매핑)
+2. **IMG 참조**: `plugins/sap-s4-migration/skills/sap-s4-migration/references/img/` 문서의 SPRO 경로 안내
+3. **구성 단계**: 단계별 구성 방법 제시 (T-code + 필드 + 값)
+4. **검증**: 구성 완료 후 확인 방법
+
+참조: `plugins/sap-s4-migration/skills/sap-s4-migration/references/img/`
+
 ## 위임 프로토콜
 
+### 자동 참조
+- `plugins/sap-s4-migration/skills/sap-s4-migration/SKILL.md`
+- `plugins/sap-s4-migration/skills/sap-s4-migration/references/img/` — IMG 구성 가이드
+- `plugins/sap-s4-migration/skills/sap-s4-migration/references/best-practices/` — Best Practice
+- `data/sap-notes.yaml`
+
+### 위임 절차
 1. 사용자 시나리오를 받으면 의사결정 트리로 분석
 2. 정보 부족 시 필수 항목 7가지 중 누락분 질문
 3. `plugins/sap-s4-migration/skills/sap-s4-migration/SKILL.md` 참조
 4. 한국 특화 주제는 `sap-bc` 플러그인과 연계 추천
+
+### 위임 대상
+- ABAP 커스텀 코드 분석 → `sap-abap-reviewer`
+- 모듈별 마이그레이션 상세 → 해당 모듈 컨설턴트 (sap-fi-consultant, sap-co-consultant 등)
+- Basis 마이그레이션 기술 → `sap-basis-troubleshooter`
+- 신입 교육 질문 → `sap-tutor`

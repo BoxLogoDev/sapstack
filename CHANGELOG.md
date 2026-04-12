@@ -5,6 +5,87 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-04-12
+
+### Theme
+**"Enterprise SAP Operations Platform"** — sapstack이 트러블슈팅 도구에서
+**SAP 운영 전체 라이프사이클 플랫폼**으로 진화하는 릴리스.
+IMG 구성 가이드, 3-Tier Best Practice, 엔터프라이즈 시나리오, 업종별 가이드를
+추가하여 Configure → Implement → Operate → Diagnose → Optimize 5축 구조를 완성한다.
+
+### Added — New Modules (+4)
+- **`sap-pm`** — SAP Plant Maintenance (설비보전): 장비마스터, 보전오더, 예방보전, MTBF/MTTR, 산업안전보건법
+- **`sap-qm`** — SAP Quality Management (품질관리): 검사계획, 검사로트, 사용결정, 품질통보, ISO/GMP/HACCP
+- **`sap-wm`** — SAP Warehouse Management (창고관리): ECC 레거시, S/4 deprecated 안내, EWM 전환 가이드
+- **`sap-ewm`** — SAP Extended Warehouse Management (확장창고관리): Wave/Pack/RF, Embedded vs Decentralized
+
+### Added — IMG Configuration Framework (Phase 1)
+- **45+ IMG 구성 가이드** — 11개 모듈에 SPRO 경로, 구성 단계, 필드 설정, ECC/S/4 차이, 검증 방법
+  - FI: 7 files (GL 계정결정, 전표유형, 기간제어, 세금, 자산회계, GR/IR, overview)
+  - CO: 5 files (관리회계영역, 원가센터, 내부오더, 제품원가, overview)
+  - TR: 5 files (하우스뱅크, 지급프로그램, 은행명세서, DMEE, overview)
+  - MM: 5 files (이동유형, 계정결정, 허용한도, 구매조직, overview)
+  - SD: 5 files (가격결정, 계정결정, 복사제어, 여신관리, overview)
+  - PP: 5 files (MRP구성, 생산오더유형, BOM/라우팅, 용량계획, overview)
+  - PM: 5 files (장비/기능위치, 보전오더유형, 예방보전, 통보카탈로그, overview)
+  - QM: 5 files (검사유형, 검사계획, 사용결정, 품질통보유형, overview)
+  - WM: 3 files (창고구조, 이동유형/전략, overview)
+  - HCM: 5 files (인사관리, 급여영역, 근태관리, 조직관리, overview)
+  - EWM: 5 files (창고프로세스유형, 적치전략, RF프레임워크, Wave/Packing, overview)
+- **`scripts/check-img-references.sh`** — IMG 문서 형식 검증 QG
+
+### Added — Best Practice Framework (Phase 2)
+- **3-Tier Best Practice 체계**: Operational (일상) / Period-End (기간마감) / Governance (거버넌스)
+- **7 공통 BP 문서** (`docs/best-practices/`):
+  - authorization-governance, transport-management, master-data-governance,
+    period-end-orchestration, change-management, data-archiving, README
+- **33 모듈별 BP** (11 modules × 3 tiers) — FI/CO/TR/MM/SD/PP/PM/QM/WM/EWM/HCM
+- **`scripts/check-best-practices.sh`** — BP 3-Tier 구조 검증 QG
+
+### Added — Enterprise Scenario Layer (Phase 3)
+- **6 엔터프라이즈 문서** (`docs/enterprise/`):
+  - multi-company-code, shared-services, system-landscape,
+    intercompany, global-rollout, integration-constraints
+- **3 업종별 가이드** (`docs/industry/`):
+  - manufacturing (제조업), retail (유통업), financial-services (금융업)
+- **`data/industry-matrix.yaml`** — 업종별 모듈 활성화/중요도 매트릭스
+- **`scripts/check-industry-refs.sh`** — 업종별 가이드 참조 무결성 QG
+
+### Added — Agents (+6) & Commands (+5)
+- **`sap-tutor`** — SAP 신입사원 교육 튜터 (각 컨설턴트에게 질문 위임 + 초보자 수준 번역)
+- **`sap-hcm-consultant`** — HCM 한국어 컨설턴트 (4대보험, 원천징수, 퇴직연금)
+- **`sap-tr-consultant`** — TR 한국어 컨설턴트 (유동성, 은행 연동, DMEE)
+- **`sap-pm-analyst`** — PM 한국어 전문가 (장비, 보전오더, MTBF/MTTR)
+- **`sap-qm-inspector`** — QM 한국어 전문가 (검사, 사용결정, ISO/GMP)
+- **`sap-ewm-consultant`** — EWM/WM 한국어 컨설턴트 (Wave, RF, 마이그레이션)
+- **`/sap-img-guide`** — IMG 구성 가이드 조회 커맨드
+- **`/sap-master-data-check`** — 마스터데이터 사전검증
+- **`/sap-bp-review`** — Best Practice 준수 리뷰
+- **`/sap-pm-diagnosis`** — 설비 고장 진단
+- **`/sap-qm-inspection`** — 품질검사 분석
+
+### Added — Data Assets
+- **`data/period-end-sequence.yaml`** — 모듈 횡단 기간마감 실행 순서 (의존성 포함)
+- **`data/master-data-rules.yaml`** — 마스터데이터 필수 필드 검증 규칙
+- **`data/industry-matrix.yaml`** — 업종별 모듈 매트릭스
+
+### Changed
+- **`sap-pp-analyzer` → `sap-pp-consultant`** — PP 에이전트 이름 변경 (다른 모듈과 일관성)
+- **기존 9개 에이전트** — IMG 구성 라우팅 + sap-tutor 위임 프로토콜 추가
+- **`data/tcodes.yaml`** — 279 → ~340 T-codes (+PM/QM/WM/EWM)
+- **`data/symptom-index.yaml`** — 18 → 62 증상 (+CO/PP/SD/HCM/PM/QM/WM/EWM/TR/Integration/Korea)
+- **`data/sap-notes.yaml`** — 46 → 57 SAP Notes (+PM/QM/WM/EWM/HCM)
+- **`data/synonyms.yaml`** — 58 → 80+ 동의어 (+PM/QM/WM/EWM 현장용어)
+- **`CLAUDE.md`** — PM/QM/WM/EWM 호환성 매트릭스, IMG/BP/Enterprise/Industry 참조 규칙, 튜터 에이전트 라우팅
+- **`.claude-plugin/marketplace.json`** — 4개 플러그인 추가, 버전 1.6.0
+- **`.github/workflows/ci.yml`** — 3개 신규 QG + validate-config 추가
+
+### Migration
+- 하위 호환: 기존 v1.5.0 설정과 완전 호환
+- `sap-pp-analyzer` → `sap-pp-consultant` 이름 변경 — 기존 참조 업데이트 필요
+
+---
+
 ## [1.5.0] - 2026-04-12
 
 ### Theme

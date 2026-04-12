@@ -1,0 +1,70 @@
+# sapstack — 업종별 모듈 활성화/중요도 매트릭스
+#
+# 목적: 업종별 어떤 SAP 모듈이 핵심인지, 어떤 에이전트를 우선 라우팅할지 결정
+# 참조: docs/industry/manufacturing.md, retail.md, financial-services.md
+#
+# importance: critical (핵심), high (높음), medium (보통), low (낮음), none (미사용)
+# agent: 우선 라우팅 에이전트
+
+manufacturing:
+  name: 제조업
+  description: 자동차, 전자, 화학, 철강, 식품 등 제조 기반 산업
+  korean_examples: 삼성전자, LG전자, 현대자동차, SK하이닉스, 포스코
+  modules:
+    PP: { importance: critical, agent: sap-pp-consultant, note: "MRP/BOM/Routing — 생산 핵심" }
+    MM: { importance: critical, agent: sap-mm-consultant, note: "원자재 조달, 재고 관리" }
+    QM: { importance: critical, agent: sap-qm-inspector, note: "품질 검사, ISO/IATF" }
+    PM: { importance: critical, agent: sap-pm-analyst, note: "설비 보전, 예방 정비" }
+    FI: { importance: high, agent: sap-fi-consultant, note: "제조원가, 재무제표" }
+    CO: { importance: high, agent: sap-co-consultant, note: "제품원가, 차이 분석" }
+    SD: { importance: high, agent: sap-sd-consultant, note: "완제품 출하, 납품" }
+    WM: { importance: medium, agent: sap-ewm-consultant, note: "원자재/완제품 창고" }
+    EWM: { importance: medium, agent: sap-ewm-consultant, note: "대형 물류센터" }
+    HCM: { importance: medium, agent: sap-hcm-consultant, note: "3교대 근무 관리" }
+    TR: { importance: low, agent: sap-tr-consultant }
+    ABAP: { importance: high, agent: sap-abap-reviewer, note: "MES 연동 커스텀 개발" }
+    BASIS: { importance: medium, agent: sap-basis-troubleshooter }
+    BTP: { importance: low }
+    GTS: { importance: low, note: "수출입 기업만" }
+
+retail:
+  name: 유통업
+  description: 백화점, 대형마트, 편의점, 이커머스, 물류 기업
+  korean_examples: 쿠팡, SSG닷컴, 롯데쇼핑, CJ대한통운, GS리테일
+  modules:
+    SD: { importance: critical, agent: sap-sd-consultant, note: "대량 주문 처리, 프로모션" }
+    MM: { importance: critical, agent: sap-mm-consultant, note: "상품 조달, 재고 관리" }
+    EWM: { importance: critical, agent: sap-ewm-consultant, note: "풀필먼트센터, 피킹/패킹" }
+    WM: { importance: high, agent: sap-ewm-consultant, note: "ECC 레거시 창고" }
+    FI: { importance: high, agent: sap-fi-consultant, note: "매출채권, 매입채무" }
+    CO: { importance: medium, agent: sap-co-consultant, note: "채널별 수익성" }
+    QM: { importance: medium, agent: sap-qm-inspector, note: "식품 HACCP" }
+    PP: { importance: low, agent: sap-pp-consultant, note: "PB 상품 생산 시에만" }
+    PM: { importance: low, agent: sap-pm-analyst, note: "물류 설비" }
+    HCM: { importance: medium, agent: sap-hcm-consultant, note: "매장 인력 관리" }
+    TR: { importance: low, agent: sap-tr-consultant }
+    ABAP: { importance: high, agent: sap-abap-reviewer, note: "POS/EDI 연동" }
+    BASIS: { importance: medium, agent: sap-basis-troubleshooter }
+    BTP: { importance: medium, note: "이커머스 연동" }
+    GTS: { importance: medium, note: "해외 직구/수입" }
+
+financial_services:
+  name: 금융업
+  description: 은행, 보험, 증권, 카드, 자산운용
+  korean_examples: 국민은행, 삼성생명, 한국투자증권, 신한카드
+  modules:
+    FI: { importance: critical, agent: sap-fi-consultant, note: "재무회계 핵심, 연결결산" }
+    CO: { importance: critical, agent: sap-co-consultant, note: "부서별 손익, 비용 배부" }
+    TR: { importance: critical, agent: sap-tr-consultant, note: "자금관리, 금융상품, 리스크" }
+    HCM: { importance: high, agent: sap-hcm-consultant, note: "대규모 인력, 성과급" }
+    MM: { importance: medium, agent: sap-mm-consultant, note: "간접 구매(IT, 사무용품)" }
+    BASIS: { importance: critical, agent: sap-basis-troubleshooter, note: "보안, 감사, SoD" }
+    ABAP: { importance: medium, agent: sap-abap-reviewer, note: "코어뱅킹 인터페이스" }
+    BTP: { importance: medium, note: "디지털 채널" }
+    SD: { importance: low, note: "일부 상품 판매" }
+    PP: { importance: none }
+    QM: { importance: none }
+    PM: { importance: low, note: "ATM/단말기 관리" }
+    WM: { importance: none }
+    EWM: { importance: none }
+    GTS: { importance: low, note: "해외 송금 규제" }

@@ -2,8 +2,9 @@
 name: sap-session
 description: |
   Evidence Loop — SAP 운영 진단을 라이브 접근 없이 "확인→수정→재확인" 루프로 수행.
-  기존 14개 sapstack 모듈과 9개 컨설턴트 에이전트를 오케스트레이션하는 상위 스킬.
+  18개 sapstack 모듈과 15개 컨설턴트 에이전트를 오케스트레이션하는 상위 스킬.
   Turn-aware 응답 포맷 (Hypothesis → Follow-up → Verify → Fix + Rollback).
+  v1.6.0: PM/QM/WM/EWM 모듈 + sap-tutor/hcm/tr/pm/qm/ewm 에이전트 라우팅 추가.
 version: 0.1.0
 stage: experimental
 language: [ko, en]

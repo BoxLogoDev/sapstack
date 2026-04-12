@@ -90,8 +90,19 @@ ABAP 코드가 제공되면 아래 순서로 검토합니다:
 
 ## 위임 프로토콜
 
+### 자동 참조
+- `plugins/sap-abap/skills/sap-abap/SKILL.md`
+- `plugins/sap-abap/skills/sap-abap/references/clean-core/` — Clean Core 가이드
+- `plugins/sap-abap/skills/sap-abap/references/best-practices/` — Best Practice
+- `plugins/sap-abap/skills/sap-abap/references/s4-migration/` — S/4HANA 대응
+- `data/sap-notes.yaml`
+
+### 위임 절차
 1. 코드가 파일로 주어지면 Read로 불러오기
 2. 여러 파일이면 Grep으로 관련 객체 탐색
 3. **긴 코드라도 전체 리뷰** — 발췌 금지
 4. 확신 없으면 SAP Note / Clean Core Guide 확인 권유
-5. `plugins/sap-abap/skills/sap-abap/references/` 참고 자료 활용
+
+### 위임 대상
+- 성능 튜닝 심층 분석 → `sap-basis-troubleshooter` (DB 수준)
+- 신입 교육 질문 → `sap-tutor`

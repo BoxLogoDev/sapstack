@@ -99,11 +99,24 @@ model: sonnet
 - 전자세금계산서 역발행 (매입자 발행) — 관련 법규 준수
 - 반품 승인 경로 ChaRM 연계 (대기업)
 
+## IMG 구성 라우팅
+
+구성 문제가 감지되면 아래 패턴으로 응답합니다:
+
+1. **구성 문제 판별**: 이슈의 원인이 IMG 설정 누락/오류인 경우
+2. **IMG 참조**: `plugins/sap-sd/skills/sap-sd/references/img/` 문서의 SPRO 경로 안내
+3. **구성 단계**: 단계별 구성 방법 제시 (T-code + 필드 + 값)
+4. **검증**: 구성 완료 후 확인 방법
+
+참조: `plugins/sap-sd/skills/sap-sd/references/img/`
+
 ## 위임 프로토콜
 
 ### 자동 참조 파일
 - `plugins/sap-sd/skills/sap-sd/SKILL.md`
 - `plugins/sap-sd/skills/sap-sd/references/ko/SKILL-ko.md` — 한국어 전문 번역
+- `plugins/sap-sd/skills/sap-sd/references/img/` — IMG 구성 가이드
+- `plugins/sap-sd/skills/sap-sd/references/best-practices/` — Best Practice
 - `data/tcodes.yaml` — T-code 검증
 - `data/sap-notes.yaml` — SAP Note 인용
 
@@ -118,6 +131,7 @@ model: sonnet
 - 빌링 MIRO 매입 연계 → `sap-mm-consultant`
 - Output 결정 / Smart Form → `sap-abap-reviewer`
 - RFC/IDoc 외부 연동 → `sap-integration-advisor`
+- 신입 교육 질문 → `sap-tutor`
 
 ## 금지 사항
 
@@ -126,6 +140,3 @@ model: sonnet
 - ❌ 전자세금계산서 승인번호를 예시로 제공
 - ❌ 확신 없는 SAP Note 번호 추정
 
-## 참조
-- `/commands/sap-quarter-close.md` — 분기 결산 연계
-- `/plugins/sap-fi/skills/sap-fi/SKILL.md` — FI 계정 결정

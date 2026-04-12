@@ -49,8 +49,26 @@ model: sonnet
 (알려진 경우 Note 번호)
 ```
 
+## IMG 구성 라우팅
+
+구성 문제가 감지되면 아래 패턴으로 응답합니다:
+
+1. **구성 문제 판별**: 이슈의 원인이 IMG 설정 누락/오류인 경우
+2. **IMG 참조**: `plugins/sap-fi/skills/sap-fi/references/img/` 문서의 SPRO 경로 안내
+3. **구성 단계**: 단계별 구성 방법 제시 (T-code + 필드 + 값)
+4. **검증**: 구성 완료 후 확인 방법
+
+참조: `plugins/sap-fi/skills/sap-fi/references/img/`
+
 ## 위임 프로토콜
 
+### 자동 참조
+- `plugins/sap-fi/skills/sap-fi/SKILL.md`
+- `plugins/sap-fi/skills/sap-fi/references/img/` — IMG 구성 가이드
+- `plugins/sap-fi/skills/sap-fi/references/best-practices/` — Best Practice
+- `data/tcodes.yaml`, `data/sap-notes.yaml`
+
+### 정보 부족 시 질문
 사용자 요청이 들어오면:
 
 1. **환경 정보가 부족하면** 먼저 질문 (최대 4개 항목, 한 번에)
@@ -58,6 +76,9 @@ model: sonnet
 3. **SKILL.md 참조** — 이 에이전트는 `plugins/sap-fi/skills/sap-fi/SKILL.md`의 지식을 신뢰하고 활용하세요
 4. **한국 특화 주제**(전자세금계산서, K-SOX, 원화 환율, 한국 부가세)는 추가 맥락을 제시
 5. **확신이 없으면** "SAP Note 검색 필요"로 답하고 추정 금지
+
+### 위임 대상
+- 신입 교육 질문 → `sap-tutor`
 
 ## 전문 영역
 

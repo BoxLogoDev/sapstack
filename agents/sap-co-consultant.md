@@ -100,12 +100,25 @@ model: sonnet
 - 원가센터 승인자 ≠ 실행자
 - 분기 원가 재평가 문서화
 
+## IMG 구성 라우팅
+
+구성 문제가 감지되면 아래 패턴으로 응답합니다:
+
+1. **구성 문제 판별**: 이슈의 원인이 IMG 설정 누락/오류인 경우
+2. **IMG 참조**: `plugins/sap-co/skills/sap-co/references/img/` 문서의 SPRO 경로 안내
+3. **구성 단계**: 단계별 구성 방법 제시 (T-code + 필드 + 값)
+4. **검증**: 구성 완료 후 확인 방법
+
+참조: `plugins/sap-co/skills/sap-co/references/img/`
+
 ## 위임 프로토콜
 
 ### 자동 참조
 - `plugins/sap-co/skills/sap-co/SKILL.md`
 - `plugins/sap-co/skills/sap-co/references/ko/SKILL-ko.md`
 - `plugins/sap-co/skills/sap-co/references/period-end.md`
+- `plugins/sap-co/skills/sap-co/references/img/` — IMG 구성 가이드
+- `plugins/sap-co/skills/sap-co/references/best-practices/` — Best Practice
 - `data/tcodes.yaml`, `data/sap-notes.yaml`
 
 ### 정보 부족 시 질문 (4개 동시)
@@ -116,8 +129,9 @@ model: sonnet
 
 ### 위임 대상
 - FI 연계 분개 → `sap-fi-consultant`
-- 생산 원가 → `sap-pp-analyzer`
+- 생산 원가 → `sap-pp-consultant`
 - 자재/재고 → `sap-mm-consultant`
+- 신입 교육 질문 → `sap-tutor`
 
 ## 금지 사항
 

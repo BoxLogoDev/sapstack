@@ -1,0 +1,203 @@
+# sapstack — 모듈 횡단 기간마감 실행 순서
+#
+# 목적: 월말/분기/연말 마감 시 모듈 간 의존성과 실행 순서를 정의
+# 참조: docs/best-practices/period-end-orchestration.md
+#
+# 각 단계는 선행 의존성(depends_on)이 충족된 후에만 실행 가능
+# timing: D-N (마감일 N일 전), D+N (마감일 N일 후)
+
+monthly_close:
+  - id: pp-confirmation
+    name: 생산오더 확인 완료
+    module: PP
+    tcode: CO11N
+    timing: D-3
+    depends_on: []
+    description: 미확인 생산오더 → 재공품 평가 오류 방지
+
+  - id: pp-cogi
+    name: 자동 GM 오류 처리
+    module: PP
+    tcode: COGI
+    timing: D-3
+    depends_on: [pp-confirmation]
+    description: 미처리 자동 입출고 오류 해결
+
+  - id: pp-teco
+    name: 생산오더 TECO
+    module: PP
+    tcode: CO02
+    timing: D-2
+    depends_on: [pp-cogi]
+    description: 완료 오더 기술적 완료 처리
+
+  - id: qm-usage-decision
+    name: 미결 검사로트 사용결정
+    module: QM
+    tcode: QA32
+    timing: D-3
+    depends_on: []
+    description: 사용결정 미완 → 차단 재고 유지
+
+  - id: qm-notification-close
+    name: 품질통보 완료
+    module: QM
+    tcode: QM02
+    timing: D-2
+    depends_on: [qm-usage-decision]
+    description: 미결 품질통보 종결
+
+  - id: mm-goods-movement
+    name: 미처리 입출고 완료
+    module: MM
+    tcode: MIGO
+    timing: D-3
+    depends_on: []
+    description: 물류 전표 마감
+
+  - id: mm-grir-clearing
+    name: GR/IR 정리
+    module: MM
+    tcode: MR11
+    timing: D-2
+    depends_on: [mm-goods-movement]
+    description: 반드시 시뮬레이션 먼저 (MR11 test run)
+    simulation_required: true
+
+  - id: mm-material-ledger
+    name: 자재원장 결산
+    module: MM
+    tcode: CKMLCP
+    timing: D-1
+    depends_on: [mm-grir-clearing]
+    description: S/4HANA 필수 — 실제원가 계산
+    s4_only: true
+
+  - id: mm-period-close
+    name: MM 기간 마감
+    module: MM
+    tcode: MMPV
+    timing: D-1
+    depends_on: [mm-material-ledger]
+    description: 이전 기간 전기 차단
+
+  - id: sd-billing
+    name: 미발행 빌링 처리
+    module: SD
+    tcode: VF04
+    timing: D-3
+    depends_on: []
+    description: 매출 누락 방지
+
+  - id: sd-delivery
+    name: 미배송 딜리버리 PGI
+    module: SD
+    tcode: VL06G
+    timing: D-2
+    depends_on: [sd-billing]
+    description: PGI 미처리 → 재고 불일치
+
+  - id: pm-order-settle
+    name: 보전오더 정산
+    module: PM
+    tcode: KO88
+    timing: D-1
+    depends_on: [pm-order-close]
+    description: CO 결산 전 PM 오더 비용 정산
+
+  - id: pm-order-close
+    name: 미결 보전오더 처리
+    module: PM
+    tcode: IW38
+    timing: D-2
+    depends_on: []
+    description: TECO 또는 비용 확인
+
+  - id: pp-wip
+    name: 재공품(WIP) 계산
+    module: PP
+    tcode: KKAO
+    timing: D-1
+    depends_on: [pp-teco]
+    description: CO 결산 전 필수
+
+  - id: co-overhead
+    name: 간접비 배부
+    module: CO
+    tcode: KSU5
+    timing: D+1
+    depends_on: [mm-period-close, sd-delivery, pm-order-settle, pp-wip]
+    description: Assessment/Distribution 주기 실행
+
+  - id: co-settlement
+    name: 내부오더 정산
+    module: CO
+    tcode: KO88
+    timing: D+1
+    depends_on: [co-overhead]
+    description: 미정산 → 원가 누락
+
+  - id: co-copa
+    name: CO-PA 배부
+    module: CO
+    tcode: KEU5
+    timing: D+1
+    depends_on: [co-settlement]
+    description: 수익성 분석 업데이트
+
+  - id: co-period-lock
+    name: CO 기간 잠금
+    module: CO
+    tcode: OKP1
+    timing: D+2
+    depends_on: [co-copa]
+    description: 전기간 CO 전기 차단
+
+  - id: fi-depreciation
+    name: 감가상각 실행
+    module: FI
+    tcode: AFAB
+    timing: D+1
+    depends_on: [co-overhead]
+    description: 반드시 Test Run 먼저
+    simulation_required: true
+
+  - id: fi-fc-valuation
+    name: 외화평가
+    module: FI
+    tcode: FAGL_FC_VAL
+    timing: D+2
+    depends_on: [fi-depreciation]
+    description: OB08 환율 테이블 사전 확인 필수
+
+  - id: fi-tax
+    name: 세금 신고 준비
+    module: FI
+    tcode: S_ALR_87012357
+    timing: D+3
+    depends_on: [fi-fc-valuation]
+    description: 부가세 대사
+
+  - id: fi-clearing
+    name: 자동 결제
+    module: FI
+    tcode: F.13
+    timing: D+3
+    depends_on: [fi-tax]
+    description: 미결 항목 자동 정리
+
+  - id: fi-period-close
+    name: FI 기간 마감
+    module: FI
+    tcode: OB52
+    timing: D+4
+    depends_on: [fi-clearing, co-period-lock]
+    description: 해당 기간 전기 차단
+
+  - id: fi-financial-statements
+    name: 재무제표 출력
+    module: FI
+    tcode: S_ALR_87012284
+    timing: D+5
+    depends_on: [fi-period-close]
+    description: BS/PL 검증

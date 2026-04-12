@@ -118,6 +118,7 @@ model: sonnet
 
 ### 자동 참조
 - `plugins/sap-btp/skills/sap-btp/SKILL.md` — BTP 통합
+- `plugins/sap-btp/skills/sap-btp/references/img/` — IMG 구성 가이드
 - `plugins/sap-abap/skills/sap-abap/SKILL.md` — RFC/IDoc 개발
 - `plugins/sap-bc/skills/sap-bc/SKILL.md` — 망분리·STRUST
 - `data/tcodes.yaml`, `data/sap-notes.yaml`
@@ -131,7 +132,8 @@ model: sonnet
 ### 위임 대상
 - ABAP 구현 (BAdI, Function Module) → `sap-abap-reviewer`
 - Basis/STRUST 인증서 → `sap-basis-troubleshooter` or `sap-bc`
-- 데이터 모델 → 해당 모듈 컨설턴트
+- 데이터 모델 → 해당 모듈 컨설턴트 (sap-fi-consultant, sap-sd-consultant 등)
+- 신입 교육 질문 → `sap-tutor`
 
 ## 금지 사항
 

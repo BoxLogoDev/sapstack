@@ -710,6 +710,252 @@ terms:
     related_tcodes: [WE02, WE05, WE19, BD87]
 
 # ═══════════════════════════════════════════════════════════════
+# PM — Plant Maintenance (10)
+# ═══════════════════════════════════════════════════════════════
+
+  - canonical: maintenance_order
+    module: PM
+    field_forms: [AUFNR, AUFK]
+    en: Maintenance Order
+    ko:
+      primary: "보전오더"
+      variants: ["보전 오더", "작업지시서", "보전작업", "maintenance order", "MO", "정기점검"]
+    related_tcodes: [IW31, IW32, IW33, IW52]
+    notes: |
+      PM 오더는 CO의 Internal Order(AUFNR)를 상속. IW31(새 생성) vs KO01(비용 오더).
+
+  - canonical: inspection_lot
+    module: QM
+    field_forms: [LSING, QALS, QAMR]
+    en: Inspection Lot
+    ko:
+      primary: "검사로트"
+      variants: ["검사 로트", "IL", "아이엘", "검수 로트", "inspection lot", "검사 배치"]
+    related_tcodes: [QA01, QA03, QA11, QA25]
+
+  - canonical: usage_decision
+    module: QM
+    field_forms: [QAMR-ELOSNR, QAMR-ELOSLS]
+    en: Usage Decision
+    ko:
+      primary: "사용결정"
+      variants: ["사용 결정", "UD", "유유디", "usage decision", "판별", "검사 판정"]
+    related_tcodes: [QA11, QA25, QA32]
+    notes: |
+      QM의 최종 결과. Accept(A), Reject(R), Conditional(C), Scrap(S) 등.
+
+  - canonical: picking
+    module: WM/EWM
+    field_forms: [LTAP-LGPBE, "/SCWM/PICK"]
+    en: Picking
+    ko:
+      primary: "피킹"
+      variants: ["집품", "picking", "집하", "주문 피킹"]
+    related_tcodes: [LT0G, "/SCWM/WAVE", "/SCWM/PICK"]
+    notes: |
+      창고에서 고객 주문에 따라 물품을 모으는 작업.
+
+  - canonical: putaway
+    module: WM/EWM
+    field_forms: [LTAP-LGPBE, "/SCWM/PUTAWAY"]
+    en: Putaway
+    ko:
+      primary: "적치"
+      variants: ["입고적치", "적치작업", "putaway", "보관 위치 할당"]
+    related_tcodes: [LT01, "/SCWM/PUTAWAY"]
+    notes: |
+      입고된 물품을 창고 빈에 배치하는 작업.
+
+  - canonical: wave
+    module: EWM
+    field_forms: ["/SCWM/WAVE"]
+    en: Wave
+    ko:
+      primary: "파도"
+      variants: ["웨이브", "wave", "파동"]
+    related_tcodes: ["/SCWM/WAVE", "/SCWM/MON"]
+    notes: |
+      EWM에서 여러 주문을 묶어 처리하는 배치 단위.
+
+  - canonical: packing
+    module: EWM
+    field_forms: ["/SCWM/PACK"]
+    en: Packing
+    ko:
+      primary: "패킹"
+      variants: ["포장", "packing", "상자 포장"]
+    related_tcodes: ["/SCWM/PACK", "/SCWM/MON"]
+
+  - canonical: equipment
+    module: PM
+    field_forms: [EQUI, EQKT, IE02]
+    en: Equipment
+    ko:
+      primary: "장비"
+      variants: ["설비", "equipment", "기계", "제조 설비"]
+    related_tcodes: [IE01, IE02, IE03, IE04]
+    notes: |
+      PM 자산 마스터. 기능위치(FuncLoc)와 구분.
+
+  - canonical: func_loc
+    module: PM
+    field_forms: [ILOA, IFLO, IL01]
+    en: Functional Location
+    ko:
+      primary: "기능위치"
+      variants: ["기능 위치", "FuncLoc", "FL", "펑셔널 로케이션", "작업장"]
+    related_tcodes: [IL01, IL02, IL03, ICWB]
+    notes: |
+      PM의 조직 계층. 공장 → 부서 → 작업장 구조.
+
+# ═══════════════════════════════════════════════════════════════
+# Quality & Metrics (5)
+# ═══════════════════════════════════════════════════════════════
+
+  - canonical: mtbf
+    module: PM
+    field_forms: []
+    en: Mean Time Between Failures
+    ko:
+      primary: "엠티비에프"
+      variants: ["MTBF", "평균고장간격", "평균 고장 간격"]
+    notes: |
+      설비 신뢰성 지표. 높을수록 설비가 안정적.
+
+  - canonical: mttr
+    module: PM
+    field_forms: []
+    en: Mean Time To Repair
+    ko:
+      primary: "엠티티알"
+      variants: ["MTTR", "평균수리시간", "평균 수리 시간"]
+    notes: |
+      설비 유지보수 효율 지표. 낮을수록 빠른 복구.
+
+  - canonical: oee
+    module: PM
+    field_forms: []
+    en: Overall Equipment Effectiveness
+    ko:
+      primary: "오이이"
+      variants: ["OEE", "종합설비효율", "종합 설비 효율"]
+    notes: |
+      설비 생산성 종합 지표 = Availability × Performance × Quality.
+
+  - canonical: damage_code
+    module: PM/QM
+    field_forms: []
+    en: Damage Code / Failure Code
+    ko:
+      primary: "고장코드"
+      variants: ["고장 코드", "failure code", "결함코드", "오류코드"]
+    related_tcodes: [IW21, IW23]
+
+  - canonical: mic
+    module: QM
+    field_forms: [QPLA, QPLS, QC21]
+    en: Master Inspection Characteristic
+    ko:
+      primary: "엠아이씨"
+      variants: ["MIC", "검사특성", "검사 특성", "마스터 특성"]
+    related_tcodes: [QS21, QM02, QC21]
+    notes: |
+      QM에서 검사 항목 정의. 물리·화학·시각 특성 등.
+
+# ═══════════════════════════════════════════════════════════════
+# Warehouse Management (5)
+# ═══════════════════════════════════════════════════════════════
+
+  - canonical: handhold_terminal
+    module: WM/EWM
+    field_forms: ["/SCWM/RF"]
+    en: Hand-held Terminal / RF Scanner
+    ko:
+      primary: "핸드헬드"
+      variants: ["RF", "알에프", "핸드헬드 터미널", "스캔기", "핸드스캔"]
+    related_tcodes: ["/SCWM/RF", "LT06"]
+    notes: |
+      창고 내 이동식 단말기. RF 스캔으로 재고 추적.
+
+  - canonical: transfer_order
+    module: WM
+    field_forms: [LTAP, LTAK]
+    en: Transfer Order
+    ko:
+      primary: "이관오더"
+      variants: ["TO", "티오", "transfer order", "이동 지시"]
+    related_tcodes: [LT01, LT06, LTAK]
+    notes: |
+      창고 내 위치 간 물품 이동 지시.
+
+  - canonical: transfer_requirement
+    module: MM
+    field_forms: [LBKP, LBPOS]
+    en: Transfer Requirement
+    ko:
+      primary: "이관요청"
+      variants: ["TR", "티알", "transfer requirement", "이동요청"]
+    related_tcodes: [LB01, LB02, LB03]
+    notes: |
+      공장 간/스토락 간 재고 이동 요청.
+
+  - canonical: warehouse_order
+    module: EWM
+    field_forms: ["/SCWM/ORDH", "/SCWM/ORDL"]
+    en: Warehouse Order
+    ko:
+      primary: "창고오더"
+      variants: ["WO", "더블유오", "warehouse order", "창고 주문"]
+    related_tcodes: ["/SCWM/MON", "/SCWM/WAVE"]
+
+  - canonical: handling_unit
+    module: EWM
+    field_forms: ["/SCWM/HUME", "/SCWM/HUMO"]
+    en: Handling Unit
+    ko:
+      primary: "핸들링유닛"
+      variants: ["HU", "에이치유", "handling unit", "단위물건"]
+    related_tcodes: ["/SCWM/HU", "/SCWM/MON"]
+    notes: |
+      EWM에서 물품 추적의 최소 단위. 팰릿·박스 등.
+
+# ═══════════════════════════════════════════════════════════════
+# Quality & Certification (3)
+# ═══════════════════════════════════════════════════════════════
+
+  - canonical: certificate_of_analysis
+    module: QM
+    field_forms: [QCMA, QCALC]
+    en: Certificate of Analysis / CoA
+    ko:
+      primary: "인증서"
+      variants: ["CoA", "씨오에이", "시험성적서", "certificate of analysis", "검사성적서"]
+    related_tcodes: [QC21, QC22, QM01]
+    notes: |
+      제품 품질 테스트 증명서. 고객·규제 기관 제출용.
+
+  - canonical: preventive_maintenance
+    module: PM
+    field_forms: [IVPLAN, IP01, IP10]
+    en: Preventive Maintenance
+    ko:
+      primary: "예방보전"
+      variants: ["PM", "피엠", "정기점검", "예방정비", "preventive maintenance"]
+    related_tcodes: [IP01, IP10, IP30]
+    notes: |
+      설비 고장 사전 예방을 위한 정기적 점검·정비.
+
+  - canonical: gmp
+    module: QM
+    field_forms: []
+    en: Good Manufacturing Practice
+    ko:
+      primary: "지엠피"
+      variants: ["GMP", "우수제조관리기준", "우수 제조 관리 기준"]
+    notes: |
+      제약·식품 산업 품질 표준. QM 모듈 활용 범위 확대 분야.
+
+# ═══════════════════════════════════════════════════════════════
 # 약어 (Abbreviations) — 10
 # 현장에서 풀네임 없이 바로 쓰이는 약어
 # ═══════════════════════════════════════════════════════════════
@@ -837,15 +1083,19 @@ business_time_expressions:
 
 meta:
   total:
-    terms: 58
+    terms: 80
     abbreviations: 10
     business_time: 15
   coverage:
     FI: 20
     CO: 8
-    MM: 12
+    MM: 13
     SD: 10
-    BASIS: 8
+    BASIS: 9
+    PM: 10
+    QM: 6
+    WM: 2
+    EWM: 2
   language_coverage:
     ko: { primary: 58, variants_per_term_avg: 5 }
     en: 58

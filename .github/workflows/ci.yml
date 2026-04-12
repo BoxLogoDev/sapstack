@@ -45,6 +45,18 @@ jobs:
       - name: Build multi-AI compatibility layer (check-only)
         run: ./scripts/build-multi-ai.sh --check
 
+      - name: Check IMG references
+        run: ./scripts/check-img-references.sh
+
+      - name: Check Best Practice structure
+        run: ./scripts/check-best-practices.sh
+
+      - name: Check Industry references
+        run: ./scripts/check-industry-refs.sh
+
+      - name: Validate config schema
+        run: ./scripts/validate-config.sh || true
+
       - name: Smoke test — resolve-note
         run: |
           ./scripts/resolve-note.sh korea | head -5
