@@ -140,4 +140,4 @@ Planned Order (MRP) → CO01 Production Order Create → Release
 - `quick-guide.md`
 - `/plugins/sap-mm/skills/sap-mm/references/ko/SKILL-ko.md` — 구성품 재고
 - `/plugins/sap-co/skills/sap-co/references/ko/SKILL-ko.md` — 생산원가
-- `/agents/sap-pp-analyzer.md` — PP 분석 에이전트 (v1.3.0 신규)
+- `/agents/sap-pp-consultant.md` — PP 분석 에이전트 (v1.3.0 신규)

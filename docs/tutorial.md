@@ -135,7 +135,7 @@ Task 도구로 sap-fi-consultant에 이 결산 이슈를 위임해줘: ...
 | `sap-co-consultant` | CO 전반 |
 | `sap-mm-consultant` | MM 전반 |
 | `sap-sd-consultant` | SD 전반 |
-| `sap-pp-analyzer` | PP 생산계획 |
+| `sap-pp-consultant` | PP 생산계획 |
 | `sap-abap-developer` | ABAP 코드 리뷰 |
 | `sap-basis-consultant` | Basis 장애 |
 | `sap-s4-migration-advisor` | S/4 마이그레이션 |

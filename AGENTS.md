@@ -227,7 +227,7 @@ sapstack/
 | sap-co-consultant | CO 원가·배분·CO-PA |
 | sap-mm-consultant | MM 전반 (구매·재고·GR/IR) |
 | sap-sd-consultant | Order-to-Cash |
-| sap-pp-analyzer | MRP·BOM·생산오더 |
+| sap-pp-consultant | MRP·BOM·생산오더 |
 | sap-abap-developer | ABAP 코드 리뷰 (Clean Core, HANA, ATC) |
 | sap-s4-migration-advisor | 마이그레이션 경로 + Risk |
 | sap-basis-consultant | Basis 장애 증상 라우팅 |

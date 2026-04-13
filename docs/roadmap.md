@@ -147,16 +147,47 @@
 
 ---
 
-## 🎯 v1.7.0 — Native Runtime
+## ✅ v1.7.0 — Global Expansion + Cloud Native (완료)
 
-**테마**: 매니페스트에서 실제 동작으로
+**테마**: 글로벌 확장 + 클라우드 네이티브 + 에이전트 구조 정비
 
-### 계획
+### 신규 모듈 & 에이전트
+- [x] `sap-cloud` 플러그인 — S/4HANA Cloud Public Edition 전용
+- [x] `sap-cloud-consultant` 에이전트 신규
+- [x] `sap-basis-troubleshooter` → `sap-basis-consultant` 이름 변경
+- [x] `sap-abap-reviewer` → `sap-abap-developer` 이름 변경
+
+### 다국어 프레임워크 (6개 언어)
+- [x] i18n JSON 완전 (ko, en, zh, ja, de, vi) 6개 언어
+- [x] symptom-index 다국어 번역 (부분, 커뮤니티 확장 대상)
+- [x] synonyms 다국어 variants 추가
+- [x] CLAUDE.md 다국어 감지/응답 규칙
+
+### SAP AI/Joule 연구
+- [x] `docs/sap-ai-integration.md` — Joule vs sapstack 포지셔닝, 상호보완 전략
+
+---
+
+## 🎯 v1.8.0 — Native Runtime + 완전 다국어
+
+**테마**: 매니페스트에서 실제 동작으로 + 다국어 100%
+
+### 인프라
 - [ ] **MCP Server write-path 구현** — start_session, add_evidence, next_turn
 - [ ] **VS Code Extension 실제 구현** — 5 commands, ABAP snippets, quick picker
 - [ ] **NPM 패키지** — `npx @boxlogodev/sapstack-mcp`
 - [ ] **Web UI 확장** — T-code 탭, Plugin 카탈로그 탭, 다크/라이트 테마
 - [ ] **PWA** — 오프라인 사용 가능 Web UI
+
+### 다국어 100% 완성
+- [ ] **symptom-index 62개 × 4개 언어 (zh/ja/de/vi) 전체 번역** — 현재 ~15/62
+- [ ] **synonyms 80+ 용어 × 4개 언어 완전 번역**
+- [ ] **모듈별 quick-guide 다국어 버전** — en 우선, 나머지 선택
+
+### 커뮤니티 기여 대상 (Good First Issues)
+- [ ] 각 언어별 네이티브 스피커 검토
+- [ ] symptom-index 나머지 entry 번역
+- [ ] sap-cloud 플러그인 IMG 가이드 확장 (2개 추가 필요)
 - [ ] **build-multi-ai.sh 완전 자동화**
 
 ---

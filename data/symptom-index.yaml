@@ -77,6 +77,8 @@ symptoms:
     symptom_en: "F110 Proposal runs but selects no items"
     symptom_zh: "F110 提案运行但未选中任何项目"
     symptom_ja: "F110 提案実行時に対象項目がゼロ件"
+    symptom_de: "F110 Proposal wird ausgeführt, wählt aber keine Positionen aus"
+    symptom_vi: "F110 Proposal chạy nhưng không chọn bất kỳ mục nào"
     likely_modules: [FI]
     first_check_tcodes: [F110, FBL1N, OB29]
     typical_causes:
@@ -171,6 +173,8 @@ symptoms:
     symptom_en: "MMBE shows stock quantity mismatch vs physical count"
     symptom_zh: "MMBE库存数量与实际不符"
     symptom_ja: "MMBE在庫数量と実物の不一致"
+    symptom_de: "MMBE zeigt Bestandsmengendiskrepanzen gegenüber physischem Bestand"
+    symptom_vi: "MMBE cho thấy sự không phù hợp về số lượng tồn kho so với số lượng thực tế"
     likely_modules: [MM, PP]
     first_check_tcodes: [MMBE, MB51, MB52, MI31, SE16N]
     typical_causes:
@@ -195,6 +199,8 @@ symptoms:
     symptom_en: "MIRO invoice verification shows tax code mismatch"
     symptom_zh: "MIRO发票验证中税码不匹配"
     symptom_ja: "MIRO送状検証時に税コードが不一致"
+    symptom_de: "MIRO Rechnungsprüfung zeigt Steuerkode-Nichtübereinstimmung"
+    symptom_vi: "Xác minh hóa đơn MIRO cho thấy mã thuế không phù hợp"
     likely_modules: [MM, FI]
     first_check_tcodes: [MIRO, FTXP, OBCL]
     typical_causes:
@@ -227,6 +233,8 @@ symptoms:
     symptom_en: "Period close issue — postings allowed/blocked in wrong period"
     symptom_zh: "月结后，凭证无法正常过账到相应期间"
     symptom_ja: "月次決算後、伝票が正期間に過账されない"
+    symptom_de: "Periodenschluss-Problem — Postierungen in falscher Periode erlaubt/gesperrt"
+    symptom_vi: "Vấn đề đóng kỳ — các bút toán được phép/bị chặn trong kỳ sai"
     likely_modules: [FI]
     first_check_tcodes: [OB52, FBL3N, SE16N]
     typical_causes:
@@ -249,6 +257,8 @@ symptoms:
     symptom_en: "F.5D foreign currency valuation shows unexpected results"
     symptom_zh: "F.5D外币评估(FCV)结果异常"
     symptom_ja: "F.5D外貨評価(FCV)の結果が異常"
+    symptom_de: "F.5D Fremdwährungsbewertung zeigt unerwartete Ergebnisse"
+    symptom_vi: "Định giá ngoại tệ F.5D cho thấy kết quả không mong đợi"
     likely_modules: [FI]
     first_check_tcodes: [F.5D, OBA1, OB08, FAGLB03]
     typical_causes:
@@ -274,6 +284,10 @@ symptoms:
       - "청구서 안 완성됨"
       - "빌링 도큐 상태 이상"
     symptom_en: "VF01 billing document saved as incomplete"
+    symptom_zh: "VF01 生成的账单文件以不完整状态保存"
+    symptom_ja: "VF01で生成した請求書が未完成状態で保存される"
+    symptom_de: "VF01 Rechnungsdokument wird als unvollständig gespeichert"
+    symptom_vi: "Tài liệu hóa đơn VF01 được lưu ở trạng thái không hoàn chỉnh"
     likely_modules: [SD, FI]
     first_check_tcodes: [VF01, VF03, V.23, OVA2]
     typical_causes:
@@ -295,6 +309,10 @@ symptoms:
       - "에스오 크레딧에 잡혔어요"
       - "여신한도 넘어서 블록"
     symptom_en: "VA01 sales order blocked by credit check"
+    symptom_zh: "VA01 销售订单被信用检查阻止"
+    symptom_ja: "VA01の販売注文が信用チェックでブロックされている"
+    symptom_de: "VA01 Auftrag durch Bonitätsprüfung blockiert"
+    symptom_vi: "Đơn hàng bán VA01 bị chặn bởi kiểm tra tín dụng"
     likely_modules: [SD, FI]
     first_check_tcodes: [VA01, FD32, VKM1, OVA8]
     typical_causes:
@@ -343,6 +361,10 @@ symptoms:
       - "메모리 덤프 계속 떠요"
       - "페이지 얼록 실패"
     symptom_en: "Repeated TSV_TNEW_PAGE_ALLOC_FAILED dumps"
+    symptom_zh: "TSV_TNEW_PAGE_ALLOC_FAILED 转储反复出现"
+    symptom_ja: "TSV_TNEW_PAGE_ALLOC_FAILED ダンプの繰り返し発生"
+    symptom_de: "Wiederholte TSV_TNEW_PAGE_ALLOC_FAILED Dumps"
+    symptom_vi: "Các bản lưu TSV_TNEW_PAGE_ALLOC_FAILED lặp lại"
     likely_modules: [ABAP, BASIS]
     first_check_tcodes: [ST22, ST06, SM50, RZ10]
     typical_causes:
@@ -369,6 +391,10 @@ symptoms:
       - "TR 임포트 에러"
       - "트포 떨어졌어요"
     symptom_en: "STMS transport import failed (RC=8 or 12)"
+    symptom_zh: "STMS 传输导入失败 (RC=8 或 12)"
+    symptom_ja: "STMS トランスポートインポート失敗 (RC=8 または 12)"
+    symptom_de: "STMS Transportimport fehlgeschlagen (RC=8 oder 12)"
+    symptom_vi: "Nhập vận chuyển STMS thất bại (RC=8 hoặc 12)"
     likely_modules: [BASIS, ABAP]
     first_check_tcodes: [STMS, SE09, SE10]
     typical_causes:
@@ -391,6 +417,10 @@ symptoms:
       - "노 오쏘라이제이션"
       - "권한 튕겨요"
     symptom_en: "T-code execution fails with 'You have no authorization'"
+    symptom_zh: "T-code 执行失败，提示'您没有授权'"
+    symptom_ja: "T-code実行時に「権限がありません」エラーが発生"
+    symptom_de: "T-code-Ausführung fehlgeschlagen mit 'Sie haben keine Berechtigung'"
+    symptom_vi: "Thực thi T-code thất bại với 'Bạn không có quyền'"
     likely_modules: [BASIS]
     first_check_tcodes: [SU53, PFCG, SUIM, SU01]
     typical_causes:
@@ -417,6 +447,10 @@ symptoms:
       - "응답 느려요"
       - "특정 트랜잭션 느림"
     symptom_en: "Specific T-code response time significantly degraded"
+    symptom_zh: "特定 T-code 响应时间明显变慢"
+    symptom_ja: "特定の T-code の応答時間が大幅に低下"
+    symptom_de: "Antwortzeit für bestimmten T-code deutlich verschlechtert"
+    symptom_vi: "Thời gian phản hồi T-code cụ thể giảm đáng kể"
     likely_modules: [BASIS, ABAP]
     first_check_tcodes: [ST05, SAT, ST12, DB02, ST03N]
     typical_causes:
