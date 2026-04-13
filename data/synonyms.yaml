@@ -155,6 +155,8 @@ terms:
     related_tcodes: [XD01, XD02, XD03, BP, FD03]
     notes: |
       한국 현장은 "거래처"가 벤더/고객 구분 없이 쓰이기도 함 — 문맥 확인 필요.
+    zh: { primary: "客户", variants: ['用户', '购货方', 'KUNNR'] }
+    vi: { primary: "Khách hàng", variants: ['Khách', 'Bên mua', 'KUNNR'] }
 
   - canonical: payment_method
     module: FI
@@ -166,6 +168,7 @@ terms:
     de: { primary: "Zahlungsmethode", variants: ["Zahlweg"] }
     ja: { primary: "支払方法", variants: ["ペイメントメソッド"] }
     related_tcodes: [FBZP, XK02, F110]
+    zh: { primary: "支付方式", variants: ['付款方式', '支付方法', 'ZWELS'] }
 
   - canonical: payment_block
     module: FI
@@ -177,6 +180,7 @@ terms:
     de: { primary: "Zahlsperre" }
     ja: { primary: "支払ブロック" }
     related_tcodes: [FB02, MRBR, F110]
+    vi: { primary: "Khóa thanh toán", variants: ['Cấm thanh toán', 'ZAHLS'] }
 
   - canonical: payment_run
     module: FI
@@ -188,6 +192,7 @@ terms:
     de: { primary: "Zahlungslauf" }
     ja: { primary: "支払実行", variants: ["ペイメントラン"] }
     related_tcodes: [F110, F110S, REGUH]
+    zh: { primary: "支付运行", variants: ['批量支付', '支付处理', 'F110'] }
 
   - canonical: accounts_payable
     module: FI
@@ -199,6 +204,7 @@ terms:
     de: { primary: "Kreditorenbuchhaltung" }
     ja: { primary: "買掛金", variants: ["AP"] }
     related_tcodes: [FBL1N, FK10N, F-53]
+    vi: { primary: "Công nợ phải trả", variants: ['Nợ phải trả', 'BSIK'] }
 
   - canonical: accounts_receivable
     module: FI
@@ -210,6 +216,7 @@ terms:
     de: { primary: "Debitorenbuchhaltung" }
     ja: { primary: "売掛金", variants: ["AR"] }
     related_tcodes: [FBL5N, FD10N, F-28]
+    zh: { primary: "应收账款", variants: ['应收', '债务人', 'BSID'] }
 
   - canonical: special_gl
     module: FI
@@ -221,6 +228,7 @@ terms:
     de: { primary: "Sonderhauptbuch" }
     ja: { primary: "特別仕訳帳", variants: ["特殊G/L"] }
     related_tcodes: [OBXR, OBXT, FBL1N]
+    vi: { primary: "Sổ cái đặc biệt", variants: ['GL đặc biệt', 'UMSKZ'] }
 
   - canonical: withholding_tax
     module: FI
@@ -234,6 +242,7 @@ terms:
     related_tcodes: [FB60, J1INCERT, S_P00_07000134]
     notes: |
       한국 원천세는 3.3%(사업소득), 8.8%(기타소득) 등 구분. 연말정산과 직결.
+    zh: { primary: "代扣税", variants: ['所得税代扣', '代扣', 'WHT'] }
 
   - canonical: tax_code
     module: FI
@@ -245,6 +254,7 @@ terms:
     de: { primary: "Steuerkennzeichen" }
     ja: { primary: "税コード", variants: ["タックスコード"] }
     related_tcodes: [FTXP, FB60, MIRO]
+    vi: { primary: "Mã thuế", variants: ['Mã loại thuế', 'MWSKZ'] }
 
   - canonical: house_bank
     module: FI
@@ -256,6 +266,7 @@ terms:
     de: { primary: "Hausbank" }
     ja: { primary: "ハウスバンク", variants: ["自社銀行"] }
     related_tcodes: [FI12, FBZP, NWBC_BAM]
+    zh: { primary: "公司银行", variants: ['自有银行', '内部银行', 'HBKID'] }
 
   - canonical: period_close
     module: FI
@@ -269,6 +280,7 @@ terms:
     related_tcodes: [OB52, F.05, F.19, FAGLGVTR]
     notes: |
       한국 기업 월마감은 보통 D+3~D+5 (익월 3~5영업일). 분기마감·연마감·가결산 구분.
+    vi: { primary: "Đóng kỳ", variants: ['Đóng tháng', 'Kết thúc kỳ', 'D+3'] }
 
   - canonical: foreign_currency_valuation
     module: FI
@@ -284,6 +296,7 @@ terms:
 # ═══════════════════════════════════════════════════════════════
 # CO — Controlling (8)
 # ═══════════════════════════════════════════════════════════════
+    zh: { primary: "外币估值", variants: ['外汇估值', '外币重估', 'FCV'] }
 
   - canonical: cost_element
     module: CO
@@ -297,6 +310,7 @@ terms:
     related_tcodes: [KA01, KA02, KA03, KAH1]
     notes: |
       S/4HANA에서는 GL 계정과 통합(Unified Ledger). 현장은 여전히 "코스트 엘리먼트" 사용.
+    vi: { primary: "Yếu tố chi phí", variants: ['Loại chi phí', 'KSTAR'] }
 
   - canonical: internal_order
     module: CO
@@ -308,6 +322,7 @@ terms:
     de: { primary: "Innenauftrag" }
     ja: { primary: "内部指図", variants: ["インターナルオーダ", "IO"] }
     related_tcodes: [KO01, KO02, KO03, KOB1]
+    zh: { primary: "内部订单", variants: ['内部指令', '内部命令', 'IO'] }
 
   - canonical: wbs_element
     module: CO
@@ -330,6 +345,7 @@ terms:
     de: { primary: "Leistungsart" }
     ja: { primary: "活動タイプ", variants: ["アクティビティタイプ"] }
     related_tcodes: [KL01, KL02, KP26]
+    vi: { primary: "Loại hoạt động", variants: ['Hình thức hoạt động', 'LSTAR'] }
 
   - canonical: assessment
     module: CO
@@ -341,6 +357,7 @@ terms:
     de: { primary: "Umlage" }
     ja: { primary: "配賦", variants: ["アセスメント"] }
     related_tcodes: [KSU1, KSU5, KSUB]
+    zh: { primary: "分摊", variants: ['评估', '费用分摊', 'RKEB'] }
 
   - canonical: distribution
     module: CO
@@ -363,6 +380,7 @@ terms:
     de: { primary: "Abrechnung" }
     ja: { primary: "決済", variants: ["セトルメント"] }
     related_tcodes: [KO88, KO8G, CJ88]
+    vi: { primary: "Quyết toán", variants: ['Thanh toán', 'COBL'] }
 
   - canonical: co_pa
     module: CO
@@ -378,6 +396,7 @@ terms:
 # ═══════════════════════════════════════════════════════════════
 # MM — Materials Management (12)
 # ═══════════════════════════════════════════════════════════════
+    zh: { primary: "利润分析", variants: ['收益分析', 'CO-PA', '盈利能力分析'] }
 
   - canonical: material
     module: MM
@@ -400,6 +419,7 @@ terms:
     de: { primary: "Werk" }
     ja: { primary: "プラント", variants: ["工場"] }
     related_tcodes: [OX10, OMSJ]
+    vi: { primary: "Nhà máy", variants: ['Cơ sở sản xuất', 'WERKS'] }
 
   - canonical: storage_location
     module: MM
@@ -436,6 +456,8 @@ terms:
     de: { primary: "Wareneingang" }
     ja: { primary: "入庫", variants: ["GR", "グッズレシート"] }
     related_tcodes: [MIGO, MB01, MB31]
+    zh: { primary: "收货", variants: ['货物收据', '入库', 'MIGO'] }
+    vi: { primary: "Biên lai nhận hàng", variants: ['Nhận hàng', 'Biên bản nhận', 'MIGO'] }
 
   - canonical: goods_issue
     module: MM
@@ -469,6 +491,8 @@ terms:
     de: { primary: "Banfanforderung", variants: ["Bestellanforderung"] }
     ja: { primary: "購買依頼", variants: ["PR"] }
     related_tcodes: [ME51N, ME52N, ME53N]
+    zh: { primary: "采购申请", variants: ['采购需求', '采购请求', 'EBAN'] }
+    vi: { primary: "Yêu cầu mua hàng", variants: ['Yêu cầu đặt hàng', 'EBAN'] }
 
   - canonical: gr_ir
     module: MM
@@ -504,6 +528,8 @@ terms:
     de: { primary: "Bestand" }
     ja: { primary: "在庫" }
     related_tcodes: [MMBE, MB52, MB51, MB5B]
+    zh: { primary: "库存", variants: ['存货', '库存量', 'MENGE'] }
+    vi: { primary: "Tồn kho", variants: ['Hàng tồn', 'MENGE'] }
 
   - canonical: batch
     module: MM
@@ -541,6 +567,8 @@ terms:
     de: { primary: "Lieferung" }
     ja: { primary: "出荷", variants: ["デリバリ"] }
     related_tcodes: [VL01N, VL02N, VL03N, VL06O]
+    zh: { primary: "交货", variants: ['发货', '配送', 'LIKP'] }
+    vi: { primary: "Giao hàng", variants: ['Chuyên chở', 'LIKP'] }
 
   - canonical: billing
     module: SD
@@ -739,6 +767,8 @@ terms:
     related_tcodes: [IW31, IW32, IW33, IW52]
     notes: |
       PM 오더는 CO의 Internal Order(AUFNR)를 상속. IW31(새 생성) vs KO01(비용 오더).
+    zh: { primary: "维护订单", variants: ['维保单', '保养单', 'AUFNR'] }
+    vi: { primary: "Lệnh bảo trì", variants: ['Đơn bảo dưỡng', 'AUFNR'] }
 
   - canonical: inspection_lot
     module: QM
@@ -770,6 +800,8 @@ terms:
     related_tcodes: [LT0G, "/SCWM/WAVE", "/SCWM/PICK"]
     notes: |
       창고에서 고객 주문에 따라 물품을 모으는 작업.
+    ja: { primary: "ピッキング", variants: ['摘み取り'] }
+    de: { primary: "Kommissionierung" }
 
   - canonical: putaway
     module: WM/EWM
@@ -781,6 +813,8 @@ terms:
     related_tcodes: [LT01, "/SCWM/PUTAWAY"]
     notes: |
       입고된 물품을 창고 빈에 배치하는 작업.
+    zh: { primary: "上架", variants: ['入库放置', '入库作业'] }
+    vi: { primary: "Lưu trữ hàng", variants: ['Đặt vào kho', 'Phục vụ'] }
 
   - canonical: wave
     module: EWM
@@ -812,6 +846,8 @@ terms:
     related_tcodes: [IE01, IE02, IE03, IE04]
     notes: |
       PM 자산 마스터. 기능위치(FuncLoc)와 구분.
+    ja: { primary: "設備", variants: ['機器'] }
+    de: { primary: "Ausrüstung" }
 
   - canonical: func_loc
     module: PM
@@ -837,6 +873,8 @@ terms:
       variants: ["MTBF", "평균고장간격", "평균 고장 간격"]
     notes: |
       설비 신뢰성 지표. 높을수록 설비가 안정적.
+    zh: { primary: "平均故障间隔", variants: ['MTBF', '无故障工作时间'] }
+    vi: { primary: "Thời gian trung bình giữa các lỗi", variants: ['MTBF'] }
 
   - canonical: mttr
     module: PM
@@ -857,6 +895,8 @@ terms:
       variants: ["OEE", "종합설비효율", "종합 설비 효율"]
     notes: |
       설비 생산성 종합 지표 = Availability × Performance × Quality.
+    ja: { primary: "総合設備効率", variants: ['OEE'] }
+    de: { primary: "OEE" }
 
   - canonical: damage_code
     module: PM/QM
@@ -892,6 +932,8 @@ terms:
     related_tcodes: ["/SCWM/RF", "LT06"]
     notes: |
       창고 내 이동식 단말기. RF 스캔으로 재고 추적.
+    zh: { primary: "手持终端", variants: ['移动终端', '手持设备'] }
+    vi: { primary: "Thiết bị cầm tay", variants: ['Máy móc cầm tay', 'Thiết bị di động'] }
 
   - canonical: transfer_order
     module: WM
@@ -914,6 +956,8 @@ terms:
     related_tcodes: [LB01, LB02, LB03]
     notes: |
       공장 간/스토락 간 재고 이동 요청.
+    ja: { primary: "移動要求", variants: ['転送要求'] }
+    de: { primary: "Umlagerungsanforderung" }
 
   - canonical: warehouse_order
     module: EWM
@@ -949,6 +993,8 @@ terms:
     related_tcodes: [QC21, QC22, QM01]
     notes: |
       제품 품질 테스트 증명서. 고객·규제 기관 제출용.
+    zh: { primary: "分析证书", variants: ['检验报告', 'CoA'] }
+    vi: { primary: "Chứng chỉ phân tích", variants: ['CoA', 'Báo cáo phân tích'] }
 
   - canonical: preventive_maintenance
     module: PM
@@ -1015,11 +1061,16 @@ abbreviations:
 # ═══════════════════════════════════════════════════════════════
 
 business_time_expressions:
+    ja: { primary: "GMP", variants: ['医薬品等の製造管理及び品質管理の基準'] }
+    de: { primary: "GMP" }
+
   - canonical: d_minus_1
     ko: "D-1"
     ko_variants: ["디마이너스원", "디 마이너스 원", "전일", "하루 전", "one day before"]
     meaning: "Reference day minus one. 마감 기준일 하루 전"
     notes: "월마감 D-1 = 마감일 하루 전 = 최종 점검일"
+    zh: { primary: "D-1", variants: ['前一天', 'D-1工作日'] }
+    vi: { primary: "D-1", variants: ['Hôm trước', 'Ngày D-1'] }
 
   - canonical: d_day
     ko: "D-Day"
@@ -1070,6 +1121,8 @@ business_time_expressions:
     ko: "영업일"
     ko_variants: ["영업 일", "근무일", "business day", "평일"]
     meaning: "Business working day (주말·공휴일 제외)"
+    ja: { primary: "営業日", variants: ['業務日'] }
+    de: { primary: "Geschäftstag" }
 
   - canonical: d_day_plus_n
     ko: "D+N"
@@ -1077,6 +1130,8 @@ business_time_expressions:
     meaning: "N days after reference day"
     notes: |
       월마감 D+3 = 익월 3영업일째 마감 완료. 한국 대기업 평균.
+    zh: { primary: "D+n", variants: ['D日后n天', 'D+N'] }
+    vi: { primary: "D+n", variants: ['Ngày D cộng n', 'D+N'] }
 
   - canonical: provisional
     ko: "잠정치"
