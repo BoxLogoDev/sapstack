@@ -168,27 +168,60 @@
 
 ---
 
-## 🎯 v1.8.0 — Native Runtime + 완전 다국어
+## ✅ v2.0.0 — Runtime Completion (완료)
 
-**테마**: 매니페스트에서 실제 동작으로 + 다국어 100%
+**테마**: 스캐폴딩 → 실제 작동하는 글로벌 OSS 플랫폼
 
-### 인프라
-- [ ] **MCP Server write-path 구현** — start_session, add_evidence, next_turn
-- [ ] **VS Code Extension 실제 구현** — 5 commands, ABAP snippets, quick picker
-- [ ] **NPM 패키지** — `npx @boxlogodev/sapstack-mcp`
-- [ ] **Web UI 확장** — T-code 탭, Plugin 카탈로그 탭, 다크/라이트 테마
-- [ ] **PWA** — 오프라인 사용 가능 Web UI
+### MCP Server Write-Path
+- [x] start_session / add_evidence / next_turn 완전 구현
+- [x] Ajv 스키마 검증 활성화
+- [x] --offline 플래그 (망분리 지원)
+- [x] mcp/cli.ts, mcp/types.ts 추가
 
-### 다국어 100% 완성
-- [ ] **symptom-index 62개 × 4개 언어 (zh/ja/de/vi) 전체 번역** — 현재 ~15/62
-- [ ] **synonyms 80+ 용어 × 4개 언어 완전 번역**
-- [ ] **모듈별 quick-guide 다국어 버전** — en 우선, 나머지 선택
+### VS Code Extension
+- [x] TypeScript 전체 구현 (10 commands + 3 tree views)
+- [x] File watcher, Webview, YAML validation
+- [x] esbuild 번들링 + Marketplace 발행 준비
+
+### NPM + CI 자동화
+- [x] `@boxlogodev/sapstack-mcp` 발행 준비
+- [x] GitHub Actions release.yml (태그 push → 자동 발행)
+- [x] bump-version.sh, generate-release-notes.sh
+
+### 컴플라이언스 권고안
+- [x] SECURITY.md 대폭 교체 (Threat Model, PII, Air-Gap, 감사 매핑)
+- [x] docs/compliance/ — K-SOX, SOC2, ISO27001, GDPR, 망분리, PII, Audit Trail
+- [x] mcp/pii-scrubber.ts — 한국 PII 자동 마스킹
+
+---
+
+## 🎯 v2.1.0 — Learning Loop + 다국어 완성
+
+**테마**: 사용 → 지식 축적의 학습 루프 + 나머지 다국어 100%
+
+### Learning Loop (opt-in telemetry, pure OSS)
+- [ ] Evidence Loop 세션 결과 → 익명화된 패턴 축적
+- [ ] 사용자 기여 SAP Notes 자동 등록 워크플로
+- [ ] 가설 정확도 메트릭 (어떤 hypothesis가 실제로 맞았는지)
+
+### 완전 다국어
+- [ ] symptom-index 62/62 × 6개 언어 (네이티브 검토)
+- [ ] synonyms 80+ terms × 6개 언어
+- [ ] 모듈별 quick-guide 영어판 (en 우선)
+
+---
+
+## 🎯 v2.2.0 — Web UI 확장 + PWA
+
+**테마**: Web UI 강화, 오프라인 사용 가능
+
+- [ ] Web UI 탭 확장 (T-code, Plugin 카탈로그, 다크 테마)
+- [ ] PWA — 오프라인 사용 가능
+- [ ] build-multi-ai.sh 완전 자동화
 
 ### 커뮤니티 기여 대상 (Good First Issues)
 - [ ] 각 언어별 네이티브 스피커 검토
-- [ ] symptom-index 나머지 entry 번역
-- [ ] sap-cloud 플러그인 IMG 가이드 확장 (2개 추가 필요)
-- [ ] **build-multi-ai.sh 완전 자동화**
+- [ ] sap-cloud IMG 가이드 확장 (2개 추가)
 
 ---
 

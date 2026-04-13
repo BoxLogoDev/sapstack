@@ -44,7 +44,8 @@ import {
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import * as yaml from "js-yaml";
-// import Ajv from "ajv";  // v1.6.0 — enable for write-path validation
+import Ajv from "ajv";
+import * as crypto from "node:crypto";
 
 // ─────────────────────────────────────────────────────────────
 // Paths & constants
@@ -56,6 +57,52 @@ const SESSIONS_DIR = path.join(WORKSPACE_ROOT, ".sapstack", "sessions");
 const DATA_DIR = path.join(SAPSTACK_ROOT, "data");
 const SCHEMAS_DIR = path.join(SAPSTACK_ROOT, "schemas");
 const PLUGINS_DIR = path.join(SAPSTACK_ROOT, "plugins");
+
+// ─────────────────────────────────────────────────────────────
+// Schema validation & utilities
+// ─────────────────────────────────────────────────────────────
+
+let ajv: Ajv | null = null;
+const schemas: Record<string, unknown> = {};
+
+async function initializeAjv() {
+  if (ajv) return;
+  ajv = new Ajv({ strict: true });
+
+  // Load all schemas
+  const schemaNames = ["evidence-bundle", "followup-request", "hypothesis", "verdict", "session-state"];
+  for (const name of schemaNames) {
+    try {
+      const schemaPath = path.join(SCHEMAS_DIR, `${name}.schema.yaml`);
+      const content = await readFileSafe(schemaPath);
+      schemas[name] = yaml.load(content);
+    } catch (err) {
+      console.error(`[sapstack] Failed to load schema ${name}:`, err);
+    }
+  }
+}
+
+function generateId(prefix: string): string {
+  const now = new Date();
+  const dateStr = now.toISOString().substring(0, 10).replace(/-/g, "");
+  const randomStr = crypto.randomBytes(4).toString("hex").substring(0, 6);
+  return `${prefix}-${dateStr}-${randomStr}`;
+}
+
+function validateWithSchema(schema: string, data: unknown): { valid: boolean; errors?: string[] } {
+  if (!ajv || !schemas[schema]) {
+    return { valid: false, errors: [`Schema '${schema}' not loaded`] };
+  }
+  const validate = ajv.compile(schemas[schema]);
+  const valid = validate(data) as boolean;
+  if (!valid) {
+    const errors = (validate.errors || []).map(e =>
+      `${e.instancePath || "root"} ${e.keyword}: ${e.message}`
+    );
+    return { valid: false, errors };
+  }
+  return { valid: true };
+}
 
 // ─────────────────────────────────────────────────────────────
 // Helpers
@@ -411,23 +458,382 @@ async function listPlugins() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Write-path tool implementations (stubs — v1.6.0)
+// Write-path tool implementations (v1.6.0)
 // ─────────────────────────────────────────────────────────────
 
-async function startSession(_args: unknown): Promise<never> {
-  throw new NotImplementedError("start_session");
+interface StartSessionArgs {
+  symptom: string;
+  reporter_role?: string;
+  country_iso?: string;
+  release?: string;
+  deployment?: string;
+  client?: string;
+  language?: string;
 }
 
-async function addEvidence(_args: unknown): Promise<never> {
-  throw new NotImplementedError("add_evidence");
+async function startSession(args: StartSessionArgs) {
+  const {
+    symptom,
+    reporter_role = "operator",
+    country_iso = "kr",
+    language = "ko",
+  } = args;
+
+  if (!symptom || symptom.trim().length === 0) {
+    throw new Error("symptom is required and cannot be empty");
+  }
+
+  const sessionId = generateId("sess");
+  const sessionDir = path.join(SESSIONS_DIR, sessionId);
+  const filesDir = path.join(sessionDir, "files");
+
+  // Create directories
+  await fs.mkdir(filesDir, { recursive: true });
+
+  // Create initial state.yaml
+  const now = new Date().toISOString();
+  const initialState: any = {
+    session_id: sessionId,
+    schema_version: "1.0.0",
+    created_at: now,
+    last_updated_at: now,
+    created_by: {
+      role: reporter_role,
+    },
+    originating_surface: "mcp_client",
+    status: "intake",
+    initial_symptom: {
+      description: symptom,
+      reporter_role,
+      language,
+      country_iso,
+    },
+    turns: [
+      {
+        turn_number: 1,
+        turn_type: "intake",
+        started_at: now,
+        status: "active",
+        surface: "mcp_client",
+      },
+    ],
+    current_turn_number: 1,
+    hypotheses: [],
+    bundles: [],
+    followup_requests: [],
+    verdicts: [],
+    audit_trail: [
+      {
+        at: now,
+        action: "session_created",
+        actor: {
+          role: reporter_role,
+          surface: "mcp_client",
+        },
+        note: `Session started for symptom: ${symptom.substring(0, 100)}`,
+      },
+    ],
+    tags: [],
+  };
+
+  const stateYaml = yaml.dump(initialState, { lineWidth: -1 });
+  const statePath = path.join(sessionDir, "state.yaml");
+
+  // Atomic write: write to temp, then rename
+  const tmpPath = `${statePath}.tmp`;
+  await fs.writeFile(tmpPath, stateYaml, "utf-8");
+  await fs.rename(tmpPath, statePath);
+
+  return {
+    session_id: sessionId,
+    state_path: statePath,
+    status: "intake",
+    message: `Session ${sessionId} created. Ready for evidence bundle.`,
+  };
 }
 
-async function nextTurn(_args: unknown): Promise<never> {
-  throw new NotImplementedError("next_turn");
+interface AddEvidenceArgs {
+  session_id: string;
+  bundle_yaml: string;
 }
 
-async function validateSessionFile(_args: unknown): Promise<never> {
-  throw new NotImplementedError("validate_session_file");
+async function addEvidence(args: AddEvidenceArgs) {
+  const { session_id, bundle_yaml } = args;
+
+  if (!session_id || !/^sess-[0-9]{8}-[a-z0-9]{6}$/.test(session_id)) {
+    throw new Error("Invalid session_id format");
+  }
+
+  if (!bundle_yaml || bundle_yaml.trim().length === 0) {
+    throw new Error("bundle_yaml cannot be empty");
+  }
+
+  // Parse and validate bundle
+  let bundleData: any;
+  try {
+    bundleData = yaml.load(bundle_yaml);
+  } catch (err) {
+    throw new Error(`Invalid YAML in bundle_yaml: ${(err as Error).message}`);
+  }
+
+  const validation = validateWithSchema("evidence-bundle", bundleData);
+  if (!validation.valid) {
+    throw new Error(`Bundle validation failed: ${validation.errors?.join(", ")}`);
+  }
+
+  // Load session state
+  const sessionDir = path.join(SESSIONS_DIR, session_id);
+  const statePath = path.join(sessionDir, "state.yaml");
+  let state: any;
+  try {
+    state = await loadYaml<any>(statePath);
+  } catch (err) {
+    throw new Error(`Cannot load session ${session_id}: ${(err as Error).message}`);
+  }
+
+  // Ensure bundle has required fields
+  if (!bundleData.bundle_id) {
+    bundleData.bundle_id = generateId("evb");
+  }
+  if (!bundleData.session_id) {
+    bundleData.session_id = session_id;
+  }
+  if (!bundleData.collected_at) {
+    bundleData.collected_at = new Date().toISOString();
+  }
+
+  // Write bundle file
+  const bundleFilename = `evidence-${state.bundles?.length || 0}.yaml`;
+  const bundlePath = path.join(sessionDir, bundleFilename);
+  const bundleYaml = yaml.dump(bundleData, { lineWidth: -1 });
+
+  const tmpPath = `${bundlePath}.tmp`;
+  await fs.writeFile(tmpPath, bundleYaml, "utf-8");
+  await fs.rename(tmpPath, bundlePath);
+
+  // Update session state
+  const now = new Date().toISOString();
+  if (!state.bundles) state.bundles = [];
+  state.bundles.push(bundleData);
+  state.last_updated_at = now;
+
+  if (!state.audit_trail) state.audit_trail = [];
+  state.audit_trail.push({
+    at: now,
+    action: "bundle_added",
+    actor: {
+      role: bundleData.collected_by?.role || "operator",
+      handle: bundleData.collected_by?.handle,
+      surface: "mcp_client",
+    },
+    ref_id: bundleData.bundle_id,
+    note: `Evidence bundle added with ${bundleData.items?.length || 0} items`,
+  });
+
+  // State transition: if intake, move to awaiting_hypothesis (which AI will process)
+  if (state.status === "intake") {
+    state.status = "hypothesizing";
+  }
+
+  const stateYaml = yaml.dump(state, { lineWidth: -1 });
+  const tmpStatePath = `${statePath}.tmp`;
+  await fs.writeFile(tmpStatePath, stateYaml, "utf-8");
+  await fs.rename(tmpStatePath, statePath);
+
+  return {
+    session_id,
+    bundle_id: bundleData.bundle_id,
+    bundle_path: bundlePath,
+    message: `Evidence bundle ${bundleData.bundle_id} added to session`,
+    session_status: state.status,
+  };
+}
+
+interface NextTurnArgs {
+  session_id: string;
+  force_hypothesize?: boolean;
+}
+
+async function nextTurn(args: NextTurnArgs) {
+  const { session_id, force_hypothesize = false } = args;
+
+  if (!session_id || !/^sess-[0-9]{8}-[a-z0-9]{6}$/.test(session_id)) {
+    throw new Error("Invalid session_id format");
+  }
+
+  // Load session state
+  const sessionDir = path.join(SESSIONS_DIR, session_id);
+  const statePath = path.join(sessionDir, "state.yaml");
+  let state: any;
+  try {
+    state = await loadYaml<any>(statePath);
+  } catch (err) {
+    throw new Error(`Cannot load session ${session_id}: ${(err as Error).message}`);
+  }
+
+  const now = new Date().toISOString();
+  const currentStatus = state.status;
+  const currentTurn = state.current_turn_number || 1;
+  let nextStatus = currentStatus;
+  let signal = "";
+
+  // State machine transitions
+  if (currentStatus === "intake" && (state.bundles?.length || 0) > 0) {
+    // Intake with evidence → Hypothesis turn needed
+    nextStatus = "hypothesizing";
+    signal = "generate_hypotheses";
+
+    // Create turn 2 (Hypothesis)
+    if (!state.turns) state.turns = [];
+    const nextTurnNum = currentTurn + 1;
+    state.turns.push({
+      turn_number: nextTurnNum,
+      turn_type: "hypothesis",
+      started_at: now,
+      status: "active",
+      surface: "mcp_client",
+    });
+    state.current_turn_number = nextTurnNum;
+  } else if (currentStatus === "hypothesizing" && force_hypothesize) {
+    // Already hypothesizing — transition to awaiting_evidence
+    nextStatus = "awaiting_evidence";
+    signal = "waiting_for_evidence";
+
+    // Mark Hypothesis turn complete, create Collect turn
+    if (state.turns && state.turns.length > 0) {
+      const lastTurn = state.turns[state.turns.length - 1];
+      if (lastTurn.turn_type === "hypothesis" && lastTurn.status === "active") {
+        lastTurn.status = "complete";
+        lastTurn.completed_at = now;
+      }
+    }
+
+    const nextTurnNum = currentTurn + 1;
+    state.turns.push({
+      turn_number: nextTurnNum,
+      turn_type: "collect",
+      started_at: now,
+      status: "active",
+      surface: "mcp_client",
+    });
+    state.current_turn_number = nextTurnNum;
+  } else if (currentStatus === "awaiting_evidence" && (state.bundles?.length || 0) > 1) {
+    // More evidence arrived → Verify turn
+    nextStatus = "verifying";
+    signal = "verify_hypotheses";
+
+    if (state.turns && state.turns.length > 0) {
+      const lastTurn = state.turns[state.turns.length - 1];
+      if (lastTurn.turn_type === "collect" && lastTurn.status === "active") {
+        lastTurn.status = "complete";
+        lastTurn.completed_at = now;
+      }
+    }
+
+    const nextTurnNum = currentTurn + 1;
+    state.turns.push({
+      turn_number: nextTurnNum,
+      turn_type: "verify",
+      started_at: now,
+      status: "active",
+      surface: "mcp_client",
+    });
+    state.current_turn_number = nextTurnNum;
+  } else if (currentStatus === "verifying" && (state.verdicts?.length || 0) > 0) {
+    // Verdict issued → resolved or needs next loop
+    const latestVerdict = state.verdicts[state.verdicts.length - 1];
+    if (latestVerdict?.overall_state === "resolved") {
+      nextStatus = "resolved";
+      signal = "session_complete";
+    } else if (latestVerdict?.overall_state === "needs_next_loop") {
+      nextStatus = "hypothesizing";
+      signal = "generate_hypotheses";
+      const nextTurnNum = currentTurn + 1;
+      state.turns.push({
+        turn_number: nextTurnNum,
+        turn_type: "hypothesis",
+        started_at: now,
+        status: "active",
+        surface: "mcp_client",
+      });
+      state.current_turn_number = nextTurnNum;
+    } else {
+      nextStatus = latestVerdict?.overall_state || currentStatus;
+      signal = "waiting_for_input";
+    }
+  } else {
+    signal = "no_transition";
+  }
+
+  state.status = nextStatus;
+  state.last_updated_at = now;
+
+  if (!state.audit_trail) state.audit_trail = [];
+  state.audit_trail.push({
+    at: now,
+    action: "session_updated",
+    actor: { surface: "mcp_client" },
+    note: `Status transitioned from ${currentStatus} to ${nextStatus}. Signal: ${signal}`,
+  });
+
+  const stateYaml = yaml.dump(state, { lineWidth: -1 });
+  const tmpStatePath = `${statePath}.tmp`;
+  await fs.writeFile(tmpStatePath, stateYaml, "utf-8");
+  await fs.rename(tmpStatePath, statePath);
+
+  return {
+    session_id,
+    status: nextStatus,
+    current_turn: state.current_turn_number,
+    signal,
+    message: `Session advanced. Signal: ${signal}`,
+  };
+}
+
+interface ValidateSessionFileArgs {
+  path: string;
+  schema: string;
+}
+
+async function validateSessionFile(args: ValidateSessionFileArgs) {
+  const { path: filePath, schema } = args;
+
+  if (!schema || !["session-state", "evidence-bundle", "hypothesis", "followup-request", "verdict"].includes(schema)) {
+    throw new Error(`Invalid schema name: ${schema}`);
+  }
+
+  // Resolve path safely — must be under .sapstack/sessions/
+  const resolvedPath = path.isAbsolute(filePath)
+    ? filePath
+    : path.join(SESSIONS_DIR, filePath);
+
+  if (!resolvedPath.startsWith(SESSIONS_DIR)) {
+    throw new Error("Path traversal not allowed — must be under .sapstack/sessions/");
+  }
+
+  try {
+    const content = await readFileSafe(resolvedPath);
+    const data = yaml.load(content);
+    const validation = validateWithSchema(schema, data);
+
+    if (!validation.valid) {
+      return {
+        valid: false,
+        path: filePath,
+        schema,
+        errors: validation.errors,
+      };
+    }
+
+    return {
+      valid: true,
+      path: filePath,
+      schema,
+      message: "Validation passed",
+    };
+  } catch (err) {
+    throw new Error(`Cannot read or parse file ${filePath}: ${(err as Error).message}`);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -437,7 +843,7 @@ async function validateSessionFile(_args: unknown): Promise<never> {
 const server = new Server(
   {
     name: "sapstack",
-    version: "1.5.0",
+    version: "1.6.0",
   },
   {
     capabilities: {
@@ -594,9 +1000,12 @@ server.setRequestHandler(GetPromptRequestSchema, async (req) => {
 // ─────────────────────────────────────────────────────────────
 
 async function main() {
+  // Initialize Ajv and load schemas
+  await initializeAjv();
+
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error(`sapstack MCP server v1.5.0 (scaffolding) started. Workspace: ${WORKSPACE_ROOT}`);
+  console.error(`sapstack MCP server v1.6.0 (write-path enabled) started. Workspace: ${WORKSPACE_ROOT}`);
 }
 
 main().catch((err) => {

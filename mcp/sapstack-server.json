@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.modelcontextprotocol.io/server/v1",
   "name": "sapstack",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "SAP operations advisory + Evidence Loop session manager — 14 modules, 9 agents, 10+ commands, 279 T-codes, 20 symptom index entries, turn-aware sessions",
   "author": "BoxLogoDev",
   "license": "MIT",
@@ -176,7 +176,7 @@
     },
     {
       "name": "start_session",
-      "description": "Start a new Evidence Loop session (NEW in v1.5.0)",
+      "description": "Start a new Evidence Loop session (Stable in v1.6.0)",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -193,7 +193,7 @@
     },
     {
       "name": "add_evidence",
-      "description": "Add an evidence bundle to an existing session (NEW in v1.5.0)",
+      "description": "Add an evidence bundle to an existing session (Stable in v1.6.0)",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -205,7 +205,7 @@
     },
     {
       "name": "next_turn",
-      "description": "Run the next Evidence Loop turn (Hypothesis or Verify) for a session (NEW in v1.5.0)",
+      "description": "Run the next Evidence Loop turn (Hypothesis or Verify) for a session (Stable in v1.6.0)",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -229,7 +229,7 @@
     },
     {
       "name": "validate_session_file",
-      "description": "Validate a session YAML file against its schema (NEW in v1.5.0)",
+      "description": "Validate a session YAML file against its schema (Stable in v1.6.0)",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -242,19 +242,28 @@
   ],
 
   "sapstack": {
-    "stage": "partial",
+    "stage": "stable",
     "implementation": {
       "manifest": "complete",
-      "runtime_entry": "mcp/server.ts (Slice 7 scaffolding)",
-      "dependency_strategy": "minimal — @modelcontextprotocol/sdk only",
+      "runtime_entry": "mcp/server.ts (v1.6.0)",
+      "dependency_strategy": "minimal — @modelcontextprotocol/sdk + ajv + js-yaml",
       "session_storage": "file system (.sapstack/sessions/) — no database",
-      "schema_validation": "ajv against schemas/*.schema.yaml"
+      "schema_validation": "ajv against schemas/*.schema.yaml",
+      "write_tools": "fully implemented — start_session, add_evidence, next_turn, validate_session_file"
     },
-    "runtime_tbd_in": "v1.6.0 — TypeScript implementation + npm package",
-    "v1_5_0_notes": [
-      "Manifest defines the complete contract for v1.6.0 runtime.",
-      "Current JSON is used by: Claude Desktop, Cursor, and other MCP-aware clients that read manifests for discovery.",
-      "The session-related resources and tools assume client is running in a workspace with .sapstack/ directory access."
+    "v1_6_0_features": [
+      "Session creation with state machine (intake → hypothesizing → awaiting_evidence → verifying → resolved)",
+      "Evidence bundle validation with Ajv against evidence-bundle.schema.yaml",
+      "State machine transitions with turn management",
+      "Atomic writes (write-to-temp, rename) for data integrity",
+      "Audit trail append-only logging",
+      "Schema validation on all write operations"
+    ],
+    "notes": [
+      "The manifest defines the complete contract for MCP-aware clients.",
+      "Write-path tools are production-ready with full validation.",
+      "All sessions stored in .sapstack/sessions/ (workspace-relative).",
+      "No live SAP connection — all operations use local files."
     ]
   }
 }

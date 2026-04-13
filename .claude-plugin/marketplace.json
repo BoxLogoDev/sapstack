@@ -1,7 +1,7 @@
 {
   "name": "sapstack",
-  "version": "1.7.0",
-  "description": "SAP Enterprise Operations Platform — 20 plugins (incl. Cloud PE), 16 agents, 18 commands, 52+ IMG guides, 43+ Best Practices, Enterprise/Industry guides, 340+ T-codes, 62 symptoms (6 languages: ko/en/zh/ja/de/vi), SAP AI/Joule research, 7 AI tools, MCP-ready",
+  "version": "2.0.0",
+  "description": "SAP Enterprise Operations Platform — 20 plugins, 16 agents, 18 commands, MCP Server (write-path), VS Code Extension, NPM published, Compliance framework (K-SOX/SOC2/ISO27001/GDPR), 55+ IMG guides, 43+ Best Practices, 6 languages, Evidence Loop runtime",
   "author": "BoxLogoDev",
   "license": "MIT",
   "repository": "https://github.com/BoxLogoDev/sapstack",

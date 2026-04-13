@@ -5,6 +5,57 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-04-13
+
+### Theme
+**"Runtime Completion"** — sapstack이 feature-complete knowledge repo에서
+**실제 작동하는 글로벌 OSS 플랫폼**으로 진화하는 메이저 릴리스.
+스캐폴딩 상태였던 MCP write-path, VS Code Extension, NPM 패키지를 전부
+실구현하고, 엔터프라이즈 채택 장벽 제거를 위한 컴플라이언스 권고안을 추가.
+
+### Added — MCP Server Write-Path (실구현)
+- **start_session / add_evidence / next_turn** 툴 완전 구현
+  - Evidence Loop 전체 턴을 MCP를 통해 실행 가능
+  - Ajv 기반 스키마 검증 활성화
+  - 원자적 파일 쓰기 (tmp → rename)
+- **mcp/cli.ts** — stdio 서버 CLI 래퍼
+- **mcp/types.ts** — TypeScript 타입 정의
+- **--offline 플래그** — 망분리 환경 지원
+- **npm 패키지 발행 준비** — `@boxlogodev/sapstack-mcp`
+
+### Added — VS Code Extension (실구현)
+- **전체 TypeScript 구현** — 10 commands + 3 tree views
+  - SessionsTreeProvider, FollowupsTreeProvider, PluginsTreeProvider
+  - VerdictWebview, FollowupWebview
+- **File watcher** — `.sapstack/sessions/**/*.yaml` 자동 감지
+- **YAML 검증** — Red Hat YAML 연계
+- **esbuild 번들링** — dist/extension.js
+
+### Added — NPM + CI 자동화
+- **`.github/workflows/release.yml`** — 태그 push 시 자동 빌드/발행
+- **`scripts/bump-version.sh`** — 3개 package.json 일괄 버전 업데이트
+- **`scripts/generate-release-notes.sh`** — CHANGELOG에서 릴리즈 노트 추출
+
+### Added — 컴플라이언스 권고안
+- **`SECURITY.md` 대폭 교체** — Threat Model, Data Handling, PII, Air-Gap, 감사 매핑
+- **`docs/compliance/`** — 8개 문서 (K-SOX, SOC2, ISO27001, GDPR, 망분리, PII, Audit Trail)
+- **`mcp/pii-scrubber.ts`** — 한국 PII 자동 마스킹 (주민번호, 사업자번호, 전화, 카드, 계좌)
+
+### Changed
+- **marketplace.json** — version 1.7.0 → 2.0.0
+- **MCP manifest** — write tools를 stable로 표시
+- **README** — v2.0 Runtime Completion 반영 (6개 언어)
+
+### Breaking Changes
+- 없음. 하위 호환 유지.
+
+### Migration
+- 기존 v1.x 사용자: 업그레이드만 하면 됨
+- Evidence Loop 세션: 그대로 동작
+- MCP 클라이언트: 읽기 툴 호출 방식 동일
+
+---
+
 ## [1.7.0] - 2026-04-13
 
 ### Theme

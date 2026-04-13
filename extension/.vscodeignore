@@ -1,0 +1,12 @@
+.git
+.gitignore
+.gitattributes
+src/**
+tsconfig.json
+esbuild.config.js
+*.test.ts
+node_modules/**
+.vscode-test/
+.DS_Store
+*.vsix
+dist/**/*.map

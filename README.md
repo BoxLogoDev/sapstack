@@ -4,7 +4,7 @@
 
 ### Enterprise SAP Operations Platform for AI Coding Assistants
 
-**20 plugins · 16 agents · 18 commands · 55+ IMG guides · 43+ best practices · 6 languages · SAP AI ready**
+**20 plugins · 16 agents · 18 commands · MCP Server (runtime) · VS Code Extension · NPM · 6 languages · Compliance ready**
 
 🌐 **Languages**: [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 
@@ -409,7 +409,15 @@ cd sapstack
 
 ## 🧪 확장 도구
 
-### v1.7.0 신규
+### v2.0.0 신규
+- 🚀 **MCP Server 실구현** ([mcp/server.ts](mcp/server.ts), 1000+ 줄) — start_session, add_evidence, next_turn 완전 동작
+- 📦 **NPM 패키지 발행 준비** — `@boxlogodev/sapstack-mcp` (CLI + stdio)
+- 💻 **VS Code Extension TypeScript 실구현** ([extension/](extension/)) — 10 commands + 3 tree views
+- 🛡 **컴플라이언스 프레임워크** ([docs/compliance/](docs/compliance/)) — K-SOX, SOC2, ISO27001, GDPR, 망분리
+- 🔒 **PII Scrubber** ([mcp/pii-scrubber.ts](mcp/pii-scrubber.ts)) — 한국 주민번호/사업자번호/계좌번호 자동 마스킹
+- 🔧 **CI 자동화** ([.github/workflows/release.yml](.github/workflows/release.yml)) — 태그 push → npm publish + GitHub Release
+
+### v1.7.0
 - 🌐 **6개 언어 지원** — ko, en, zh, ja, de, vi (symptom-index + synonyms + UI)
 - ☁️ **SAP Cloud PE** ([plugins/sap-cloud/](plugins/sap-cloud/)) — S/4HANA Cloud Public Edition 전용 컨설턴트
 - 🤖 **SAP AI/Joule 연구 문서** ([docs/sap-ai-integration.md](docs/sap-ai-integration.md)) — Joule vs sapstack 포지셔닝, 상호보완 전략

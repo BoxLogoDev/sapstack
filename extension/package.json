@@ -188,13 +188,25 @@
         },
         "sapstack.language": {
           "type": "string",
-          "enum": ["ko", "en", "de", "ja", "auto"],
+          "enum": [
+            "ko",
+            "en",
+            "de",
+            "ja",
+            "auto"
+          ],
           "default": "auto",
           "description": "Default response language for sapstack prompts"
         },
         "sapstack.country": {
           "type": "string",
-          "enum": ["kr", "de", "us", "jp", "none"],
+          "enum": [
+            "kr",
+            "de",
+            "us",
+            "jp",
+            "none"
+          ],
           "default": "kr",
           "description": "Default country for localization routing (sets sap_context.country_iso)"
         },
@@ -276,10 +288,22 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "echo 'v1.5.0 is stub — full implementation in v1.6.0. See extension/README.md for the command contract.'",
-    "compile": "echo 'stub — TypeScript implementation pending v1.6.0'",
-    "watch": "echo 'stub'",
-    "test": "echo 'stub'"
+    "vscode:prepublish": "NODE_ENV=production node esbuild.config.js",
+    "compile": "tsc --noEmit && node esbuild.config.js",
+    "watch": "tsc -w",
+    "build": "node esbuild.config.js",
+    "test": "echo 'tests pending'"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.80.0",
+    "esbuild": "^0.19.0",
+    "typescript": "^5.2.0"
+  },
+  "dependencies": {
+    "ajv": "^8.12.0",
+    "js-yaml": "^4.1.0"
   },
   "sapstack": {
     "stage": "stub",

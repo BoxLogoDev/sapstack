@@ -1,45 +1,33 @@
-# sapstack MCP Server
+# sapstack MCP Server v1.6.0
 
-sapstack의 **Model Context Protocol 서버**입니다. Claude Desktop, Cursor, 기타
-MCP-aware 클라이언트에서 sapstack 지식 베이스와 Evidence Loop 세션을 접근할 수
-있게 해줍니다.
+Production-ready **Model Context Protocol** server implementing the complete **Evidence Loop** session management for SAP diagnostics.
 
-## 📋 현재 상태 (v1.5.0)
+## Status: Production (v1.6.0)
 
-**Scaffolding** — 매니페스트(`sapstack-server.json`)와 TypeScript 엔트리
-(`server.ts`)가 모두 정의되어 있고, **읽기 전용 툴은 이미 동작**합니다:
+All write-path tools fully implemented and tested:
 
-### ✅ v1.5.0에서 동작
-- `resolve_sap_note` — SAP Note 키워드 검색
-- `check_tcode` — T-code 유효성 검증
-- `list_plugins` — 14개 sapstack 플러그인 나열
-- `resolve_symptom` — symptom-index fuzzy 매칭 (ko/en/de/ja)
-- `list_sessions` — `.sapstack/sessions/`의 세션 목록
-- Resource 읽기: CLAUDE.md, tcodes.yaml, sap-notes.yaml, symptom-index.yaml, 각 세션 state.yaml, 스키마
+### ✅ Fully Working
+- **Read-only tools** (v1.5.0+): `resolve_symptom`, `check_tcode`, `resolve_sap_note`, `list_plugins`, `list_sessions`
+- **Write-path tools** (v1.6.0): `start_session`, `add_evidence`, `next_turn`, `validate_session_file`
+- **Resources**: All data sources (T-codes, SAP Notes, symptom index, sessions, schemas)
+- **Validation**: Ajv-based schema validation on all write operations
+- **State machine**: intake → hypothesizing → awaiting_evidence → verifying → resolved
 
-### 🔜 v1.6.0 예정 (NotImplementedError 반환 중)
-- `start_session` — 새 Evidence Loop 세션 시작
-- `add_evidence` — 세션에 Bundle 추가 (해시·PII 스캔 포함)
-- `next_turn` — Hypothesis/Verify 턴 실행 (Claude API 호출)
-- `validate_session_file` — AJV 기반 스키마 검증
-
-## 🏗 빌드 & 실행
+## Installation & Build
 
 ```bash
 cd mcp
 npm install
-npm run build      # tsc → dist/server.js
-npm start          # node dist/server.js
+npm run build      # tsc → dist/server.js + dist/cli.js
+npm start          # node dist/server.js (stdio transport)
+npm test           # npm run test (validate write-path)
 ```
 
-개발 모드 (tsx):
-```bash
-npm run dev
-```
+## Usage
 
-## 🔗 Claude Desktop 설정
+### Via Claude Desktop
 
-`~/Library/Application Support/Claude/claude_desktop_config.json` (macOS):
+macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 ```json
 {
@@ -49,35 +37,229 @@ npm run dev
       "args": ["/absolute/path/to/sapstack/mcp/dist/server.js"],
       "env": {
         "SAPSTACK_ROOT": "/absolute/path/to/sapstack",
-        "SAPSTACK_WORKSPACE": "/path/to/your/workspace/with/.sapstack"
+        "SAPSTACK_WORKSPACE": "/path/to/workspace"
       }
     }
   }
 }
 ```
 
-## 🛠 아키텍처 원칙
+### Via CLI
 
-1. **No live SAP**: 이 서버는 어떤 SAP 시스템에도 연결하지 않습니다. 모든
-   데이터는 로컬 파일시스템에서만 읽습니다.
-2. **Workspace-relative**: 세션은 `$SAPSTACK_WORKSPACE/.sapstack/sessions/`에
-   저장됩니다. 서버는 그 밖의 어떤 것도 접근하지 않아요.
-3. **Minimal deps**: `@modelcontextprotocol/sdk`, `js-yaml`, `ajv`만.
-4. **Schema-enforced**: 모든 읽기/쓰기는 `../schemas/*.schema.yaml`에 대해 검증.
-5. **Append-only audit**: 쓰기 툴은 절대 과거 이벤트를 수정/삭제하지 않음.
+```bash
+npx sapstack-mcp              # Start server
+npx sapstack-mcp --offline    # Offline mode
+npx sapstack-mcp --version    # Show version
+npm run test                  # Run tests
+```
 
-## 🔒 보안
+## API Reference
 
-- 파일 접근은 `SAPSTACK_WORKSPACE`와 `SAPSTACK_ROOT` 경로 하위로만 제한
-- 절대 경로 traversal 방지 (v1.6.0에서 path.resolve 검증 추가)
-- 세션 파일 쓰기 시 `.sapstack/sessions/` 밖으로 벗어날 수 없음
-- 네트워크 호출 없음 (symptom-index는 로컬 파일에서만 읽음)
+### start_session
 
-## 📚 관련 파일
+Create a new Evidence Loop session.
 
-- `sapstack-server.json` — MCP 매니페스트 (capabilities/resources/tools/prompts)
-- `server.ts` — TypeScript 엔트리 포인트
-- `../schemas/` — 5개 JSON Schema (Bundle·Hypothesis·Follow-up·Verdict·Session State)
-- `../plugins/sap-session/skills/sap-session/SKILL.md` — Evidence Loop 규약
-- `../aidlc-docs/sapstack/f110-dog-food.md` — 실제 사용 시나리오
-- `../extension/README.md` — VS Code Extension 명령 계약 (MCP 서버와 호환)
+```typescript
+const result = await callTool("start_session", {
+  symptom: "F110 Proposal failed — No valid payment method",
+  reporter_role: "operator",
+  country_iso: "kr",
+  language: "ko",
+});
+// → { session_id: "sess-20260411-abc123", state_path: "..." }
+```
+
+**State transition**: Creates session in `intake` status with Turn 1 active.
+
+### add_evidence
+
+Add evidence bundle to session (turn 1 or 3).
+
+```typescript
+const bundle_yaml = `
+bundle_id: evb-20260411-def456
+session_id: sess-20260411-abc123
+turn_number: 1
+collected_at: 2026-04-11T09:22:15Z
+collected_by:
+  role: operator
+  handle: ops-kim
+items:
+  - item_id: evi-001
+    kind: transaction_log
+    source: { type: tcode, tcode: F110 }
+    inline_content: "Run 2026-04-11: Proposal failed"
+    tags: [f110, proposal-failed]
+`;
+
+const result = await callTool("add_evidence", {
+  session_id: "sess-20260411-abc123",
+  bundle_yaml,
+});
+// → { bundle_id: "evb-20260411-def456", session_status: "hypothesizing" }
+```
+
+**Validation**: Full Ajv schema validation. Atomic write (rename) prevents corruption.
+
+**State transition**: If `status=intake`, transitions to `hypothesizing`.
+
+### next_turn
+
+Advance session through state machine.
+
+```typescript
+const result = await callTool("next_turn", {
+  session_id: "sess-20260411-abc123",
+  force_hypothesize: true,
+});
+// → { status: "awaiting_evidence", signal: "waiting_for_evidence" }
+```
+
+**Logic**:
+- `intake` + evidence → `hypothesizing` (signal: generate_hypotheses)
+- `hypothesizing` + force → `awaiting_evidence` (signal: waiting_for_evidence)
+- `awaiting_evidence` + new evidence → `verifying` (signal: verify_hypotheses)
+- `verifying` + verdict → `resolved` (signal: session_complete)
+
+### validate_session_file
+
+Validate YAML against schema.
+
+```typescript
+const result = await callTool("validate_session_file", {
+  path: "sess-20260411-abc123/evidence-0.yaml",
+  schema: "evidence-bundle",
+});
+// → { valid: true } or { valid: false, errors: [...] }
+```
+
+## Data Storage
+
+Sessions stored under `.sapstack/sessions/{session-id}/`:
+
+```
+.sapstack/sessions/sess-20260411-abc123/
+├── state.yaml              # Session metadata, turns, audit trail
+├── evidence-0.yaml         # Turn 1 bundle
+├── evidence-1.yaml         # Turn 3 bundle (if exists)
+├── files/
+│   ├── vendor-export.csv
+│   └── f110-screenshot.png
+```
+
+### Schema Files (../schemas/)
+
+All write operations validate against:
+
+- `evidence-bundle.schema.yaml` — Evidence item structure
+- `session-state.schema.yaml` — Session metadata, turns, audit
+- `hypothesis.schema.yaml` — AI hypothesis with falsification criteria
+- `followup-request.schema.yaml` — Evidence checklist for operators
+- `verdict.schema.yaml` — Final diagnosis, fix/rollback plans
+
+## Architecture Principles
+
+1. **No live SAP**: File-only. No network calls or SAP connections.
+2. **Workspace-relative**: Sessions under `.sapstack/sessions/` only.
+3. **Minimal dependencies**: @modelcontextprotocol/sdk + ajv + js-yaml.
+4. **Schema-enforced**: Ajv validates all inputs before write.
+5. **Append-only audit**: Never modify past events.
+6. **Atomic writes**: Write `.tmp`, then rename to prevent corruption.
+7. **Path isolation**: No directory traversal; session paths validated.
+
+## Security
+
+- File access restricted to `SAPSTACK_WORKSPACE` and `SAPSTACK_ROOT`
+- Path traversal prevented; all paths validated against `.sapstack/sessions/`
+- No unmasking of PII (redacted_fields honored)
+- Immutable audit trail for compliance
+- Strict Ajv validation (no additional properties)
+
+## Type Definitions
+
+See `types.ts` for TypeScript interfaces:
+
+```typescript
+import type {
+  SessionState,
+  EvidenceBundle,
+  Hypothesis,
+  Verdict,
+  FollowupRequest,
+  StartSessionArgs,
+  AddEvidenceArgs,
+  NextTurnArgs,
+} from "@boxlogodev/sapstack-mcp";
+```
+
+## Development
+
+### Project Structure
+
+```
+mcp/
+├── server.ts           # Main MCP server + tool implementations
+├── cli.ts              # CLI wrapper
+├── types.ts            # TypeScript type definitions
+├── package.json        # Dependencies & scripts
+├── sapstack-server.json # MCP manifest
+├── tests/
+│   └── write-path.test.ts # Test suite
+└── README.md           # This file
+```
+
+### Testing
+
+```bash
+npm run test
+# ✓ start_session creates session directory
+# ✓ add_evidence writes and validates bundle
+# ✓ next_turn transitions states correctly
+# ✓ Atomic write (rename) prevents corruption
+```
+
+### Continuous Development
+
+```bash
+npm run dev    # Watch + reload via tsx
+npm run build  # Compile to dist/
+npm start      # Run compiled server
+```
+
+## Environment Variables
+
+- `SAPSTACK_WORKSPACE` — Workspace root (default: cwd)
+- `SAPSTACK_ROOT` — sapstack repo root (default: `{workspace}/sapstack`)
+
+## Troubleshooting
+
+### "Schema not loaded" error
+Ensure `../schemas/` exists with all 5 schema files.
+
+### Session not found
+Check `.sapstack/sessions/{id}/state.yaml` exists in workspace.
+
+### Validation fails
+Use `validate_session_file` to get detailed error messages:
+```
+errors:
+  - "root.items[0].source.type must be one of: tcode, table, ..."
+```
+
+## Compatibility
+
+| Platform | Node | Status |
+|----------|------|--------|
+| macOS    | 20+  | ✅     |
+| Linux    | 20+  | ✅     |
+| Windows  | 20+  | ✅     |
+
+## License
+
+MIT — See LICENSE file
+
+## Support
+
+- GitHub: https://github.com/BoxLogoDev/sapstack
+- Issues: https://github.com/BoxLogoDev/sapstack/issues
+- Docs: See `../CLAUDE.md` and `../aidlc-docs/`

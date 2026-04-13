@@ -1,16 +1,18 @@
 {
   "name": "@boxlogodev/sapstack-mcp",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "sapstack MCP server — SAP knowledge base + Evidence Loop session management",
   "type": "module",
   "main": "dist/server.js",
   "bin": {
-    "sapstack-mcp": "dist/server.js"
+    "sapstack-mcp": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
+    "cli": "node dist/cli.js",
     "dev": "node --loader tsx server.ts",
+    "test": "node --loader tsx tests/write-path.test.ts",
     "clean": "rimraf dist"
   },
   "keywords": [
@@ -29,8 +31,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "js-yaml": "^4.1.0",
-    "ajv": "^8.17.0"
+    "ajv": "^8.17.0",
+    "js-yaml": "^4.1.0"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
@@ -48,7 +50,7 @@
     "sapstack-server.json"
   ],
   "sapstack": {
-    "stage": "scaffolding",
-    "runtime_plan": "v1.6.0 — implement write-path tools (start_session, add_evidence, next_turn, validate_session_file)"
+    "stage": "implementation",
+    "runtime_status": "v1.6.0 — write-path tools fully implemented (start_session, add_evidence, next_turn, validate_session_file)"
   }
 }
