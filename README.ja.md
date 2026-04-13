@@ -8,12 +8,6 @@
 
 🌐 **Languages**: [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 
-[![Version](https://img.shields.io/badge/version-1.7.0-blue.svg)](https://github.com/BoxLogoDev/sapstack/releases/tag/v1.7.0)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![CI](https://img.shields.io/badge/CI-passing-brightgreen.svg)](https://github.com/BoxLogoDev/sapstack/actions)
-[![Japanese](https://img.shields.io/badge/日本語-Universal-orange.svg)](README.ja.md)
-[![Multi-AI](https://img.shields.io/badge/AI%20tools-7-purple.svg)](docs/multi-ai-compatibility.md)
-[![Kiro](https://img.shields.io/badge/Kiro-ready-00D4AA.svg)](docs/kiro-quickstart.md)
 
 <p>
   <a href="docs/tutorial.md"><b>チュートリアル</b></a> ·
