@@ -1,0 +1,249 @@
+{
+  "version": "2.0",
+  "enabled": true,
+  "description": "sapstack automation hooks - copy to .sapstack/hooks.json to activate",
+
+  "global_settings": {
+    "timeout_default_seconds": 30,
+    "fail_mode_default": "warn",
+    "log_directory": "~/.sapstack/logs",
+    "environment": {
+      "SAPSTACK_MODE": "production",
+      "TZ": "Asia/Seoul"
+    }
+  },
+
+  "hooks": {
+    "PreEvidenceCollect": [
+      {
+        "matcher": "*",
+        "description": "PII 스캔 및 마스킹 (모든 입력)",
+        "enabled": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/pii-scan.sh",
+            "timeout_seconds": 30,
+            "fail_mode": "warn",
+            "environment": {
+              "SAPSTACK_PII_PATTERNS": "korean,email,phone,account"
+            }
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "description": "자동 분류 (카테고리 판정)",
+        "enabled": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/classify.sh",
+            "timeout_seconds": 15,
+            "fail_mode": "continue"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "description": "권한 검증 (감시 T-code 감지)",
+        "enabled": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/validate-auth.sh",
+            "timeout_seconds": 10,
+            "fail_mode": "warn"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "description": "민감도 평가",
+        "enabled": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/assess-sensitivity.sh",
+            "timeout_seconds": 10,
+            "fail_mode": "continue"
+          }
+        ]
+      }
+    ],
+
+    "EvidenceCollected": [
+      {
+        "matcher": "exception:CX_*",
+        "description": "CX_* Exception 자동 감지 및 카탈로그 로드",
+        "enabled": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/exception-matcher.sh",
+            "timeout_seconds": 20,
+            "fail_mode": "continue"
+          }
+        ]
+      },
+      {
+        "matcher": "*.st22|*.dump",
+        "description": "SAP Short Dump 분석 (ST22)",
+        "enabled": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node hooks/scripts/dump-analyzer.js",
+            "timeout_seconds": 45,
+            "fail_mode": "warn"
+          }
+        ]
+      }
+    ],
+
+    "PostDiagnosis": [
+      {
+        "matcher": "verdict:*",
+        "description": "진단 완료 후 로그 기록",
+        "enabled": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/save-diagnosis.sh",
+            "timeout_seconds": 10,
+            "fail_mode": "warn"
+          }
+        ]
+      }
+    ],
+
+    "VerdictConfirmed": [
+      {
+        "matcher": "verdict:rca_*",
+        "description": "Slack 채널 자동 알림 (#sap-diagnostics)",
+        "enabled": true,
+        "hooks": [
+          {
+            "type": "webhook",
+            "url": "${SAPSTACK_SLACK_WEBHOOK}",
+            "method": "POST",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "timeout_seconds": 10,
+            "fail_mode": "warn"
+          }
+        ]
+      },
+      {
+        "matcher": "verdict:critical_*",
+        "description": "Jira 이슈 자동 생성 (INCIDENT 프로젝트)",
+        "enabled": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/create-jira-issue.sh",
+            "timeout_seconds": 15,
+            "fail_mode": "warn",
+            "environment": {
+              "JIRA_PROJECT": "INCIDENT",
+              "JIRA_ISSUE_TYPE": "Bug"
+            }
+          }
+        ]
+      },
+      {
+        "matcher": "verdict:*",
+        "description": "Teams 채널 알림 (SAP Operations team)",
+        "enabled": false,
+        "hooks": [
+          {
+            "type": "webhook",
+            "url": "${SAPSTACK_TEAMS_WEBHOOK}",
+            "method": "POST",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "timeout_seconds": 10,
+            "fail_mode": "warn"
+          }
+        ]
+      }
+    ],
+
+    "PeriodEndGuard": [
+      {
+        "matcher": "period:month_end|period:quarter_end|period:year_end",
+        "description": "월말/분기말/년말 폐쇄 전 자동 검증",
+        "enabled": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/period-end-guard.sh",
+            "timeout_seconds": 120,
+            "fail_mode": "continue",
+            "environment": {
+              "CHECK_OB52": "true",
+              "CHECK_GR_IR": "true",
+              "CHECK_OPEN_IDOC": "true"
+            }
+          }
+        ]
+      }
+    ],
+
+    "TransportImport": [
+      {
+        "matcher": "transport:*",
+        "description": "Transport 이관 전 검증 (의존성, 백업)",
+        "enabled": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/transport-validator.sh",
+            "timeout_seconds": 60,
+            "fail_mode": "continue",
+            "environment": {
+              "CHECK_DEPENDENCIES": "true",
+              "BACKUP_BEFORE_IMPORT": "true",
+              "IMPACT_ANALYSIS": "true"
+            }
+          }
+        ]
+      }
+    ],
+
+    "SessionEnd": [
+      {
+        "matcher": "*",
+        "description": "세션 상태 백업",
+        "enabled": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/session-backup.sh",
+            "timeout_seconds": 30,
+            "fail_mode": "warn"
+          }
+        ]
+      },
+      {
+        "matcher": "verdict:*",
+        "description": "진단 결과를 Craft Daily Note에 기록",
+        "enabled": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/sync-to-craft.sh",
+            "timeout_seconds": 20,
+            "fail_mode": "warn",
+            "environment": {
+              "CRAFT_PAGE": "Daily",
+              "CRAFT_SECTION": "SAP Diagnostics"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.modelcontextprotocol.io/server/v1",
   "name": "sapstack",
-  "version": "1.6.0",
-  "description": "SAP operations advisory + Evidence Loop session manager — 14 modules, 9 agents, 10+ commands, 279 T-codes, 20 symptom index entries, turn-aware sessions",
+  "version": "1.7.0",
+  "description": "SAP operations advisory + Evidence Loop session manager — 22 tools, 10 prompts, knowledge base integration (T-codes, SAP Notes, synonyms, period-end sequences, industry matrix)",
   "author": "BoxLogoDev",
   "license": "MIT",
   "homepage": "https://github.com/BoxLogoDev/sapstack",
@@ -126,6 +126,41 @@
       "arguments": [
         { "name": "session_id", "description": "Existing session id", "required": true }
       ]
+    },
+    {
+      "name": "korean-field-language",
+      "description": "Field Korean translation prompt using synonyms.yaml (NEW in v1.7.0)",
+      "arguments": [
+        { "name": "text", "description": "Dictionary Korean text to translate", "required": true }
+      ]
+    },
+    {
+      "name": "img-config-walk",
+      "description": "IMG configuration step-by-step walkthrough guide (NEW in v1.7.0)",
+      "arguments": [
+        { "name": "topic", "description": "Configuration topic (module + config area)", "required": true }
+      ]
+    },
+    {
+      "name": "best-practice-review",
+      "description": "SAP setup review against 3-Tier Best Practice framework (NEW in v1.7.0)",
+      "arguments": [
+        { "name": "setup_description", "description": "Description of current SAP setup", "required": true }
+      ]
+    },
+    {
+      "name": "evidence-loop-turn2",
+      "description": "Evidence Loop Turn 2 — hypothesis generation from evidence bundle (NEW in v1.7.0)",
+      "arguments": [
+        { "name": "bundle_data", "description": "Evidence bundle YAML", "required": true }
+      ]
+    },
+    {
+      "name": "evidence-loop-turn4",
+      "description": "Evidence Loop Turn 4 — verdict generation with fix+rollback plans (NEW in v1.7.0)",
+      "arguments": [
+        { "name": "session_data", "description": "Session state and evidence", "required": true }
+      ]
     }
   ],
 
@@ -238,19 +273,162 @@
         },
         "required": ["path", "schema"]
       }
+    },
+    {
+      "name": "list_tcodes_by_module",
+      "description": "List all T-codes in a specific SAP module (NEW in v1.7.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "module": { "type": "string", "description": "SAP module code: FI, CO, MM, SD, PP, HCM, QM, PM, WM, EWM, GTS, BTP, ABAP, BASIS" }
+        },
+        "required": ["module"]
+      }
+    },
+    {
+      "name": "list_agents_for_industry",
+      "description": "List prioritized consultant agents by industry vertical (NEW in v1.7.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "industry": { "type": "string", "description": "Industry: manufacturing, retail, financial-services, healthcare, etc." },
+          "top_n": { "type": "integer", "minimum": 1, "maximum": 20, "default": 10 }
+        },
+        "required": ["industry"]
+      }
+    },
+    {
+      "name": "get_period_end_sequence",
+      "description": "Return ordered period-end closing steps with dependencies (monthly/quarterly/yearly) (NEW in v1.7.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "modules": { "type": "array", "items": { "type": "string" }, "description": "Optional: filter by module(s)" }
+        }
+      }
+    },
+    {
+      "name": "lookup_synonym",
+      "description": "Find canonical term and all variants from Korean field language synonyms.yaml (NEW in v1.7.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "term": { "type": "string", "description": "Term to look up (Korean or English)" },
+          "lang": { "type": "string", "enum": ["ko", "en", "de", "ja"], "default": "ko" }
+        },
+        "required": ["term"]
+      }
+    },
+    {
+      "name": "list_img_guides",
+      "description": "List IMG configuration step-by-step guides by module (NEW in v1.7.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "module": { "type": "string", "description": "Optional: SAP module code (FI, CO, MM, etc.)" }
+        }
+      }
+    },
+    {
+      "name": "list_best_practices",
+      "description": "List best practices by module and tier (Operational, Period-End, Governance) (NEW in v1.7.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "module": { "type": "string", "description": "Optional: SAP module code" },
+          "tier": { "type": "string", "enum": ["operational", "period_end", "governance"], "description": "Optional: BP tier level" }
+        }
+      }
+    },
+    {
+      "name": "get_master_data_rules",
+      "description": "Get required fields and validation rules for master data types (vendor, customer, material, cost-center, gl-account) (NEW in v1.7.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "master_type": { "type": "string", "enum": ["vendor", "customer", "material", "cost-center", "gl-account"] }
+        },
+        "required": ["master_type"]
+      }
+    },
+    {
+      "name": "find_sap_note_by_module",
+      "description": "Search SAP Notes by module with filtering (NEW in v1.7.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "module": { "type": "string", "description": "SAP module code" },
+          "max": { "type": "integer", "minimum": 1, "maximum": 50, "default": 10 }
+        },
+        "required": ["module"]
+      }
+    },
+    {
+      "name": "add_followup_request",
+      "description": "Add follow-up checklist items to session (Turn 2 evidence collection) (NEW in v1.7.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": { "type": "string", "pattern": "^sess-[0-9]{8}-[a-z0-9]{6}$" },
+          "turn_number": { "type": "integer", "description": "Optional: override current turn" },
+          "items": { "type": "array", "description": "Check items with purpose, action, expected_outcome, priority, estimated_minutes" },
+          "summary": { "type": "string", "description": "Optional: custom summary" }
+        },
+        "required": ["session_id", "items"]
+      }
+    },
+    {
+      "name": "submit_hypothesis",
+      "description": "Submit 2-4 hypotheses with falsification criteria to session (Turn 2) (NEW in v1.7.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": { "type": "string", "pattern": "^sess-[0-9]{8}-[a-z0-9]{6}$" },
+          "turn_number": { "type": "integer", "description": "Optional: override current turn" },
+          "hypotheses": { "type": "array", "description": "Hypothesis objects with statement, technical_chain, confidence_tier, falsification_evidence" }
+        },
+        "required": ["session_id", "hypotheses"]
+      }
+    },
+    {
+      "name": "submit_verdict",
+      "description": "Submit verdict with fix plans and rollback procedures (Turn 4) (NEW in v1.7.0)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": { "type": "string", "pattern": "^sess-[0-9]{8}-[a-z0-9]{6}$" },
+          "turn_number": { "type": "integer", "description": "Optional: override current turn" },
+          "overall_state": { "type": "string", "enum": ["resolved", "needs_next_loop", "escalated", "insufficient_evidence"] },
+          "summary": { "type": "string", "description": "Verdict summary" },
+          "resolutions": { "type": "array", "description": "Resolution objects with hypothesis_id, status, fix_plan, rollback_plan" }
+        },
+        "required": ["session_id", "overall_state", "summary", "resolutions"]
+      }
     }
   ],
 
   "sapstack": {
     "stage": "stable",
+    "version": "1.7.0",
     "implementation": {
       "manifest": "complete",
-      "runtime_entry": "mcp/server.ts (v1.6.0)",
+      "runtime_entry": "mcp/server.ts (v1.7.0)",
       "dependency_strategy": "minimal — @modelcontextprotocol/sdk + ajv + js-yaml",
       "session_storage": "file system (.sapstack/sessions/) — no database",
       "schema_validation": "ajv against schemas/*.schema.yaml",
-      "write_tools": "fully implemented — start_session, add_evidence, next_turn, validate_session_file"
+      "tools_count": 22,
+      "prompts_count": 10,
+      "write_tools": "9 tools — start_session, add_evidence, next_turn, validate_session_file, add_followup_request, submit_hypothesis, submit_verdict"
     },
+    "v1_7_0_new_features": [
+      "8 new read tools — list_tcodes_by_module, list_agents_for_industry, get_period_end_sequence, lookup_synonym, list_img_guides, list_best_practices, get_master_data_rules, find_sap_note_by_module",
+      "3 new write tools — add_followup_request, submit_hypothesis, submit_verdict",
+      "5 new prompts — korean-field-language, img-config-walk, best-practice-review, evidence-loop-turn2, evidence-loop-turn4",
+      "Knowledge base integration — T-codes, SAP Notes, period-end sequences, industry matrix, synonyms",
+      "Synonym query expansion for Korean field language",
+      "Period-end orchestration with dependency management",
+      "Best practice compliance checks (3-Tier framework: Operational, Period-End, Governance)"
+    ],
     "v1_6_0_features": [
       "Session creation with state machine (intake → hypothesizing → awaiting_evidence → verifying → resolved)",
       "Evidence bundle validation with Ajv against evidence-bundle.schema.yaml",
@@ -261,9 +439,11 @@
     ],
     "notes": [
       "The manifest defines the complete contract for MCP-aware clients.",
-      "Write-path tools are production-ready with full validation.",
+      "All tools (read and write) are production-ready with full validation.",
       "All sessions stored in .sapstack/sessions/ (workspace-relative).",
-      "No live SAP connection — all operations use local files."
+      "No live SAP connection — all operations use local knowledge base files.",
+      "Prompts can be used by LLM clients for structured reasoning (Evidence Loop turns, Korean field language translation, IMG configuration guidance, BP compliance review).",
+      "Knowledge base files: tcodes.yaml (279+ T-codes), sap-notes.yaml (50+ notes), symptom-index.yaml (20+ symptoms), synonyms.yaml (58 terms), period-end-sequence.yaml (30+ steps), industry-matrix.yaml (6 industries)."
     ]
   }
 }

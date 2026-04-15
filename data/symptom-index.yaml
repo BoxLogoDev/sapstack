@@ -472,6 +472,10 @@ symptoms:
       - "백그라운드 잡 행(hang)"
       - "잡 돌다 멈췄어요"
     symptom_en: "Background job running longer than expected or stuck"
+    symptom_zh: "后台作业运行时间比预期长或卡住"
+    symptom_ja: "バックグラウンドジョブが予想より長く実行されているか、停止している"
+    symptom_de: "Hintergrund-Job läuft länger als erwartet oder bleibt stecken"
+    symptom_vi: "Công việc nền chạy lâu hơn dự kiến hoặc bị kẹt"
     likely_modules: [BASIS]
     first_check_tcodes: [SM37, SM50, SM12, ST22]
     typical_causes:
@@ -498,6 +502,10 @@ symptoms:
       - "국세청 연동 안 돼요"
       - "세금계산서 승인번호 안 떨어짐"
     symptom_en: "Korean e-Tax Invoice submission to NTS failed"
+    symptom_zh: "韩国电子税务发票提交到国税厅失败"
+    symptom_ja: "韓国電子税務インボイス提出先の国税庁への失敗"
+    symptom_de: "Koreanische elektronische Steuerrechnung konnte nicht an NTS übermittelt werden"
+    symptom_vi: "Không thể gửi hóa đơn điện tử Hàn Quốc tới Cơ quan Thuế Quốc gia"
     likely_modules: [FI, BC]
     first_check_tcodes: [EDOC_COCKPIT, SM59, STRUST, SLG1]
     typical_causes:
@@ -530,6 +538,10 @@ symptoms:
       - "아이독 쌓여요"
       - "IDoc 어플리케이션 에러"
     symptom_en: "Multiple IDocs in status 51 (Application Error)"
+    symptom_zh: "多个状态为51的IDoc（应用错误）堆积"
+    symptom_ja: "状態51（アプリケーションエラー）の複数のIDocが蓄積"
+    symptom_de: "Mehrere IDocs im Status 51 (Anwendungsfehler) stauen sich auf"
+    symptom_vi: "Nhiều IDoc ở trạng thái 51 (Lỗi ứng dụng) đang tích tụ"
     likely_modules: [BASIS, FI, SD, MM]
     first_check_tcodes: [WE02, WE19, BD87, SM58]
     typical_causes:
@@ -555,6 +567,10 @@ symptoms:
       - "배부 순환 오류"
       - "KSU5 에러"
     symptom_en: "KSU5 assessment cycle error (sender/receiver mismatch)"
+    symptom_zh: "KSU5评估周期错误（发送方/接收方不匹配）"
+    symptom_ja: "KSU5評価サイクルエラー（送信者/受信者の不一致）"
+    symptom_de: "KSU5 Bewertungszyklus Fehler (Sender/Empfänger Nichtübereinstimmung)"
+    symptom_vi: "Lỗi chu kỳ đánh giá KSU5 (Không phù hợp giữa Người gửi/Người nhận)"
     likely_modules: [CO]
     first_check_tcodes: [KSU5, RKEB, CCSSBA, KS01]
     typical_causes:
@@ -575,6 +591,10 @@ symptoms:
       - "인터널 오더 정산 실패"
       - "오더 세틀먼트 안 돼요"
     symptom_en: "KO88 internal order settlement fails"
+    symptom_zh: "KO88内部订单结算失败"
+    symptom_ja: "KO88内部注文決済失敗"
+    symptom_de: "KO88 Interne Bestellabrechnung schlägt fehl"
+    symptom_vi: "Thanh toán đơn hàng nội bộ KO88 thất bại"
     likely_modules: [CO]
     first_check_tcodes: [KO88, KO01, COBL, AUFK]
     typical_causes:
@@ -595,6 +615,10 @@ symptoms:
       - "씨오피에이 수익성 불일치"
       - "COPA 복제 재계산 다름"
     symptom_en: "CO-PA profitability analysis variance mismatch"
+    symptom_zh: "CO-PA利润分析差异不一致"
+    symptom_ja: "CO-PA収益性分析の差異が不一致"
+    symptom_de: "CO-PA Rentabilitätsanalyse-Varianzabweichung"
+    symptom_vi: "Không phù hợp phương sai phân tích lợi nhuận CO-PA"
     likely_modules: [CO]
     first_check_tcodes: [KE30, KEPM, COBL, KE50]
     typical_causes:
@@ -615,6 +639,10 @@ symptoms:
       - "KSTAR 없어요"
       - "비용 항목 미등록"
     symptom_en: "Cost element not created automatically"
+    symptom_zh: "成本要素未自动创建"
+    symptom_ja: "コスト要素が自動的に作成されない"
+    symptom_de: "Kostenelement wird nicht automatisch erstellt"
+    symptom_vi: "Phần tử chi phí không được tạo tự động"
     likely_modules: [CO, FI]
     first_check_tcodes: [KA01, KSTAR, FAGLB03, OKB9]
     typical_causes:
@@ -635,6 +663,10 @@ symptoms:
       - "코스팅 피리어드 락"
       - "CO 기간 컨트롤 막혔어요"
     symptom_en: "OKP1 CO period lock prevents posting"
+    symptom_zh: "OKP1 CO期间锁定阻止过账"
+    symptom_ja: "OKP1 CO期間ロックで過账が阻止される"
+    symptom_de: "OKP1 CO-Periodesperre verhindert Buchung"
+    symptom_vi: "Khóa kỳ CO OKP1 ngăn chặn việc ghi sổ"
     likely_modules: [CO]
     first_check_tcodes: [OKP1, KA05, KEPM, COBL]
     typical_causes:
@@ -659,6 +691,10 @@ symptoms:
       - "자재계획 예외"
       - "MRP 에멘션"
     symptom_en: "MD04 MRP exception messages (01/07/22/25)"
+    symptom_zh: "MD04 MRP异常消息（01/07/22/25）"
+    symptom_ja: "MD04 MRP例外メッセージ（01/07/22/25）"
+    symptom_de: "MD04 MRP-Ausnahmemeldungen (01/07/22/25)"
+    symptom_vi: "Thông báo ngoại lệ MRP MD04 (01/07/22/25)"
     likely_modules: [PP, MM]
     first_check_tcodes: [MD04, MD01, MD02, MDPP]
     typical_causes:
@@ -679,6 +715,10 @@ symptoms:
       - "프로덕션 컨펌 실패"
       - "시간 기입 오류"
     symptom_en: "CO11N production confirmation fails"
+    symptom_zh: "CO11N生产确认失败"
+    symptom_ja: "CO11N生産確認失敗"
+    symptom_de: "CO11N Produktionsbestätigung schlägt fehl"
+    symptom_vi: "Xác nhận sản xuất CO11N thất bại"
     likely_modules: [PP]
     first_check_tcodes: [CO11N, CO09, PP01, AFVGD]
     typical_causes:
@@ -699,6 +739,10 @@ symptoms:
       - "설비 과부하"
       - "캐퍼시티 부족"
     symptom_en: "CM25 capacity overload warning"
+    symptom_zh: "CM25容量过载警告"
+    symptom_ja: "CM25容量オーバーロード警告"
+    symptom_de: "CM25 Kapazitätsüberlastungswarnung"
+    symptom_vi: "Cảnh báo quá tải dung lượng CM25"
     likely_modules: [PP]
     first_check_tcodes: [CM25, CR01, CR21, CRBD]
     typical_causes:
@@ -719,6 +763,10 @@ symptoms:
       - "빌오엠 폭발 실패"
       - "원재료 구성 오류"
     symptom_en: "CS13 BOM explosion fails"
+    symptom_zh: "CS13 BOM展开失败"
+    symptom_ja: "CS13 BOM展開失敗"
+    symptom_de: "CS13 BOM-Zerlegung schlägt fehl"
+    symptom_vi: "Khai triển BOM CS13 thất bại"
     likely_modules: [PP, MM]
     first_check_tcodes: [CS13, CS01, CS02, STPO]
     typical_causes:

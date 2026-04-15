@@ -5,6 +5,45 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-04-15
+
+### Theme
+**"Cross-pollination + Coverage Expansion"** — superclaude-for-sap 프로젝트의 우수
+패턴을 차용하여 sapstack 구조 보강. exceptions/, hooks/, country/, bridge/
+4개 신규 디렉토리 추가. MCP 도구 9 → 20+, 다국어 번역 30+/62 확장.
+
+### Added — 신규 디렉토리 (superclaude-for-sap 차용)
+- **`exceptions/`** — SAP 예외 클래스 카탈로그 (CX_*) 6개 카테고리
+  - financial, logistics, abap-runtime, integration, security, README
+- **`hooks/`** — sapstack 자동화 훅 시스템
+  - pre-evidence-collect, post-session-end, period-end-guard, transport-validator
+  - sample-hooks.json 예시
+- **`country/`** — 국가별 SAP 로컬라이제이션 정리 (7개 국가)
+  - korea, germany, japan, china, vietnam, usa
+- **`bridge/`** — SAP 시스템 연동 패턴 문서
+  - rfc-pattern, odata-pattern, rest-pattern, idoc-pattern, cpi-pattern
+
+### Added — MCP Server 확장
+- **MCP 도구 9 → 20+개** (read 8 신규, write 3 신규, utility 1 신규)
+  - list_tcodes_by_module, list_agents_for_industry, get_period_end_sequence
+  - lookup_synonym, list_img_guides, list_best_practices
+  - get_master_data_rules, find_sap_note_by_module
+  - add_followup_request, submit_hypothesis, submit_verdict
+  - validate_session_file
+- **MCP Prompts 5개 구현** (NotImplementedError 해결)
+  - evidence-loop-turn2, evidence-loop-turn4
+  - korean-field-language, img-config-walk, best-practice-review
+
+### Changed — 다국어 번역 확장
+- **symptom-index 번역 30+/62 entries** (각 zh/ja/de/vi)
+- 커뮤니티 기여 가속화
+
+### References
+- 차용 inspiration: [babamba2/superclaude-for-sap](https://github.com/babamba2/superclaude-for-sap)
+- 두 프로젝트는 **상호 보완**: superclaude = ABAP 개발 중심, sapstack = 운영/진단 중심
+
+---
+
 ## [2.0.0] - 2026-04-13
 
 ### Theme

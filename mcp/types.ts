@@ -390,3 +390,103 @@ export interface ValidateSessionFileArgs {
   path: string;
   schema: "session-state" | "evidence-bundle" | "hypothesis" | "followup-request" | "verdict";
 }
+
+// ─────────────────────────────────────────────────────────────
+// New Tool Arguments (v1.7.0)
+// ─────────────────────────────────────────────────────────────
+
+export interface ListTcodesByModuleArgs {
+  module: string;
+}
+
+export interface ListAgentsForIndustryArgs {
+  industry: string;
+  top_n?: number;
+}
+
+export interface GetPeriodEndSequenceArgs {
+  modules?: string[];
+}
+
+export interface LookupSynonymArgs {
+  term: string;
+  lang?: string;
+}
+
+export interface ListImgGuidesArgs {
+  module?: string;
+}
+
+export interface ListBestPracticesArgs {
+  module?: string;
+  tier?: string;
+}
+
+export interface GetMasterDataRulesArgs {
+  master_type: string;
+}
+
+export interface FindSapNoteByModuleArgs {
+  module: string;
+  max?: number;
+}
+
+export interface FollowupCheckItem {
+  check_id?: string;
+  purpose: string;
+  hypothesis_ids: string[];
+  action_type: string;
+  tcode?: string;
+  expected_outcome: string;
+  priority: string;
+  estimated_minutes: number;
+}
+
+export interface AddFollowupRequestArgs {
+  session_id: string;
+  turn_number?: number;
+  items: FollowupCheckItem[];
+  summary?: string;
+}
+
+export interface HypothesisInput {
+  statement: string;
+  technical_chain: string[];
+  confidence_tier: string;
+  impacted_modules?: string[];
+  evidence_refs?: Array<{ bundle_id: string; item_id: string; interpretation: string }>;
+  falsification_evidence?: Array<{ if_observed: string; then: string }>;
+  related_sap_notes?: string[];
+  related_tcodes?: string[];
+  consultant_agents_to_involve?: string[];
+}
+
+export interface SubmitHypothesisArgs {
+  session_id: string;
+  turn_number?: number;
+  hypotheses: HypothesisInput[];
+}
+
+export interface ResolutionInput {
+  hypothesis_id: string;
+  status: string;
+  evidence_refs?: Array<{ bundle_id: string; item_id: string; finding: string }>;
+  fix_plan?: {
+    audience: string;
+    steps: Array<{ step_number: number; description: string; tcode?: string }>;
+    reviewer_required?: boolean;
+    transport_required?: boolean;
+  };
+  rollback_plan?: {
+    steps: Array<{ step_number: number; description: string; tcode?: string }>;
+    trigger_conditions?: string[];
+  };
+}
+
+export interface SubmitVerdictArgs {
+  session_id: string;
+  turn_number?: number;
+  overall_state: string;
+  summary: string;
+  resolutions: ResolutionInput[];
+}

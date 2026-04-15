@@ -458,6 +458,255 @@ async function listPlugins() {
 }
 
 // ─────────────────────────────────────────────────────────────
+// New read-only tools (v1.7.0)
+// ─────────────────────────────────────────────────────────────
+
+async function listTcodesByModule(args: { module: string }) {
+  const tcodes = await loadYaml<any>(path.join(DATA_DIR, "tcodes.yaml"));
+  const module = (args.module || "").toUpperCase();
+
+  const matching = Object.entries(tcodes).filter(([key, val]: any) => {
+    if (key === "schema_version" || key === "generated" || key === "source" || key === "license") return false;
+    const modules = val.modules || [];
+    return Array.isArray(modules) && modules.includes(module);
+  });
+
+  return {
+    module,
+    count: matching.length,
+    tcodes: matching.map(([code, val]: any) => ({
+      code,
+      name: val.name,
+      modules: val.modules,
+      release: val.release,
+      note: val.note,
+    })),
+  };
+}
+
+async function listAgentsForIndustry(args: { industry: string; top_n?: number }) {
+  const matrix = await loadYaml<any>(path.join(DATA_DIR, "industry-matrix.yaml"));
+  const industry = (args.industry || "").toLowerCase();
+  const topN = args.top_n || 10;
+
+  if (!matrix[industry]) {
+    return { industry, error: `Unknown industry: ${industry}`, available: Object.keys(matrix) };
+  }
+
+  const industryData = matrix[industry];
+  const agents = Object.entries(industryData.modules || {})
+    .map(([moduleName, moduleData]: any) => ({
+      module: moduleName,
+      importance: moduleData.importance,
+      agent: moduleData.agent,
+      note: moduleData.note,
+    }))
+    .sort((a, b) => {
+      const importanceOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3, none: 4 };
+      return (importanceOrder[a.importance] || 4) - (importanceOrder[b.importance] || 4);
+    })
+    .slice(0, topN);
+
+  return {
+    industry: industryData.name,
+    description: industryData.description,
+    agents,
+  };
+}
+
+async function getPeriodEndSequence(args: { modules?: string[] }) {
+  const sequence = await loadYaml<any>(path.join(DATA_DIR, "period-end-sequence.yaml"));
+  const filterModules = args.modules ? args.modules.map(m => m.toUpperCase()) : null;
+
+  const allSteps = [
+    ...(sequence.monthly_close || []),
+    ...(sequence.quarterly_close || []),
+    ...(sequence.yearly_close || []),
+  ];
+
+  const filtered = filterModules
+    ? allSteps.filter((step: any) => filterModules.includes((step.module || "").toUpperCase()))
+    : allSteps;
+
+  return {
+    modules_filter: filterModules,
+    total_steps: filtered.length,
+    steps: filtered.map((step: any) => ({
+      id: step.id,
+      name: step.name,
+      module: step.module,
+      tcode: step.tcode,
+      timing: step.timing,
+      depends_on: step.depends_on || [],
+      description: step.description,
+    })),
+  };
+}
+
+async function lookupSynonym(args: { term: string; lang?: string }) {
+  const synonyms = await loadSynonyms();
+  if (!synonyms) {
+    return { error: "Synonym index not loaded" };
+  }
+
+  const term = (args.term || "").toLowerCase().replace(/\s+/g, "");
+  const canonical = synonyms.variantToCanonical.get(term);
+
+  if (!canonical) {
+    return {
+      term: args.term,
+      found: false,
+      message: "Not found in synonym index",
+    };
+  }
+
+  const allForms = synonyms.canonicalToAllForms.get(canonical) || [];
+  return {
+    term: args.term,
+    canonical,
+    found: true,
+    all_variants: allForms,
+  };
+}
+
+async function listImgGuides(args: { module?: string }) {
+  const module = args.module ? (args.module || "").toUpperCase() : null;
+  const allModules = ["FI", "CO", "MM", "SD", "PP", "HCM", "QM", "PM", "WM", "EWM", "GTS", "BTP", "ABAP", "BASIS"];
+
+  const img = {
+    description: "IMG configuration step-by-step guides",
+    location: "plugins/sap-{module}/skills/sap-{module}/references/img/",
+    note: "Each IMG guide contains SPRO paths, field values, ECC vs S/4 differences, and verification steps",
+  };
+
+  if (module && allModules.includes(module)) {
+    return {
+      module,
+      guide_path: `plugins/sap-${module.toLowerCase()}/skills/sap-${module.toLowerCase()}/references/img/`,
+    };
+  }
+
+  return {
+    modules_available: allModules,
+    img,
+  };
+}
+
+async function listBestPractices(args: { module?: string; tier?: string }) {
+  const module = args.module ? (args.module || "").toUpperCase() : null;
+  const tier = args.tier ? (args.tier || "").toLowerCase() : null;
+
+  const bpTiers = {
+    operational: "Tier 1 — Daily/weekly operations",
+    period_end: "Tier 2 — Month/quarter/year-end closing",
+    governance: "Tier 3 — Audit, compliance, K-SOX",
+  };
+
+  const bpRef = {
+    cross_module: "docs/best-practices/",
+    module_specific: "plugins/sap-{module}/skills/sap-{module}/references/best-practices/",
+  };
+
+  if (module) {
+    return {
+      module,
+      tiers: tier ? [{ tier, description: bpTiers[tier as keyof typeof bpTiers] || "Unknown tier" }] : Object.entries(bpTiers).map(([t, desc]) => ({ tier: t, description: desc })),
+      location: `plugins/sap-${module.toLowerCase()}/skills/sap-${module.toLowerCase()}/references/best-practices/`,
+    };
+  }
+
+  return {
+    available_tiers: Object.entries(bpTiers).map(([t, desc]) => ({ tier: t, description: desc })),
+    cross_module_bp: bpRef.cross_module,
+    module_bp_template: bpRef.module_specific,
+  };
+}
+
+async function getMasterDataRules(args: { master_type: string }) {
+  const masterType = (args.master_type || "").toLowerCase().replace(/_/g, "-");
+
+  // Reference data for common master types
+  const rules: Record<string, any> = {
+    "vendor": {
+      code: "LFA1",
+      table: "LFA1",
+      required_fields: ["LIFNR", "NAME1", "LAND1", "KTOKK"],
+      business_key: "LIFNR",
+      localization: { kr: ["NAMEK", "NAMEK2"] },
+    },
+    "customer": {
+      code: "FD01",
+      table: "KNA1",
+      required_fields: ["KUNNR", "NAME1", "LAND1", "BUKRS"],
+      business_key: "KUNNR",
+      localization: { kr: ["NAMEK"] },
+    },
+    "material": {
+      code: "MM01",
+      table: "MARA",
+      required_fields: ["MATNR", "MTART", "MEINS"],
+      business_key: "MATNR",
+      localization: { kr: ["MAKTX"] },
+    },
+    "cost-center": {
+      code: "KS01",
+      table: "CSKS",
+      required_fields: ["KOKRS", "KOSTL", "KTEXT"],
+      business_key: "KOSTL",
+      localization: { kr: ["KTEXT"] },
+    },
+    "gl-account": {
+      code: "FS00",
+      table: "SKA1",
+      required_fields: ["KTOPL", "SAKNR", "XBILK"],
+      business_key: "SAKNR",
+      localization: { kr: ["TXT50"] },
+    },
+  };
+
+  const found = rules[masterType];
+  if (!found) {
+    return {
+      master_type: args.master_type,
+      found: false,
+      available_types: Object.keys(rules),
+    };
+  }
+
+  return {
+    master_type: args.master_type,
+    found: true,
+    ...found,
+  };
+}
+
+async function findSapNoteByModule(args: { module: string; max?: number }) {
+  const notes = await loadYaml<any>(path.join(DATA_DIR, "sap-notes.yaml"));
+  const module = (args.module || "").toUpperCase();
+  const maxResults = args.max || 10;
+
+  const filtered = (notes.notes || [])
+    .filter((n: any) => {
+      const modules = n.modules || [];
+      return Array.isArray(modules) && (modules.includes(module) || modules.includes("ALL"));
+    })
+    .slice(0, maxResults);
+
+  return {
+    module,
+    count: filtered.length,
+    notes: filtered.map((n: any) => ({
+      id: n.id,
+      title: n.title,
+      keywords: n.keywords,
+      category: n.category,
+      release: n.release,
+      url: n.url,
+    })),
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
 // Write-path tool implementations (v1.6.0)
 // ─────────────────────────────────────────────────────────────
 
@@ -837,6 +1086,298 @@ async function validateSessionFile(args: ValidateSessionFileArgs) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// New write tools (v1.7.0)
+// ─────────────────────────────────────────────────────────────
+
+interface FollowupCheckItem {
+  check_id?: string;
+  purpose: string;
+  hypothesis_ids: string[];
+  action_type: string;
+  tcode?: string;
+  expected_outcome: string;
+  priority: string;
+  estimated_minutes: number;
+}
+
+interface AddFollowupRequestArgs {
+  session_id: string;
+  turn_number?: number;
+  items: FollowupCheckItem[];
+  summary?: string;
+}
+
+async function addFollowupRequest(args: AddFollowupRequestArgs) {
+  const { session_id, items, summary, turn_number } = args;
+
+  if (!session_id || !/^sess-[0-9]{8}-[a-z0-9]{6}$/.test(session_id)) {
+    throw new Error("Invalid session_id format");
+  }
+
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    throw new Error("items must be a non-empty array");
+  }
+
+  // Load session state
+  const sessionDir = path.join(SESSIONS_DIR, session_id);
+  const statePath = path.join(sessionDir, "state.yaml");
+  let state: any;
+  try {
+    state = await loadYaml<any>(statePath);
+  } catch (err) {
+    throw new Error(`Cannot load session ${session_id}: ${(err as Error).message}`);
+  }
+
+  const now = new Date().toISOString();
+  const requestId = generateId("flr");
+  const currentTurn = turn_number || state.current_turn_number || 2;
+
+  // Enrich items with generated check_ids
+  const enrichedItems = items.map((item, idx) => ({
+    ...item,
+    check_id: item.check_id || `chk-${String(idx + 1).padStart(3, "0")}`,
+  }));
+
+  const followupRequest = {
+    request_id: requestId,
+    session_id,
+    turn_number: currentTurn,
+    created_at: now,
+    summary: summary || `Turn ${currentTurn} follow-up checklist`,
+    estimated_total_minutes: enrichedItems.reduce((sum: number, item: any) => sum + (item.estimated_minutes || 0), 0),
+    checks: enrichedItems,
+  };
+
+  // Add to state
+  if (!state.followup_requests) state.followup_requests = [];
+  state.followup_requests.push(followupRequest);
+  state.pending_followup_request_id = requestId;
+  state.last_updated_at = now;
+
+  if (!state.audit_trail) state.audit_trail = [];
+  state.audit_trail.push({
+    at: now,
+    action: "followup_requested",
+    actor: { surface: "mcp_client" },
+    ref_id: requestId,
+    note: `${items.length} check(s) requested for Turn ${currentTurn}`,
+  });
+
+  // Save state
+  const stateYaml = yaml.dump(state, { lineWidth: -1 });
+  const tmpPath = `${statePath}.tmp`;
+  await fs.writeFile(tmpPath, stateYaml, "utf-8");
+  await fs.rename(tmpPath, statePath);
+
+  // Save followup request as separate file
+  const flrPath = path.join(sessionDir, `${requestId}.yaml`);
+  const flrYaml = yaml.dump(followupRequest, { lineWidth: -1 });
+  const tmpFlrPath = `${flrPath}.tmp`;
+  await fs.writeFile(tmpFlrPath, flrYaml, "utf-8");
+  await fs.rename(tmpFlrPath, flrPath);
+
+  return {
+    request_id: requestId,
+    session_id,
+    turn_number: currentTurn,
+    checks_count: items.length,
+    estimated_total_minutes: followupRequest.estimated_total_minutes,
+    message: `Follow-up request ${requestId} created with ${items.length} checks`,
+  };
+}
+
+interface HypothesisInput {
+  statement: string;
+  technical_chain: string[];
+  confidence_tier: string;
+  impacted_modules?: string[];
+  evidence_refs?: Array<{ bundle_id: string; item_id: string; interpretation: string }>;
+  falsification_evidence?: Array<{ if_observed: string; then: string }>;
+  related_sap_notes?: string[];
+  related_tcodes?: string[];
+  consultant_agents_to_involve?: string[];
+}
+
+interface SubmitHypothesisArgs {
+  session_id: string;
+  turn_number?: number;
+  hypotheses: HypothesisInput[];
+}
+
+async function submitHypothesis(args: SubmitHypothesisArgs) {
+  const { session_id, hypotheses, turn_number } = args;
+
+  if (!session_id || !/^sess-[0-9]{8}-[a-z0-9]{6}$/.test(session_id)) {
+    throw new Error("Invalid session_id format");
+  }
+
+  if (!hypotheses || !Array.isArray(hypotheses) || hypotheses.length === 0) {
+    throw new Error("hypotheses must be a non-empty array");
+  }
+
+  // Load session state
+  const sessionDir = path.join(SESSIONS_DIR, session_id);
+  const statePath = path.join(sessionDir, "state.yaml");
+  let state: any;
+  try {
+    state = await loadYaml<any>(statePath);
+  } catch (err) {
+    throw new Error(`Cannot load session ${session_id}: ${(err as Error).message}`);
+  }
+
+  const now = new Date().toISOString();
+  const currentTurn = turn_number || state.current_turn_number || 2;
+
+  // Create hypothesis records
+  const created = hypotheses.map((hyp, idx) => {
+    const confidenceMap: Record<string, number> = { high: 0.8, medium: 0.5, low: 0.2 };
+    return {
+      hypothesis_id: `h-${String(idx + 1).padStart(3, "0")}`,
+      session_id,
+      turn_number: currentTurn,
+      statement: hyp.statement,
+      technical_chain: hyp.technical_chain || [],
+      confidence: confidenceMap[hyp.confidence_tier] || 0.5,
+      confidence_tier: hyp.confidence_tier || "medium",
+      impacted_modules: hyp.impacted_modules || [],
+      evidence_refs: hyp.evidence_refs || [],
+      falsification_evidence: hyp.falsification_evidence || [],
+      related_sap_notes: hyp.related_sap_notes || [],
+      related_tcodes: hyp.related_tcodes || [],
+      consultant_agents_to_involve: hyp.consultant_agents_to_involve || [],
+      status: "proposed",
+    };
+  });
+
+  // Add to state
+  if (!state.hypotheses) state.hypotheses = [];
+  state.hypotheses.push(...created);
+  state.last_updated_at = now;
+
+  if (!state.audit_trail) state.audit_trail = [];
+  state.audit_trail.push({
+    at: now,
+    action: "hypothesis_proposed",
+    actor: { surface: "mcp_client" },
+    note: `${created.length} hypothesis(es) proposed for Turn ${currentTurn}`,
+  });
+
+  // Save state
+  const stateYaml = yaml.dump(state, { lineWidth: -1 });
+  const tmpPath = `${statePath}.tmp`;
+  await fs.writeFile(tmpPath, stateYaml, "utf-8");
+  await fs.rename(tmpPath, statePath);
+
+  return {
+    session_id,
+    turn_number: currentTurn,
+    hypotheses_created: created.length,
+    hypothesis_ids: created.map(h => h.hypothesis_id),
+    message: `${created.length} hypotheses submitted for session ${session_id}`,
+  };
+}
+
+interface ResolutionInput {
+  hypothesis_id: string;
+  status: string;
+  evidence_refs?: Array<{ bundle_id: string; item_id: string; finding: string }>;
+  fix_plan?: {
+    audience: string;
+    steps: Array<{ step_number: number; description: string; tcode?: string }>;
+    reviewer_required?: boolean;
+    transport_required?: boolean;
+  };
+  rollback_plan?: {
+    steps: Array<{ step_number: number; description: string; tcode?: string }>;
+    trigger_conditions?: string[];
+  };
+}
+
+interface SubmitVerdictArgs {
+  session_id: string;
+  turn_number?: number;
+  overall_state: string;
+  summary: string;
+  resolutions: ResolutionInput[];
+}
+
+async function submitVerdict(args: SubmitVerdictArgs) {
+  const { session_id, overall_state, summary, resolutions, turn_number } = args;
+
+  if (!session_id || !/^sess-[0-9]{8}-[a-z0-9]{6}$/.test(session_id)) {
+    throw new Error("Invalid session_id format");
+  }
+
+  if (!summary || summary.trim().length === 0) {
+    throw new Error("summary is required");
+  }
+
+  if (!resolutions || !Array.isArray(resolutions) || resolutions.length === 0) {
+    throw new Error("resolutions must be a non-empty array");
+  }
+
+  // Load session state
+  const sessionDir = path.join(SESSIONS_DIR, session_id);
+  const statePath = path.join(sessionDir, "state.yaml");
+  let state: any;
+  try {
+    state = await loadYaml<any>(statePath);
+  } catch (err) {
+    throw new Error(`Cannot load session ${session_id}: ${(err as Error).message}`);
+  }
+
+  const now = new Date().toISOString();
+  const currentTurn = turn_number || state.current_turn_number || 4;
+
+  const verdict = {
+    verdict_id: generateId("vdc"),
+    session_id,
+    turn_number: currentTurn,
+    created_at: now,
+    overall_state,
+    summary,
+    resolutions,
+  };
+
+  // Add to state
+  if (!state.verdicts) state.verdicts = [];
+  state.verdicts.push(verdict);
+  state.status = overall_state === "resolved" ? "resolved" : "verifying";
+  state.last_updated_at = now;
+
+  if (!state.audit_trail) state.audit_trail = [];
+  state.audit_trail.push({
+    at: now,
+    action: "verdict_issued",
+    actor: { surface: "mcp_client" },
+    ref_id: verdict.verdict_id,
+    note: `Verdict issued: overall_state=${overall_state}, ${resolutions.length} resolution(s)`,
+  });
+
+  // Save state
+  const stateYaml = yaml.dump(state, { lineWidth: -1 });
+  const tmpPath = `${statePath}.tmp`;
+  await fs.writeFile(tmpPath, stateYaml, "utf-8");
+  await fs.rename(tmpPath, statePath);
+
+  // Save verdict as separate file
+  const vdcPath = path.join(sessionDir, `${verdict.verdict_id}.yaml`);
+  const vdcYaml = yaml.dump(verdict, { lineWidth: -1 });
+  const tmpVdcPath = `${vdcPath}.tmp`;
+  await fs.writeFile(tmpVdcPath, vdcYaml, "utf-8");
+  await fs.rename(tmpVdcPath, vdcPath);
+
+  return {
+    verdict_id: verdict.verdict_id,
+    session_id,
+    turn_number: currentTurn,
+    overall_state,
+    resolutions_count: resolutions.length,
+    message: `Verdict ${verdict.verdict_id} submitted. Session status: ${state.status}`,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
 // MCP Server setup
 // ─────────────────────────────────────────────────────────────
 
@@ -858,6 +1399,7 @@ const server = new Server(
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
+      // Original 9 tools
       { name: "resolve_sap_note", description: "Search verified SAP Notes by keyword", inputSchema: { type: "object", properties: { keyword: { type: "string" } }, required: ["keyword"] } },
       { name: "check_tcode", description: "Verify T-code existence in verified registry", inputSchema: { type: "object", properties: { tcode: { type: "string" } }, required: ["tcode"] } },
       { name: "list_plugins", description: "List all sapstack plugins", inputSchema: { type: "object", properties: {} } },
@@ -867,6 +1409,21 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       { name: "next_turn", description: "[v1.6.0] Run next turn of Evidence Loop", inputSchema: { type: "object", properties: { session_id: { type: "string" } }, required: ["session_id"] } },
       { name: "list_sessions", description: "List Evidence Loop sessions", inputSchema: { type: "object", properties: { status: { type: "string" }, country_iso: { type: "string" }, limit: { type: "integer" } } } },
       { name: "validate_session_file", description: "[v1.6.0] Validate session YAML against schema", inputSchema: { type: "object", properties: { path: { type: "string" }, schema: { type: "string" } }, required: ["path", "schema"] } },
+
+      // New read tools (v1.7.0)
+      { name: "list_tcodes_by_module", description: "[v1.7.0] List all T-codes in a specific SAP module", inputSchema: { type: "object", properties: { module: { type: "string", description: "SAP module code (FI, CO, MM, SD, PP, etc.)" } }, required: ["module"] } },
+      { name: "list_agents_for_industry", description: "[v1.7.0] List prioritized consultant agents by industry", inputSchema: { type: "object", properties: { industry: { type: "string", description: "Industry name (manufacturing, retail, financial-services, etc.)" }, top_n: { type: "integer", default: 10 } } } },
+      { name: "get_period_end_sequence", description: "[v1.7.0] Return ordered period-end closing steps with dependencies", inputSchema: { type: "object", properties: { modules: { type: "array", items: { type: "string" }, description: "Optional: filter by module(s)" } } } },
+      { name: "lookup_synonym", description: "[v1.7.0] Find canonical term and variants from synonyms.yaml", inputSchema: { type: "object", properties: { term: { type: "string" }, lang: { type: "string" } }, required: ["term"] } },
+      { name: "list_img_guides", description: "[v1.7.0] List IMG configuration guides by module", inputSchema: { type: "object", properties: { module: { type: "string", description: "SAP module code (optional)" } } } },
+      { name: "list_best_practices", description: "[v1.7.0] List best practices by module and tier (Operational, Period-End, Governance)", inputSchema: { type: "object", properties: { module: { type: "string" }, tier: { type: "string", enum: ["operational", "period_end", "governance"] } } } },
+      { name: "get_master_data_rules", description: "[v1.7.0] Get required fields and validation rules for a master data type", inputSchema: { type: "object", properties: { master_type: { type: "string", description: "vendor, customer, material, cost-center, gl-account" } }, required: ["master_type"] } },
+      { name: "find_sap_note_by_module", description: "[v1.7.0] Search SAP Notes by module", inputSchema: { type: "object", properties: { module: { type: "string" }, max: { type: "integer", default: 10 } }, required: ["module"] } },
+
+      // New write tools (v1.7.0)
+      { name: "add_followup_request", description: "[v1.7.0] Add follow-up checklist to session (Turn 2)", inputSchema: { type: "object", properties: { session_id: { type: "string" }, turn_number: { type: "integer" }, items: { type: "array" }, summary: { type: "string" } }, required: ["session_id", "items"] } },
+      { name: "submit_hypothesis", description: "[v1.7.0] Submit 2-4 hypotheses to session (Turn 2)", inputSchema: { type: "object", properties: { session_id: { type: "string" }, turn_number: { type: "integer" }, hypotheses: { type: "array" } }, required: ["session_id", "hypotheses"] } },
+      { name: "submit_verdict", description: "[v1.7.0] Submit verdict with fix+rollback plans (Turn 4)", inputSchema: { type: "object", properties: { session_id: { type: "string" }, turn_number: { type: "integer" }, overall_state: { type: "string" }, summary: { type: "string" }, resolutions: { type: "array" } }, required: ["session_id", "overall_state", "summary", "resolutions"] } },
     ],
   };
 });
@@ -877,6 +1434,7 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
   try {
     let result: unknown;
     switch (name) {
+      // Original 9 tools
       case "resolve_sap_note":    result = await resolveSapNote(args as any); break;
       case "check_tcode":         result = await checkTcode(args as any); break;
       case "list_plugins":        result = await listPlugins(); break;
@@ -886,6 +1444,22 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       case "add_evidence":        result = await addEvidence(args); break;
       case "next_turn":           result = await nextTurn(args); break;
       case "validate_session_file": result = await validateSessionFile(args); break;
+
+      // New read tools (v1.7.0)
+      case "list_tcodes_by_module":   result = await listTcodesByModule(args as any); break;
+      case "list_agents_for_industry": result = await listAgentsForIndustry(args as any); break;
+      case "get_period_end_sequence":  result = await getPeriodEndSequence(args as any); break;
+      case "lookup_synonym":          result = await lookupSynonym(args as any); break;
+      case "list_img_guides":         result = await listImgGuides(args as any); break;
+      case "list_best_practices":     result = await listBestPractices(args as any); break;
+      case "get_master_data_rules":   result = await getMasterDataRules(args as any); break;
+      case "find_sap_note_by_module": result = await findSapNoteByModule(args as any); break;
+
+      // New write tools (v1.7.0)
+      case "add_followup_request": result = await addFollowupRequest(args); break;
+      case "submit_hypothesis":    result = await submitHypothesis(args); break;
+      case "submit_verdict":       result = await submitVerdict(args); break;
+
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
@@ -968,8 +1542,11 @@ server.setRequestHandler(ListPromptsRequestSchema, async () => {
       { name: "sap-s4-migration-advisor", description: "S/4HANA migration advisory" },
       { name: "sap-basis-consultant", description: "Basis issue routing" },
       { name: "sap-mm-consultant", description: "MM procurement/inventory" },
-      { name: "sap-session-turn2-hypothesis", description: "Evidence Loop Turn 2 (v1.5.0)" },
-      { name: "sap-session-turn4-verify", description: "Evidence Loop Turn 4 (v1.5.0)" },
+      { name: "sap-session-turn2-hypothesis", description: "Evidence Loop Turn 2 — hypothesis generation (v1.7.0)" },
+      { name: "sap-session-turn4-verify", description: "Evidence Loop Turn 4 — verdict with fix+rollback (v1.7.0)" },
+      { name: "korean-field-language", description: "Field Korean translation prompt using synonyms.yaml (v1.7.0)" },
+      { name: "img-config-walk", description: "IMG configuration step-by-step walkthrough (v1.7.0)" },
+      { name: "best-practice-review", description: "SAP setup review against 3-Tier Best Practice framework (v1.7.0)" },
     ],
   };
 });
@@ -978,7 +1555,7 @@ server.setRequestHandler(ListPromptsRequestSchema, async () => {
 server.setRequestHandler(GetPromptRequestSchema, async (req) => {
   const { name, arguments: args } = req.params;
 
-  if (name.startsWith("sap-") && !name.startsWith("sap-session-")) {
+  if (name.startsWith("sap-") && !name.startsWith("sap-session-") && !name.includes("-language") && name !== "img-config-walk" && name !== "best-practice-review") {
     // Legacy agent prompts — load from agents/
     const text = await readFileSafe(path.join(SAPSTACK_ROOT, "agents", `${name}.md`));
     return {
@@ -988,8 +1565,141 @@ server.setRequestHandler(GetPromptRequestSchema, async (req) => {
     };
   }
 
-  if (name === "sap-session-turn2-hypothesis" || name === "sap-session-turn4-verify") {
-    throw new NotImplementedError(`prompt:${name}`);
+  if (name === "sap-session-turn2-hypothesis") {
+    const systemPrompt = `You are an SAP consultant expert in hypothesis generation based on evidence bundles.
+
+Your role is to:
+1. Analyze the provided Evidence Bundle (T-codes accessed, table exports, error messages, configuration settings)
+2. Identify 2-4 plausible root causes that would explain the observed symptoms
+3. For each hypothesis, specify:
+   - Falsification criteria: "If we observe X, this hypothesis is FALSE"
+   - Impacted modules and technical chain
+   - Confidence level (high/medium/low)
+   - Related SAP Notes and T-codes for verification
+   - Which consultant agent should verify this hypothesis
+
+4. Prioritize hypotheses by confidence and avoid speculative theories
+
+Output format: JSON with hypothesis_id, statement, technical_chain, confidence_tier, falsification_evidence, etc.`;
+
+    return {
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: { type: "text", text: `Evidence Bundle:\n${(args as any)?.bundle_data || "(none provided)"}` } },
+      ],
+    };
+  }
+
+  if (name === "sap-session-turn4-verify") {
+    const systemPrompt = `You are an SAP incident resolution specialist. Your role is to:
+
+1. Review all collected evidence against the proposed hypotheses
+2. Determine the MOST LIKELY root cause and mark others as refuted
+3. For the confirmed hypothesis, provide:
+   - Fix plan: step-by-step instructions (T-codes, menu paths, field values)
+   - Rollback plan: how to reverse if needed, with trigger conditions
+   - Prevention measures: monitoring and future safeguards
+   - Estimated duration and required reviewer roles
+
+4. Assign overall verdict state:
+   - "resolved" if confident fix exists and is safe
+   - "needs_next_loop" if more evidence needed
+   - "escalated" if beyond current scope
+   - "insufficient_evidence" if inconclusive
+
+Output format: JSON with verdict_id, overall_state, resolutions[], fix_plan, rollback_plan, etc.`;
+
+    return {
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: { type: "text", text: `Session evidence and hypotheses:\n${(args as any)?.session_data || "(none provided)"}` } },
+      ],
+    };
+  }
+
+  if (name === "korean-field-language") {
+    const systemPrompt = `You are a SAP field language translator specializing in Korean.
+
+Your role is to:
+1. Convert dictionary Korean (formal translations) to field Korean (실제 현장에서 쓰는 용어)
+2. Use the synonyms.yaml reference to map terms accurately
+3. Annotate first occurrences with: "용어 (공식 번역, 필드 형태, 필드 코드)"
+4. Accept conversational patterns: "돌렸는데", "뜨네요", "안 돼요", "박아주세요"
+5. Keep T-codes and abbreviations as-is (F110, MIGO, PO, GR, TR)
+6. Use business time markers: D-1, 월마감 D+3, 가결산, 확정결산
+
+Examples:
+- "원가센터" → "코스트 센터 (원가센터, KOSTL)"
+- "미지급금" → "미고 (미지급금)"
+- "구매발주" → "PO (Purchase Order)"
+
+Provide translations maintaining accuracy while sounding natural to Korean SAP operators.`;
+
+    return {
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: { type: "text", text: `Dictionary Korean terms to translate:\n${(args as any)?.text || "(none provided)"}` } },
+      ],
+    };
+  }
+
+  if (name === "img-config-walk") {
+    const systemPrompt = `You are an SAP IMG configuration specialist providing step-by-step guidance.
+
+Your role is to:
+1. Break down IMG configuration into logical, executable steps
+2. For each step, provide:
+   - SPRO transaction path (e.g., IMG > Financial Accounting > General Ledger > GL Accounts)
+   - Field-by-field configuration values
+   - ECC 6.0 vs S/4HANA differences (if applicable)
+   - Verification step (which T-code to check the result)
+   - Common pitfalls and how to avoid them
+   - SAP Notes if known issues apply
+
+3. Always include:
+   - Transport request requirement (yes/no)
+   - Testing strategy (before production)
+   - Rollback procedure if misconfigured
+
+Output format: Markdown with numbered steps, tables for field values, warning blocks for risks.`;
+
+    return {
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: { type: "text", text: `Module and configuration topic:\n${(args as any)?.topic || "(none provided)"}` } },
+      ],
+    };
+  }
+
+  if (name === "best-practice-review") {
+    const systemPrompt = `You are an SAP Best Practice reviewer specializing in 3-Tier governance.
+
+Your role is to:
+1. Review the user's SAP setup against 3-Tier Best Practice framework:
+   - Tier 1 Operational: Daily/weekly operations setup
+   - Tier 2 Period-End: Month/quarter/year-end closing procedures
+   - Tier 3 Governance: Audit, compliance, K-SOX requirements
+
+2. For each tier, assess:
+   - Compliance status (compliant / at-risk / non-compliant)
+   - Specific gaps or deviations from best practice
+   - Remediation steps if needed
+   - Risk impact if not fixed
+   - SAP Notes that document the best practice
+
+3. Provide summary:
+   - Overall risk score (0-100)
+   - Top 3 priority improvements
+   - Timeline and effort estimation
+
+Output format: JSON with tier-by-tier assessment, risk scores, and action items.`;
+
+    return {
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: { type: "text", text: `SAP setup details to review:\n${(args as any)?.setup_description || "(none provided)"}` } },
+      ],
+    };
   }
 
   throw new Error(`Unknown prompt: ${name}`);
