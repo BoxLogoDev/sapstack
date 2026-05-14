@@ -69,13 +69,15 @@ while IFS= read -r md_file; do
       echo "❌ [$md_file] 끊어진 링크: $link"
       BROKEN=$((BROKEN + 1))
     fi
-  done < <(grep -oE '\[[^]]*\]\([^)]+\)' "$md_file" 2>/dev/null | \
-           grep -oE '\([^)]+\)' | \
-           tr -d '()' | \
+  # v2.2.0 Phase 0 fix: nested 괄호 처리 — `[text (foo)](url)`에서 (foo)가
+  # url로 잘못 매칭되던 버그 해결. `](url)` 패턴만 직접 추출하고 sed로 url만 분리.
+  done < <(grep -oE '\]\([^)]+\)' "$md_file" 2>/dev/null | \
+           sed -E 's/^\]\((.*)\)$/\1/' | \
            grep -v '^!' || true)
 done < <(find . -name '*.md' -type f \
          -not -path './.git/*' \
-         -not -path './node_modules/*' \
+         -not -path '*/node_modules/*' \
+         -not -path '*/dist/*' \
          -not -name '.release-notes-*.md' \
          2>/dev/null)
 
