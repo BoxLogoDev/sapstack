@@ -64,3 +64,6 @@ jobs:
 
       - name: Check version sync across packages
         run: ./scripts/bump-version.sh --check
+
+      - name: Check translation parity (multilingual SKILL)
+        run: ./scripts/check-translation-parity.sh --strict
