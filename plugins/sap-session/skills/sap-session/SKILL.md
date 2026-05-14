@@ -8,6 +8,7 @@ description: |
 version: 0.1.0
 stage: experimental
 language: [ko, en]
+allowed-tools: Read, Grep, Glob
 ---
 
 # sap-session — Evidence Loop Orchestrator

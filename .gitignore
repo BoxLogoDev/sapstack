@@ -41,6 +41,12 @@ $RECYCLE.BIN/
 # Claude Code runtime
 .claude/cache/
 .claude/.last_session_context
+.claude/agent-memory/
+.claude/worktrees/
+.claude/sessions/
 
 # Release notes temporary files
 .release-notes-*.md
+
+# Pending review (Phase 3 — to be folded into scripts/build-translations.sh)
+scripts/add_translations.py

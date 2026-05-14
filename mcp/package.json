@@ -1,6 +1,6 @@
 {
   "name": "@boxlogodev/sapstack-mcp",
-  "version": "1.6.0",
+  "version": "2.1.0",
   "description": "sapstack MCP server — SAP knowledge base + Evidence Loop session management",
   "type": "module",
   "main": "dist/server.js",

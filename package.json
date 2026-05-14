@@ -1,12 +1,13 @@
 {
   "name": "sapstack",
-  "version": "1.4.0",
-  "description": "SAP Operations Advisory Platform for 6 AI coding assistants — 14 modules, 9 subagents, 10 commands, 279 T-codes, 100% Korean, MCP-ready",
+  "version": "2.1.0",
+  "description": "SAP Enterprise Operations Platform — 20 plugins, 16 agents, 18 commands, 328+ T-codes, 6 languages, MCP server, VS Code Extension, country/industry/bridge/exceptions/hooks frameworks",
   "license": "MIT",
   "author": "BoxLogoDev",
   "keywords": [
-    "sap", "abap", "s4hana", "claude-code", "skills", "agents", "plugins",
-    "fi", "co", "tr", "mm", "sd", "pp", "hcm", "successfactors", "btp", "basis"
+    "sap", "abap", "s4hana", "claude-code", "skills", "agents", "plugins", "mcp",
+    "fi", "co", "tr", "mm", "sd", "pp", "hcm", "successfactors", "btp", "basis",
+    "pm", "qm", "wm", "ewm", "gts", "cloud-pe"
   ],
   "repository": {
     "type": "git",

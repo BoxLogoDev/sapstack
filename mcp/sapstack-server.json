@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.modelcontextprotocol.io/server/v1",
   "name": "sapstack",
-  "version": "1.7.0",
+  "version": "2.1.0",
   "description": "SAP operations advisory + Evidence Loop session manager — 22 tools, 10 prompts, knowledge base integration (T-codes, SAP Notes, synonyms, period-end sequences, industry matrix)",
   "author": "BoxLogoDev",
   "license": "MIT",
