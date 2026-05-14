@@ -1587,3 +1587,67 @@ LS24:
   name: Material Flow System
   modules: [EWM]
   release: both
+
+# ──────────────────────────────────────────────────────────────
+# v2.2.0 Phase 0 backfill — pre-existing 미등록 T-code 정리
+# (SKILL.md 인용은 있었으나 yaml 등록 누락)
+# 후속 phase에서 더 풍부한 도메인 검증 후 적절한 모듈 섹션으로 재배치 예정
+# ──────────────────────────────────────────────────────────────
+CO24:
+  name: Missing Parts Info System
+  modules: [PP, PM]
+  release: both
+IP10N:
+  name: Schedule Maintenance Plans (Mass Processing)
+  modules: [PM]
+  release: both
+MM41:
+  name: Create Article (Retail)
+  modules: [MM]
+  release: both
+  note: Retail-specific (Article Master)
+ME61:
+  name: "Vendor Evaluation: Maintain"
+  modules: [MM]
+  release: both
+QE05N:
+  name: Recording Results for Inspection Points
+  modules: [QM]
+  release: both
+VL0N:
+  name: Outbound Delivery Monitor
+  modules: [SD, LE-SHP]
+  release: both
+SE39:
+  name: Split Screen Editor (deprecated)
+  modules: [ABAP]
+  release: ecc_only
+  note: deprecated in S/4HANA — use SE80/ADT instead
+
+# v2.2.0 Phase 1 backfill — SKILL.md 인용 확인 후 등록 (의심 → 실존 확정)
+LT04:
+  name: Generate Transfer Order from Material Document
+  modules: [WM]
+  release: ecc_only
+  note: deprecated in S/4HANA — use EWM /SCWM/PRDI/PRDO
+LS16:
+  name: Stock per Storage Bin
+  modules: [WM]
+  release: ecc_only
+LS20:
+  name: Display Stock Account Movements per Storage Bin
+  modules: [WM]
+  release: ecc_only
+OB8C:
+  name: Define Field Selection Variants for Special G/L Indicator
+  modules: [FI]
+  release: both
+  note: SPRO config T-code (IMG path under FI Special G/L)
+QPR1:
+  name: Sample Drawing — Create
+  modules: [QM]
+  release: both
+QPR2:
+  name: Sample Drawing — Change
+  modules: [QM]
+  release: both

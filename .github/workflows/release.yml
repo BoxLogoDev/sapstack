@@ -30,6 +30,18 @@ jobs:
         id: version
         run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
+      - name: Verify tag matches package versions
+        run: |
+          chmod +x scripts/bump-version.sh
+          bash scripts/bump-version.sh --check
+          PKG_VERSION=$(sed -nE 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/p' package.json | head -1)
+          if [ "$PKG_VERSION" != "${{ steps.version.outputs.version }}" ]; then
+            echo "❌ Tag (${{ steps.version.outputs.version }}) does not match package.json ($PKG_VERSION)"
+            echo "    Run: bash scripts/bump-version.sh ${{ steps.version.outputs.version }} && commit before tagging"
+            exit 1
+          fi
+          echo "✅ Tag and package.json both at $PKG_VERSION"
+
       - name: Install MCP dependencies
         run: cd mcp && npm ci
 

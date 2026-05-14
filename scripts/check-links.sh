@@ -50,32 +50,36 @@ while IFS= read -r md_file; do
         ;;
     esac
 
-    # 절대 경로는 repo root 기준
+    # 절대 경로(/로 시작)는 repo root 기준
     if [[ "$target" = /* ]]; then
-      check_path="${target#/}"
-    else
-      # 상대 경로는 파일 디렉토리 기준
-      check_path="$dir/$target"
+      # v2.2.0 Phase 0 fix: 절대 경로일 때 readlink -m을 시스템 root로
+      # 해석하던 버그를 해결. repo root 기준으로 직접 검증.
+      check_path="$REPO_ROOT/${target#/}"
+      if [[ ! -e "$check_path" ]]; then
+        echo "❌ [$md_file] 끊어진 링크: $link"
+        BROKEN=$((BROKEN + 1))
+      fi
+      continue
     fi
 
-    # 경로 정규화 (../ 해결)
-    # bash 기본으로는 안 되니 readlink -m 또는 Python 활용
+    # 상대 경로는 파일 디렉토리 기준 + readlink로 ../ 정규화
+    check_path="$dir/$target"
     normalized=$(cd "$dir" && readlink -m "$target" 2>/dev/null || echo "$check_path")
-
-    # repo root로 상대화
     rel_path="${normalized#$REPO_ROOT/}"
 
-    if [[ ! -e "$rel_path" ]] && [[ ! -e "$normalized" ]]; then
+    if [[ ! -e "$rel_path" ]] && [[ ! -e "$normalized" ]] && [[ ! -e "$check_path" ]]; then
       echo "❌ [$md_file] 끊어진 링크: $link"
       BROKEN=$((BROKEN + 1))
     fi
-  done < <(grep -oE '\[[^]]*\]\([^)]+\)' "$md_file" 2>/dev/null | \
-           grep -oE '\([^)]+\)' | \
-           tr -d '()' | \
+  # v2.2.0 Phase 0 fix: nested 괄호 처리 — `[text (foo)](url)`에서 (foo)가
+  # url로 잘못 매칭되던 버그 해결. `](url)` 패턴만 직접 추출하고 sed로 url만 분리.
+  done < <(grep -oE '\]\([^)]+\)' "$md_file" 2>/dev/null | \
+           sed -E 's/^\]\((.*)\)$/\1/' | \
            grep -v '^!' || true)
 done < <(find . -name '*.md' -type f \
          -not -path './.git/*' \
-         -not -path './node_modules/*' \
+         -not -path '*/node_modules/*' \
+         -not -path '*/dist/*' \
          -not -name '.release-notes-*.md' \
          2>/dev/null)
 

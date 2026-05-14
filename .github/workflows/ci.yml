@@ -61,3 +61,6 @@ jobs:
         run: |
           ./scripts/resolve-note.sh korea | head -5
           ./scripts/resolve-note.sh migration | head -5
+
+      - name: Check version sync across packages
+        run: ./scripts/bump-version.sh --check
