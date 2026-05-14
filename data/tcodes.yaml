@@ -1651,3 +1651,101 @@ QPR2:
   name: Sample Drawing — Change
   modules: [QM]
   release: both
+
+# ──────────────────────────────────────────────────────────────
+# v2.2.0 Phase 1 — 부족 모듈 보강 (TR/HCM/EWM/CO/PP)
+# 분포 분석으로 TR=9, HCM=13, EWM=13, CO=18을 최우선 보강 대상으로 식별
+# 추가된 T-code는 모두 SAP 보편 표준 (도메인 검증 보수적)
+# ──────────────────────────────────────────────────────────────
+
+# TR (Treasury) 보강
+TBB1:
+  name: Treasury Posting Run
+  modules: [TR]
+  release: both
+TPM10:
+  name: Position Display
+  modules: [TR]
+  release: both
+FF63:
+  name: Memo Record for Cash Position
+  modules: [TR]
+  release: both
+F-58:
+  name: Outgoing Payment with Printout
+  modules: [FI, TR]
+  release: both
+
+# HCM 보강
+PA10:
+  name: Personnel File
+  modules: [HCM]
+  release: both
+PA20:
+  name: Display HR Master Data
+  modules: [HCM]
+  release: both
+PE51:
+  name: HR Form Editor
+  modules: [HCM]
+  release: both
+
+# EWM 보강 (/SCWM/ prefix)
+"/SCWM/PRDI":
+  name: Process Inbound Delivery Notification
+  modules: [EWM]
+  release: both
+"/SCWM/CWM_PHYINV":
+  name: Physical Inventory Document (Catch Weight)
+  modules: [EWM]
+  release: both
+"/SCWM/PI_PREP":
+  name: Physical Inventory Preparation
+  modules: [EWM]
+  release: both
+
+# PP (Production Planning) 보강 — Process Order 시리즈
+CO40:
+  name: Convert Planned Order to Production Order
+  modules: [PP]
+  release: both
+COR1:
+  name: Create Process Order
+  modules: [PP]
+  release: both
+COR2:
+  name: Change Process Order
+  modules: [PP]
+  release: both
+COR3:
+  name: Display Process Order
+  modules: [PP]
+  release: both
+
+# CO (Controlling) 보강
+KOH1:
+  name: Create Order Group
+  modules: [CO]
+  release: both
+KOH2:
+  name: Change Order Group
+  modules: [CO]
+  release: both
+KEKO:
+  name: Display Costing Run
+  modules: [CO]
+  release: both
+KEKD:
+  name: Display Cost Estimate
+  modules: [CO]
+  release: both
+
+# FI 보강 — 누락된 빈출 T-code
+F-43:
+  name: Vendor Invoice (Direct Entry)
+  modules: [FI]
+  release: both
+F-44:
+  name: Vendor Open Item Clearing
+  modules: [FI]
+  release: both
