@@ -1587,3 +1587,39 @@ LS24:
   name: Material Flow System
   modules: [EWM]
   release: both
+
+# ──────────────────────────────────────────────────────────────
+# v2.2.0 Phase 0 backfill — pre-existing 미등록 T-code 정리
+# (SKILL.md 인용은 있었으나 yaml 등록 누락)
+# 후속 phase에서 더 풍부한 도메인 검증 후 적절한 모듈 섹션으로 재배치 예정
+# ──────────────────────────────────────────────────────────────
+CO24:
+  name: Missing Parts Info System
+  modules: [PP, PM]
+  release: both
+IP10N:
+  name: Schedule Maintenance Plans (Mass Processing)
+  modules: [PM]
+  release: both
+MM41:
+  name: Create Article (Retail)
+  modules: [MM]
+  release: both
+  note: Retail-specific (Article Master)
+ME61:
+  name: "Vendor Evaluation: Maintain"
+  modules: [MM]
+  release: both
+QE05N:
+  name: Recording Results for Inspection Points
+  modules: [QM]
+  release: both
+VL0N:
+  name: Outbound Delivery Monitor
+  modules: [SD, LE-SHP]
+  release: both
+SE39:
+  name: Split Screen Editor (deprecated)
+  modules: [ABAP]
+  release: ecc_only
+  note: deprecated in S/4HANA — use SE80/ADT instead

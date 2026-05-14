@@ -72,6 +72,51 @@ declare -A FALSE_POSITIVES=(
   [OT83]=1
   [OX19]=1
   [RM07MDOC]=1
+  # v2.2.0 Phase 0 backfill — 명백한 false positive (SKILL.md inline 식별자/예시)
+  # 카테고리: Fiori business role, 메시지 번호, 범위 표기, 예시 ID, 기술 용어
+  [HTML5]=1
+  [SAP_BR_PLANT_MAINTENANCE]=1
+  [USER_ERROR]=1
+  [PROD-001]=1
+  [MOT-12345]=1
+  [MOT-67890]=1
+  [QA01-QA13]=1
+  [QP01-QP03]=1
+  [F5370]=1
+  [F5434]=1
+  [ZZ_CUSTOM_FIELD]=1
+  [ZZ_APPR_CODE]=1
+  # v2.2.0 Phase 0 backfill — 의심 인용 (Phase 1에서 SKILL.md 검토 후 등록/제거 결정)
+  # TODO(Phase 1): sap-ewm/sap-pm/sap-qm/sap-cloud SKILL.md 컨텍스트 검증 →
+  # 실존하면 tcodes.yaml로 이동, 의사 예시면 SKILL.md fenced code block 처리
+  [MIGO_SAC]=1
+  [WM01]=1
+  [WM02]=1
+  [WM03]=1
+  [WM04]=1
+  [RES01]=1
+  [HU_MAINT]=1
+  [HU_WEIGH]=1
+  [PACK_MONITOR]=1
+  [PI_POST]=1
+  [SHIP_MON]=1
+  [PLAN_ORDER]=1
+  [PM01]=1
+  [PM02]=1
+  [PM03]=1
+  [PM10]=1
+  [ER01]=1
+  [QM04]=1
+  [QM05]=1
+  [QPR1]=1
+  [QPR2]=1
+  [SBCO_APPL_TYPES]=1
+  [LT04]=1
+  [LS0N]=1
+  [LS16]=1
+  [LS20]=1
+  [OB8C]=1
+  [QA25]=1
 )
 
 # 1. 확정 T-code 목록 추출 (YAML 최상위 키)
