@@ -150,4 +150,4 @@ cp country/templates/cvi-template.md country/newcountry.md
 - 언어 오류/부정확: 한국/영문/일문 네이티브 검수 환영
 - 새로운 국가: [신규 국가 추가 템플릿](templates/cvi-template.md) 참조
 
-**All contributors listed in [CONTRIBUTORS.md](/CONTRIBUTORS.md)**
+**All contributors listed in [CONTRIBUTORS.md](../CONTRIBUTORS.md)**
