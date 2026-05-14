@@ -1623,3 +1623,31 @@ SE39:
   modules: [ABAP]
   release: ecc_only
   note: deprecated in S/4HANA — use SE80/ADT instead
+
+# v2.2.0 Phase 1 backfill — SKILL.md 인용 확인 후 등록 (의심 → 실존 확정)
+LT04:
+  name: Generate Transfer Order from Material Document
+  modules: [WM]
+  release: ecc_only
+  note: deprecated in S/4HANA — use EWM /SCWM/PRDI/PRDO
+LS16:
+  name: Stock per Storage Bin
+  modules: [WM]
+  release: ecc_only
+LS20:
+  name: Display Stock Account Movements per Storage Bin
+  modules: [WM]
+  release: ecc_only
+OB8C:
+  name: Define Field Selection Variants for Special G/L Indicator
+  modules: [FI]
+  release: both
+  note: SPRO config T-code (IMG path under FI Special G/L)
+QPR1:
+  name: Sample Drawing — Create
+  modules: [QM]
+  release: both
+QPR2:
+  name: Sample Drawing — Change
+  modules: [QM]
+  release: both

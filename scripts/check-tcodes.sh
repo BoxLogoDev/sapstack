@@ -111,11 +111,9 @@ declare -A FALSE_POSITIVES=(
   [QPR1]=1
   [QPR2]=1
   [SBCO_APPL_TYPES]=1
-  [LT04]=1
+  # LS0N — sap-ewm SKILL: "Unlike WM (LS0N)" — WM 비교 인용, /SCWM/MON 의도일 가능성
+  # TODO(Phase 1 후속): /SCWM/MON 등록 + SKILL.md 표기 일치화
   [LS0N]=1
-  [LS16]=1
-  [LS20]=1
-  [OB8C]=1
   [QA25]=1
 )
 
