@@ -115,6 +115,11 @@ declare -A FALSE_POSITIVES=(
   # TODO(Phase 1 후속): /SCWM/MON 등록 + SKILL.md 표기 일치화
   [LS0N]=1
   [QA25]=1
+  # v2.2.0 Phase 2 — 신규 cloud module 식별자 (T-code 아닌 모듈/Planning Area 이름)
+  [SAP7]=1
+  [SAPIBP1]=1
+  [SAP_DATASPHERE]=1
+  [SAP_ANALYTICS_CLOUD]=1
 )
 
 # 1. 확정 T-code 목록 추출 (YAML 최상위 키)

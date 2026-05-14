@@ -187,6 +187,42 @@
       "compatibility": { "ecc": true, "s4hana": true, "btp": true },
       "stage": "experimental",
       "depends_on": ["sap-fi","sap-co","sap-mm","sap-sd","sap-tr","sap-basis","sap-abap"]
+    },
+    {
+      "id": "sap-ibp",
+      "name": "SAP Integrated Business Planning",
+      "version": "1.0.0",
+      "description": "Demand sensing, S&OP, supply planning, inventory optimization, response & supply, control tower. Cloud-native successor to APO. BTP-deployed.",
+      "path": "plugins/sap-ibp",
+      "keywords": ["IBP","integrated business planning","수요계획","공급계획","S&OP","demand sensing","수요센싱","inventory optimization","재고최적화","response","ATP","Control Tower","APO","planning area","key figure","planning level","Excel UI","BTP planning"],
+      "compatibility": { "ecc": false, "s4hana": true, "btp": true }
+    },
+    {
+      "id": "sap-sac",
+      "name": "SAP Analytics Cloud",
+      "version": "1.0.0",
+      "description": "Cloud BI, Story design, Analytic Applications, Planning models, Smart Predict, BW Bridge, Datasphere connectivity. Cloud-native analytics replacing on-prem BI.",
+      "path": "plugins/sap-sac",
+      "keywords": ["SAC","Analytics Cloud","분석클라우드","Story","Analytic Application","Smart Predict","예측분석","Planning Model","계획모델","BW Bridge","Datasphere","Live Connection","Import Connection"],
+      "compatibility": { "ecc": false, "s4hana": true, "btp": true }
+    },
+    {
+      "id": "sap-ariba",
+      "name": "SAP Ariba",
+      "version": "1.0.0",
+      "description": "Strategic sourcing, contracts, procurement, supplier lifecycle (SLP), spend analysis, Ariba Network. Cloud procurement integrated with S/4 via CIG.",
+      "path": "plugins/sap-ariba",
+      "keywords": ["Ariba","sourcing","소싱","RFx","e-Auction","경쟁입찰","Contracts","계약관리","Procurement","조달","Supplier Lifecycle","SLP","Spend Analysis","지출분석","Ariba Network","ANID","Guided Buying","CIG","Cloud Integration Gateway"],
+      "compatibility": { "ecc": true, "s4hana": true, "btp": true }
+    },
+    {
+      "id": "sap-integration-cloud",
+      "name": "SAP Integration Suite + Datasphere",
+      "version": "1.0.0",
+      "description": "Cloud integration platform — CPI (Cloud Platform Integration) iFlows, API Management, Event Mesh, Open Connectors, Datasphere (data warehouse cloud). PO/PI successor.",
+      "path": "plugins/sap-integration-cloud",
+      "keywords": ["CPI","Cloud Platform Integration","Integration Suite","iFlow","Datasphere","DWC","Data Warehouse Cloud","API Management","Event Mesh","Open Connectors","Cloud Connector","OData","REST","SOAP","IDoc cloud","SuccessFactors integration","HCI","ABAP CDS exposure"],
+      "compatibility": { "ecc": false, "s4hana": true, "btp": true }
     }
   ]
 }
