@@ -1749,3 +1749,124 @@ F-44:
   name: Vendor Open Item Clearing
   modules: [FI]
   release: both
+
+# ─────────────────────────────────────────────────────────
+# v2.3 B3 — 신규 4 클라우드 모듈 연동 T-code
+# IBP/SAC/Ariba/Integration Cloud 는 BTP SaaS 라 자체 SAP GUI
+# T-code 가 없음. 아래는 S/4·ECC 측에서 해당 클라우드와 연동할 때
+# 실제로 사용하는 검증된 통합 T-code (추측 식별자 미포함).
+# ─────────────────────────────────────────────────────────
+
+# Integration Cloud — Web Service / SOA (CPI ↔ S/4 SOAP)
+SOAMANAGER:
+  name: Web Service Configuration (SOA Management)
+  modules: [IC, BC]
+  release: both
+SRT_MONI:
+  name: Web Service Message Monitor
+  modules: [IC, BC]
+  release: both
+SRT_UTIL:
+  name: SOAP Runtime Utility / Trace
+  modules: [IC, BC]
+  release: both
+
+# Integration Cloud — IDoc / EDI (CPI IDoc adapter ↔ S/4)
+WE20:
+  name: Partner Profiles (IDoc)
+  modules: [IC, BC]
+  release: both
+WE21:
+  name: Port Definition (IDoc)
+  modules: [IC, BC]
+  release: both
+IDX1:
+  name: IDoc Adapter Port Maintenance
+  modules: [IC, BC]
+  release: both
+IDX2:
+  name: IDoc Adapter Metadata
+  modules: [IC, BC]
+  release: both
+
+# Integration Cloud — OData / Gateway (Datasphere·SAC consumption)
+SEGW:
+  name: Gateway Service Builder (OData)
+  modules: [IC, BC]
+  release: both
+SICF:
+  name: HTTP Service Hierarchy Maintenance (ICF)
+  modules: [IC, BC]
+  release: both
+SAML2:
+  name: SAML 2.0 Configuration (cloud SSO)
+  modules: [IC, BC]
+  release: both
+
+# Integration Cloud — SLT / Delta Queue (Datasphere replication)
+LTRC:
+  name: SLT Replication Configuration
+  modules: [IC]
+  release: both
+LTRS:
+  name: SLT Advanced Replication Settings
+  modules: [IC]
+  release: both
+ODQMON:
+  name: Operational Delta Queue Monitor
+  modules: [IC, SAC]
+  release: both
+
+# SAC / Datasphere — BW extraction source (Live / Import connection)
+RSA1:
+  name: Data Warehouse Workbench
+  modules: [SAC, IC]
+  release: both
+RSO2:
+  name: Maintain Generic DataSource
+  modules: [SAC, IC]
+  release: both
+RSA5:
+  name: Install Business Content DataSource
+  modules: [SAC, IC]
+  release: both
+RSA6:
+  name: Maintain DataSource (post-install)
+  modules: [SAC, IC]
+  release: both
+RSRT:
+  name: BW Query Monitor (SAC import test)
+  modules: [SAC]
+  release: both
+
+# IBP — S/4 PP integration (PIR / MRP after IBP plan release)
+MD05:
+  name: MRP List — Individual Display
+  modules: [IBP, PP]
+  release: both
+MD63:
+  name: Display Planned Independent Requirements (PIR)
+  modules: [IBP, PP]
+  release: both
+MDBT:
+  name: MRP Run in Background (parallel)
+  modules: [IBP, PP]
+  release: both
+CO41:
+  name: Conversion of Planned Orders (collective)
+  modules: [IBP, PP]
+  release: both
+VFX3:
+  name: Release Billing Documents for Accounting
+  modules: [IBP, SD]
+  release: both
+
+# Ariba — S/4 MM procurement integration (PR-to-PO flow)
+ME2N:
+  name: Purchase Orders by PO Number
+  modules: [Ariba, MM]
+  release: both
+ME59N:
+  name: Automatic Creation of PO from Requisitions
+  modules: [Ariba, MM]
+  release: both
