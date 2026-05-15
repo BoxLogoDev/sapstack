@@ -4,7 +4,7 @@
 
 ### AI-Codierungsassistent für SAP-Unternehmensoperationen
 
-**20 Plugins · 16 Agenten · MCP-Laufzeit · VS Code-Erweiterung · 6 Sprachen · Konformitätsbereit**
+**24 Plugins · 20 Agenten · 22+ Befehle · MCP (npm publish) · VS Code-Erweiterung v0.1 · 8 KI-Tool-Kompatibilität · 6 Länder · 6 Sprachen · Konformitätsbereit**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 

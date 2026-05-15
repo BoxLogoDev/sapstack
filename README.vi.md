@@ -4,7 +4,7 @@
 
 ### Nền tảng SAP Enterprise Operations cho AI Coding Assistants
 
-**20 plugins · 16 agents · MCP runtime · VS Code extension · 6 languages · Compliance ready**
+**24 plugins · 20 agents · 22+ commands · MCP (npm publish) · VS Code extension v0.1 · Tương thích 8 AI tool · 6 quốc gia · 6 ngôn ngữ · Sẵn sàng tuân thủ**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 

@@ -4,7 +4,7 @@
 
 ### AI 编码助手的 SAP 企业运营平台
 
-**20 个插件 · 16 个代理 · MCP 运行时 · VS Code 扩展 · 6 种语言 · 合规就绪**
+**24 个插件 · 20 个代理 · 22+ 个命令 · MCP (npm 发布) · VS Code 扩展 v0.1 · 兼容 8 个 AI 工具 · 6 个国家 · 6 种语言 · 合规就绪**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 

@@ -2,7 +2,7 @@
   "name": "sapstack-vscode",
   "displayName": "sapstack for VS Code",
   "description": "SAP operations advisory — Evidence Loop session manager + 14 modules, 9 agents, 10+ commands",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "publisher": "BoxLogoDev",
   "license": "MIT",
   "repository": {

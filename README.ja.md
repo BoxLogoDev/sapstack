@@ -4,7 +4,7 @@
 
 ### AI コーディング アシスタント向け SAP 企業運用プラットフォーム
 
-**20 プラグイン · 16 エージェント · MCP ランタイム · VS Code 拡張 · 6 言語 · コンプライアンス対応**
+**24 プラグイン · 20 エージェント · 22+ コマンド · MCP (npm 公開) · VS Code 拡張 v0.1 · 8 AI ツール対応 · 6 か国 · 6 言語 · コンプライアンス対応**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 
