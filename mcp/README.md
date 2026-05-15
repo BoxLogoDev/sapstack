@@ -13,7 +13,32 @@ All write-path tools fully implemented and tested:
 - **Validation**: Ajv-based schema validation on all write operations
 - **State machine**: intake → hypothesizing → awaiting_evidence → verifying → resolved
 
-## Installation & Build
+## Installation
+
+### Option A — One-line installer (recommended)
+
+The installer registers sapstack-mcp in Claude Desktop automatically.
+
+```bash
+# macOS / Linux
+bash scripts/install-claude-desktop.sh
+
+# Windows (PowerShell)
+powershell -ExecutionPolicy Bypass -File scripts\install-claude-desktop.ps1
+```
+
+After installation, restart Claude Desktop. The installer registers a `npx @boxlogodev/sapstack-mcp@latest` invocation, so npm fetches the latest published version on first launch.
+
+Use `--dry-run` (or `-DryRun` on PowerShell) to preview, `--uninstall` to remove.
+
+### Option B — npm global install
+
+```bash
+npm install -g @boxlogodev/sapstack-mcp
+# then add { "command": "sapstack-mcp" } to claude_desktop_config.json mcpServers
+```
+
+### Option C — Build from source (development)
 
 ```bash
 cd mcp

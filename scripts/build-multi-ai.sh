@@ -114,6 +114,9 @@ COMPAT_FILES=(
   ".cursor/rules/sapstack.mdc"
   ".continue/config.yaml"
   "CONVENTIONS.md"
+  ".cody/rules.md"
+  ".windsurfrules"
+  ".idea/sapstack-prompt.md"
 )
 
 MISSING=0
