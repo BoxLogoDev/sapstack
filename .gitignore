@@ -55,3 +55,6 @@ scripts/add_translations.py
 
 # npm pack 산출물 (release.yml 의 'Pack MCP tarball' step 에서 생성, asset 으로만 사용)
 mcp/*.tgz
+
+# mcp 테스트가 생성하는 세션 디렉토리
+mcp/.sapstack/

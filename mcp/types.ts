@@ -431,6 +431,19 @@ export interface FindSapNoteByModuleArgs {
   max?: number;
 }
 
+// v2.3 C2 — new read-only tools
+export interface FindImgNodeByKeywordArgs {
+  keyword: string;
+}
+
+export interface SymptomToAgentAutoArgs {
+  symptom: string;
+}
+
+export interface SapNoteStepsArgs {
+  note_id: string;
+}
+
 export interface FollowupCheckItem {
   check_id?: string;
   purpose: string;

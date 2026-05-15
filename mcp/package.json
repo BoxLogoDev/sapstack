@@ -11,8 +11,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "cli": "node dist/cli.js",
-    "dev": "node --loader tsx server.ts",
-    "test": "node --loader tsx tests/write-path.test.ts",
+    "dev": "tsx server.ts",
+    "test": "tsx tests/write-path.test.ts",
     "clean": "rimraf dist"
   },
   "keywords": [

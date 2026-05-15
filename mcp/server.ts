@@ -622,6 +622,113 @@ async function listBestPractices(args: { module?: string; tier?: string }) {
   };
 }
 
+// ─────────────────────────────────────────────────────────────
+// New read-only tools (v2.3 C2)
+// ─────────────────────────────────────────────────────────────
+
+// IMG 가이드들의 SPRO/cockpit 경로·본문에서 키워드 매칭
+async function findImgNodeByKeyword(args: { keyword: string }) {
+  const kw = (args.keyword || "").toLowerCase();
+  if (!kw) return { keyword: args.keyword, count: 0, matches: [] };
+  const plugins = await listDir(PLUGINS_DIR).catch(() => [] as string[]);
+  const matches: any[] = [];
+  for (const p of plugins) {
+    if (!p.startsWith("sap-")) continue;
+    const imgDir = path.join(PLUGINS_DIR, p, "skills", p, "references", "img");
+    let files: string[] = [];
+    try { files = await listDir(imgDir); } catch { continue; }
+    for (const f of files) {
+      if (!f.endsWith(".md")) continue;
+      let text = "";
+      try { text = await readFileSafe(path.join(imgDir, f)); } catch { continue; }
+      if (!text.toLowerCase().includes(kw)) continue;
+      const lines = text.split(/\r?\n/);
+      const matched_lines = lines.filter((l) => l.toLowerCase().includes(kw)).slice(0, 5);
+      const spro_paths = lines.filter((l) => l.includes("SPRO")).slice(0, 3);
+      matches.push({
+        module: p,
+        file: f,
+        path: `plugins/${p}/skills/${p}/references/img/${f}`,
+        matched_lines,
+        spro_paths,
+      });
+    }
+  }
+  return { keyword: args.keyword, count: matches.length, matches: matches.slice(0, 20) };
+}
+
+// 자연어 증상 → likely_modules → 추천 consultant agent 자동 라우팅
+async function symptomToAgentAuto(args: { symptom: string }) {
+  const idx = await loadYaml<{ symptoms: any[] }>(path.join(DATA_DIR, "symptom-index.yaml"));
+  const q = (args.symptom || "").toLowerCase();
+  const tokens = q.split(/\s+/).filter(Boolean);
+  const scored = (idx.symptoms || [])
+    .map((s: any) => {
+      const hay = JSON.stringify(s).toLowerCase();
+      let score = 0;
+      for (const t of tokens) if (hay.includes(t)) score++;
+      return { s, score };
+    })
+    .filter((x: any) => x.score > 0)
+    .sort((a: any, b: any) => b.score - a.score)
+    .slice(0, 3);
+
+  const agentFiles = (await listDir(path.join(SAPSTACK_ROOT, "agents")).catch(() => [] as string[]))
+    .filter((a) => a.endsWith(".md"));
+
+  const matches = scored.map(({ s, score }: any) => {
+    const mods: string[] = s.likely_modules || [];
+    const recommended_agents = [
+      ...new Set(
+        mods.flatMap((m: string) => {
+          const ml = m.toLowerCase();
+          return agentFiles
+            .filter((a) => a.includes(`sap-${ml}-`) || a.includes(`-${ml}-`))
+            .map((a) => a.replace(/\.md$/, ""));
+        })
+      ),
+    ];
+    return {
+      symptom_id: s.id,
+      score,
+      likely_modules: mods,
+      recommended_agents,
+      first_check_tcodes: s.first_check_tcodes || [],
+    };
+  });
+  return { query: args.symptom, match_count: matches.length, matches };
+}
+
+// SAP Note 메타 + symptom-index 역참조 진단 단계 조합
+// (sap-notes.yaml 은 설계상 포인터만 — 본문은 SAP Portal URL)
+async function sapNoteSteps(args: { note_id: string }) {
+  const notes = await loadYaml<{ notes: any[] }>(path.join(DATA_DIR, "sap-notes.yaml"));
+  const note = (notes.notes || []).find((n: any) => String(n.id) === String(args.note_id));
+  if (!note) {
+    return {
+      note_id: args.note_id,
+      found: false,
+      message: "Note not registered in sapstack pointer dataset (verify on SAP Support Portal)",
+    };
+  }
+  const idx = await loadYaml<{ symptoms: any[] }>(path.join(DATA_DIR, "symptom-index.yaml"));
+  const related = (idx.symptoms || []).filter((s: any) =>
+    (s.related_sap_notes || []).map(String).includes(String(args.note_id))
+  );
+  const diagnostic_steps = related.flatMap((s: any) => [
+    ...(s.typical_causes || []).map((c: string) => ({ from: s.id, type: "likely_cause", detail: c })),
+    ...(s.evidence_needed || []).map((e: any) => ({ from: s.id, type: "evidence", detail: e })),
+  ]);
+  return {
+    note_id: args.note_id,
+    found: true,
+    note,
+    note_body: "SAP Note 본문은 SAP Support Portal URL 에서 확인 (sapstack 은 검증된 포인터만 제공)",
+    related_symptom_count: related.length,
+    diagnostic_steps,
+  };
+}
+
 async function getMasterDataRules(args: { master_type: string }) {
   const masterType = (args.master_type || "").toLowerCase().replace(/_/g, "-");
 
@@ -1459,6 +1566,11 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       case "add_followup_request": result = await addFollowupRequest(args as any); break;
       case "submit_hypothesis":    result = await submitHypothesis(args as any); break;
       case "submit_verdict":       result = await submitVerdict(args as any); break;
+
+      // New read-only tools (v2.3 C2)
+      case "find_img_node_by_keyword": result = await findImgNodeByKeyword(args as any); break;
+      case "symptom_to_agent_auto":    result = await symptomToAgentAuto(args as any); break;
+      case "sap_note_steps":           result = await sapNoteSteps(args as any); break;
 
       default:
         throw new Error(`Unknown tool: ${name}`);
