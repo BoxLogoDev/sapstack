@@ -1511,27 +1511,716 @@ symptoms:
     severity: high
     recurrence: occasional
 
+  # ═══════════════════════════════════════════════
+  # SAP IBP — Integrated Business Planning (5건, v2.3 B4)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-ibp-forecast-not-generated
+    symptom_ko: "IBP 통계 예측을 돌렸는데 결과가 안 나와요 (Forecast 비어있음)"
+    symptom_ko_variants:
+      - "IBP Demand 예측값 0"
+      - "포캐스트 모델 실행했는데 결과 없음"
+      - "수요계획 예측 안 잡혀요"
+    symptom_en: "IBP statistical forecast run produces no output"
+    likely_modules: [IBP]
+    first_check_tcodes: []
+    typical_causes:
+      - "Forecast Model에 알고리즘/파라미터 미정의 (Planning Area Configuration)"
+      - "히스토리 데이터 부족 — 최소 시계열 길이 미달"
+      - "Product/Location 마스터 매핑 누락 — 입력 키 figure가 비어있음"
+      - "Planning Run이 잘못된 버전/시나리오 대상으로 실행됨"
+    evidence_needed:
+      - { type: screenshot, target: "Application Job Monitor — forecast run log", priority: critical }
+      - { type: screenshot, target: "Planning Area Configuration — Forecast Model", priority: high }
+      - { type: data_export, target: "input key figure sample (history)", priority: high }
+    localized_checks:
+      kr:
+        - "추석/설 음력 이벤트가 Time Event Master에 등록됐는지"
+        - "신제품(NPI) lifecycle이 history 부족 모델로 자동 fallback되는지"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-ibp-excel-addin-slow
+    symptom_ko: "IBP Excel Add-In이 너무 느려요 (Planning View 새로고침 지연)"
+    symptom_ko_variants:
+      - "엑셀 플래닝 뷰 멈춤"
+      - "IBP 엑셀 refresh 오래 걸림"
+    symptom_en: "IBP Excel Add-In Planning View is extremely slow to refresh"
+    likely_modules: [IBP]
+    first_check_tcodes: []
+    typical_causes:
+      - "Planning View가 너무 큼 — 권장 10K cells 초과"
+      - "동시 접속 planner 과다 — 테넌트 부하"
+      - "필터 미설정으로 전체 Planning Area scope 로드"
+      - "Add-In 버전이 IBP 릴리스와 불일치"
+    evidence_needed:
+      - { type: screenshot, target: "Planning View definition (rows×cols)", priority: critical }
+      - { type: screenshot, target: "IBP Excel Add-In version vs IBP release", priority: high }
+    localized_checks:
+      kr:
+        - "다국가 모델(한국+베트남/중국)에서 location 전체 로드 여부"
+    severity: medium
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-ibp-cpi-integration-fail
+    symptom_ko: "IBP-S/4 CPI 연동이 실패해요 (마스터/트랜잭션 미동기)"
+    symptom_ko_variants:
+      - "IBP CPI 메시지 에러"
+      - "S/4에서 IBP로 데이터 안 넘어감"
+    symptom_en: "IBP ↔ S/4 CPI integration fails with message mapping error"
+    likely_modules: [IBP, IC]
+    first_check_tcodes: [SXMB_MONI, SRT_MONI]
+    typical_causes:
+      - "CPI iFlow 메시지 매핑 오류 — S/4 마스터 변경 후 ID mismatch"
+      - "IBP Configuration의 External Codes 매핑 불일치"
+      - "Cloud Connector 또는 CPI tenant 인증 만료"
+      - "S/4 측 OData/SOAP 서비스 비활성"
+    evidence_needed:
+      - { type: transaction_log, target: "CPI tenant — Monitor → Messages (error)", priority: critical }
+      - { type: screenshot, target: "IBP Configuration — External Codes", priority: high }
+    localized_checks:
+      kr:
+        - "한국 자회사 통화/이전가 필드가 매핑에 포함됐는지"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-ibp-pir-not-in-s4-mrp
+    symptom_ko: "IBP에서 PIR 릴리스했는데 S/4 MRP에 안 보여요"
+    symptom_ko_variants:
+      - "IBP 수요계획이 S/4 PP로 안 넘어옴"
+      - "PIR 릴리스 후 MD63에 데이터 없음"
+    symptom_en: "PIR released from IBP does not appear in S/4 MRP"
+    likely_modules: [IBP, PP]
+    first_check_tcodes: [MD63, MD05, MDBT, MD04]
+    typical_causes:
+      - "IBP Application Job(PIR 릴리스)이 실패 또는 미완료"
+      - "S/4 측 requirements type/version이 IBP 릴리스 타깃과 불일치"
+      - "CPI 연동 단에서 PIR 메시지 drop"
+      - "MRP가 아직 실행 안 됨 (MDBT 백그라운드 미스케줄)"
+    evidence_needed:
+      - { type: screenshot, target: "IBP Application Job — PIR release status", priority: critical }
+      - { type: transaction_log, target: "MD63 PIR display for material", priority: critical }
+      - { type: transaction_log, target: "MD04 stock/requirements list", priority: high }
+    localized_checks:
+      kr:
+        - "신차/신모델 부품 PIR이 협력사 알림 타이밍에 맞게 릴리스됐는지"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-ibp-supply-heuristic-mismatch
+    symptom_ko: "IBP Supply 휴리스틱 결과가 예상과 달라요 (공급계획 불일치)"
+    symptom_ko_variants:
+      - "공급계획 수량 이상함"
+      - "Supply heuristic vs optimizer 결과 차이"
+    symptom_en: "IBP Supply heuristic produces unexpected planning results"
+    likely_modules: [IBP]
+    first_check_tcodes: []
+    typical_causes:
+      - "Lead time/lot size 마스터가 S/4와 불일치"
+      - "BOM/source of supply 매핑 오류 (multi-level)"
+      - "Capacity/constraint 설정 누락으로 무한 공급 가정"
+      - "휴리스틱 vs 옵티마이저 프로파일 선택 오류"
+    evidence_needed:
+      - { type: data_export, target: "supply planning input (lead time, lot size)", priority: critical }
+      - { type: screenshot, target: "source of supply / BOM mapping", priority: high }
+    localized_checks:
+      kr:
+        - "원자재 수입 의존 품목의 lead time 환율 시나리오 반영 여부"
+    severity: medium
+    recurrence: occasional
+    related_sap_notes: []
+
+  # ═══════════════════════════════════════════════
+  # SAP SAC — SAP Analytics Cloud (5건, v2.3 B4)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-sac-live-connection-fail
+    symptom_ko: "SAC Story가 데이터 새로고침에 실패해요 (Live Connection 오류)"
+    symptom_ko_variants:
+      - "SAC 스토리 데이터 안 나옴"
+      - "라이브 커넥션 끊김"
+      - "SAC에서 S/4 데이터 로드 실패"
+    symptom_en: "SAC Story fails to refresh — Live Connection error"
+    likely_modules: [SAC, IC]
+    first_check_tcodes: [SICF, SAML2]
+    typical_causes:
+      - "S/4/BW 측 OData/InA 서비스 비활성 (SICF 노드 inactive)"
+      - "CORS 화이트리스트에 SAC 테넌트 URL 미등록"
+      - "SAML2 SSO 인증서 만료 또는 IdP trust 불일치"
+      - "Live connection 사용자 권한(analytic privilege) 부족"
+    evidence_needed:
+      - { type: screenshot, target: "SAC connection test result", priority: critical }
+      - { type: transaction_log, target: "SICF service node status", priority: high }
+      - { type: screenshot, target: "SAML2 certificate validity", priority: high }
+    localized_checks:
+      kr:
+        - "한국 리전 SAC 테넌트와 S/4 데이터센터 간 네트워크 경로 확인"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-sac-import-schedule-fail
+    symptom_ko: "SAC Import Connection 스케줄이 자꾸 실패해요"
+    symptom_ko_variants:
+      - "SAC 데이터 임포트 스케줄 에러"
+      - "예약 새로고침 실패"
+    symptom_en: "SAC Import Connection scheduled refresh keeps failing"
+    likely_modules: [SAC, IC]
+    first_check_tcodes: [RSA1, RSRT]
+    typical_causes:
+      - "Data Provisioning Agent(DPA) 다운 또는 버전 불일치"
+      - "소스 BW query/CDS view 변경으로 매핑 깨짐"
+      - "스케줄 윈도가 소스 시스템 배치와 충돌"
+      - "Import 데이터 볼륨이 테넌트 한도 초과"
+    evidence_needed:
+      - { type: screenshot, target: "SAC schedule status / error detail", priority: critical }
+      - { type: transaction_log, target: "DPA agent log", priority: high }
+    localized_checks:
+      kr:
+        - "월마감 배치 시간대와 SAC import 스케줄 겹침 여부"
+    severity: medium
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-sac-predictive-inaccurate
+    symptom_ko: "SAC Smart Predict 예측 정확도가 너무 낮아요"
+    symptom_ko_variants:
+      - "Predictive scenario 결과 신뢰 안 됨"
+      - "SAC 예측 모델 품질 낮음"
+    symptom_en: "SAC Smart Predict scenario produces low-accuracy predictions"
+    likely_modules: [SAC]
+    first_check_tcodes: []
+    typical_causes:
+      - "Training dataset 기간 부족 또는 outlier 미처리"
+      - "Influencer(설명변수) 선택 부적절 — 누수 변수 포함"
+      - "타깃 변수 분포 불균형 (분류 시나리오)"
+      - "데이터 갱신 후 모델 재학습 미수행"
+    evidence_needed:
+      - { type: screenshot, target: "Smart Predict — model performance / debrief", priority: critical }
+      - { type: data_export, target: "training dataset sample + influencers", priority: high }
+    localized_checks:
+      kr:
+        - "추석/설 시즌성이 influencer로 반영됐는지"
+    severity: medium
+    recurrence: occasional
+    related_sap_notes: []
+
+  - id: sym-sac-planning-version-lock
+    symptom_ko: "SAC Planning model에 데이터 입력이 잠겨있어요 (version locked)"
+    symptom_ko_variants:
+      - "SAC 플래닝 입력 안 됨"
+      - "버전 잠금으로 셀 수정 불가"
+    symptom_en: "SAC Planning model data entry is locked (version locked)"
+    likely_modules: [SAC]
+    first_check_tcodes: []
+    typical_causes:
+      - "Public version이 잠금 상태 — private version으로 작업 필요"
+      - "Data locking task가 해당 영역을 lock"
+      - "사용자에게 planning model write 권한 없음"
+      - "Data Action 실행 중 동시 편집 충돌"
+    evidence_needed:
+      - { type: screenshot, target: "version management — lock status", priority: critical }
+      - { type: screenshot, target: "data locking task scope", priority: high }
+    localized_checks:
+      kr:
+        - "본사/자회사 분리 버전에서 권한 경계 확인"
+    severity: medium
+    recurrence: occasional
+    related_sap_notes: []
+
+  - id: sym-sac-story-performance
+    symptom_ko: "SAC Story 로딩이 너무 느려요 (대시보드 지연)"
+    symptom_ko_variants:
+      - "SAC 대시보드 느림"
+      - "스토리 위젯 렌더 지연"
+    symptom_en: "SAC Story / dashboard loads very slowly"
+    likely_modules: [SAC]
+    first_check_tcodes: [RSRT]
+    typical_causes:
+      - "Live connection에서 대량 행 fetch — 집계 미적용"
+      - "위젯이 너무 많음 / 페이지당 쿼리 과다"
+      - "소스 BW query/CDS view 미최적화 (no aggregation)"
+      - "Unbooked data / 복잡한 calculation 다수"
+    evidence_needed:
+      - { type: screenshot, target: "SAC story — number of widgets / queries", priority: high }
+      - { type: transaction_log, target: "RSRT query runtime (source)", priority: high }
+    localized_checks:
+      kr:
+        - "한국 리전 ↔ 글로벌 소스 latency 영향 확인"
+    severity: medium
+    recurrence: frequent
+    related_sap_notes: []
+
+  # ═══════════════════════════════════════════════
+  # SAP Ariba — Procurement Cloud (5건, v2.3 B4)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-ariba-supplier-no-rfx
+    symptom_ko: "공급사가 Ariba RFx를 못 받았다고 해요"
+    symptom_ko_variants:
+      - "공급사 입찰 초대 못 받음"
+      - "RFx 발송했는데 공급사 안 보임"
+    symptom_en: "Supplier did not receive the Ariba RFx invitation"
+    likely_modules: [Ariba]
+    first_check_tcodes: []
+    typical_causes:
+      - "공급사 ANID(Ariba Network ID) 미등록 또는 onboarding 미완료"
+      - "초대 이메일이 공급사 스팸 폴더로 분류"
+      - "Trading Relationship 미수립 (buyer-supplier)"
+      - "공급사 Network 계정 비활성/만료"
+    evidence_needed:
+      - { type: screenshot, target: "Ariba sourcing event — invited supplier status", priority: critical }
+      - { type: screenshot, target: "supplier ANID / Trading Relationship", priority: high }
+    localized_checks:
+      kr:
+        - "국내 공급사 Network 가입률 낮음 — 단계적 onboarding 진행 여부"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-ariba-pr-not-approved
+    symptom_ko: "Ariba에서 PR이 승인 단계에서 멈춰있어요"
+    symptom_ko_variants:
+      - "구매요청 승인 안 됨"
+      - "PR approver 안 넘어감"
+    symptom_en: "Ariba purchase requisition stuck in approval"
+    likely_modules: [Ariba]
+    first_check_tcodes: []
+    typical_causes:
+      - "Approver delegation 미설정 (휴가/부재 시)"
+      - "조직 변경 후 approver가 자동 갱신 안 됨"
+      - "Approval rule의 금액 임계/카테고리 조건 불일치"
+      - "Approver 계정 비활성"
+    evidence_needed:
+      - { type: screenshot, target: "PR approval flow — current node", priority: critical }
+      - { type: screenshot, target: "approval rule / delegation config", priority: high }
+    localized_checks:
+      kr:
+        - "한국 결재선(전결규정) 매핑이 Ariba approval rule에 반영됐는지"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-ariba-po-not-sent
+    symptom_ko: "Ariba PO가 공급사에게 전송이 안 돼요"
+    symptom_ko_variants:
+      - "PO 공급사 미수신"
+      - "발주서 Network 전송 실패"
+    symptom_en: "Ariba PO is not transmitted to the supplier"
+    likely_modules: [Ariba, IC]
+    first_check_tcodes: [SLG1, ME2N]
+    typical_causes:
+      - "공급사 Trading Relationship 미수립 또는 Network 미등록"
+      - "전송 방식(Network/Email/cXML) 설정 불일치"
+      - "CIG(Cloud Integration Gateway) 메시지 큐 적체/에러"
+      - "PO 문서에 필수 필드(공급사 part number 등) 누락"
+    evidence_needed:
+      - { type: transaction_log, target: "CIG monitor — message status", priority: critical }
+      - { type: transaction_log, target: "S/4 SLG1 — CIG namespace log", priority: high }
+      - { type: screenshot, target: "supplier Trading Relationship status", priority: high }
+    localized_checks:
+      kr:
+        - "국내 공급사 이메일 전송 폴백 설정 여부"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-ariba-invoice-mismatch
+    symptom_ko: "Ariba Invoice가 PO/GR과 mismatch 나요 (3-way match 실패)"
+    symptom_ko_variants:
+      - "송장 매칭 불일치"
+      - "Invoice exception 발생"
+    symptom_en: "Ariba invoice fails 3-way match (PO-GR-Invoice)"
+    likely_modules: [Ariba, MM, FI]
+    first_check_tcodes: [MIRO, ME2N]
+    typical_causes:
+      - "수량/단가 PO 대비 tolerance 초과"
+      - "GR 미입력 또는 부분 입고 상태"
+      - "부가세 코드 mapping 불일치 (한국 V0~V9 ↔ Ariba)"
+      - "외화 청구서 환율 차이"
+    evidence_needed:
+      - { type: screenshot, target: "Ariba invoice exception detail", priority: critical }
+      - { type: transaction_log, target: "S/4 MIRO 3-way match result", priority: critical }
+    localized_checks:
+      kr:
+        - "한국 부가세 코드 V0~V9 ↔ Ariba tax mapping 테이블 확인"
+        - "전자세금계산서 승인번호와 Ariba invoice 매칭"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-ariba-cig-message-fail
+    symptom_ko: "Ariba-S/4 CIG 연동 메시지가 실패해요"
+    symptom_ko_variants:
+      - "CIG 메시지 에러"
+      - "Ariba 통합 worker 끊김"
+    symptom_en: "Ariba ↔ S/4 CIG integration messages fail"
+    likely_modules: [Ariba, IC]
+    first_check_tcodes: [SLG1, SXMB_MONI]
+    typical_causes:
+      - "ERP Integration Add-on for Ariba 비활성 또는 버전 불일치"
+      - "CIG Worker(Cloud Connector) DOWN — GREEN 아님"
+      - "Ariba Realm 설정 오류 (test/prod 혼선)"
+      - "Material/Vendor/PR/PO 메시지 매핑 누락"
+    evidence_needed:
+      - { type: screenshot, target: "CIG Worker / Cloud Connector status", priority: critical }
+      - { type: transaction_log, target: "CIG monitor — message status breakdown", priority: critical }
+      - { type: transaction_log, target: "S/4 SLG1 — CIG application log", priority: high }
+    localized_checks:
+      kr:
+        - "사업자등록번호 사용자정의 필드가 CIG 매핑에 포함됐는지"
+    severity: high
+    recurrence: occasional
+    related_sap_notes: []
+
+  # ═══════════════════════════════════════════════
+  # SAP Integration Cloud — CPI / Datasphere (5건, v2.3 B4)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-ic-cpi-iflow-message-fail
+    symptom_ko: "CPI iFlow에서 메시지가 자꾸 실패해요"
+    symptom_ko_variants:
+      - "Cloud Integration 메시지 에러"
+      - "iFlow 매핑 실패"
+      - "CPI 메시지 retry 무한반복"
+    symptom_en: "CPI iFlow messages keep failing (mapping/adapter error)"
+    likely_modules: [IC]
+    first_check_tcodes: [SXMB_MONI, SRT_MONI]
+    typical_causes:
+      - "Message/Value Mapping 오류 — 소스 구조 변경 후 미반영"
+      - "Adapter 인증(credential/OAuth) 만료"
+      - "Payload 스키마 검증 실패 (XSD/JSON schema)"
+      - "Exception subprocess 미정의로 에러 메시지 적체"
+    evidence_needed:
+      - { type: transaction_log, target: "CPI Monitor — Message Processing (failed)", priority: critical }
+      - { type: screenshot, target: "iFlow message mapping definition", priority: high }
+      - { type: transaction_log, target: "S/4 SXMB_MONI (if SOAP/IDoc leg)", priority: medium }
+    localized_checks:
+      kr:
+        - "한국 PG사(토스페이/KG이니시스) 연동 iFlow의 인증서 만료 여부"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-ic-datasphere-replication-fail
+    symptom_ko: "Datasphere Replication Flow가 실패/지연돼요"
+    symptom_ko_variants:
+      - "데이터스피어 복제 안 됨"
+      - "SLT 리플리케이션 멈춤"
+      - "delta queue 적체"
+    symptom_en: "Datasphere Replication Flow fails or lags (SLT/delta queue)"
+    likely_modules: [IC, SAC]
+    first_check_tcodes: [LTRC, LTRS, ODQMON]
+    typical_causes:
+      - "SLT 마이그레이션 서버 부하 또는 job 중단 (LTRC)"
+      - "Operational Delta Queue 적체 — 소비자 미동작 (ODQMON)"
+      - "소스 테이블 구조 변경으로 매핑 깨짐"
+      - "LTRS 고급 설정의 reading type/parallel 미튜닝"
+    evidence_needed:
+      - { type: transaction_log, target: "LTRC replication status / job log", priority: critical }
+      - { type: transaction_log, target: "ODQMON delta queue backlog", priority: critical }
+      - { type: screenshot, target: "Datasphere replication flow monitor", priority: high }
+    localized_checks:
+      kr:
+        - "한국 데이터 레지던시 요건상 소스 컬럼 마스킹 적용 여부"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-ic-cloud-connector-down
+    symptom_ko: "Cloud Connector 연결이 끊겨서 온프레미스 연동이 안 돼요"
+    symptom_ko_variants:
+      - "클라우드 커넥터 다운"
+      - "BTP에서 온프레 시스템 접근 불가"
+    symptom_en: "Cloud Connector is down — on-premise connectivity broken"
+    likely_modules: [IC]
+    first_check_tcodes: [SICF, SM59]
+    typical_causes:
+      - "Cloud Connector 서비스 중단 또는 subaccount 연결 해제"
+      - "Access Control에 백엔드 호스트/경로 미등록"
+      - "S/4 측 ICF 서비스(SICF) 노드 inactive"
+      - "방화벽/인증서 만료로 터널 재수립 실패"
+    evidence_needed:
+      - { type: screenshot, target: "Cloud Connector admin — connection state", priority: critical }
+      - { type: screenshot, target: "Cloud Connector Access Control entries", priority: high }
+      - { type: transaction_log, target: "S/4 SICF node status", priority: high }
+    localized_checks:
+      kr:
+        - "한국 망분리 환경에서 DMZ 경유 터널 정책 확인"
+    severity: high
+    recurrence: occasional
+    related_sap_notes: []
+
+  - id: sym-ic-odata-auth-expired
+    symptom_ko: "OData/SOAP 서비스 인증이 만료돼서 연동이 401 나요"
+    symptom_ko_variants:
+      - "OData 401 Unauthorized"
+      - "SOAP 서비스 인증 실패"
+      - "토큰 만료 연동 끊김"
+    symptom_en: "OData/SOAP service auth expired — integration returns 401"
+    likely_modules: [IC]
+    first_check_tcodes: [SOAMANAGER, SICF, SAML2]
+    typical_causes:
+      - "OAuth client secret/certificate 만료"
+      - "SOAMANAGER 측 binding의 인증 방식 불일치"
+      - "Communication user 잠금/비밀번호 만료"
+      - "SAML2 trust 인증서 rotation 미반영"
+    evidence_needed:
+      - { type: transaction_log, target: "S/4 SOAMANAGER — service binding auth", priority: critical }
+      - { type: screenshot, target: "SAML2 / OAuth certificate validity", priority: high }
+      - { type: transaction_log, target: "SICF error log (401 entries)", priority: high }
+    localized_checks:
+      kr:
+        - "한국 인증서(공인/사설) 갱신 주기와 연동 인증서 동기화 여부"
+    severity: high
+    recurrence: occasional
+    related_sap_notes: []
+
+  - id: sym-ic-idoc-adapter-stuck
+    symptom_ko: "CPI IDoc 어댑터 메시지가 처리 안 되고 쌓여요"
+    symptom_ko_variants:
+      - "IDoc 어댑터 멈춤"
+      - "IDoc 메시지 적체"
+      - "WE20 파트너 프로파일 에러"
+    symptom_en: "CPI IDoc adapter messages stuck / piling up"
+    likely_modules: [IC]
+    first_check_tcodes: [WE20, WE21, IDX1, IDX2]
+    typical_causes:
+      - "Partner Profile(WE20) 인바운드/아웃바운드 파라미터 누락"
+      - "Port(WE21)/IDX1 RFC destination 비정상"
+      - "IDX2 메타데이터 미등록으로 변환 실패"
+      - "tRFC/qRFC 큐 락 또는 적체"
+    evidence_needed:
+      - { type: transaction_log, target: "WE20 partner profile config", priority: critical }
+      - { type: transaction_log, target: "IDX1/IDX2 port & metadata", priority: high }
+      - { type: transaction_log, target: "CPI IDoc adapter channel status", priority: high }
+    localized_checks:
+      kr:
+        - "한국 EDI(전자문서) 사업자와의 IDoc 포맷 합의 버전 확인"
+    severity: medium
+    recurrence: occasional
+    related_sap_notes: []
+
+  # ═══════════════════════════════════════════════
+  # v2.3 B4 — 부족 모듈 보강 (BTP/ABAP/EWM/WM, likely_modules 5+ 보장)
+  # ═══════════════════════════════════════════════
+
+  - id: sym-btp-xsuaa-role-missing
+    symptom_ko: "BTP 앱 접근 시 권한 없음 — XSUAA role-collection 미할당"
+    symptom_ko_variants:
+      - "BTP 앱 403 Forbidden"
+      - "role collection 매핑 안 됨"
+    symptom_en: "BTP app access denied — XSUAA role-collection not assigned"
+    likely_modules: [BTP]
+    first_check_tcodes: []
+    typical_causes:
+      - "사용자에게 role-collection 미할당 (BTP cockpit → Security)"
+      - "xs-security.json scope/role-template 변경 후 재배포 누락"
+      - "IdP(SAML/OIDC) 그룹 ↔ role-collection 매핑 불일치"
+      - "subaccount/space 권한 경계 오류"
+    evidence_needed:
+      - { type: screenshot, target: "BTP cockpit — user role-collection assignment", priority: critical }
+      - { type: screenshot, target: "xs-security.json scopes/role-templates", priority: high }
+    localized_checks:
+      kr:
+        - "카카오/네이버 커스텀 IdP 그룹 매핑 반영 여부"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-btp-destination-fail
+    symptom_ko: "BTP Destination으로 백엔드 호출이 실패해요"
+    symptom_ko_variants:
+      - "Destination service 연결 실패"
+      - "BTP에서 S/4 호출 안 됨"
+    symptom_en: "BTP Destination service call to backend fails"
+    likely_modules: [BTP, IC]
+    first_check_tcodes: [SICF, SM59]
+    typical_causes:
+      - "Destination 설정의 URL/인증 타입 오류"
+      - "Cloud Connector location ID 불일치"
+      - "백엔드 ICF 서비스(SICF) inactive"
+      - "토큰/인증서 만료"
+    evidence_needed:
+      - { type: screenshot, target: "BTP Destination — check connection result", priority: critical }
+      - { type: screenshot, target: "Cloud Connector mapping / location ID", priority: high }
+    localized_checks:
+      kr:
+        - "한국 망분리 DMZ 경유 시 location ID 분리 확인"
+    severity: high
+    recurrence: frequent
+    related_sap_notes: []
+
+  - id: sym-btp-cap-deploy-fail
+    symptom_ko: "BTP CAP 앱 배포가 실패해요 (cf push / mta deploy)"
+    symptom_ko_variants:
+      - "CAP 배포 에러"
+      - "mtar deploy 실패"
+    symptom_en: "BTP CAP application deployment fails (cf push / mta deploy)"
+    likely_modules: [BTP]
+    first_check_tcodes: []
+    typical_causes:
+      - "service binding 누락 (HANA/XSUAA/destination)"
+      - "mta.yaml resource/requires 정의 오류"
+      - "quota(메모리/디스크) 초과"
+      - "HDI container 마이그레이션 실패 (db deploy)"
+    evidence_needed:
+      - { type: transaction_log, target: "cf logs / mta deploy log", priority: critical }
+      - { type: screenshot, target: "mta.yaml resources & bindings", priority: high }
+    localized_checks:
+      kr:
+        - "Singapore 리전 quota 한도 — 한국 사용 패턴 대비 확인"
+    severity: medium
+    recurrence: occasional
+    related_sap_notes: []
+
+  - id: sym-btp-fiori-launchpad-blank
+    symptom_ko: "BTP Fiori Launchpad에 타일이 안 보여요 (빈 화면)"
+    symptom_ko_variants:
+      - "Launchpad 타일 없음"
+      - "Fiori 앱 안 뜸"
+    symptom_en: "BTP Fiori Launchpad shows no tiles (blank)"
+    likely_modules: [BTP]
+    first_check_tcodes: []
+    typical_causes:
+      - "Catalog/Group에 앱 미할당 또는 role 미매핑"
+      - "HTML5 app repository 배포 누락"
+      - "Destination(앱 런타임) 연결 실패"
+      - "Launchpad site 캐시 stale"
+    evidence_needed:
+      - { type: screenshot, target: "Launchpad site — catalog/role assignment", priority: critical }
+      - { type: screenshot, target: "HTML5 app deployment status", priority: high }
+    localized_checks:
+      kr:
+        - "한국어 i18n 리소스 번들 누락으로 렌더 실패 여부"
+    severity: medium
+    recurrence: occasional
+    related_sap_notes: []
+
+  - id: sym-abap-amdp-runtime-error
+    symptom_ko: "AMDP/CDS에서 런타임 에러가 나요 (HANA push-down 실패)"
+    symptom_ko_variants:
+      - "AMDP 메소드 덤프"
+      - "CDS view 활성화 실패"
+    symptom_en: "AMDP/CDS runtime error (HANA push-down failure)"
+    likely_modules: [ABAP]
+    first_check_tcodes: [ST22, SE11, ST05]
+    typical_causes:
+      - "AMDP SQLScript 문법 오류 또는 미지원 함수"
+      - "CDS view 의존 객체 비활성/순환 참조"
+      - "HANA 권한(_SYS_REPO) 부족"
+      - "Client handling/세션 변수 미설정"
+    evidence_needed:
+      - { type: transaction_log, target: "ST22 dump (AMDP/CDS)", priority: critical }
+      - { type: transaction_log, target: "ST05 SQL trace", priority: high }
+    localized_checks:
+      kr:
+        - "한글 데이터 codepage 변환이 push-down 로직에 영향 주는지"
+    severity: high
+    recurrence: occasional
+    related_sap_notes: []
+
+  - id: sym-ewm-wave-not-released
+    symptom_ko: "EWM Wave가 릴리스 안 되거나 task가 안 생겨요"
+    symptom_ko_variants:
+      - "웨이브 릴리스 실패"
+      - "Warehouse task 미생성"
+    symptom_en: "EWM Wave not released / warehouse tasks not created"
+    likely_modules: [EWM]
+    first_check_tcodes: [SLG1]
+    typical_causes:
+      - "Wave template/조건 미충족 (capacity, cutoff)"
+      - "Storage type/bin determination 오류"
+      - "PPF(Post Processing Framework) action 실패"
+      - "qRFC 큐 적체 (ERP-EWM 분산 시)"
+    evidence_needed:
+      - { type: transaction_log, target: "EWM Wave monitor — status", priority: critical }
+      - { type: transaction_log, target: "SLG1 EWM application log", priority: high }
+    localized_checks:
+      kr:
+        - "한국 3PL 위탁창고 연동 시 분산 EWM qRFC 확인"
+    severity: high
+    recurrence: occasional
+    related_sap_notes: []
+
+  - id: sym-wm-transfer-order-fail
+    symptom_ko: "WM Transfer Order 생성/확인이 안 돼요 (legacy WM)"
+    symptom_ko_variants:
+      - "TO 생성 실패"
+      - "LT03 전기 안 됨"
+    symptom_en: "WM Transfer Order creation/confirmation fails (legacy WM)"
+    likely_modules: [WM, MM]
+    first_check_tcodes: [LT03, LT12, LS24]
+    typical_causes:
+      - "Storage bin/quant 데이터 불일치 (LS24)"
+      - "Movement type ↔ WM reference 매핑 누락"
+      - "Negative stock 또는 bin capacity 초과"
+      - "IM-WM interface(LB10) 미동기"
+    evidence_needed:
+      - { type: transaction_log, target: "LS24 bin/quant status", priority: critical }
+      - { type: screenshot, target: "movement type WM config", priority: high }
+    localized_checks:
+      kr:
+        - "S/4 전환 시 WM→EWM 마이그레이션 대상 여부 (WM deprecated)"
+    severity: medium
+    recurrence: occasional
+    related_sap_notes: []
+
+  - id: sym-wm-im-wm-mismatch
+    symptom_ko: "IM 재고와 WM 재고가 안 맞아요 (interface 불일치)"
+    symptom_ko_variants:
+      - "IM-WM 재고 차이"
+      - "LB10 인터페이스 미처리"
+    symptom_en: "IM stock and WM stock mismatch (interface inconsistency)"
+    likely_modules: [WM, MM]
+    first_check_tcodes: [LB10, LS24, LX23]
+    typical_causes:
+      - "LB10 transfer requirement 미처리 누적"
+      - "Interim storage type(902/903 등) 미정리"
+      - "동시 입출고로 IM/WM 타이밍 차이"
+      - "LX23 재고비교에서 차이 미조정"
+    evidence_needed:
+      - { type: transaction_log, target: "LX23 IM vs WM stock comparison", priority: critical }
+      - { type: transaction_log, target: "LB10 open transfer requirements", priority: high }
+    localized_checks:
+      kr:
+        - "월마감 시 IM-WM 재고 일치 확인 절차 포함 여부"
+    severity: medium
+    recurrence: occasional
+    related_sap_notes: []
+
 meta:
-  total: 83
+  total: 90
   languages: [ko, en]
   language_coverage:
-    ko: 83         # 전체 (원본)
-    en: 83         # 전체
+    ko: 90         # 전체 (원본) — 실측 (v2.3 B4: 신규 4모듈 +20, 부족모듈 +8)
+    en: 90         # 전체
+  # coverage 는 likely_modules 기준 실측값 (v2.3 B4 에서 옛 부정확 표기 정정)
+  # 한 symptom 이 여러 모듈에 매핑되므로 합계 != total
   coverage:
-    FI: 5
-    MM: 3
-    SD: 7
-    BASIS: 4
-    ABAP: 2
-    TR: 5
-    BC: 2
-    CO: 5
-    PP: 5
-    HCM: 4
+    FI: 19
+    MM: 15
+    IC: 11         # Integration Cloud — CPI/Datasphere (cross-module 다수)
+    SD: 10
+    BASIS: 9
+    BC: 8
+    PP: 7
+    CO: 6
     PM: 6
+    SAC: 6
+    ABAP: 5
+    Ariba: 5
+    BTP: 5
+    EWM: 5
+    HCM: 5
+    IBP: 5
     QM: 5
-    WM: 2
-    EWM: 3
+    TR: 5
+    WM: 3          # S/4HANA deprecated legacy — 의도적 3 (EWM 후속, 과투자 회피)
     KB: 0
   localization_consultants_planned:
     kr: present (built-in)
