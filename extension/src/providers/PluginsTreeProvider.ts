@@ -105,7 +105,7 @@ export class PluginsTreeProvider implements vscode.TreeDataProvider<PluginTreeIt
     return this.pluginsCache;
   }
 
-  getParent(): vscode.TreeItem | undefined {
-    return undefined;
+  getParent(_element: PluginTreeItem): vscode.ProviderResult<PluginTreeItem> {
+    return undefined; // flat tree — no parent
   }
 }

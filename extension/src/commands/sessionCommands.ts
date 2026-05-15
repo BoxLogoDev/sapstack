@@ -391,22 +391,149 @@ export function registerSessionCommands(
     })
   );
 
-  // Stub commands (placeholders for future implementation)
-  const stubCommands = [
-    'sapstack.session.showFollowup',
-    'sapstack.session.showVerdict',
-    'sapstack.session.handoff',
-    'sapstack.session.exportBundle',
-    'sapstack.session.openInWeb',
-  ];
+  // v2.3 C3 — implemented (was stub placeholders)
 
-  for (const cmd of stubCommands) {
-    disposables.push(
-      vscode.commands.registerCommand(cmd, () => {
-        vscode.window.showInformationMessage(`Command ${cmd} coming in v1.7.0`);
-      })
-    );
-  }
+  // 현재 세션의 특정 하위 디렉토리에서 yaml 파일을 골라 열기
+  const openFromSessionDir = async (subdir: string, label: string) => {
+    const config = vscode.workspace.getConfiguration('sapstack');
+    const sessionId = config.get<string>('currentSessionId');
+    if (!sessionId) {
+      vscode.window.showErrorMessage('No current session selected');
+      return;
+    }
+    const dir = path.join(workspaceRoot, '.sapstack', 'sessions', sessionId, subdir);
+    if (!fs.existsSync(dir)) {
+      vscode.window.showInformationMessage(`No ${label} found for session ${sessionId}`);
+      return;
+    }
+    const files = fs.readdirSync(dir).filter((f) => f.endsWith('.yaml')).sort();
+    if (files.length === 0) {
+      vscode.window.showInformationMessage(`No ${label} found`);
+      return;
+    }
+    const selected =
+      files.length === 1
+        ? files[0]
+        : await vscode.window.showQuickPick(files, { placeHolder: `Select ${label} to view` });
+    if (!selected) {
+      return;
+    }
+    await vscode.window.showTextDocument(vscode.Uri.file(path.join(dir, selected)));
+  };
+
+  disposables.push(
+    vscode.commands.registerCommand('sapstack.session.showFollowup', async () => {
+      try {
+        await openFromSessionDir('requests', 'Follow-up Request');
+      } catch (error) {
+        const m = error instanceof Error ? error.message : String(error);
+        vscode.window.showErrorMessage(`Failed to show follow-up: ${m}`);
+      }
+    })
+  );
+
+  disposables.push(
+    vscode.commands.registerCommand('sapstack.session.showVerdict', async () => {
+      try {
+        await openFromSessionDir('verdicts', 'Verdict');
+      } catch (error) {
+        const m = error instanceof Error ? error.message : String(error);
+        vscode.window.showErrorMessage(`Failed to show verdict: ${m}`);
+      }
+    })
+  );
+
+  disposables.push(
+    vscode.commands.registerCommand('sapstack.session.handoff', async () => {
+      try {
+        const config = vscode.workspace.getConfiguration('sapstack');
+        const sessionId = config.get<string>('currentSessionId');
+        if (!sessionId) {
+          vscode.window.showErrorMessage('No current session selected');
+          return;
+        }
+        const sessionPath = path.join(workspaceRoot, '.sapstack', 'sessions', sessionId);
+        const payload = JSON.stringify(
+          { sessionId, statePath: path.join(sessionPath, 'state.yaml'), handoffAt: new Date().toISOString() },
+          null,
+          2
+        );
+        await vscode.env.clipboard.writeText(payload);
+        vscode.window.showInformationMessage(
+          `Session ${sessionId} handoff payload copied to clipboard (paste into target surface)`
+        );
+      } catch (error) {
+        const m = error instanceof Error ? error.message : String(error);
+        vscode.window.showErrorMessage(`Failed to handoff: ${m}`);
+      }
+    })
+  );
+
+  disposables.push(
+    vscode.commands.registerCommand('sapstack.session.exportBundle', async () => {
+      try {
+        const config = vscode.workspace.getConfiguration('sapstack');
+        const sessionId = config.get<string>('currentSessionId');
+        if (!sessionId) {
+          vscode.window.showErrorMessage('No current session selected');
+          return;
+        }
+        const sessionPath = path.join(workspaceRoot, '.sapstack', 'sessions', sessionId);
+        if (!fs.existsSync(sessionPath)) {
+          vscode.window.showErrorMessage(`Session directory not found: ${sessionId}`);
+          return;
+        }
+        const collect = (dir: string, prefix: string): string => {
+          let out = '';
+          for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+              out += collect(full, `${prefix}${entry.name}/`);
+            } else if (entry.name.endsWith('.yaml') || entry.name.endsWith('.md')) {
+              out += `\n\n## ${prefix}${entry.name}\n\n\`\`\`\n${fs.readFileSync(full, 'utf8')}\n\`\`\`\n`;
+            }
+          }
+          return out;
+        };
+        const md = `# sapstack session export — ${sessionId}\n\nExported: ${new Date().toISOString()}\n${collect(sessionPath, '')}`;
+        const target = await vscode.window.showSaveDialog({
+          defaultUri: vscode.Uri.file(path.join(workspaceRoot, `sapstack-session-${sessionId}.md`)),
+          filters: { Markdown: ['md'] },
+        });
+        if (!target) {
+          return;
+        }
+        fs.writeFileSync(target.fsPath, md, 'utf8');
+        vscode.window.showInformationMessage(`Session exported to ${target.fsPath}`);
+        await vscode.window.showTextDocument(target);
+      } catch (error) {
+        const m = error instanceof Error ? error.message : String(error);
+        vscode.window.showErrorMessage(`Failed to export bundle: ${m}`);
+      }
+    })
+  );
+
+  disposables.push(
+    vscode.commands.registerCommand('sapstack.session.openInWeb', async () => {
+      try {
+        const config = vscode.workspace.getConfiguration('sapstack');
+        const sessionId = config.get<string>('currentSessionId');
+        const baseUrl = config.get<string>(
+          'webViewerUrl',
+          'https://boxlogodev.github.io/sapstack/session.html'
+        );
+        if (!sessionId) {
+          vscode.window.showErrorMessage('No current session selected');
+          return;
+        }
+        const url = `${baseUrl}?session=${encodeURIComponent(sessionId)}`;
+        await vscode.env.openExternal(vscode.Uri.parse(url));
+      } catch (error) {
+        const m = error instanceof Error ? error.message : String(error);
+        vscode.window.showErrorMessage(`Failed to open in web: ${m}`);
+      }
+    })
+  );
 
   return disposables;
 }
