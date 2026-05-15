@@ -25,6 +25,7 @@ yarn-error.log*
 # IDE
 .vscode/
 .idea/
+!.idea/sapstack-prompt.md
 *.swp
 *.swo
 *~

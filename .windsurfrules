@@ -1,0 +1,57 @@
+# Windsurf / Codeium Rules for sapstack
+
+> Project-wide instructions for **Windsurf (Codeium)** AI assistant.
+> Windsurf reads `.windsurfrules` automatically from the project root.
+>
+> For Claude Code users: `plugins/*/skills/*/SKILL.md`.
+> For Codex/Kiro users: `AGENTS.md`.
+> For Copilot users: `.github/copilot-instructions.md`.
+> For Cody users: `.cody/rules.md`.
+
+---
+
+## Project: sapstack
+
+SAP operations advisory plugin collection — 24 SAP modules covering FI, CO, TR, MM, SD, PP, HCM, SFSF, ABAP, S4-Migration, BTP, BASIS, BC, PM, QM, EWM, GTS, IBP, SAC, Ariba, Integration Cloud, plus meta plugins.
+
+Repository: https://github.com/BoxLogoDev/sapstack
+
+<!-- BEGIN sapstack-auto: stats -->
+- **sapstack 버전**: v2.1.0
+- **플러그인**: 24개
+- **서브에이전트**: 20개
+- **슬래시 커맨드**: 22개
+<!-- END sapstack-auto: stats -->
+
+## Universal Rules (mandatory)
+
+1. NEVER hardcode company codes, G/L accounts, cost centers, org units.
+2. ALWAYS ask for environment first: SAP Release (ECC EhP / S/4HANA year), Deployment (On-Prem / RISE / Cloud PE), Industry sector, Company code.
+3. ALWAYS distinguish ECC vs S/4HANA where behavior differs.
+4. Transport request mandatory for any config change.
+5. No production changes without simulation/test run.
+6. No SE16N data edits in production.
+7. Always provide T-code AND menu path.
+
+## Korean Field Language
+
+When responding in Korean:
+- Use 외래어 as primary: "코스트 센터", "페이먼트 메소드", "트포", "미고"
+- Annotate on first occurrence: "코스트 센터 (원가센터, KOSTL)"
+- Accept conversational patterns: "돌렸는데", "뜨네요", "안 돼요"
+- Keep T-codes and abbreviations as-is (F110, PO, GR, MIGO)
+
+## Response Modes
+
+- **Quick Advisory** for factual questions: Issue → Root Cause → Check → Fix → Prevention → SAP Note
+- **Evidence Loop** for incident diagnosis: Turn 1 INTAKE → Turn 2 HYPOTHESIS → Turn 3 COLLECT → Turn 4 VERIFY (see `plugins/sap-session/skills/sap-session/SKILL.md`)
+
+## Windsurf-Specific Tips
+
+- Use Cascade chat to reference SKILL.md files: `@plugins/sap-fi/...`
+- For multi-file SAP context, mention `data/tcodes.yaml`, `data/symptom-index.yaml`, `data/synonyms.yaml`
+- The `references/ko/quick-guide.md` (and other languages) under each plugin provides compressed quick-reference
+
+## References
+
+Universal rules source of truth: `CLAUDE.md` (repo root).

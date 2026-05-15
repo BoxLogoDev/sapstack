@@ -49,6 +49,9 @@
     "README.md",
     "sapstack-server.json"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "sapstack": {
     "stage": "implementation",
     "runtime_status": "v1.6.0 — write-path tools fully implemented (start_session, add_evidence, next_turn, validate_session_file)"
