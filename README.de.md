@@ -142,6 +142,16 @@ Repository klonen → automatisch erkannt. Details: [docs/multi-ai-compatibility
 
 ---
 
+## Übersetzungen beitragen
+
+Die 5-sprachigen Quick-Guides (en/zh/ja/de/vi) sind **Claude-erstellte Entwürfe**. Muttersprachler + SAP-Domänenexperten sind zur Prüfung eingeladen.
+
+- Ablauf, Kriterien, PR-Format: **[docs/TRANSLATION-REVIEW.md](docs/TRANSLATION-REVIEW.md)**
+- Feedback: [Translation-Feedback-Issue](https://github.com/BoxLogoDev/sapstack/issues/new?template=translation-feedback.md)
+- T-Codes / Note-Nummern werden nicht übersetzt (Originalform beibehalten)
+
+---
+
 ## Lizenz & Beiträge
 
 **MIT-Lizenz** — frei für kommerzielle und nichtkommerzielle Nutzung. Namensnennung erforderlich.

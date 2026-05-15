@@ -51,6 +51,19 @@
 /data/sap-notes.yaml                    @BoxLogoDev
 
 # ──────────────────────────────────────────────────────────────
+# 다국어 quick-guide 검수 (native reviewer)
+# 현재는 @BoxLogoDev 단일 — native 검수 지속 기여자는 docs/TRANSLATION-REVIEW.md
+# 절차에 따라 언어별 reviewer 로 추가됨 (메인테이너 판단).
+# 예) /plugins/*/skills/*/references/de/  @BoxLogoDev @de-native-reviewer
+# ──────────────────────────────────────────────────────────────
+/plugins/*/skills/*/references/en/      @BoxLogoDev
+/plugins/*/skills/*/references/zh/      @BoxLogoDev
+/plugins/*/skills/*/references/ja/      @BoxLogoDev
+/plugins/*/skills/*/references/de/      @BoxLogoDev
+/plugins/*/skills/*/references/vi/      @BoxLogoDev
+/docs/TRANSLATION-REVIEW.md             @BoxLogoDev
+
+# ──────────────────────────────────────────────────────────────
 # 품질 게이트 스크립트 (높은 중요도)
 # ──────────────────────────────────────────────────────────────
 /scripts/                               @BoxLogoDev
