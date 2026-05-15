@@ -50,3 +50,4 @@ $RECYCLE.BIN/
 
 # Pending review (Phase 3 — to be folded into scripts/build-translations.sh)
 scripts/add_translations.py
+.pr-body-*.md

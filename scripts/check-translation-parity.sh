@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # check-translation-parity.sh — sapstack 다국어 quick-guide의 구조 정합성 검증
 #
-# v2.2.0 Phase 3 Quality Gate: 영문 SKILL.md를 source로 5개 언어(en/zh/ja/de/vi)
+# v2.2.0 Phase 3 Quality Gate: ko/quick-guide.md를 source로 5개 언어(en/zh/ja/de/vi)
 # quick-guide-{lang}.md가 동등한 구조를 유지하는지 자동 검증.
+# ko/quick-guide.md가 없는 모듈은 fallback으로 SKILL.md 사용.
 #
 # 검증 항목:
 #   - H2 헤딩 개수 (±2 허용)
@@ -64,11 +65,19 @@ echo "🔍 Translation Parity Check"
 echo "═══════════════════════════════════════"
 
 # 모든 모듈 순회
-while IFS= read -r src; do
-  # src = plugins/{module}/skills/{module}/SKILL.md
+while IFS= read -r skill_md; do
+  # skill_md = plugins/{module}/skills/{module}/SKILL.md
   # dirname × 3 + basename → {module}
-  module=$(basename "$(dirname "$(dirname "$(dirname "$src")")")")
+  module=$(basename "$(dirname "$(dirname "$(dirname "$skill_md")")")")
   TOTAL_MODULES=$((TOTAL_MODULES + 1))
+
+  # source 우선순위: ko/quick-guide.md (압축본) → SKILL.md (전체본)
+  ko_quick="plugins/$module/skills/$module/references/ko/quick-guide.md"
+  if [[ -f "$ko_quick" ]]; then
+    src="$ko_quick"
+  else
+    src="$skill_md"
+  fi
 
   src_h2=$(count_h2 "$src")
   src_h3=$(count_h3 "$src")
@@ -128,11 +137,12 @@ while IFS= read -r src; do
       fi
     fi
 
-    # 라인 수 (30% ~ 110% — quick-guide는 30-80% 압축이 자연스러움)
+    # 라인 수 (30% ~ 250% — 영어/독일어/일본어는 한국어 대비 1.5-2배 자연 증가)
+    # 핵심은 정보량 보존이지 라인 수 일치가 아님 (자연어 길이 특성)
     min_lines=$((src_lines * 3 / 10))
-    max_lines=$((src_lines * 11 / 10))
+    max_lines=$((src_lines * 25 / 10))
     if (( t_lines < min_lines || t_lines > max_lines )); then
-      issue_msgs+=("라인 수 범위 이탈 $t_lines vs $src_lines (target 30~110%)")
+      issue_msgs+=("라인 수 범위 이탈 $t_lines vs $src_lines (target 30~250%)")
       WARNINGS=$((WARNINGS + 1))
     fi
 
