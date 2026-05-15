@@ -372,7 +372,7 @@ export interface EvidenceBundleScrubRequest {
 export interface EvidenceBundleScrubResult {
   scrubbedBundle: any;
   findings: Finding[];
-  fieldsScubbed: string[];
+  fieldsScrubbed: string[];
   timestamp: string;
 }
 
@@ -428,7 +428,7 @@ export function scrubEvidenceBundle(
   return {
     scrubbedBundle,
     findings: scrubber.analyze(JSON.stringify(req.bundle)),
-    fieldsScubbed,
+    fieldsScrubbed,
     timestamp: new Date().toISOString(),
   };
 }
