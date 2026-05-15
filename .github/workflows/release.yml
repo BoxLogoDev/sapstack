@@ -51,6 +51,12 @@ jobs:
       - name: Run MCP tests
         run: cd mcp && npm test || echo "tests optional for now"
 
+      - name: Pack MCP tarball
+        # mcp/boxlogodev-sapstack-mcp-<version>.tgz 를 working dir 에 생성
+        # → 이후 'Create GitHub Release' step 의 files: mcp/*.tgz 패턴이 매치
+        # publish 가 NPM_TOKEN 미설정으로 fail 해도 tarball 은 보존됨
+        run: cd mcp && npm pack
+
       - name: Publish MCP to npm
         run: cd mcp && npm publish --access public
         env:
