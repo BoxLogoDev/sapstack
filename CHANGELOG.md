@@ -5,6 +5,104 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-05-15
+
+### Theme
+**"Global SAP Cloud + Polyglot"** — 신규 4개 SAP Cloud 모듈, 5개 언어 quick-guide, 8개 AI 도구 호환 레이어, MCP npm publish + VS Code Extension v0.1 beta. 단일 릴리스, 5개 phase × 별도 PR로 검증.
+
+### Added — 신규 4개 SAP Cloud 모듈 (Phase 2)
+- **sap-ibp** — Integrated Business Planning (수요 예측, S&OP, supply planning)
+- **sap-sac** — SAP Analytics Cloud (스토리, BW Bridge, predictive)
+- **sap-ariba** — Ariba Sourcing/Contracts/Procurement/Supplier
+- **sap-integration-cloud** — Datasphere + Cloud Integration (CPI/iFlow)
+- 각 모듈마다 SKILL.md + agent (`sap-{module}-consultant`) + command 1개씩
+- marketplace.json: 20 → **24 플러그인**
+
+### Added — 산업·국가 가이드 (Phase 2)
+- 산업 가이드 +4: chemicals.md, automotive.md, healthcare.md, public-sector.md
+- 산업 매트릭스 (`data/industry-matrix.yaml`) 신규 모듈 행 추가
+- country/ 디렉토리: korea, germany 외 japan/china/vietnam/usa 신규 (총 6개)
+
+### Added — 다국어 quick-guide (Phase 3)
+- 핵심 5개 모듈 × 5개 언어 = **25 신규 quick-guide-{lang}.md** 파일
+  - 대상: sap-fi, sap-mm, sap-abap, sap-s4-migration, sap-btp
+  - 언어: en/zh/ja/de/vi (모두 `<!-- Claude-authored draft -->` 배지 부착)
+  - ko-specific 섹션 → 각 언어 country localization 변환
+- 다국어 빌드 인프라: `scripts/build-translations.sh` (LLM API 기반 자동 번역)
+- 다국어 정합성 검증: `scripts/check-translation-parity.sh` (Quality Gate)
+- 검수 상태: Claude 작성 초안, 커뮤니티 리뷰 환영
+
+### Added — AI 도구 호환 레이어 (Phase 4)
+- **신규 3개**: `.cody/rules.md`, `.windsurfrules`, `.idea/sapstack-prompt.md`
+- 기존 5개 + 신규 3개 = **8개 AI 도구 호환 레이어** 총합
+- `build-multi-ai.sh` COMPAT_FILES 배열 확장, sync block 자동 주입
+
+### Added — MCP npm publish (Phase 4)
+- `mcp/package.json`: `publishConfig.access = "public"` 추가
+- `mcp/README.md`: 3가지 설치 옵션 안내 (one-line installer / npm global / source build)
+- **Claude Desktop 자동 설치 스크립트**
+  - `scripts/install-claude-desktop.sh` (macOS / Linux, jq 필수)
+  - `scripts/install-claude-desktop.ps1` (Windows PowerShell)
+  - `--dry-run` / `--uninstall` 옵션
+
+### Added — VS Code Extension v0.1 beta (Phase 4)
+- `package` / `publish` 스크립트 (vsce 호출) 추가
+- `@vscode/vsce` 2.24 devDependency
+- 메타데이터: `stage: "stub"` → `"beta-v0.1"`, `implementedIn: "v2.2.0"`
+- 실제 빌드/publish는 v2.2.0 tag push 시 release.yml 자동 실행
+
+### Added — Quality Gates 신규
+- `bump-version.sh --check` — 5개 package 파일 버전 동기화 검증
+- `check-translation-parity.sh --strict` — 5언어 quick-guide 구조 정합성
+- `release.yml` 보강 — tag-version 일치 검증, MCP build + npm publish, Extension build, GitHub Release 자동
+
+### Changed — 기존 모듈 깊이 강화 (Phase 1)
+- T-code 레지스트리: 311 → **370** (+20 module boost + Phase 0 backfill 13 + Phase 1 module boost)
+- `check-tcodes.sh --strict` allowlist 47개 추가 (false positives + suspicious + cloud identifiers)
+- Best Practice 3-Tier: 7개 모듈 추가 (sap-basis, sap-abap, sap-bc, sap-btp, sap-gts, sap-s4-migration, sap-sfsf — 각 operational/period-end/governance 21파일)
+- IMG 가이드 분량 확장
+- CONTRIBUTORS.md 신규 (broken link 해소)
+- country/templates/cvi-template.md 신규
+- plugins/sap-hcm/skills/sap-hcm/references/finance-integration.md 신규
+
+### Changed — Phase 0 정리 + 버전 sync 인프라
+- `INDEX.md`, `DIRECTORIES.md`, `SETUP-GUIDE.md` 디렉토리 가이드 commit
+- `scripts/add_translations.py` 삭제 (다국어 빌드 파이프라인으로 통합)
+- `.gitignore` 보강 (agent-memory, worktrees, .pr-body-*.md, .idea/sapstack-prompt.md negate)
+- `scripts/bump-version.sh` 확장 — 5개 package 파일 일괄 갱신 + `--check` 모드
+
+### Fixed
+- `check-links.sh` 정규식 버그 수정 (nested parens 인식)
+- `check-links.sh` 절대 경로 처리 + node_modules/dist 제외
+- `check-translation-parity.sh` 3가지 버그 수정 (CI exit 1, dirname 깊이, 임계값)
+- `check-translation-parity.sh` source 우선순위: `ko/quick-guide.md` → `SKILL.md` fallback
+
+### Stats
+| 지표 | v2.1.0 | v2.2.0 |
+|---|---|---|
+| 플러그인 | 20 | **24** |
+| 에이전트 | 16 | **20** |
+| 슬래시 커맨드 | 18 | **22+** |
+| T-code | 311 | **370+** |
+| 산업 가이드 | 3 | **7** |
+| country/ | 2 | **6** |
+| AI 도구 호환 레이어 | 5 | **8** |
+| quick-guide 언어 | 1 (ko) | **6** (핵심 5 모듈) |
+| MCP | source-only | **npm publish 가능** |
+| VS Code Extension | stub | **v0.1 beta** |
+
+### PRs (v2.2.0 phase-별)
+- #1 (Phase 0) — 정리 + 버전 sync 인프라
+- #3 (Phase 1) — 기존 모듈 깊이 강화
+- #4 (Phase 2 part 1) — 신규 4개 클라우드 SAP 모듈
+- #5 (Phase 2 part 2) — agent 4 + command 4 + 산업 가이드 4
+- #6 (Phase 3 infra) — 다국어 번역 인프라
+- #7 (Phase 3 core) — 핵심 5 모듈 × 5 언어 quick-guide (25 파일)
+- #8 (Phase 4) — AI 도구 통합 강화
+- #9 (Phase 5) — v2.2.0 릴리스 (이 PR)
+
+---
+
 ## [2.1.0] - 2026-04-15
 
 ### Theme

@@ -4,7 +4,7 @@
 
 ### AI 코딩 어시스턴트를 위한 SAP 엔터프라이즈 운영 플랫폼
 
-**20 플러그인 · 16 에이전트 · MCP (20+ 도구) · VS Code 확장 · 7개 국가 · 6개 언어 · 컴플라이언스**
+**24 플러그인 · 20 에이전트 · 22+ 커맨드 · MCP (npm publish) · VS Code 확장 v0.1 · 8개 AI 도구 호환 · 6개 국가 · 6개 언어 · 컴플라이언스**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 
