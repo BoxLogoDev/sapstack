@@ -8,7 +8,6 @@
  */
 
 import { parseArgs } from "node:util";
-import { startServer } from "./server.js";
 
 async function main() {
   const { values, positionals } = parseArgs({
@@ -61,10 +60,17 @@ Examples:
     console.error(`[sapstack MCP] Sessions directory: ${options.sessionsDir}`);
   }
 
-  // Start the server (stdio transport is set up in server.ts)
+  // Start the server (stdio transport is set up in server.ts top-level main)
   console.error("[sapstack MCP] Server starting...");
-  // The server is already set up with stdio transport in server.ts main()
-  // This CLI is just a wrapper that parses CLI args and could set environment variables
+  // Pass CLI options via env vars before importing server (server reads them at module load)
+  if (options.sessionsDir) {
+    process.env.SAPSTACK_SESSIONS_DIR = options.sessionsDir;
+  }
+  if (options.offline) {
+    process.env.SAPSTACK_OFFLINE = "1";
+  }
+  // Dynamic import triggers server.ts top-level main()
+  await import("./server.js");
 }
 
 main().catch((err) => {

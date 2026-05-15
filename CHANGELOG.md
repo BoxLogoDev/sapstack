@@ -5,6 +5,19 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.2] - 2026-05-15
+
+### Fixed
+- **mcp/server.ts TypeScript strict-mode 에러 7건** — `tsc --strict` 가 `Record<string, unknown> | undefined` 타입을 strict args 타입에 직접 패스하지 못한 문제. 기존 코드의 일관된 패턴(`as any` 캐스팅)에 맞춰 라인 1443-1446, 1459-1461 보정
+- **로컬 tsc 검증 누락** — mcp/ 디렉토리에 `node_modules` 가 없어 로컬에서 `npm run build` 가 실행된 적 없음. CI release.yml 단계에서 처음 빌드되며 발견됨
+
+### Notes
+- v2.2.0 release fail = mcp/package-lock.json 누락 (v2.2.1 에서 fix)
+- v2.2.1 release fail = mcp/server.ts tsc 에러 7 (이 v2.2.2 에서 fix)
+- v2.2.2 = release.yml 의 build → publish 까지 정상 통과 예상되는 첫 버전
+
+---
+
 ## [2.2.1] - 2026-05-15
 
 ### Fixed

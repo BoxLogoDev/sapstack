@@ -1440,10 +1440,10 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       case "list_plugins":        result = await listPlugins(); break;
       case "resolve_symptom":     result = await resolveSymptom(args as any); break;
       case "list_sessions":       result = await listSessions(args as any); break;
-      case "start_session":       result = await startSession(args); break;
-      case "add_evidence":        result = await addEvidence(args); break;
-      case "next_turn":           result = await nextTurn(args); break;
-      case "validate_session_file": result = await validateSessionFile(args); break;
+      case "start_session":       result = await startSession(args as any); break;
+      case "add_evidence":        result = await addEvidence(args as any); break;
+      case "next_turn":           result = await nextTurn(args as any); break;
+      case "validate_session_file": result = await validateSessionFile(args as any); break;
 
       // New read tools (v1.7.0)
       case "list_tcodes_by_module":   result = await listTcodesByModule(args as any); break;
@@ -1456,9 +1456,9 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       case "find_sap_note_by_module": result = await findSapNoteByModule(args as any); break;
 
       // New write tools (v1.7.0)
-      case "add_followup_request": result = await addFollowupRequest(args); break;
-      case "submit_hypothesis":    result = await submitHypothesis(args); break;
-      case "submit_verdict":       result = await submitVerdict(args); break;
+      case "add_followup_request": result = await addFollowupRequest(args as any); break;
+      case "submit_hypothesis":    result = await submitHypothesis(args as any); break;
+      case "submit_verdict":       result = await submitVerdict(args as any); break;
 
       default:
         throw new Error(`Unknown tool: ${name}`);
