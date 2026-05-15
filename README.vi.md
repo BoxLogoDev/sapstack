@@ -142,6 +142,16 @@ Clone repository → tự động phát hiện. Chi tiết: [docs/multi-ai-compa
 
 ---
 
+## Đóng góp dịch thuật
+
+Quick-guide 5 ngôn ngữ (en/zh/ja/de/vi) là **bản nháp do Claude soạn**. Hoan nghênh người bản ngữ + chuyên gia SAP rà soát.
+
+- Quy trình·tiêu chí·định dạng PR: **[docs/TRANSLATION-REVIEW.md](docs/TRANSLATION-REVIEW.md)**
+- Phản hồi: [Translation Feedback issue](https://github.com/BoxLogoDev/sapstack/issues/new?template=translation-feedback.md)
+- T-code / số Note không dịch (giữ nguyên dạng gốc)
+
+---
+
 ## Giấy phép và Đóng góp
 
 **MIT License** — Miễn phí cho cả sử dụng thương mại và không thương mại. Cần ghi công.

@@ -142,6 +142,16 @@ cp sapstack/.kiro/steering/*.md .kiro/steering/
 
 ---
 
+## 参与翻译校对
+
+5 种语言 (en/zh/ja/de/vi) 快速指南为 **Claude 撰写初稿**。欢迎各语言母语者 + SAP 领域专家校对。
+
+- 流程·标准·PR 格式: **[docs/TRANSLATION-REVIEW.md](docs/TRANSLATION-REVIEW.md)**
+- 反馈: [Translation Feedback issue](https://github.com/BoxLogoDev/sapstack/issues/new?template=translation-feedback.md)
+- T-code / Note 编号不翻译 (保留原形)
+
+---
+
 ## 许可证和贡献
 
 **MIT 许可证** — 允许商业和非商业使用。需要注明出处。

@@ -142,6 +142,16 @@ cp sapstack/.kiro/steering/*.md .kiro/steering/
 
 ---
 
+## 翻訳レビューへの貢献
+
+5 言語 (en/zh/ja/de/vi) クイックガイドは **Claude 作成のドラフト**です。各言語ネイティブ + SAP ドメイン専門家のレビューを歓迎します。
+
+- 手順・基準・PR 形式: **[docs/TRANSLATION-REVIEW.md](docs/TRANSLATION-REVIEW.md)**
+- フィードバック: [Translation Feedback issue](https://github.com/BoxLogoDev/sapstack/issues/new?template=translation-feedback.md)
+- T-code / Note 番号は翻訳対象外 (原形維持)
+
+---
+
 ## ライセンス & 貢献
 
 **MIT ライセンス** — 商業・非商業利用、両方無料。帰属必須。

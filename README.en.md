@@ -142,6 +142,16 @@ Clone repository → auto-detected. Details: [docs/multi-ai-compatibility.md](do
 
 ---
 
+## Contribute Translations
+
+The 5-language quick-guides (en/zh/ja/de/vi) are **Claude-authored drafts**. Native speakers + SAP domain experts are welcome to review.
+
+- Process, criteria, PR format: **[docs/TRANSLATION-REVIEW.md](docs/TRANSLATION-REVIEW.md)**
+- Feedback: [Translation Feedback issue](https://github.com/BoxLogoDev/sapstack/issues/new?template=translation-feedback.md)
+- T-codes / Note numbers are not translated (keep original form)
+
+---
+
 ## License & Contributing
 
 **MIT License** — free for commercial and non-commercial use. Attribution required.
