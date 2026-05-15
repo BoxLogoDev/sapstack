@@ -55,6 +55,10 @@ jobs:
         run: cd mcp && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        # NPM_TOKEN secret 미설정 시 401 가능 — release 의 나머지 (Extension build,
+        # GitHub Release 생성) 가 차단되지 않도록 fail 허용. publish 자체는
+        # 별도로 npm 인증 후 'npm publish' 수동 실행 가능.
+        continue-on-error: true
 
       - name: Install VS Code Extension dependencies
         run: cd extension && npm ci
