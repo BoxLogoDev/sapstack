@@ -5,6 +5,20 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.3] - 2026-05-15
+
+### Changed
+- **`.github/workflows/release.yml`** — "Publish MCP to npm" 단계에 `continue-on-error: true` 추가
+  - NPM_TOKEN secret 미설정 시 발생하는 401 ENEEDAUTH 가 뒤따르는 단계 (Extension build, GitHub Release 생성) 를 skip 시키던 설계 결함 해소
+  - npm publish 자체는 사용자가 NPM_TOKEN 등록 후 별도 트리거 가능
+  - v2.0.0/v2.1.0/v2.2.x 모두 동일 원인으로 GitHub Releases 페이지에 v2.1.0 이 마지막이었음 — 이번 fix 로 해소
+
+### Notes
+- v2.2.3 = release.yml 의 모든 단계 (npm publish 제외) 가 정상 통과되어 GitHub Release 가 만들어지는 첫 버전
+- NPM publish 는 사용자 GitHub repo → Settings → Secrets → Actions 에 `NPM_TOKEN` 등록 후 v2.2.4 또는 새 태그 push 시 정상 동작
+
+---
+
 ## [2.2.2] - 2026-05-15
 
 ### Fixed
