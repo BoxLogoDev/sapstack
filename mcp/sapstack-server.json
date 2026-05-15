@@ -404,6 +404,39 @@
         },
         "required": ["session_id", "overall_state", "summary", "resolutions"]
       }
+    },
+    {
+      "name": "find_img_node_by_keyword",
+      "description": "Search IMG/cockpit configuration guides by keyword across all modules — returns matched files, lines, and SPRO paths (NEW in v2.3)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "keyword": { "type": "string", "description": "Configuration keyword (e.g. 'depreciation area', 'partner profile', 'replication flow')" }
+        },
+        "required": ["keyword"]
+      }
+    },
+    {
+      "name": "symptom_to_agent_auto",
+      "description": "Match a natural-language symptom to symptom-index entries and recommend consultant agents via likely_modules (NEW in v2.3)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symptom": { "type": "string", "description": "Free-text symptom (Korean or English)" }
+        },
+        "required": ["symptom"]
+      }
+    },
+    {
+      "name": "sap_note_steps",
+      "description": "Return SAP Note pointer metadata + diagnostic steps assembled from symptom-index back-references (sap-notes.yaml is pointer-only; body is on SAP Support Portal) (NEW in v2.3)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "note_id": { "type": "string", "description": "SAP Note number (string)" }
+        },
+        "required": ["note_id"]
+      }
     }
   ],
 
