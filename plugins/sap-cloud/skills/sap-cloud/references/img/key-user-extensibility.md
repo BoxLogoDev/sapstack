@@ -512,4 +512,31 @@ Q6: Classic ABAP 코드 또는 table 수정 필요?
 - **Custom Business Objects**: 3~5일 배포 (개발 + 테스트)
 - **Rollback**: Cloud PE는 instant rollback 가능 (green/blue deployment)
 
+## SPRO 경로
+
+Cloud PE — 전통 SPRO IMG 미해당. Key User 확장은 in-app 도구로 수행:
+
+```
+Fiori Launchpad → Custom Fields and Logic (Tier 1)
+Fiori Launchpad → Custom Business Objects / Custom CDS Views
+Cloud ALM → Transport (CSP) — Q→P 이관
+```
+
+## 구성 단계 (Configuration Steps)
+
+1. **Custom Field**: "Custom Fields and Logic" 앱 → 필드 추가 → UI/CDS 게시
+2. **Custom Logic**: BAdI/Validation/Determination → 클라우드 BAdI 구현
+3. **Custom CDS View**: "Custom CDS Views" 앱 → analytics/OData 노출
+4. **Custom Business Object**: RAP 기반 BO + behavior 정의
+5. **이관**: Q-system 검증 → CSP(Cloud ALM)로 P-system 배포
+
+## 구성 검증 (Verification)
+
+- [ ] Custom Field가 대상 UI/OData에 노출 (Tier별 배포시간 표 참조)
+- [ ] Custom Logic이 의도한 시점에 trigger (event/validation)
+- [ ] quarterly release 호환성 (deprecated API 미사용)
+- [ ] Rollback 가능 확인 (green/blue deployment)
+
+## 참고
+
 관련: `overview.md`, `../../best-practices/governance.md`

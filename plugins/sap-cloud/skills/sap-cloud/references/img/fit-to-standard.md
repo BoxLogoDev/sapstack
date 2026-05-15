@@ -383,6 +383,32 @@ Workshop Lead: SAP Consultant A, Functional Lead B, IT Lead C
 
 ---
 
+## SPRO 경로
+
+Cloud PE(Public Edition) — 전통 SPRO IMG 미해당. Fit-to-Standard는
+**구현 방법론**이며, 실제 구성은 SAP Central Business Configuration(CBC)
+및 Cloud ALM에서 수행:
+
+```
+SAP Central Business Configuration → Scope → Configure
+Cloud ALM → Implementation → Setup / Process Authoring
+```
+
+## 구성 단계 (Configuration Steps)
+
+1. **Scoping**: CBC에서 country/industry/scope item 선택
+2. **Fit-to-Standard 워크숍**: 표준 프로세스 시연 → gap 식별 (위 워크숍 구조 참조)
+3. **Configuration**: CBC self-service configuration (Tier 0)
+4. **Extension 결정**: gap을 Tier 1/2/3로 분류 (`key-user-extensibility.md`)
+5. **Iteration**: Q-system 검증 → P-system 이관 (CSP via Cloud ALM)
+
+## 구성 검증 (Verification)
+
+- [ ] CBC scope가 비즈니스 요구를 커버 (gap 목록 0 critical)
+- [ ] 표준 프로세스 end-to-end 테스트 통과 (Q-system)
+- [ ] 확장(Tier 1/2/3)이 quarterly release 영향도 평가 완료
+- [ ] User adoption / system stability KPI 목표 설정 (위 표 참조)
+
 ## 참고
 
 - `overview.md` — Cloud ALM 설정
