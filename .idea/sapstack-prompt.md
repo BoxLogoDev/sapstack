@@ -18,7 +18,7 @@ SAP operations advisory plugin collection — 24 SAP modules covering FI, CO, TR
 Repository: https://github.com/BoxLogoDev/sapstack
 
 <!-- BEGIN sapstack-auto: stats -->
-- **sapstack 버전**: v2.2.0
+- **sapstack 버전**: v2.2.1
 - **플러그인**: 24개
 - **서브에이전트**: 20개
 - **슬래시 커맨드**: 22개
