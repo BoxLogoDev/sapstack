@@ -5,6 +5,19 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2026-05-15
+
+### Fixed
+- **mcp/package-lock.json** 생성 (이전 누락) — release.yml 의 `npm ci` 단계 실패 원인 해소
+  - v2.0.0 / v2.1.0 / v2.2.0 릴리스 모두 동일 원인으로 npm publish 실패해온 것이 v2.2.0 release run 분석 중 발견됨
+  - 이번 hotfix 로 첫 정상 npm publish 가능 (`@boxlogodev/sapstack-mcp@2.2.1`)
+
+### Notes
+- v2.2.0 의 모든 기능 변경은 main 에 이미 머지됨 — 이 패치는 빌드 인프라 fix 만 포함
+- npm 에 publish 되는 첫 정상 버전: `@boxlogodev/sapstack-mcp@2.2.1`
+
+---
+
 ## [2.2.0] - 2026-05-15
 
 ### Theme
