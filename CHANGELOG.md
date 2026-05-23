@@ -5,6 +5,21 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.2] - 2026-05-23
+
+### Fixed
+- **`extension/package-lock.json` 5개 transitive dependencies 누락 — npm ci fail** — v2.3.1 의 release.yml CI 가 `cd extension && npm ci` 단계에서 `npm error Missing: sax@1.6.0 from lock file` (외 xmlbuilder@11.0.1, buffer-crc32@0.2.13, fd-slicer@1.1.0, pend@1.2.0) 발생. `@vscode/vsce` 의 transitive deps 가 package.json 명시 없이 lock 에만 존재해야 하는데 lock 이 outdated. 결과: node_modules 비어서 `@types/vscode`, `@types/node` 모두 누락 → tsc TS2307/TS2591 errors → vsix 미생성 → GitHub Release assets 에 mcp tgz 만 첨부, vsix 또 누락.
+- **Root cause**: v2.2.1 의 `mcp/package-lock.json` 누락 안티패턴 (memory/feedback_release_pipeline.md) 이 extension 에서 재현. lock 산포 (drift) — 로컬 install 후 commit 안 됨.
+- **Fix**: `cd extension && npm install --package-lock-only --ignore-scripts` 로 lock 재생성. 573 → 2977 라인. 5개 누락 entries (sax, xmlbuilder, buffer-crc32, fd-slicer, pend) 추가.
+- 로컬에서 `npm ci && npm run compile` 통과 검증.
+
+### Notes
+- v2.3.1 의 tsconfig/esbuild fix 는 정상 유지 (lock 누락 fix 후 tsc 가 통과해야만 의미가 살아남)
+- v2.3.2 = release.yml 의 vsix asset 정상 첨부가 검증되는 첫 버전 (예상)
+- v2.3.0 → v2.3.1 → v2.3.2 의 3 단계 사이클 = v2.2.x 4 hotfix 사이클 대비 1 회 감소 — 부분 retro 학습 적용
+
+---
+
 ## [2.3.1] - 2026-05-23
 
 ### Fixed
