@@ -80,6 +80,7 @@ done < <(find . -name '*.md' -type f \
          -not -path './.git/*' \
          -not -path '*/node_modules/*' \
          -not -path '*/dist/*' \
+         -not -path '*/.claude/worktrees/*' \
          -not -name '.release-notes-*.md' \
          2>/dev/null)
 

@@ -5,6 +5,67 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-05-23
+
+### Theme
+**"Polyglot Completion + Cloud Depth + Pipeline Robustness"** — 다국어 quick-guide 를 5 → 24 모듈로 확장, 신규 4 클라우드 모듈의 IMG / Best Practice / T-code 자산을 보강, MCP 도구 +3 (find_img_node_by_keyword / symptom_to_agent_auto / sap_note_steps), VS Code Extension stub command 5개 실 구현, native 검수 community 인프라 추가, 그리고 release pipeline 의 mcp tgz asset 정합화. 모든 sub-goal 은 별도 PR (#13~#25, 13 PRs) 로 분리 머지되었고 quality gate 10개를 strict mode 로 통과.
+
+### Added — 다국어 quick-guide 완성 (C1, PR #21~#25)
+- **24 모듈 × 5 lang = 120 파일** 신규 작성 (`plugins/sap-*/skills/sap-*/references/{en,zh,ja,de,vi}/quick-guide-{lang}.md`)
+- 모든 파일 상단에 `<!-- Claude-authored draft (community review welcome) -->` 배지 (native 검수 inflow 유도)
+- `scripts/check-translation-parity.sh --strict` 결과 ERRORS=0, WARNINGS=0 (H2 ±3 / H3 ±8 / code-block ±2 / T-code ≥60% / lines 30-250% 게이트 통과)
+- ko 소스 → 5 lang 확장은 직접 작성 (LLM API 미사용 — 비용 $0)
+- ko-specific 컨텐츠는 country localization 적용: 中国本地化 (zh) / 日本ローカル (ja) / Deutsche Lokalisierung (de) / Bản địa hóa Việt Nam (vi) / Country-agnostic (en)
+- T-code / SAP Note 번호 / Fiori app ID 는 원형 유지 (F110, MIGO, MD63, /SCWM/MON 등)
+
+### Added — 신규 4 클라우드 모듈 자산 보강 (B1, B2, B3)
+- **IMG 가이드 16 파일** (B1, PR #16): sap-ibp / sap-sac / sap-ariba / sap-integration-cloud 각각 BTP cockpit / Key User 구성 가이드 (`references/img/*.md`)
+- **Best Practice 3-Tier 12 파일** (B2, PR #17): operational / period-end / governance × 4 모듈
+- **T-code / Fiori app 25 entries** (B3, PR #14, `data/tcodes.yaml`): IBP Planning Area / SAC story ID / Ariba module ID / Integration Suite iFlow / Datasphere / Cloud Connector 경로
+- 결과: `check-img-references.sh` 76 파일 ✓ / `check-best-practices.sh` 23 모듈 완성 ✓ / `check-tcodes.sh --strict` 395 확정 / 0 미등록
+
+### Added — MCP 신규 도구 3개 (C2, PR #18)
+- `find_img_node_by_keyword(keyword)` — IMG 가이드 SPRO 경로에서 키워드 매칭
+- `symptom_to_agent_auto(symptom)` — symptom-index + agents/ 매핑으로 자동 라우팅 추천
+- `sap_note_steps(note_id)` — sap-notes.yaml solution 단계를 ordered list 로 반환
+- **MCP server total: 20 → 23 tools** (`mcp/sapstack-server.json`)
+- `mcp/types.ts` strict 타입 정의 + handler 구현 + npm test 스크립트 정합화
+
+### Added — VS Code Extension 5 stub command 실 구현 (C3, PR #19)
+- 5 stub command 가 실 동작 핸들러로 교체 (`extension/src/commands/`)
+- `getParent` 타입 fix (tree provider hover info 정상화)
+- QA 리포트 신규: `docs/vscode-extension-qa.md` — 14/14 commands 동작 검증
+
+### Added — symptom-index 보강 (B4-A, PR #15)
+- 신규 4 모듈 +20 entries + 부족 모듈 +8 entries = **62 → 90 entries** (`data/symptom-index.yaml`)
+- 모든 모듈이 5+ entries 확보
+
+### Added — native 검수 community 인프라 (C4, PR #20)
+- `docs/TRANSLATION-REVIEW.md` 신규 — 검수 절차 / 평가 기준 / PR 템플릿 가이드
+- `.github/ISSUE_TEMPLATE/translation-feedback.md` 신규 — 언어 / 모듈 / 페이지 / 제안 필드 Issue form
+- `CODEOWNERS` 에 `plugins/*/skills/*/references/{en,zh,ja,de,vi}/` 별 placeholder reviewer
+- README × 6 (root + ko/en/zh/ja/de/vi) 에 "How to Contribute Translations" 섹션
+
+### Changed — release pipeline (A1, PR #13)
+- `.github/workflows/release.yml` 에 별도 "Pack MCP tarball" step 분리 (`cd mcp && npm pack`)
+- `.gitignore` 에 `mcp/*.tgz` (release.yml 의 tgz asset 산출물만 ignore, source 보존)
+- 효과: NPM_TOKEN 미설정으로 publish step 이 continue-on-error skip 되어도 GitHub Release artifacts 에 `boxlogodev-sapstack-mcp-2.3.0.tgz` 첨부됨
+
+### Changed — quality gate 개선
+- `scripts/check-links.sh` — `.claude/worktrees/*` 무시 패턴 추가. agent worktree 임시 디렉토리의 link error 로 인한 false positive 차단 (1209 → 521 검사 파일, 끊어진 링크 0)
+
+### Deferred — v2.3.1 또는 v2.4 이월
+- **SAP Note 57 → 100+ 추가 등록 (43 entries 미작업)** — Note 번호 / URL / solution 단계의 ground-truth 검증 부담이 크고 SAP Service Marketplace 직접 확인 필요한 작업이라 별도 사이클로 분리
+- A2 (NPM publish 활성화 검증) — 사용자가 GitHub repo Settings → Secrets → Actions 에 `NPM_TOKEN` 등록 후 v2.3.1 또는 새 태그 push 시 자동 동작
+- A3 (VS Code Marketplace publish) — 사용자가 Azure DevOps PAT 발급 + `vsce login BoxLogoDev` 완료 후 `npx vsce publish` 트리거 가능
+
+### Notes
+- 정량 목표 vs 실측: 다국어 120 (목표 115+) ✓ / IMG 16 (목표 12+) ✓ / BP 12 (목표 12) ✓ / T-code 25 (목표 ~30) △ / MCP +3 (목표 +3) ✓ / SAP Note 57 (목표 100+) ✗ — 5/6 정량 목표 달성, SAP Note 만 이월
+- 13 PRs (PR #13 ~ #25) 분리 머지로 검증 가능성 확보 — v2.2.x 의 4 hotfix 사이클 안티패턴 (단일 거대 PR 의 묶음 fail) 회피
+- 자율 작업 ground-truth retro: plan 의 "fact-claim 즉시 verify" 원칙으로 일부 sub-goal 의 misreport 감지 → CHANGELOG 정확성 확보
+
+---
+
 ## [2.2.3] - 2026-05-15
 
 ### Changed
