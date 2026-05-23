@@ -8,6 +8,7 @@ const baseConfig = {
   minify: production,
   sourcemap: !production,
   target: 'ES2020',
+  platform: 'node',
   format: 'cjs',
   external: ['vscode'], // VS Code runtime provides vscode
   loader: {

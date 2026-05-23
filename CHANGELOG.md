@@ -5,6 +5,20 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.1] - 2026-05-23
+
+### Fixed
+- **Extension vsix 빌드 실패로 v2.3.0 GitHub Release 의 vsix asset 누락** — v2.3.0 release.yml CI 환경 (TypeScript 6.x 예고 + deprecation→error 처리) 에서 `extension/tsconfig.json` 의 `moduleResolution: "node"` ("node10" alias) 가 TS5107 error 로 처리되어 `tsc --noEmit && esbuild` 가 `&&` 단락으로 esbuild 실행 못 함 → vsix 미생성 → `softprops/action-gh-release` 의 `extension/*.vsix` pattern mismatch (`🤔 Pattern 'extension/*.vsix' does not match any files.`)
+- **Fix**: `extension/tsconfig.json` 의 `module: "commonjs"` → `"ES2020"`, `moduleResolution: "node"` → `"bundler"` (esbuild 환경에 맞는 모던 옵션, TS 5.x/6.x 모두에서 deprecation 없음)
+- **Fix**: `extension/esbuild.config.js` 에 `platform: 'node'` 추가 — `moduleResolution: bundler` 환경에서 node built-ins (`path`, `fs` 등) 자동 external 처리
+
+### Notes
+- v2.3.0 의 모든 컨텐츠 변경은 main 에 머지됨 — 이 patch 는 빌드 인프라 fix 만 포함
+- CI 의 step conclusion 이 `continue-on-error: true` 로 success mask 되는 안티패턴 재현 — v2.2.x 4 hotfix retro 의 학습이 부분 적용됐으나 `npm run compile && npm run package` 의 `&&` 단락 silent fail 까지는 잡지 못함. memory/feedback_release_pipeline.md 에 보강 예정
+- v2.3.1 = release.yml 의 vsix asset 정상 첨부 + mcp tgz asset 정상 첨부 모두 검증되는 첫 버전
+
+---
+
 ## [2.3.0] - 2026-05-23
 
 ### Theme
