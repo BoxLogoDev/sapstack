@@ -5,6 +5,28 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.3] - 2026-05-24
+
+### Added — B4-B 공개 SAP KBA 부분 진행 (sap-notes.yaml 57 → 77)
+
+- **20 신규 KBA** 등록 (`data/sap-notes.yaml`) — WebSearch 로 SAP Help Portal / userapps.support.sap.com 의 공개 KBA 페이지만 source-of-truth 로 사용. ground-truth 룰 (CLAUDE.md `Plan ground truth 검증`) 준수 — solution 단계가 SAP for Me paywall 뒤에 있는 경우 등록하지 않음.
+- **신규 module 약어 도입**: `IBP` (SAP Integrated Business Planning), `SAC` (SAP Analytics Cloud) — 기존 BTP 단일 약어로 묶이던 신규 4 클라우드 모듈을 세분화.
+- **카테고리 분포** (v2.3.0 확장 4 섹션):
+  - **Universal Journal & Group Reporting** (8건): ACDOCA 미활성 (2184861), 확장 (2403232), 기술 문서 prefix (3378282), GL Fiori line items 누락 (2756457), SPL 비활성 brownfield (3523712), BCF ACDOCA→ACDOCU (3494994), 데이터 볼륨 ACDOCU On-Premise (3000108), Group Reporting 성능 collective (2875820)
+  - **Cloud Modules — IBP/SAC** (4건): IBP 데이터 통합 collective (2436131), SAC 성능 collective (2511489), SAC story 느린 성능 (3056467), SAC charts/tables 오류 (2651014)
+  - **PM/QM/EWM 보강** (7건): IW31 planning plant 비활성 (3502643), IW31 IM440 (3622495), IW31 정산 룰 (2841195), QA11/QA32 강제 완료 (1958483), QA11/QA32 CL738 (3524952), /SCWM/L3104 (3612979), /SCWM/WMEBASICS 018 (3105375)
+  - **Korea Localization** (1건): South Korea S/4HANA Cloud 활성화 요청 (2738889)
+- `data/sap-notes.yaml` `meta.last_updated`: 2026-04-11 → 2026-05-24
+
+### Notes — Plan B4 의 부분 완료 사유
+
+- plan B4 의 acceptance criteria 는 "100건 이상" 이었으나 ground-truth 룰 (CLAUDE.md, sap-notes.yaml 헤더 룰 모두) 에 따라 **검증 가능한 공개 KBA 만** 등록. SAP Service Marketplace 의 paywall 뒤 solution 단계는 추측 등록 금지 (PR #32→#33 revert 학습 회피).
+- 잔여 23+ 건은 v2.4 또는 SAP S-user 계정 보유자가 등록 가능. `data/sap-notes.yaml` 의 `meta.contribution_guideline` 절차에 따라 community PR 환영.
+- `bash scripts/check-ko-references.sh --strict` (누락 0), `bash scripts/lint-frontmatter.sh` (오류 0), `bash scripts/check-marketplace.sh` (오류 0), `bash scripts/build-multi-ai.sh --check` (drift 없음) 통과.
+- v2.3.3 tag push 는 사용자가 `NPM_TOKEN` GitHub repo secret 등록 후 진행 (A2 검증 통합).
+
+---
+
 ## [2.3.2] - 2026-05-23
 
 ### Fixed

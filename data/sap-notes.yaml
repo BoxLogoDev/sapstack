@@ -532,12 +532,184 @@ notes:
     category: migration
     url: https://launchpad.support.sap.com/#/notes/2612789
 
+  # ──────────────────────────────────────────
+  # v2.3.0 확장 — Universal Journal & Group Reporting (S/4HANA)
+  # ──────────────────────────────────────────
+  - id: "2184861"
+    title: "ACDOCA not activated after Simple Finance installation"
+    keywords: [ACDOCA, universal journal, simple finance, activation, migration]
+    modules: [FI, CO]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2184861
+
+  - id: "2403232"
+    title: "Extending the Universal Journal with Customer fields"
+    keywords: [ACDOCA, universal journal, customer fields, append, extension]
+    modules: [FI, CO]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2403232
+
+  - id: "2756457"
+    title: "Missing data when displaying line items from GL Fiori apps"
+    keywords: [Fiori, GL, line items, authorization, missing data]
+    modules: [FI]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2756457
+
+  - id: "3378282"
+    title: "Technical documents in ACDOCA (DG/DC/DU prefix)"
+    keywords: [ACDOCA, technical documents, DG, DC, DU, migration]
+    modules: [FI, CO]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/3378282
+
+  - id: "3523712"
+    title: "Deactivation of Special Purpose Ledger (SPL) during brownfield S/4HANA migration"
+    keywords: [SPL, special purpose ledger, brownfield, migration, FAGLFLEXA]
+    modules: [FI, CO]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/3523712
+
+  - id: "3494994"
+    title: "BCF postings of ACDOCA not released into ACDOCU via universal journal task"
+    keywords: [BCF, balance carry forward, ACDOCA, ACDOCU, group reporting]
+    modules: [FI, CO]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/3494994
+
+  - id: "3000108"
+    title: "Group Reporting — Data volume control in ACDOCU (On-Premise)"
+    keywords: [group reporting, ACDOCU, data volume, performance, on-premise]
+    modules: [FI, CO]
+    release: s4_only
+    category: performance
+    url: https://launchpad.support.sap.com/#/notes/3000108
+
+  - id: "2875820"
+    title: "S/4HANA Group Reporting On-Premise Performance — Collective Note"
+    keywords: [group reporting, performance, ACDOCU, partitioning, collective]
+    modules: [FI, CO]
+    release: s4_only
+    category: performance
+    url: https://launchpad.support.sap.com/#/notes/2875820
+
+  # ──────────────────────────────────────────
+  # v2.3.0 확장 — Cloud Modules (IBP / SAC)
+  # ──────────────────────────────────────────
+  - id: "2436131"
+    title: "SAP IBP — Data Integration common errors (Collective KBA)"
+    keywords: [IBP, integrated business planning, data integration, CPI, collective]
+    modules: [IBP]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2436131
+
+  - id: "2511489"
+    title: "SAP Analytics Cloud — Performance troubleshooting (Collective KBA)"
+    keywords: [SAC, analytics cloud, performance, troubleshooting, collective]
+    modules: [SAC]
+    release: s4_only
+    category: performance
+    url: https://launchpad.support.sap.com/#/notes/2511489
+
+  - id: "3056467"
+    title: "SAP Analytics Cloud — Slow performance when opening/running stories"
+    keywords: [SAC, story, performance, slow, refresh]
+    modules: [SAC]
+    release: s4_only
+    category: performance
+    url: https://launchpad.support.sap.com/#/notes/3056467
+
+  - id: "2651014"
+    title: "SAP Analytics Cloud — Common errors with charts and tables"
+    keywords: [SAC, chart, table, story, error]
+    modules: [SAC]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2651014
+
+  # ──────────────────────────────────────────
+  # v2.3.0 확장 — PM / QM / EWM
+  # ──────────────────────────────────────────
+  - id: "3502643"
+    title: "IW31/IW32 Maintenance Planning Plant field not editable"
+    keywords: [IW31, IW32, plant maintenance, planning plant, greyed out]
+    modules: [PM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/3502643
+
+  - id: "3622495"
+    title: "IW31 IM440 — Enter a planning plant when creating Maintenance Order"
+    keywords: [IW31, IM440, planning plant, maintenance order, service order]
+    modules: [PM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/3622495
+
+  - id: "2841195"
+    title: "IW31 No default settlement rule auto-created for Maintenance Order"
+    keywords: [IW31, settlement rule, maintenance order, default, KOSRLIST]
+    modules: [PM, CO]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2841195
+
+  - id: "1958483"
+    title: "QA11/QA32 Usage decision allowed when results not recorded for all required chars"
+    keywords: [QA11, QA32, usage decision, inspection, force completion]
+    modules: [QM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/1958483
+
+  - id: "3524952"
+    title: "QA11/QA32 — Error CL738 during usage decision (assignment not changed)"
+    keywords: [QA11, QA32, CL738, usage decision, classification, error]
+    modules: [QM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/3524952
+
+  - id: "3612979"
+    title: "/SCWM/L3104 — Unable to create warehouse task"
+    keywords: [SCWM, L3104, warehouse task, EWM, stock]
+    modules: [EWM]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/3612979
+
+  - id: "3105375"
+    title: "/SCWM/WMEBASICS 018 — Warehouse number assignment not maintained"
+    keywords: [SCWM, WMEBASICS, warehouse number, TM, integration]
+    modules: [EWM]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/3105375
+
+  # ──────────────────────────────────────────
+  # v2.3.0 확장 — Korea Localization
+  # ──────────────────────────────────────────
+  - id: "2738889"
+    title: "Request for activation of South Korea localization (S/4HANA Cloud)"
+    keywords: [Korea, 한국, localization, S/4HANA Cloud, activation, controlled availability]
+    modules: [FI, BC]
+    release: s4_only
+    category: korea
+    url: https://launchpad.support.sap.com/#/notes/2738889
+
 # ──────────────────────────────────────────────────────────────
 # 메타 정보
 # ──────────────────────────────────────────────────────────────
 meta:
   version: 1
-  last_updated: "2026-04-11"
+  last_updated: "2026-05-24"
   total_entries_rule: "Must be verifiable on SAP Support Portal"
   contribution_guideline: |
     새 Note 추가 시:
