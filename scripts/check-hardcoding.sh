@@ -39,6 +39,12 @@ ALLOWLIST_KEYWORDS=(
   "BUKRS=[A-Z"  # 정규식 예시
 )
 
+# 정규식 패턴 (bash 네이티브 =~ 용, ERE) — echo|grep subprocess 제거로 성능 확보
+# q: 따옴표 문자 클래스 ["'] (옵션)
+q="[\"']"
+RE_BUKRS="BUKRS[[:space:]]*=[[:space:]]*${q}?[A-Z0-9]{4}${q}?"
+RE_CC="(company_code|BUKRS)[[:space:]]*[:=][[:space:]]*${q}?[0-9]{4}${q}?"
+
 is_allowlisted() {
   local line="$1"
   for kw in "${ALLOWLIST_KEYWORDS[@]}"; do
@@ -72,24 +78,18 @@ scan_file() {
     body=$(extract_body "$file")
   fi
 
-  # 패턴 1: BUKRS = 고정값 (회사코드 하드코딩)
-  # 정규식 설명과 혼동되지 않게 "BUKRS\s*=\s*["']..." 형태만 잡음
+  # body 1회 순회로 두 패턴 모두 검사 (bash 네이티브 regex — subprocess 없음)
+  local line
   while IFS= read -r line; do
-    if echo "$line" | grep -Eq 'BUKRS[[:space:]]*=[[:space:]]*["'\'']?[A-Z0-9]{4}["'\'']?' ; then
-      if ! is_allowlisted "$line"; then
-        echo "⚠️  $file:${line%%:*} — 회사코드 하드코딩 의심: $(echo "$line" | sed 's/^[0-9]*: //' | head -c 120)"
-        ERRORS=$((ERRORS + 1))
-      fi
+    # 패턴 1: BUKRS = 고정값 (회사코드 하드코딩)
+    if [[ "$line" =~ $RE_BUKRS ]] && ! is_allowlisted "$line"; then
+      echo "⚠️  $file:${line%%:*} — 회사코드 하드코딩 의심: $(echo "$line" | sed 's/^[0-9]*: //' | head -c 120)"
+      ERRORS=$((ERRORS + 1))
     fi
-  done <<< "$body"
-
-  # 패턴 2: company_code = "숫자" (YAML/JSON/config)
-  while IFS= read -r line; do
-    if echo "$line" | grep -Eq '(company_code|BUKRS)[[:space:]]*[:=][[:space:]]*["'\'']?[0-9]{4}["'\'']?' ; then
-      if ! is_allowlisted "$line"; then
-        echo "⚠️  $file:${line%%:*} — company_code 고정값: $(echo "$line" | sed 's/^[0-9]*: //' | head -c 120)"
-        ERRORS=$((ERRORS + 1))
-      fi
+    # 패턴 2: company_code = "숫자" (YAML/JSON/config)
+    if [[ "$line" =~ $RE_CC ]] && ! is_allowlisted "$line"; then
+      echo "⚠️  $file:${line%%:*} — company_code 고정값: $(echo "$line" | sed 's/^[0-9]*: //' | head -c 120)"
+      ERRORS=$((ERRORS + 1))
     fi
   done <<< "$body"
 }
