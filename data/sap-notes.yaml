@@ -704,12 +704,310 @@ notes:
     category: korea
     url: https://launchpad.support.sap.com/#/notes/2738889
 
+  # ──────────────────────────────────────────
+  # v2.4 확장 — MM / SD (공개 KBA, userapps 검증)
+  # ──────────────────────────────────────────
+  - id: "3292146"
+    title: "No message to prompt stock deficit when using stock determination in MIGO"
+    keywords: [MIGO, stock determination, stock deficit, goods movement, 재고]
+    modules: [MM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/3292146
+
+  - id: "2674900"
+    title: "Posting logic for scenarios of Invoice with price variances"
+    keywords: [MIRO, invoice, price variance, posting logic, GR/IR]
+    modules: [MM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2674900
+
+  - id: "2683046"
+    title: "How to clear variances between invoice and goods receipt for a purchase order"
+    keywords: [GR/IR, variance, invoice, goods receipt, purchase order, MR11]
+    modules: [MM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2683046
+
+  - id: "2834127"
+    title: "How to post Supplier Invoice with Price/Quantity/Tax Variance"
+    keywords: [MIRO, supplier invoice, tolerance, variance, tax]
+    modules: [MM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2834127
+
+  - id: "1911776"
+    title: "Using the moving average cost for material valuation"
+    keywords: [moving average, MAP, material valuation, price control, MM-IM]
+    modules: [MM]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/1911776
+
+  - id: "3323529"
+    title: "SD pricing: Standard behaviors guide and How-to scenarios"
+    keywords: [SD, pricing, condition, VK11, standard behavior]
+    modules: [SD]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/3323529
+
+  - id: "2961761"
+    title: "Desired entry doesn't show up when creating a new sales area for a customer"
+    keywords: [SD, sales area, customer, business partner, S/4HANA Cloud]
+    modules: [SD]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2961761
+
+  # ──────────────────────────────────────────
+  # v2.4 확장 — PP / WM / QM / EWM (공개 KBA, userapps 검증)
+  # ──────────────────────────────────────────
+  - id: "2577428"
+    title: "Road map for LE-WM in SAP S/4HANA"
+    keywords: [WM, LE-WM, stock room management, S/4HANA, roadmap, migration]
+    modules: [WM]
+    release: s4_only
+    category: migration
+    url: https://launchpad.support.sap.com/#/notes/2577428
+
+  - id: "3608136"
+    title: "MRP Run with Planning Mode 3 not deleting and recreating existing planned orders"
+    keywords: [PP, MRP, planning mode, planned order, 자재소요계획]
+    modules: [PP]
+    release: s4_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/3608136
+
+  - id: "3357801"
+    title: "Component materials of material cost estimate differ from the items in BOM"
+    keywords: [PP, CO, cost estimate, BOM, CK11N, costing]
+    modules: [PP, CO]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/3357801
+
+  - id: "1767507"
+    title: "Material Cost Estimate does not contain input products as in the associated BOM"
+    keywords: [PP, CO, cost estimate, BOM, input products, costing]
+    modules: [PP, CO]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/1767507
+
+  - id: "2797831"
+    title: "QM Fiori error 'Request failed' in Quality Technician Overview / Record Inspection Results"
+    keywords: [QM, Fiori, inspection results, request failed, quality technician]
+    modules: [QM]
+    release: s4_only
+    category: dump
+    url: https://launchpad.support.sap.com/#/notes/2797831
+
+  - id: "3170884"
+    title: "Background job for wave release stops after 24 continuous hours of execution attempts"
+    keywords: [EWM, wave release, background job, SCWM, performance]
+    modules: [EWM]
+    release: s4_only
+    category: performance
+    url: https://launchpad.support.sap.com/#/notes/3170884
+
+  - id: "2829796"
+    title: "Wave slowness through /SCWM/WAVE or /SCWM/MON transactions"
+    keywords: [EWM, wave, SCWM, performance, slowness]
+    modules: [EWM]
+    release: both
+    category: performance
+    url: https://launchpad.support.sap.com/#/notes/2829796
+
+  # ──────────────────────────────────────────
+  # v2.4 확장 — ABAP dump / BASIS / Security (공개 KBA + CVE)
+  # ──────────────────────────────────────────
+  - id: "1961643"
+    title: "Dump MEMORY_NO_MORE_PAGING"
+    keywords: [MEMORY_NO_MORE_PAGING, dump, ST22, paging, EXPORT_TO_MEMORY, PG_MAXFS]
+    modules: [ABAP]
+    release: both
+    category: dump
+    url: https://launchpad.support.sap.com/#/notes/1961643
+
+  - id: "2299338"
+    title: "BAPI_PROJECT_GETINFO causes MEMORY_NO_MORE_PAGING short dump"
+    keywords: [MEMORY_NO_MORE_PAGING, BAPI_PROJECT_GETINFO, dump, EXPORT_TO_MEMORY]
+    modules: [ABAP]
+    release: ecc_only
+    category: dump
+    url: https://launchpad.support.sap.com/#/notes/2299338
+
+  - id: "2162346"
+    title: "SYSTEM_CORE_DUMPED on ST22 — how to analyze it"
+    keywords: [SYSTEM_CORE_DUMPED, ST22, kernel, signal, core dump, 덤프]
+    modules: [BASIS]
+    release: both
+    category: dump
+    url: https://launchpad.support.sap.com/#/notes/2162346
+
+  - id: "1918785"
+    title: "SYSTEM_CORE_DUMPED short dump generated with signal 6 or 17"
+    keywords: [SYSTEM_CORE_DUMPED, signal 6, signal 17, kernel crash, ST22]
+    modules: [BASIS]
+    release: both
+    category: dump
+    url: https://launchpad.support.sap.com/#/notes/1918785
+
+  - id: "3600840"
+    title: "[CVE-2025-42989] Missing authorization check in NetWeaver AS ABAP (tRFC/qRFC S_RFC)"
+    keywords: [security, CVE-2025-42989, S_RFC, tRFC, qRFC, authorization, RFC]
+    modules: [BASIS]
+    release: both
+    category: security
+    url: https://launchpad.support.sap.com/#/notes/3600840
+
+  - id: "3688703"
+    title: "[CVE-2026-0506] Missing authorization check in NetWeaver AS ABAP (RFC FORM routines)"
+    keywords: [security, CVE-2026-0506, RFC, FORM routines, authorization]
+    modules: [BASIS]
+    release: both
+    category: security
+    url: https://launchpad.support.sap.com/#/notes/3688703
+
+  # ──────────────────────────────────────────
+  # v2.4 확장 — FI / CO Period-End (공개 KBA, userapps 검증)
+  # ──────────────────────────────────────────
+  - id: "3334470"
+    title: "Central KBA — Year End Closing in Asset Accounting (how-to scenarios & guides)"
+    keywords: [FI, AA, asset accounting, year-end close, depreciation, 자산회계, 결산]
+    modules: [FI, AA]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/3334470
+
+  - id: "3332871"
+    title: "Central KBA — Depreciation calculation (how-to scenarios & guides)"
+    keywords: [FI, AA, depreciation, calculation, fixed assets, 감가상각]
+    modules: [FI, AA]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/3332871
+
+  - id: "3002980"
+    title: "Valuation: how to configure impairments (unplanned depreciation) with Asset integration"
+    keywords: [FI, AA, impairment, unplanned depreciation, valuation, 손상]
+    modules: [FI, AA]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/3002980
+
+  - id: "2364341"
+    title: "OBJ period end closing performance optimization at a glance"
+    keywords: [CO, period-end, performance, closing, optimization, 마감]
+    modules: [CO]
+    release: both
+    category: performance
+    url: https://launchpad.support.sap.com/#/notes/2364341
+
+  - id: "2921106"
+    title: "System termination when running Controlling period-end closing apps"
+    keywords: [CO, period-end, system termination, timeout, background, settlement]
+    modules: [CO]
+    release: both
+    category: dump
+    url: https://launchpad.support.sap.com/#/notes/2921106
+
+  # ──────────────────────────────────────────
+  # v2.4 확장 — TR / Bank / F110 Payment (공개 KBA, userapps 검증)
+  # ──────────────────────────────────────────
+  - id: "2051660"
+    title: "How to obtain a comprehensive bank reconciliation view"
+    keywords: [TR, bank reconciliation, cash management, 자금관리, 은행조정]
+    modules: [TR, FI]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2051660
+
+  - id: "2504184"
+    title: "Bank statements reversal via background"
+    keywords: [TR, bank statement, reversal, background, reconciliation]
+    modules: [TR, FI]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2504184
+
+  - id: "3275729"
+    title: "Payment and Reconciliation — standard behaviors and how-to scenarios"
+    keywords: [FI, payment, reconciliation, standard behavior, clearing]
+    modules: [FI]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/3275729
+
+  - id: "3040958"
+    title: "F110 — resolving enhanced bank determination errors (FZ671, FZ616)"
+    keywords: [F110, bank determination, FZ671, FZ616, payment run, 지급]
+    modules: [FI]
+    release: both
+    category: dump
+    url: https://launchpad.support.sap.com/#/notes/3040958
+
+  - id: "2787843"
+    title: "Partner bank selection in F110"
+    keywords: [F110, partner bank, payment, bank selection, 파트너은행]
+    modules: [FI]
+    release: both
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2787843
+
+  - id: "2974693"
+    title: "F110 — issue with House Bank derivation (errors FZ653, FZ661, FZ671)"
+    keywords: [F110, house bank, derivation, FZ653, FZ661, FZ671]
+    modules: [FI]
+    release: both
+    category: dump
+    url: https://launchpad.support.sap.com/#/notes/2974693
+
+  - id: "2227124"
+    title: "F110 incorrect house bank selected (ranking order) — RFFOUS_C"
+    keywords: [F110, house bank, ranking, RFFOUS_C, payment, 주거래은행]
+    modules: [FI]
+    release: ecc_only
+    category: config
+    url: https://launchpad.support.sap.com/#/notes/2227124
+
+  # ──────────────────────────────────────────
+  # v2.4 확장 — Korea Localization (공개 KBA, userapps 검증)
+  # ──────────────────────────────────────────
+  - id: "2753199"
+    title: "Missing customer invoices in Tax Return — South Korea"
+    keywords: [Korea, 한국, tax return, 전자세금계산서, customer invoice, VAT]
+    modules: [FI]
+    release: ecc_only
+    category: korea
+    url: https://launchpad.support.sap.com/#/notes/2753199
+
+  - id: "2898580"
+    title: "How to enable 'Korea supplement' button in customer/vendor master data (ERP)"
+    keywords: [Korea, 한국, supplement, master data, customer, vendor, localization]
+    modules: [FI, MM, SD]
+    release: ecc_only
+    category: korea
+    url: https://launchpad.support.sap.com/#/notes/2898580
+
+  - id: "2780200"
+    title: "No ETax invoice created for South Korea"
+    keywords: [Korea, 한국, ETax, 전자세금계산서, e-invoice, NTS]
+    modules: [FI, SD]
+    release: ecc_only
+    category: korea
+    url: https://launchpad.support.sap.com/#/notes/2780200
+
 # ──────────────────────────────────────────────────────────────
 # 메타 정보
 # ──────────────────────────────────────────────────────────────
 meta:
   version: 1
-  last_updated: "2026-05-24"
+  last_updated: "2026-06-15"
   total_entries_rule: "Must be verifiable on SAP Support Portal"
   contribution_guideline: |
     새 Note 추가 시:
