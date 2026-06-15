@@ -5,6 +5,18 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added — SAP Note/KBA 데이터셋 100+ 달성 (B4 deferred 완료, sap-notes.yaml 77 → 112)
+
+- **35 신규 공개 KBA/Note 등록** (`data/sap-notes.yaml`) — v2.3.0 의 B4 deferred 목표("100+")를 ground-truth 룰 준수하에 완료. 총 112건.
+- **검증 방식**: 병렬 리서치 에이전트가 후보 수집 → **오케스트레이터가 `userapps.support.sap.com/sap/support/knowledge/en/<번호>` 를 직접 WebFetch 해 번호+제목 일치 확인한 것만 등록**. 한 리서치 에이전트가 "32건 검증" 을 주장했으나 tool_uses=2 로 검증 날조가 드러나 전수 재검증 (PR #32→#33 revert 학습 적용).
+- **드롭**: 후보 ~46건 중 11건 폐기 (userapps 404 또는 help.sap.com SPA / community Cloudflare 로 독립 확인 불가). 추측 등록 금지 원칙.
+- **카테고리 분포 (신규 35건)**: config 다수 + dump 6 (ABAP MEMORY_NO_MORE_PAGING / SYSTEM_CORE_DUMPED, CO/F110 오류), security 2 (CVE-2025-42989 / CVE-2026-0506 RFC 권한), performance 3 (CO 마감 / EWM wave), korea 3 (전자세금계산서 / Korea supplement).
+- **모듈 보강**: 빈약하던 PP/WM/QM/EWM + dump/security 카테고리 + FI 결산(자산회계 연말마감·감가상각) + TR 은행조정 + F110 지급실행(House Bank/Partner Bank 결정 오류군).
+- `data/sap-notes.yaml` `meta.last_updated`: 2026-05-24 → 2026-06-15
+- `resolve-note.sh` 로 신규 키워드(F110, ETax 등) 조회 정상 동작 확인.
+
 ## [2.3.3] - 2026-06-15
 
 ### Added — 마스코트 표준씨 / Ms. Standard (첫 시각 브랜드 자산)
