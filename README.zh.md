@@ -2,6 +2,10 @@
 
 # 🏛 sapstack
 
+<img src="docs/assets/mascot/standard-en.png" alt="标准小姐 — sapstack 吉祥物" width="280" />
+
+_“在 SAP 中这是标准，所以无法更改。” — 标准小姐 ([品牌指南](MASCOT.md))_
+
 ### AI 编码助手的 SAP 企业运营平台
 
 **24 个插件 · 20 个代理 · 22+ 个命令 · MCP (npm 发布) · VS Code 扩展 v0.1 · 兼容 8 个 AI 工具 · 6 个国家 · 6 种语言 · 合规就绪**

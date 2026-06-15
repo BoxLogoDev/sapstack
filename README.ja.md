@@ -2,6 +2,10 @@
 
 # 🏛 sapstack
 
+<img src="docs/assets/mascot/standard-en.png" alt="標準さん — sapstack マスコット" width="280" />
+
+_「SAPでは標準なので変更できません。」 — 標準さん ([ブランドガイド](MASCOT.md))_
+
 ### AI コーディング アシスタント向け SAP 企業運用プラットフォーム
 
 **24 プラグイン · 20 エージェント · 22+ コマンド · MCP (npm 公開) · VS Code 拡張 v0.1 · 8 AI ツール対応 · 6 か国 · 6 言語 · コンプライアンス対応**

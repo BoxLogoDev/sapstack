@@ -2,6 +2,10 @@
 
 # 🏛 sapstack
 
+<img src="docs/assets/mascot/standard-en.png" alt="Ms. Standard — the sapstack mascot" width="280" />
+
+_"In SAP, it's standard, so it can't be changed." — Ms. Standard ([brand guide](MASCOT.md))_
+
 ### AI Coding Assistant for SAP Enterprise Operations
 
 **24 plugins · 20 agents · 22+ commands · MCP (npm publish) · VS Code extension v0.1 · 8 AI tool compat · 6 countries · 6 languages · Compliance ready**

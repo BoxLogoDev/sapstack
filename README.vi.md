@@ -2,6 +2,10 @@
 
 # 🏛 sapstack
 
+<img src="docs/assets/mascot/standard-en.png" alt="Standard — linh vật của sapstack" width="280" />
+
+_"Trong SAP, đây là tiêu chuẩn nên không thể thay đổi." — Ms. Standard ([hướng dẫn thương hiệu](MASCOT.md))_
+
 ### Nền tảng SAP Enterprise Operations cho AI Coding Assistants
 
 **24 plugins · 20 agents · 22+ commands · MCP (npm publish) · VS Code extension v0.1 · Tương thích 8 AI tool · 6 quốc gia · 6 ngôn ngữ · Sẵn sàng tuân thủ**
