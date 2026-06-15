@@ -2,6 +2,10 @@
 
 # 🏛 sapstack
 
+<img src="docs/assets/mascot/standard-ko.png" alt="표준씨 — sapstack 마스코트" width="280" />
+
+_"SAP에서는 스탠다드라서 안됩니다." — 표준씨 ([브랜드 가이드](MASCOT.md))_
+
 ### AI 코딩 어시스턴트를 위한 SAP 엔터프라이즈 운영 플랫폼
 
 **24 플러그인 · 20 에이전트 · 22+ 커맨드 · MCP (npm publish) · VS Code 확장 v0.1 · 8개 AI 도구 호환 · 6개 국가 · 6개 언어 · 컴플라이언스**

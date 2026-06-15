@@ -19,7 +19,7 @@
 
 ---
 
-## ✅ v1.1.0 — Active Advisor (현재)
+## ✅ v1.1.0 — Active Advisor (완료)
 
 **테마: 3축 구조로 재구축**
 
@@ -45,7 +45,7 @@
 
 ---
 
-## ✅ v1.3.0 — Depth & Ecosystem (현재)
+## ✅ v1.3.0 — Depth & Ecosystem (완료)
 
 **테마**: 깊이 있는 생태계 완성
 
@@ -195,78 +195,87 @@
 
 ---
 
-## 🎯 v2.1.0 — Learning Loop + 다국어 완성
+## ✅ v2.1.0 — Cross-pollination + Coverage Expansion (완료, 2026-04-15)
 
-**테마**: 사용 → 지식 축적의 학습 루프 + 나머지 다국어 100%
+**테마**: superclaude-for-sap 패턴 차용 + 커버리지 확장
 
-### Learning Loop (opt-in telemetry, pure OSS)
-- [ ] Evidence Loop 세션 결과 → 익명화된 패턴 축적
-- [ ] 사용자 기여 SAP Notes 자동 등록 워크플로
-- [ ] 가설 정확도 메트릭 (어떤 hypothesis가 실제로 맞았는지)
+- [x] 신규 디렉토리 4종 — `exceptions/`(CX_* 예외 카탈로그), `hooks/`(자동화 훅), `country/`(7개국 로컬라이제이션), `bridge/`(RFC/OData/REST/IDoc/CPI 연동 패턴)
+- [x] MCP 도구 9 → 20개 (read 8 + write 3 + utility 1 신규)
+- [x] MCP Prompts 5개 구현 (NotImplementedError 해소)
+- [x] symptom-index 다국어 번역 30+/62 (zh/ja/de/vi)
 
-### 완전 다국어
-- [ ] symptom-index 62/62 × 6개 언어 (네이티브 검토)
-- [ ] synonyms 80+ terms × 6개 언어
-- [ ] 모듈별 quick-guide 영어판 (en 우선)
+> 참고: 당초 계획한 "Learning Loop + 다국어 100%"는 범위 조정으로 v2.4+ 이월.
 
 ---
 
-## 🎯 v2.2.0 — Web UI 확장 + PWA
+## ✅ v2.2.0 — Global SAP Cloud + Polyglot (완료, 2026-05-15)
 
-**테마**: Web UI 강화, 오프라인 사용 가능
+**테마**: 신규 클라우드 모듈 + 다국어 quick-guide + AI 도구 호환 + 발행 파이프라인
 
-- [ ] Web UI 탭 확장 (T-code, Plugin 카탈로그, 다크 테마)
-- [ ] PWA — 오프라인 사용 가능
-- [ ] build-multi-ai.sh 완전 자동화
+- [x] 신규 4개 SAP Cloud 모듈 — marketplace 20 → **24 플러그인**
+- [x] 다국어 quick-guide — 핵심 5개 모듈 × 5개 언어 = 25 파일
+- [x] AI 도구 호환 레이어 8개 (.cody, .windsurfrules, .idea 등 신규 3개 추가)
+- [x] MCP npm publish 준비 (`publishConfig.access=public`)
+- [x] VS Code Extension v0.1 beta
+- [x] T-code 311 → 370, Best Practice 3-Tier 7개 모듈 추가
+- [x] 후속 hotfix v2.2.1~v2.2.3 (lockfile / release pipeline)
 
-### 커뮤니티 기여 대상 (Good First Issues)
-- [ ] 각 언어별 네이티브 스피커 검토
-- [ ] sap-cloud IMG 가이드 확장 (2개 추가)
-
----
-
-## 🎯 v1.2.0 — Precision & Scale (과거)
-
-**테마: 정확도 및 자동 검증 강화**
-
-### 계획
-- [ ] **T-code validator** — 각 SKILL.md의 모든 T-code가 실제 SAP 영역에서 유효한지 검증 (정적 리스트 대조)
-- [ ] **SAP Note resolver** — 키워드 → 확정된 Note 번호 매핑 데이터셋 (`data/sap-notes.yaml`)
-- [ ] **ECC vs S/4HANA 표기 검증** — SKILL.md에서 두 릴리스 차이점이 명시적으로 표기됐는지 자동 검사
-- [ ] **추가 서브에이전트 2종**:
-  - `sap-basis-consultant` — STMS/SM50/ST22 덤프 라우팅
-  - `sap-mm-consultant` — 구매/재고/GR-IR
-- [ ] **`check-hardcoding.sh --strict`** CI 기본 활성화
-- [ ] 한국어 quick-guide를 **13개 → 전체 본문 한국어 병렬 버전**으로 확장 (2개 모듈 시범)
+> 참고: 당초 계획한 "Web UI 확장 + PWA"는 미출하 — vNext 이월.
 
 ---
 
-## 🚀 v1.3.0 — Integration
+## ✅ v2.3.0 — Polyglot Completion + Cloud Depth (완료, 2026-05-23)
 
-**테마: 외부 시스템 연동**
+**테마**: 다국어 완성 + 클라우드 모듈 심화 + 파이프라인 견고화
 
-### 계획
-- [ ] **BTP OData helper** — CAP/Fiori 프로젝트에서 sapstack 스킬이 실제 OData 메타데이터 분석
+- [x] 다국어 quick-guide — **24 모듈 × 5개 언어 = 120 파일** (LLM API 미사용, 비용 $0)
+- [x] 신규 4 클라우드 모듈 자산 — IMG 76파일, Best Practice 23모듈 완성, T-code --strict 395 확정
+- [x] MCP 도구 20 → **23개**
+- [x] VS Code Extension 5개 stub command 실 구현 (14/14 동작 검증)
+- [x] symptom-index 62 → **90 entries**
+- [x] native 검수 community 인프라 (TRANSLATION-REVIEW.md + Issue 템플릿 + CODEOWNERS)
+- [x] 후속 hotfix v2.3.1~v2.3.2 (Extension vsix 빌드)
+
+### v2.3.3 (릴리스 대기)
+- [x] SAP KBA 57 → **77** (공개 검증 가능 건만, paywall 추측 금지)
+- [x] check-hardcoding.sh 성능 수정 (Windows 90s+ → ~25s)
+- [ ] git tag v2.3.3 + npm publish — `NPM_TOKEN` GitHub secret 등록 후 진행
+
+---
+
+## 🎯 v2.4.0 — Knowledge Depth + Learning Loop (다음)
+
+**테마**: 지식 자산 심화 + 사용 학습 루프
+
+- [ ] **SAP Note/KBA 100+** — 잔여 공개 KBA 등록 (S-user 보유자 community PR 환영)
+- [ ] **Learning Loop** (opt-in telemetry, pure OSS) — Evidence Loop 결과 익명 패턴 축적, 가설 정확도 메트릭
+- [ ] **다국어 네이티브 검수** — symptom-index 90/90 × 6개 언어, synonyms 80+ terms
+
+---
+
+## 🚀 vNext — Integration & Web
+
+**테마**: 외부 시스템 연동 + Web/PWA
+
+- [ ] **Web UI 확장** — T-code/Plugin 카탈로그 탭, 다크 테마, PWA(오프라인)
+- [ ] **BTP OData helper** — CAP/Fiori OData 메타데이터 분석
 - [ ] **Integration Suite 시나리오** — iFlow 설계 가이드 자동 생성
-- [ ] **Solution Manager 연동 가이드** — ChaRM 워크플로 특화
-- [ ] **SAP Cloud ALM** — S/4HANA Cloud PE용 운영 가이드
+- [ ] **Solution Manager 연동** — ChaRM 워크플로 특화
+- [ ] **SAP Cloud ALM** — S/4HANA Cloud PE 운영 가이드
 - [ ] **KISA 보안 체크리스트** — 한국 금융/공공 특화 자동화
 
 ---
 
-## 🔬 v2.0.0 — AI-Native SAP Consulting
+## 🔬 Vision — AI-Native SAP Operations Platform
 
-**테마: SAP 운영 AI 플랫폼**
+**테마**: 단순 플러그인 → SAP 운영 AI 플랫폼
 
-### 비전
-sapstack을 단순 플러그인에서 **SAP 운영 AI 플랫폼**으로 승격:
+- [ ] **프로덕트 컨텍스트 엔진** — 실제 SAP 시스템(읽기 전용) 연결, 라이브 진단
+- [ ] **멀티에이전트 오케스트레이션** — FI 이슈 시 FI+BC+ABAP 병렬 협업
+- [ ] **반응형 런북(Runbook)** — "결산 시작" 한마디로 전체 프로세스 자동 실행·검증
+- [ ] **Adaptive learning** — 프로젝트별 특수 설정 자동 학습
 
-- [ ] **프로덕트 컨텍스트 엔진** — 사용자의 실제 SAP 시스템(읽기 전용)과 연결, 라이브 진단
-- [ ] **멀티에이전트 오케스트레이션** — FI 이슈 시 FI+BC+ABAP 에이전트가 병렬 협업
-- [ ] **반응형 런북(Runbook)** — 사용자가 "결산 시작"이라고만 해도 전체 프로세스 자동 실행·검증
-- [ ] **Adaptive learning** — 각 프로젝트별 특수 설정을 config.yaml 외에 자동 학습
-
-**외부 의존성**: SAP API 접근 권한, 사용자 조직의 보안 정책 승인 등 — 프로덕션 도입은 파일럿부터.
+**외부 의존성**: SAP API 접근 권한, 조직 보안 정책 승인 — 프로덕션은 파일럿부터.
 
 ---
 

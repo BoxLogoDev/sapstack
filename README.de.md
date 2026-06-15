@@ -2,6 +2,10 @@
 
 # 🏛 sapstack
 
+<img src="docs/assets/mascot/standard-en.png" alt="Standard — das sapstack-Maskottchen" width="280" />
+
+_„In SAP ist das Standard, also kann es nicht geändert werden." — Ms. Standard ([Markenrichtlinie](MASCOT.md))_
+
 ### AI-Codierungsassistent für SAP-Unternehmensoperationen
 
 **24 Plugins · 20 Agenten · 22+ Befehle · MCP (npm publish) · VS Code-Erweiterung v0.1 · 8 KI-Tool-Kompatibilität · 6 Länder · 6 Sprachen · Konformitätsbereit**
