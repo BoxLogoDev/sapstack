@@ -5,7 +5,23 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.3.3] - 2026-05-24
+## [2.3.3] - 2026-06-15
+
+### Added — 마스코트 표준씨 / Ms. Standard (첫 시각 브랜드 자산)
+
+- **마스코트 "표준씨" (영문 Ms. Standard) 도입** — sapstack 최초의 시각 브랜드 자산. SAP 현업의 "표준이라 안 됩니다" 트로프를 의인화한 시니어 컨설턴트 캐릭터. ponytail (DietrichGebert/ponytail) 의 "캐릭터=프로젝트 철학" 패턴 차용.
+- **자산**: `docs/assets/mascot/standard-ko.png` (한국어 말풍선), `standard-en.png` (영어 말풍선). 흑백 라인아트.
+- **`MASCOT.md`** 신규 — 브랜드 가이드 (성격·철학·6개 언어 시그니처 대사·사용 가이드라인·크레딧). 캐릭터 태도를 CLAUDE.md Universal Rules 와 1:1 매핑.
+- **6개 언어 README 히어로** 에 마스코트 + 현지화 캡션 배선. ja/zh/de/vi 는 영어 이미지 폴백 (현지화 말풍선은 community 기여 대상).
+
+### Fixed — check-hardcoding.sh 성능 (Windows 90s+ → ~25s)
+
+- `scan_file` 의 라인당 `echo \"$line\" | grep -Eq` subprocess 2회 spawn 을 bash 네이티브 `[[ =~ ]]` 정규식으로 교체. 449 .md 파일 × 라인 수 × 2 의 fork 폭발이 Windows Git Bash 에서 사실상 hang (>90s) 을 유발하던 문제 해소. body 1회 순회로 병합. 탐지 의미 동일 (위반 케이스 회귀 검증 완료).
+
+### Changed — 릴리스 정합화 + roadmap 재정리
+
+- **버전 sync**: package.json / marketplace.json / mcp/package.json / mcp/sapstack-server.json / extension/package.json 5개 파일 2.3.2 → **2.3.3** (`scripts/bump-version.sh`).
+- **`docs/roadmap.md` 재정리**: 중복 버전 헤더 (v1.3.0 ×2, v2.0.0 ×2) 제거, 출하된 v2.1.0/v2.2.0/v2.3.0 을 실제 출하 내용으로 ✅ 갱신 (이전엔 🎯 계획 + 미체크 상태로 드리프트), 미출하 항목 (Learning Loop, Web UI/PWA) 을 v2.4.0 / vNext / Vision 으로 재배치, stale "(현재)" 라벨 정정.
 
 ### Added — B4-B 공개 SAP KBA 부분 진행 (sap-notes.yaml 57 → 77)
 
