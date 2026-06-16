@@ -32,6 +32,23 @@ _"Trong SAP, đây là tiêu chuẩn nên không thể thay đổi." — Ms. Sta
 
 ---
 
+## 🧭 Golden Path — dùng gì khi nào
+
+Không phải công cụ rời rạc, mà là **một con đường**. Hướng dẫn đầy đủ: **[docs/workflow.md](docs/workflow.md)** · Phân tích khoảng cách hoàn thiện: [docs/gstack-gap-analysis.md](docs/gstack-gap-analysis.md)
+
+| Bạn muốn gì | Con đường |
+|---|---|
+| Câu trả lời nhanh | **Quick Advisory** — cứ hỏi |
+| Chẩn đoán sự cố | **Evidence Loop** (4 lượt) → consultant theo module / lệnh theo triệu chứng |
+| Không rõ module | `sap-tutor` (phân loại, ủy quyền chuyên gia) |
+| Vấn đề cấu hình (IMG) | `/sap-img-guide` |
+| Khóa sổ kỳ | `/sap-fi-closing` → `/sap-quarter-close` → `/sap-year-end` |
+| Đóng góp cho dự án | Maintainer Golden Path |
+
+> Bí thì lên một cấp (Evidence Loop), không rõ thì bắt đầu với `sap-tutor`.
+
+---
+
 ## Các tính năng chính
 
 ### 🎯 Bao gồm đầy đủ các mô-đun SAP

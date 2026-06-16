@@ -32,6 +32,23 @@ _“在 SAP 中这是标准，所以无法更改。” — 标准小姐 ([品牌
 
 ---
 
+## 🧭 Golden Path — 何时用什么
+
+不是零散的工具，而是**一条路径**。完整指南：**[docs/workflow.md](docs/workflow.md)** · 完成度差距分析：[docs/gstack-gap-analysis.md](docs/gstack-gap-analysis.md)
+
+| 你想要的 | 路径 |
+|---|---|
+| 快速事实答案 | **Quick Advisory** — 直接提问 |
+| 故障诊断 | **Evidence Loop**（4 轮）→ 模块顾问 / 症状命令 |
+| 不确定模块 | `sap-tutor`（分类后委派专家） |
+| 配置（IMG）问题 | `/sap-img-guide` |
+| 期末结账 | `/sap-fi-closing` → `/sap-quarter-close` → `/sap-year-end` |
+| 为项目贡献 | 维护者 Golden Path |
+
+> 卡住了就上一层（Evidence Loop），不清楚就从 `sap-tutor` 开始。
+
+---
+
 ## 核心功能
 
 ### 🎯 完整 SAP 模块覆盖

@@ -32,6 +32,23 @@ _"In SAP, it's standard, so it can't be changed." — Ms. Standard ([brand guide
 
 ---
 
+## 🧭 Golden Path — what to use when
+
+Not scattered tools, but **one path**. Full guide: **[docs/workflow.md](docs/workflow.md)** · Completeness gap analysis: [docs/gstack-gap-analysis.md](docs/gstack-gap-analysis.md)
+
+| What you want | The path |
+|---|---|
+| A quick factual answer | **Quick Advisory** — just ask |
+| Incident diagnosis | **Evidence Loop** (4 turns) → module consultant / symptom command |
+| Don't know the module | `sap-tutor` (classifies, delegates to a specialist) |
+| Config (IMG) issue | `/sap-img-guide` |
+| Period-end close | `/sap-fi-closing` → `/sap-quarter-close` → `/sap-year-end` |
+| Contribute to the project | Maintainer Golden Path |
+
+> Stuck? Go one level up (Evidence Loop). Lost? Start with `sap-tutor`.
+
+---
+
 ## Core Features
 
 ### 🎯 Complete SAP Module Coverage

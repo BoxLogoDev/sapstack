@@ -32,6 +32,23 @@ _„In SAP ist das Standard, also kann es nicht geändert werden." — Ms. Stand
 
 ---
 
+## 🧭 Golden Path — was wann verwenden
+
+Keine verstreuten Werkzeuge, sondern **ein Weg**. Vollständige Anleitung: **[docs/workflow.md](docs/workflow.md)** · Vollständigkeits-Gap-Analyse: [docs/gstack-gap-analysis.md](docs/gstack-gap-analysis.md)
+
+| Was Sie wollen | Der Weg |
+|---|---|
+| Schnelle Faktantwort | **Quick Advisory** — einfach fragen |
+| Störungsdiagnose | **Evidence Loop** (4 Runden) → Modul-Consultant / Symptom-Befehl |
+| Modul unbekannt | `sap-tutor` (klassifiziert, delegiert an Spezialist) |
+| Konfiguration (IMG) | `/sap-img-guide` |
+| Periodenabschluss | `/sap-fi-closing` → `/sap-quarter-close` → `/sap-year-end` |
+| Zum Projekt beitragen | Maintainer Golden Path |
+
+> Stecken geblieben? Eine Ebene höher (Evidence Loop). Unsicher? Mit `sap-tutor` starten.
+
+---
+
 ## Kernfunktionen
 
 ### 🎯 Vollständige SAP-Modulabdeckung
