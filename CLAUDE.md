@@ -7,6 +7,10 @@ Applicable to any company on SAP ECC 6.0 or S/4HANA (on-premise, RISE, or Cloud 
 No company-specific hardcoding. Skills must adapt dynamically to any company code structure,
 chart of accounts, fiscal year variant, and industry sector.
 
+> **Philosophy:** These rules enforce the sapstack Advisor Ethos — see [`ETHOS.md`](ETHOS.md)
+> for the *why* behind them (Ground-truth over plausibility, Evidence over confidence,
+> No hardcoding, ECC≠S/4, Field language, Operator decides).
+
 ## Universal Rules (Apply to ALL Skills)
 
 1. NEVER hardcode company codes, G/L accounts, cost centers, or org units
