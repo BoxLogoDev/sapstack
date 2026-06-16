@@ -5,7 +5,7 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.3.3] - 2026-06-16
 
 ### Added — ETHOS.md (sapstack Advisor Ethos — 철학 단일출처)
 
@@ -29,8 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **모듈 보강**: 빈약하던 PP/WM/QM/EWM + dump/security 카테고리 + FI 결산(자산회계 연말마감·감가상각) + TR 은행조정 + F110 지급실행(House Bank/Partner Bank 결정 오류군).
 - `data/sap-notes.yaml` `meta.last_updated`: 2026-05-24 → 2026-06-15
 - `resolve-note.sh` 로 신규 키워드(F110, ETax 등) 조회 정상 동작 확인.
-
-## [2.3.3] - 2026-06-15
 
 ### Added — 마스코트 표준씨 / Ms. Standard (첫 시각 브랜드 자산)
 
