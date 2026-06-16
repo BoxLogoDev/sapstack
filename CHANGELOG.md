@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — gstack 수준 완성도 갭 분석 + Golden Path 워크플로 (문서)
+
+- **`docs/gstack-gap-analysis.md`** 신규 — sapstack 을 gstack(Garry Tan's Stack) 수준의 "완성도 있는 제품"으로 끌어올리기 위한 구조적 갭 분석. gstack 완성도 7규율(ETHOS/Golden Path/생성 단일출처/셋업/eval/업그레이드/결정메모리) 식별 → 차원별 갭 매트릭스 10항 → 우선순위 채택 로드맵(roadmap.md 정합) → 명시적 non-goals(베끼지 않을 것).
+- **`docs/workflow.md`** 신규 — sapstack Golden Path. 흩어진 24 플러그인/20 에이전트/22 커맨드를 *하나의 진단 여정*(모드 선택 → Evidence Loop 4턴 → 진입점 라우팅 → 폴백 사다리)으로 묶음. 메인테이너 워크플로(기여→게이트→릴리스) 포함.
+- **6개 언어 README 에 "🧭 Golden Path" 표 추가** — "어떤 상황 → 어떤 진입점" 1-표 + 두 문서 링크.
+- 배경: 원래 클라우드 ultraplan 세션 산출물이 서명 인프라 장애로 커밋되지 못해 소실 → 로컬에서 ground-truth(gstack 실제 구조 정독) 기반 재생성.
+
 ### Added — SAP Note/KBA 데이터셋 100+ 달성 (B4 deferred 완료, sap-notes.yaml 77 → 112)
 
 - **35 신규 공개 KBA/Note 등록** (`data/sap-notes.yaml`) — v2.3.0 의 B4 deferred 목표("100+")를 ground-truth 룰 준수하에 완료. 총 112건.
