@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — ETHOS.md (sapstack Advisor Ethos — 철학 단일출처)
+
+- **`ETHOS.md`** 신규 (루트) — gstack 갭 분석의 G1 채택. sapstack 의 6가지 어드바이저 철학을 단일 문서로: ① Ground-truth over plausibility, ② Evidence over confidence, ③ No hardcoding, ④ ECC ≠ S/4, ⑤ Field language, ⑥ Operator decides. 각 원칙에 why + anti-patterns. gstack ETHOS.md(Builder Ethos)에 대응하는 Advisor Ethos.
+- **`CLAUDE.md`** — Universal Rules 상단에 ETHOS.md 참조 추가. 규칙(무엇을)과 철학(왜)을 연결.
+- `docs/gstack-gap-analysis.md` G1 을 ✅ 완료로 갱신, `docs/workflow.md` 철학 배경 링크 연결.
+
 ### Added — gstack 수준 완성도 갭 분석 + Golden Path 워크플로 (문서)
 
 - **`docs/gstack-gap-analysis.md`** 신규 — sapstack 을 gstack(Garry Tan's Stack) 수준의 "완성도 있는 제품"으로 끌어올리기 위한 구조적 갭 분석. gstack 완성도 7규율(ETHOS/Golden Path/생성 단일출처/셋업/eval/업그레이드/결정메모리) 식별 → 차원별 갭 매트릭스 10항 → 우선순위 채택 로드맵(roadmap.md 정합) → 명시적 non-goals(베끼지 않을 것).

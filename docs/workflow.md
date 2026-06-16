@@ -4,7 +4,7 @@
 > 하나의 서사로 묶는다. gstack 의 Golden Path(plan→ship→canary) 에 대응하는, sapstack 의
 > *end user 진단 여정* 이다.
 >
-> 철학적 배경은 [`gstack-gap-analysis.md`](gstack-gap-analysis.md) 와 (예정) `ETHOS.md`,
+> 철학적 배경은 [`gstack-gap-analysis.md`](gstack-gap-analysis.md) 와 [`../ETHOS.md`](../ETHOS.md),
 > 모드 선택 규칙은 루트 [`CLAUDE.md`](../CLAUDE.md) 참조.
 
 ---

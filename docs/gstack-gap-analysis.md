@@ -59,11 +59,9 @@ ETHOS.md · CLAUDE.md · ARCHITECTURE.md 정독으로 추출한, gstack 을 "완
 ## 3. 우선순위 채택 로드맵 (roadmap.md 와 정합)
 
 ### 즉시 (이번 사이클 — 저비용·고효과, 문서 중심)
-- **G1. `ETHOS.md` 신설** — sapstack 빌더 철학을 단일 문서로. 핵심 4원칙:
-  ① **Ground-truth 우선** (추측 등록 금지, 검증된 것만 — sap-notes 룰),
-  ② **No hardcoding** (회사코드/계정/조직 단위 동적화 — Universal Rule #1),
-  ③ **ECC ≠ S/4 명시** (릴리스 차이 항상 구분),
-  ④ **Evidence over confidence** (단정보다 falsification — Evidence Loop).
+- **G1. `ETHOS.md`** ✅ *(완료 — 루트 [`../ETHOS.md`](../ETHOS.md))* — sapstack Advisor Ethos 를 단일 문서로.
+  6원칙: ① Ground-truth over plausibility, ② Evidence over confidence, ③ No hardcoding,
+  ④ ECC ≠ S/4, ⑤ Field language, ⑥ Operator decides. `CLAUDE.md` Universal Rules 가 이를 강제.
 - **G2. `docs/workflow.md` (Golden Path)** — end user 진단 여정 + 진입점 라우팅 표. *(본 PR 동봉)*
 - **G3. README 6종 Golden Path 표** — "어떤 상황 → 어떤 진입점" 1-표. *(본 PR 동봉)*
 
