@@ -58,3 +58,7 @@ mcp/*.tgz
 
 # mcp 테스트가 생성하는 세션 디렉토리
 mcp/.sapstack/
+
+# 런타임 진단 데이터 — PII 가능성, 절대 커밋 금지 (Learning Loop / Evidence Loop)
+.sapstack/sessions/
+.sapstack/decisions.jsonl
