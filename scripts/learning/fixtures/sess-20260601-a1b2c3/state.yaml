@@ -1,0 +1,91 @@
+# Fixture session (codify/aggregate 테스트용) — 실제 .sapstack/sessions 와 무관
+# 시나리오: FB60 송장 입력 시 원천세(Withholding Tax) 자동계산 누락.
+# matched_symptom_index_entry 가 없음(novel) → codify 가 신규 symptom 후보를 제안.
+session_id: sess-20260601-a1b2c3
+schema_version: "1.0.0"
+created_at: "2026-06-01T09:12:00+09:00"
+last_updated_at: "2026-06-01T10:40:00+09:00"
+created_by: { role: operator, handle: "op-fixture" }
+originating_surface: cli
+status: resolved
+
+initial_symptom:
+  description: "FB60으로 국내 사업소득 벤더 송장 입력하는데 원천세가 자동으로 안 잡혀요. 수기로 넣어야 하나요?"
+  reporter_role: operator
+  language: ko
+  country_iso: kr
+  # matched_symptom_index_entry 없음 — 인덱스에 아직 없는 증상
+
+sap_context:
+  release: ecc
+  deployment: on-prem
+  industry: manufacturing
+
+tags: [withholding-tax, fb60, korea, ap]
+
+hypotheses:
+  - hypothesis_id: h-001
+    statement: "벤더 마스터(LFBW)에 원천세 유형/코드가 배정되지 않음"
+    falsification: "LFBW에 WT type+code가 이미 있고 활성화돼 있으면 기각"
+    likely_modules: [FI]
+  - hypothesis_id: h-002
+    statement: "회사코드 레벨 원천세 활성화(OBWW 계정 등) 누락"
+    falsification: "다른 벤더는 동일 회사코드에서 정상 계산되면 기각"
+    likely_modules: [FI]
+
+verdicts:
+  - verdict_id: vdc-20260601-aa11bb
+    session_id: sess-20260601-a1b2c3
+    turn_number: 4
+    created_at: "2026-06-01T10:35:00+09:00"
+    overall_state: resolved
+    summary: "H1 확정 — 벤더 LFBW에 원천세 유형/코드 미배정. XK02로 배정 후 FB60 재시도 정상."
+    resolutions:
+      - hypothesis_id: h-001
+        status: confirmed
+        evidence_refs:
+          - finding: "LFBW에 해당 벤더 WT type=KR3(사업소득) 코드 없음"
+        fix_plan:
+          audience: operator
+          steps:
+            - step_number: 1
+              description: "XK02 → 벤더 → 원천세 탭 → WT type/code 배정(사업소득)"
+              tcode: XK02
+              menu_path: "Accounting → AP → Master records → Change"
+              simulation_first: false
+          reviewer_required: true
+          transport_required: false
+        rollback_plan:
+          steps:
+            - step_number: 1
+              description: "XK02에서 추가한 WT 코드 제거(원상복구)"
+              tcode: XK02
+          trigger_conditions: ["다른 송장에서 원천세 이중계산 발생 시"]
+      - hypothesis_id: h-002
+        status: refuted
+
+turns:
+  - turn_number: 1
+    turn_type: intake
+    started_at: "2026-06-01T09:12:00+09:00"
+    status: complete
+  - turn_number: 2
+    turn_type: hypothesis
+    started_at: "2026-06-01T09:40:00+09:00"
+    status: complete
+  - turn_number: 4
+    turn_type: verify
+    started_at: "2026-06-01T10:20:00+09:00"
+    status: complete
+
+audit_trail:
+  - at: "2026-06-01T09:12:00+09:00"
+    action: session_created
+    actor: { role: operator, surface: cli }
+  - at: "2026-06-01T10:35:00+09:00"
+    action: hypothesis_confirmed
+    actor: { role: operator, surface: cli }
+    ref_id: h-001
+  - at: "2026-06-01T10:40:00+09:00"
+    action: closed
+    actor: { role: operator, surface: cli }

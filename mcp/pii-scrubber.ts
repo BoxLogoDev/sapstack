@@ -211,9 +211,12 @@ export class PIIScrubber {
           examples,
         });
 
-        // Apply masking
-        scrubbedText = scrubbedText.replace(pattern.pattern, (match) => {
-          return pattern.mask(match);
+        // Apply masking — forward capture groups so masks like 이메일/IP
+        // (match, group1, group2) work. replace() callback args are
+        // [match, p1, p2, ..., offset, fullString]; drop offset + fullString.
+        scrubbedText = scrubbedText.replace(pattern.pattern, (...args) => {
+          const groups = args.slice(1, -2);
+          return pattern.mask(args[0], ...groups);
         });
 
         if (this.logMatches) {

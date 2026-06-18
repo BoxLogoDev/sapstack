@@ -1,0 +1,42 @@
+# schemas/decision-event.schema.yaml
+# Decision Event — .sapstack/decisions.jsonl 한 줄(JSON)의 계약
+#
+# 목적:
+#   "왜 이렇게 설정/결정했나"를 세션을 넘어 보존하는 이벤트 소싱 로그.
+#   gstack decisions.jsonl 의 SAP판. 감사·온보딩·회고에서 의도를 복원.
+#   scripts/record-decision.sh 가 append, append-only.
+#
+# 저장: .sapstack/decisions.jsonl (JSONL — 한 줄당 한 이벤트)
+#   ⚠ .gitignore 로 커밋 차단 (PII/내부정보 가능)
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://boxlogodev.github.io/sapstack/schemas/decision-event.schema.yaml"
+title: "Decision Event"
+description: "One append-only decision record persisting the rationale behind a config/operational choice"
+type: object
+required: [at, actor, decision, rationale]
+additionalProperties: false
+
+properties:
+  at:
+    type: string
+    description: "ISO-8601 timestamp (with offset)"
+  actor:
+    type: string
+    description: "Who made the decision — role or handle (e.g. operator, consultant, op-kim)"
+  decision:
+    type: string
+    minLength: 1
+    description: "What was decided (one line)"
+  rationale:
+    type: string
+    minLength: 1
+    description: "Why — the reasoning to preserve across sessions"
+  refs:
+    type: array
+    description: "Related ids — session ids, T-codes, SAP Notes, file paths"
+    items: { type: string }
+
+# 예시 (한 줄):
+# {"at":"2026-06-18T22:31:28+0900","actor":"operator","decision":"F110 기본 페이먼트 메소드 T",
+#  "rationale":"국내 이체가 표준","refs":["sess-20260601-a1b2c3","FBZP"]}

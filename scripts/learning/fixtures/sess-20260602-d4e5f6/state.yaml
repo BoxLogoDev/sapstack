@@ -1,0 +1,75 @@
+# Fixture session 2 — 기존 symptom 매칭, 단 gold-set 엔 없음
+# → aggregate 가 "gold-set 확장 후보"로 식별하는 케이스 시연.
+session_id: sess-20260602-d4e5f6
+schema_version: "1.0.0"
+created_at: "2026-06-02T13:05:00+09:00"
+last_updated_at: "2026-06-02T14:10:00+09:00"
+created_by: { role: consultant, handle: "co-fixture" }
+originating_surface: vscode_extension
+status: resolved
+
+initial_symptom:
+  description: "KE30 수익성분석 보고서에서 실제와 계획 차이(variance)가 설명 안 되는 금액으로 떠요."
+  reporter_role: consultant
+  language: ko
+  country_iso: kr
+  matched_symptom_index_entry: sym-co-copa-variance
+
+sap_context:
+  release: s4
+  deployment: rise
+  industry: manufacturing
+
+tags: [copa, ke30, month-end]
+
+hypotheses:
+  - hypothesis_id: h-001
+    statement: "원가요소→가치필드 매핑(KEI1) 누락으로 일부 금액 미반영"
+    falsification: "KEI1 매핑이 완전하면 기각"
+    likely_modules: [CO]
+
+verdicts:
+  - verdict_id: vdc-20260602-cc22dd
+    session_id: sess-20260602-d4e5f6
+    turn_number: 4
+    created_at: "2026-06-02T14:05:00+09:00"
+    overall_state: resolved
+    summary: "H1 확정 — KEI1 가치필드 매핑 누락. 매핑 보완 후 KE30 재집계 일치."
+    resolutions:
+      - hypothesis_id: h-001
+        status: confirmed
+        evidence_refs:
+          - finding: "특정 원가요소가 어떤 value field 에도 매핑되지 않음"
+        fix_plan:
+          audience: consultant
+          steps:
+            - step_number: 1
+              description: "KEI1 → 원가요소-가치필드 매핑 추가"
+              tcode: KEI1
+              simulation_first: true
+          reviewer_required: true
+          transport_required: true
+        rollback_plan:
+          steps:
+            - step_number: 1
+              description: "추가한 매핑 라인 삭제(트포 회수)"
+              tcode: KEI1
+          trigger_conditions: ["다른 value field 이중 반영 시"]
+
+turns:
+  - turn_number: 1
+    turn_type: intake
+    started_at: "2026-06-02T13:05:00+09:00"
+    status: complete
+  - turn_number: 4
+    turn_type: verify
+    started_at: "2026-06-02T13:50:00+09:00"
+    status: complete
+
+audit_trail:
+  - at: "2026-06-02T13:05:00+09:00"
+    action: session_created
+    actor: { role: consultant, surface: vscode_extension }
+  - at: "2026-06-02T14:10:00+09:00"
+    action: closed
+    actor: { role: consultant, surface: vscode_extension }
