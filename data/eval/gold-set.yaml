@@ -1,0 +1,352 @@
+# data/eval/gold-set.yaml
+# sapstack 진단 품질 eval — Gold Set (정답 데이터셋)
+#
+# 목적:
+#   에이전트/커맨드가 대표 증상에 대해 내놓는 진단이 ground-truth 와
+#   일치하는지 LLM-judge 로 채점하기 위한 정답셋. "112개 노트 보유"를
+#   "진단 정확도 X%"로 바꾸는 측정 기반. (gstack qa/canary 의 SAP판)
+#
+# 설계 원칙 (ETHOS):
+#   1. 단일출처 — 증상 본문은 data/symptom-index.yaml 을 symptom_ref 로 참조.
+#      여기엔 *채점용 정답*(primary root cause + 반드시 나와야 할 T-code +
+#      검증 포인트)만 얇게 얹는다. 증상 텍스트를 복제하지 않는다.
+#   2. Ground-truth — primary_root_cause 는 symptom-index 의 typical_causes
+#      첫 항목("제일 흔함")에서 파생. 추측 정답 금지.
+#   3. 참조 무결성 — symptom_ref 는 symptom-index 에 실재, must_tcodes 는
+#      tcodes.yaml 에 실재해야 한다. scripts/check-eval-goldset.sh 가 강제.
+#
+# 채점 (scripts/eval-diagnosis.sh → scripts/eval/judge.mjs):
+#   - root_cause_match: primary_root_cause 를 답변이 맞혔는가 (full/partial/miss)
+#   - tcode_recall: must_tcodes 중 답변에 등장한 비율
+#   - check_coverage: must_checks 중 답변이 다룬 비율
+#   - ethos_violations: ethos_flags 위반 감지 (하드코딩/ECC·S4 혼동 등)
+#
+# 스키마: schemas/eval-gold-set.schema.json
+#
+# 확장:
+#   현재 21건(대표 모듈 커버). 목표 30~50건. symptom-index 90건에서
+#   ground-truth 가 명확한 것 위주로 확장. 기여 가이드: data/eval/README.md
+
+schema_version: "1.0.0"
+generated: 2026-06-18
+source: sapstack authors (derived from data/symptom-index.yaml)
+license: MIT
+
+cases:
+  # ═══════════════════════════════════════ FI ═══════════════════════════════════════
+  - id: eval-fi-f110-no-payment-method
+    symptom_ref: sym-f110-no-payment-method
+    module: FI
+    difficulty: easy
+    env: { release: both, deployment: on-prem, country: KR }
+    prompt: "F110 돌렸는데 벤더 하나만 'No valid payment method' 떠요. 다른 벤더는 정상이에요."
+    expected:
+      primary_root_cause: "해당 벤더 마스터(LFB1)에 Payment Method(ZWELS)가 비어 있음"
+      must_tcodes: [XK03, FBZP]
+      must_checks:
+        - "LFB1 ZWELS(payment method) 값 확인"
+        - "CDHDR/CDPOS 로 최근 변경 이력 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-fi-period-close-open-posting
+    symptom_ref: sym-period-close-open-posting
+    module: FI
+    difficulty: easy
+    env: { release: both, deployment: any, country: any }
+    prompt: "결산 마감했는데 그 기간에 전표가 계속 들어가요. 왜 막히지 않죠?"
+    expected:
+      primary_root_cause: "OB52 Posting Period Variant 의 기간 범위 설정이 잘못됨"
+      must_tcodes: [OB52]
+      must_checks:
+        - "OB52 에서 해당 회사코드의 posting period variant 범위 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-fi-fx-valuation-anomaly
+    symptom_ref: sym-foreign-currency-valuation-anomaly
+    module: FI
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "F.5D 외화평가 돌렸는데 평가차액이 비정상적으로 크게 나와요."
+    expected:
+      primary_root_cause: "환율(OB08) 또는 외화평가 설정(OBA1)이 잘못됨"
+      must_tcodes: [OBA1, OB08]
+      must_checks:
+        - "OB08 환율 유형/일자 확인"
+        - "OBA1 valuation area·method 설정 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode, ecc_s4_distinction]
+
+  - id: eval-kr-etax-invoice-submission-failed
+    symptom_ref: sym-kr-etax-invoice-submission-failed
+    module: FI
+    difficulty: hard
+    env: { release: both, deployment: on-prem, country: KR }
+    prompt: "전자세금계산서 국세청 전송이 실패해요. 어제까지 잘 됐는데요."
+    expected:
+      primary_root_cause: "STRUST 인증서 만료 또는 인증서 체인 누락"
+      must_tcodes: [STRUST, EDOC_COCKPIT]
+      must_checks:
+        - "STRUST 인증서 유효기간/체인 확인"
+        - "EDOC_COCKPIT 에서 실패 문서 상태 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ═══════════════════════════════════════ MM ═══════════════════════════════════════
+  - id: eval-mm-migo-posting-error
+    symptom_ref: sym-migo-posting-error
+    module: MM
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "MIGO 입고 전기하는데 전기가 안 되고 에러가 나요."
+    expected:
+      primary_root_cause: "이동유형(BWART) 설정 누락/오류 또는 계정결정(OBYC) 미설정"
+      must_tcodes: [OMJJ, OBYC]
+      must_checks:
+        - "OMJJ 에서 해당 이동유형 설정 확인"
+        - "OBYC 자동 계정결정 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode, ecc_s4_distinction]
+
+  - id: eval-mm-miro-tax-code-mismatch
+    symptom_ref: sym-miro-tax-code-mismatch
+    module: MM
+    difficulty: easy
+    env: { release: both, deployment: any, country: any }
+    prompt: "MIRO 송장처리하는데 택스코드가 PO랑 안 맞다고 떠요."
+    expected:
+      primary_root_cause: "PO 의 택스코드와 송장의 택스코드가 불일치"
+      must_tcodes: [MIRO, FTXP]
+      must_checks:
+        - "PO 라인의 택스코드와 송장 택스코드 비교"
+        - "FTXP 세율 정의 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-mm-mmbe-stock-mismatch
+    symptom_ref: sym-mmbe-stock-mismatch
+    module: MM
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "MMBE 재고가 실물이랑 안 맞아요. 장부상 더 많아요."
+    expected:
+      primary_root_cause: "역전표(102/122 등 이동유형) 전기로 재고가 어긋났을 가능성"
+      must_tcodes: [MB51, MMBE]
+      must_checks:
+        - "MB51 자재문서 이력에서 역전표(102/122) 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ═══════════════════════════════════════ SD ═══════════════════════════════════════
+  - id: eval-sd-va01-credit-block
+    symptom_ref: sym-va01-credit-block
+    module: SD
+    difficulty: easy
+    env: { release: both, deployment: any, country: any }
+    prompt: "VA01 수주 넣는데 크레딧 블록이 걸려서 저장이 안 돼요."
+    expected:
+      primary_root_cause: "고객 신용한도 초과로 credit check 가 막음"
+      must_tcodes: [FD32, VKM1]
+      must_checks:
+        - "FD32 고객 신용한도/사용액 확인"
+        - "VKM1 에서 블록 검토·해제"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-sd-pricing-error
+    symptom_ref: sym-sd-pricing-error
+    module: SD
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "VA01 에서 가격이 안 잡혀요. 단가가 0으로 나와요."
+    expected:
+      primary_root_cause: "고객·자재별 condition record 정의 누락"
+      must_tcodes: [VK11, "V/08"]
+      must_checks:
+        - "VK11 condition record 존재 확인"
+        - "V/08 pricing procedure 결정 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-sd-vf01-billing-incomplete
+    symptom_ref: sym-vf01-billing-incomplete
+    module: SD
+    difficulty: easy
+    env: { release: both, deployment: any, country: any }
+    prompt: "VF01 빌링하는데 incomplete 떠서 회계전기가 안 돼요."
+    expected:
+      primary_root_cause: "필수 필드(예: Customer PO number) 미입력으로 incompletion"
+      must_tcodes: [VF03]
+      must_checks:
+        - "incompletion log 에서 미입력 필수 필드 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ═══════════════════════════════════════ PP ═══════════════════════════════════════
+  - id: eval-pp-mrp-exception
+    symptom_ref: sym-pp-mrp-exception
+    module: PP
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "MD04 보면 MRP 가 자동 계획을 안 만들어요."
+    expected:
+      primary_root_cause: "자재마스터 MRP 타입이 자동계획 불가 유형(예: Forecast)로 설정됨"
+      must_tcodes: [MD04]
+      must_checks:
+        - "자재마스터 MRP1 뷰의 MRP Type 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-pp-cogi-auto-gm
+    symptom_ref: sym-pp-cogi-auto-gm
+    module: PP
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "COGI 에 자동 자재이동(backflush) 오류가 계속 쌓여요."
+    expected:
+      primary_root_cause: "Confirmation 수량에 맞는 자재 재고가 부족해 backflush 실패"
+      must_tcodes: [COGI]
+      must_checks:
+        - "COGI 미처리 건의 부족 자재/수량 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ═══════════════════════════════════════ CO ═══════════════════════════════════════
+  - id: eval-co-settlement-error
+    symptom_ref: sym-co-settlement-error
+    module: CO
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "KO88 내부오더 정산하는데 에러나요."
+    expected:
+      primary_root_cause: "내부오더 상태가 정산 불가(이미 정산됨/삭제예정 등)"
+      must_tcodes: [KO88, KO01]
+      must_checks:
+        - "AUFK 오더 시스템 상태 확인"
+        - "정산규칙(settlement rule) 존재/유효 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-co-cost-element-missing
+    symptom_ref: sym-co-cost-element-missing
+    module: CO
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "전기하는데 cost element 가 없다고 막혀요."
+    expected:
+      primary_root_cause: "해당 G/L 계정에 대응하는 cost element 가 생성되지 않음"
+      must_tcodes: [KA01, OKB9]
+      must_checks:
+        - "ECC: KA01 로 cost element 생성 / S4: G/L 계정 유형 확인(FS00)"
+        - "OKB9 자동 계정배정 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode, ecc_s4_distinction]
+
+  # ═══════════════════════════════════════ ABAP / BASIS ═══════════════════════════════
+  - id: eval-abap-st22-dump-in-production
+    symptom_ref: sym-st22-dump-in-production
+    module: ABAP
+    difficulty: hard
+    env: { release: both, deployment: on-prem, country: any }
+    prompt: "운영에서 ST22 덤프가 떠요. 표준 트랜잭션에서 났어요."
+    expected:
+      primary_root_cause: "표준 기능 관련 SAP Note 미적용 (SNOTE 로 확인 필요)"
+      must_tcodes: [ST22]
+      must_checks:
+        - "ST22 덤프 상세(예외 클래스/소스 위치) 분석"
+        - "SNOTE 에서 관련 노트 적용 여부 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-basis-transport-import-failed
+    symptom_ref: sym-transport-import-failed
+    module: BASIS
+    difficulty: medium
+    env: { release: both, deployment: on-prem, country: any }
+    prompt: "STMS 트포 임포트가 RC=8 로 실패해요."
+    expected:
+      primary_root_cause: "크로스 트랜스포트 종속성 — 선행 트포를 먼저 임포트해야 함"
+      must_tcodes: [STMS, SE09]
+      must_checks:
+        - "임포트 큐 순서/선행 트포 종속성 확인"
+        - "임포트 로그의 RC=8 상세 원인 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-basis-authorization-missing
+    symptom_ref: sym-authorization-missing
+    module: BASIS
+    difficulty: easy
+    env: { release: both, deployment: any, country: any }
+    prompt: "특정 T-code 들어가는데 권한 없다고 떠요."
+    expected:
+      primary_root_cause: "사용자 롤(PFCG)에 S_TCODE 권한 오브젝트가 빠져 있음"
+      must_tcodes: [SU53, PFCG]
+      must_checks:
+        - "SU53 로 실패한 권한 오브젝트 확인"
+        - "PFCG 롤에 S_TCODE 추가 후 재생성/배정"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ═══════════════════════════════════════ TR ═══════════════════════════════════════
+  - id: eval-tr-bank-statement-mismatch
+    symptom_ref: sym-tr-bank-statement-mismatch
+    module: TR
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "은행명세서(전자)랑 SAP 잔액이 안 맞아요."
+    expected:
+      primary_root_cause: "은행에서 처리된 거래(수수료/이자)가 SAP 에 아직 미계상"
+      must_tcodes: [FF_5, FEBAN]
+      must_checks:
+        - "FEBAN/FF.5 에서 미계상 거래(수수료·이자) 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ═══════════════════════════════════════ QM ═══════════════════════════════════════
+  - id: eval-qm-inspection-lot-stuck
+    symptom_ref: sym-qm-inspection-lot-stuck
+    module: QM
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "QA03 검사로트가 다음 단계로 안 넘어가요."
+    expected:
+      primary_root_cause: "검사 특성 평가 결과가 미완(또는 검사 중단) 상태라 UD 불가"
+      must_tcodes: [QA03, QA11]
+      must_checks:
+        - "QA03 에서 검사로트/특성 상태 확인"
+        - "QA11 usage decision 가능 여부 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ═══════════════════════════════════════ HCM ═══════════════════════════════════════
+  - id: eval-hcm-payroll-error
+    symptom_ref: sym-hcm-payroll-error
+    module: HCM
+    difficulty: hard
+    env: { release: both, deployment: on-prem, country: KR }
+    prompt: "급여계산(PC00_M99) 돌리는데 특정 인원에서 에러나요."
+    expected:
+      primary_root_cause: "임금유형(Wage Type) 기본데이터(급여구성·공제·세금) 누락"
+      must_tcodes: [PC00_M99]
+      must_checks:
+        - "해당 인원의 wage type 설정/인포타입 확인"
+        - "MOLGA 국가그룹별 처리 차이 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ═══════════════════════════════════════ EWM ═══════════════════════════════════════
+  - id: eval-ewm-wave-release-fail
+    symptom_ref: sym-ewm-wave-release-fail
+    module: EWM
+    difficulty: hard
+    env: { release: s4, deployment: any, country: any }
+    prompt: "EWM 에서 wave release 가 안 돼요."
+    expected:
+      primary_root_cause: "Wave 요청의 자재/수량이 현재 가용재고와 맞지 않음"
+      must_tcodes: ["/SCWM/WAVE", "/SCWM/MON"]
+      must_checks:
+        - "/SCWM/MON 에서 해당 자재 가용재고 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode, ecc_s4_distinction]

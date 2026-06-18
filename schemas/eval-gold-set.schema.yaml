@@ -1,0 +1,134 @@
+# schemas/eval-gold-set.schema.yaml
+# Eval Gold Set — 진단 품질 채점용 정답셋
+#
+# 목적:
+#   data/eval/gold-set.yaml 의 구조 계약. 각 케이스는 symptom-index 의
+#   증상을 참조(symptom_ref)하고, LLM-judge 채점에 쓰일 정답(expected)만
+#   얇게 얹는다. 증상 본문 복제 금지(단일출처).
+#
+# 강제 원칙 (scripts/check-eval-goldset.sh 가 추가로 참조 무결성 검증):
+#   1. symptom_ref 는 data/symptom-index.yaml 에 실재해야 함
+#   2. expected.must_tcodes 의 각 T-code 는 data/tcodes.yaml 에 실재해야 함
+#   3. case id 중복 금지
+#   4. expected.primary_root_cause 는 추측 금지 — symptom-index typical_causes 파생
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://boxlogodev.github.io/sapstack/schemas/eval-gold-set.schema.yaml"
+title: "Eval Gold Set"
+description: "Curated ground-truth answer set for scoring sapstack diagnostic quality"
+type: object
+required: [schema_version, cases]
+additionalProperties: false
+
+properties:
+  schema_version:
+    type: string
+    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+  generated:
+    type: string
+    description: "ISO date (YYYY-MM-DD) of last generation"
+  source:
+    type: string
+  license:
+    type: string
+
+  cases:
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/Case"
+
+$defs:
+  Case:
+    type: object
+    required: [id, symptom_ref, module, difficulty, prompt, expected]
+    additionalProperties: false
+    properties:
+      id:
+        type: string
+        pattern: "^eval-[a-z0-9-]+$"
+        description: "Unique case id, kebab-case"
+
+      symptom_ref:
+        type: string
+        pattern: "^sym-[a-z0-9-]+$"
+        description: "Reference into data/symptom-index.yaml (single source of truth for the symptom text)"
+
+      module:
+        type: string
+        enum: [FI, CO, TR, MM, SD, PP, HCM, ABAP, BASIS, PM, QM, WM, EWM, BTP, IBP, SAC, Ariba, IC]
+
+      difficulty:
+        type: string
+        enum: [easy, medium, hard]
+
+      env:
+        type: object
+        description: "SAP environment the case assumes — judge penalizes ECC/S4 confusion against this"
+        additionalProperties: false
+        properties:
+          release:
+            type: string
+            enum: [ecc, s4, both]
+          deployment:
+            type: string
+            enum: [on-prem, rise, cloud-pe, any]
+          country:
+            type: string
+            description: "ISO-3166 alpha-2 (uppercase) or 'any'"
+
+      prompt:
+        type: string
+        minLength: 8
+        maxLength: 600
+        description: "The end-user query fed to the agent under test (field language ok)"
+
+      expected:
+        type: object
+        required: [primary_root_cause, must_tcodes, must_checks]
+        additionalProperties: false
+        properties:
+          primary_root_cause:
+            type: string
+            minLength: 8
+            maxLength: 400
+            description: "Single most-likely root cause (from symptom-index typical_causes[0])"
+          must_tcodes:
+            type: array
+            minItems: 1
+            description: "T-codes that MUST appear in a correct answer (each must exist in tcodes.yaml)"
+            items: { type: string }
+          must_checks:
+            type: array
+            minItems: 1
+            description: "Verification points the answer must cover (free text)"
+            items: { type: string }
+          sap_note:
+            type: [string, "null"]
+            description: "Expected SAP Note id if one is definitively known, else null"
+
+      ethos_flags:
+        type: array
+        description: "ETHOS violations the judge should actively penalize for this case"
+        items:
+          type: string
+          enum: [no_hardcode, ecc_s4_distinction, field_language, evidence_required]
+
+# ─────────────────────────────────────────────────────────────
+# Example case (see data/eval/gold-set.yaml for the live set):
+#
+# - id: eval-fi-f110-no-payment-method
+#   symptom_ref: sym-f110-no-payment-method
+#   module: FI
+#   difficulty: easy
+#   env: { release: both, deployment: on-prem, country: KR }
+#   prompt: "F110 돌렸는데 벤더 하나만 'No valid payment method' 떠요."
+#   expected:
+#     primary_root_cause: "해당 벤더 마스터(LFB1)에 Payment Method(ZWELS)가 비어 있음"
+#     must_tcodes: [XK03, FBZP]
+#     must_checks:
+#       - "LFB1 ZWELS(payment method) 값 확인"
+#       - "CDHDR/CDPOS 로 최근 변경 이력 확인"
+#     sap_note: null
+#   ethos_flags: [no_hardcode]
+# ─────────────────────────────────────────────────────────────

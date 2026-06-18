@@ -236,20 +236,25 @@
 - [x] native 검수 community 인프라 (TRANSLATION-REVIEW.md + Issue 템플릿 + CODEOWNERS)
 - [x] 후속 hotfix v2.3.1~v2.3.2 (Extension vsix 빌드)
 
-### v2.3.3 (릴리스 대기)
-- [x] SAP KBA 57 → **77** (공개 검증 가능 건만, paywall 추측 금지)
+### ✅ v2.3.3 (완료, 2026-06-16)
+- [x] SAP KBA 57 → 77 → **112** (공개 검증 가능 건만, paywall 추측 금지)
 - [x] check-hardcoding.sh 성능 수정 (Windows 90s+ → ~25s)
-- [ ] git tag v2.3.3 + npm publish — `NPM_TOKEN` GitHub secret 등록 후 진행
+- [x] 마스코트 표준씨/Ms. Standard + ETHOS.md + gstack 갭 분석 + Golden Path
+- [x] README 6종 전면 재보강 (통계 정확화 + 페르소나 + 배지)
+- [x] git tag v2.3.3 + npm publish (`@boxlogodev/sapstack-mcp`) + GitHub Release
 
 ---
 
 ## 🎯 v2.4.0 — Knowledge Depth + Learning Loop (다음)
 
-**테마**: 지식 자산 심화 + 사용 학습 루프
+**테마**: 지식 자산 심화 + 사용 학습 루프 + **진단 품질 측정**(gstack 갭 G4)
 
-- [ ] **SAP Note/KBA 100+** — 잔여 공개 KBA 등록 (S-user 보유자 community PR 환영)
-- [ ] **Learning Loop** (opt-in telemetry, pure OSS) — Evidence Loop 결과 익명 패턴 축적, 가설 정확도 메트릭
+- [x] **SAP Note/KBA 100+** — 112건 등록 완료 (v2.3.3)
+- [~] **진단 품질 eval 하니스 (G4)** — gold-set 21건 + LLM-judge 러너 + 무료 무결성 게이트.
+  "112개 노트"를 "진단 정확도 X%"로. 로컬 전용(CI 비용 0). → [`eval/methodology.md`](eval/methodology.md)
+- [ ] **Learning Loop** (opt-in telemetry, pure OSS) — Evidence Loop 결과 익명 패턴 축적, 가설 정확도 메트릭 → eval gold-set 환류
 - [ ] **다국어 네이티브 검수** — symptom-index 90/90 × 6개 언어, synonyms 80+ terms
+- [ ] **5분 온보딩 (G6)** — setup.sh/ps1 + quickstart (비개발자 진입점)
 
 ---
 

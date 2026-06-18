@@ -1870,3 +1870,28 @@ ME59N:
   name: Automatic Creation of PO from Requisitions
   modules: [Ariba, MM]
   release: both
+
+# ──────────────────────────────────────────────────────────────
+# eval gold-set 참조 보강 (v2.4) — symptom-index가 참조하나 미등록이던 실존 T-code
+# ──────────────────────────────────────────────────────────────
+OB08:
+  name: Maintain Exchange Rates (currency translation)
+  modules: [FI, TR]
+  release: both
+"V/08":
+  name: Maintain Pricing Procedure (Conditions Pricing Procedure)
+  modules: [SD]
+  release: both
+KA01:
+  name: Create Cost Element (Primary)
+  modules: [CO]
+  release: ecc_only
+  note: "S/4: cost element = G/L account, maintain via FS00"
+PC00_M99:
+  name: Payroll Driver (International / generic)
+  modules: [HCM]
+  release: both
+EDOC_COCKPIT:
+  name: eDocument Cockpit (electronic document / e-invoice monitor)
+  modules: [FI]
+  release: both
