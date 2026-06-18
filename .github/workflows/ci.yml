@@ -67,3 +67,6 @@ jobs:
 
       - name: Check translation parity (multilingual SKILL)
         run: ./scripts/check-translation-parity.sh --strict
+
+      - name: Check eval gold-set integrity (strict, API-free)
+        run: ./scripts/check-eval-goldset.sh --strict
