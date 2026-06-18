@@ -5,6 +5,42 @@ All notable changes to **sapstack** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-06-18
+
+**테마: "진짜 gstack" — 자기-증명·자기-성장 3축** (갭 분석 G4·G6 + Learning Loop)
+
+기능 수가 아니라 *완성도 규율*을 SAP 도메인으로 번역. sapstack 을 "112개 노트 보유"에서
+**"진단 정확도를 측정하고, 세션이 지식으로 환류되며, 5분에 시작되는 제품"** 으로 승격.
+
+### Added — Pillar A: 진단 품질 eval 하니스 (G4)
+
+- **`data/eval/gold-set.yaml`** (21건, 11개 모듈) — symptom-index 참조(단일출처) + 채점용 정답. `primary_root_cause` 는 typical_causes 에서 파생(추측 금지, ETHOS ①).
+- **`scripts/check-eval-goldset.sh`** — 참조 무결성 게이트(API 불필요) → `ci.yml` 편입. symptom_ref·must_tcode 실재 검증.
+- **`scripts/eval-diagnosis.sh` + `scripts/eval/run.mjs`** — LLM-judge 러너(로컬 전용, SDK 0개, Node fetch). 실제 에이전트 `.md` 본문을 system 으로 써 운영 동작 충실 재현. root_cause/tcode_recall/check_coverage/ethos 채점.
+- **`schemas/eval-gold-set.schema.yaml`**, `docs/eval/{methodology,REPORT}.md`, `data/eval/README.md`.
+- 비용 경계: 정합성(무료·CI) / LLM-judge(유료·로컬 수동) 분리.
+
+### Added — Pillar C: Learning Loop + Codify + 결정 메모리
+
+- **`scripts/codify-session.sh`** (`learning/codify.mjs`) — 해결된 Evidence Loop 세션 → symptom-index 후보(사람 검수 PR). skillify 의 SAP판.
+- **`scripts/aggregate-sessions.sh`** (`learning/aggregate.mjs`) — 세션 집계 → 해결률·가설 정확도·모듈 분포 + **gold-set 환류 후보**(Pillar A↔C 플라이휠). 메트릭만 출력(PII 안전).
+- **`scripts/record-decision.sh`** + `schemas/decision-event.schema.yaml` — "왜 이렇게 설정했나" 이벤트 소싱(`.sapstack/decisions.jsonl`).
+- `docs/learning-loop.md`, 검증용 fixture 2건.
+
+### Added — Pillar B: 5분 온보딩 (G6)
+
+- **`setup.sh` + `setup.ps1`** — 비개발자 운영자가 "설치 → 첫 진단"까지 한 명령. 환경 프로필 대화형 생성(릴리스/배포/회사코드/언어) + 검증 → MCP 안내 → 첫 진단. `--check` 비대화 점검.
+- **`docs/quickstart-5min.md`** + README 6종 "⚡ 5분 온보딩" 섹션.
+
+### Fixed
+
+- **`mcp/pii-scrubber.ts`** — `scrubPII` 적용부가 mask 에 캡처그룹을 전달하지 않아 **이메일/IP 마스킹 시 크래시**하던 production 버그 수정.
+- **`data/tcodes.yaml`** — symptom-index 가 참조하나 미등록이던 실존 T-code 5종 등록(OB08/V/08/KA01/PC00_M99/EDOC_COCKPIT).
+
+### Security
+
+- `.gitignore` — `.sapstack/sessions/`·`decisions.jsonl`·`config.yaml` 커밋 차단(런타임 PII·실 회사코드).
+
 ## [2.3.3] - 2026-06-16
 
 ### Added — ETHOS.md (sapstack Advisor Ethos — 철학 단일출처)

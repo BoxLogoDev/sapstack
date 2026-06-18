@@ -13,7 +13,7 @@ _“在 SAP 中这是标准，所以无法更改。” — 标准小姐 ([品牌
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![languages](https://img.shields.io/badge/languages-6-orange)](#)
 
-**24 个插件 · 20 个代理 · 22 个命令 · MCP 23 个工具 (npm) · VS Code 扩展 v2.3.3 · 兼容 8 个 AI 工具 · 6 个国家 · 6 种语言 · 合规就绪**
+**24 个插件 · 20 个代理 · 22 个命令 · MCP 23 个工具 (npm) · VS Code 扩展 v2.4.0 · 兼容 8 个 AI 工具 · 6 个国家 · 6 种语言 · 合规就绪**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 
@@ -111,7 +111,7 @@ Clean Core · Key User Extensibility · 3-Tier Extension · Fit-to-Standard · C
 ### 🚀 MCP Runtime (v2.0+)
 `@boxlogodev/sapstack-mcp` —— 在 Claude Desktop 中运行完整 Evidence Loop。**23 个工具 + 12 个提示 + 9 个资源**。
 
-### 💻 VS Code Extension (v2.3.3)
+### 💻 VS Code Extension (v2.4.0)
 会话管理侧栏 · YAML 校验 · Webview 渲染 · File Watcher
 
 ### 🛡 合规就绪 (v2.0+)
