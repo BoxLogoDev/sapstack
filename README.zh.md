@@ -121,6 +121,13 @@ K-SOX · SOC 2 · ISO 27001 · GDPR · 网络隔离部署 · PII 自动脱敏
 
 ## 快速开始
 
+### ⚡ 5分钟上手（推荐起点）
+非开发者也能用一条命令从安装到首次诊断。详情：[docs/quickstart-5min.md](docs/quickstart-5min.md)
+```bash
+git clone https://github.com/BoxLogoDev/sapstack.git && cd sapstack
+./setup.sh        # Windows: ./setup.ps1   ·   仅检查: ./setup.sh --check
+```
+
 ### Claude Code
 ```bash
 /plugin marketplace add https://github.com/BoxLogoDev/sapstack

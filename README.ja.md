@@ -121,6 +121,13 @@ K-SOX · SOC 2 · ISO 27001 · GDPR · 分離ネットワーク展開 · PII 自
 
 ## クイック スタート
 
+### ⚡ 5分オンボーディング（推奨スタート）
+非開発者でもインストールから初回診断までコマンド1つ。詳細: [docs/quickstart-5min.md](docs/quickstart-5min.md)
+```bash
+git clone https://github.com/BoxLogoDev/sapstack.git && cd sapstack
+./setup.sh        # Windows: ./setup.ps1   ·   点検のみ: ./setup.sh --check
+```
+
 ### Claude Code
 ```bash
 /plugin marketplace add https://github.com/BoxLogoDev/sapstack

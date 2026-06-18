@@ -121,6 +121,13 @@ K-SOX · SOC 2 · ISO 27001 · GDPR · 망분리 배포 · PII 자동 마스킹
 
 ## 빠른 시작
 
+### ⚡ 5분 온보딩 (추천 시작점)
+비개발자도 설치 → 첫 진단까지 한 명령으로. 자세히: [docs/quickstart-5min.md](docs/quickstart-5min.md)
+```bash
+git clone https://github.com/BoxLogoDev/sapstack.git && cd sapstack
+./setup.sh        # Windows: ./setup.ps1   ·   점검만: ./setup.sh --check
+```
+
 ### Claude Code
 ```bash
 /plugin marketplace add https://github.com/BoxLogoDev/sapstack
