@@ -13,7 +13,7 @@ _"In SAP, it's standard, so it can't be changed." — Ms. Standard ([brand guide
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![languages](https://img.shields.io/badge/languages-6-orange)](#)
 
-**24 plugins · 20 agents · 22 commands · MCP 23 tools (npm) · VS Code extension v2.3.3 · 8 AI tool compat · 6 countries · 6 languages · Compliance ready**
+**24 plugins · 20 agents · 22 commands · MCP 23 tools (npm) · VS Code extension v2.4.0 · 8 AI tool compat · 6 countries · 6 languages · Compliance ready**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 
@@ -111,7 +111,7 @@ Clean Core · Key User Extensibility · 3-Tier Extension · Fit-to-Standard · C
 ### 🚀 MCP Runtime (v2.0+)
 `@boxlogodev/sapstack-mcp` — run the full Evidence Loop from Claude Desktop. **23 tools + 12 prompts + 9 resources**.
 
-### 💻 VS Code Extension (v2.3.3)
+### 💻 VS Code Extension (v2.4.0)
 Session sidebar · YAML validation · Webview rendering · File Watcher
 
 ### 🛡 Compliance ready (v2.0+)

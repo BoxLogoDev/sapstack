@@ -13,7 +13,7 @@ _"Trong SAP, đây là tiêu chuẩn nên không thể thay đổi." — Ms. Sta
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![languages](https://img.shields.io/badge/languages-6-orange)](#)
 
-**24 plugin · 20 agent · 22 lệnh · MCP 23 công cụ (npm) · VS Code extension v2.3.3 · Tương thích 8 AI tool · 6 quốc gia · 6 ngôn ngữ · Sẵn sàng tuân thủ**
+**24 plugin · 20 agent · 22 lệnh · MCP 23 công cụ (npm) · VS Code extension v2.4.0 · Tương thích 8 AI tool · 6 quốc gia · 6 ngôn ngữ · Sẵn sàng tuân thủ**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 
@@ -111,7 +111,7 @@ Clean Core · Key User Extensibility · 3-Tier Extension · Fit-to-Standard · C
 ### 🚀 MCP Runtime (v2.0+)
 `@boxlogodev/sapstack-mcp` — chạy toàn bộ Evidence Loop từ Claude Desktop. **23 công cụ + 12 prompt + 9 resource**.
 
-### 💻 VS Code Extension (v2.3.3)
+### 💻 VS Code Extension (v2.4.0)
 Thanh bên quản lý session · Kiểm tra YAML · Render Webview · File Watcher
 
 ### 🛡 Sẵn sàng tuân thủ (v2.0+)
