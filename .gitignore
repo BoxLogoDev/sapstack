@@ -62,3 +62,6 @@ mcp/.sapstack/
 # 런타임 진단 데이터 — PII 가능성, 절대 커밋 금지 (Learning Loop / Evidence Loop)
 .sapstack/sessions/
 .sapstack/decisions.jsonl
+
+# 사용자 환경 프로필 — 실 회사코드 포함, 커밋 금지 (config.example.yaml 만 공유)
+.sapstack/config.yaml

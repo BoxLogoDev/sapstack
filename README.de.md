@@ -121,6 +121,13 @@ K-SOX · SOC 2 · ISO 27001 · GDPR · Air-Gap-Bereitstellung · automatische PI
 
 ## Schnelleinstieg
 
+### ⚡ 5-Minuten-Onboarding (empfohlener Start)
+Von der Installation bis zur ersten Diagnose mit einem Befehl — kein Programmieren nötig. Details: [docs/quickstart-5min.md](docs/quickstart-5min.md)
+```bash
+git clone https://github.com/BoxLogoDev/sapstack.git && cd sapstack
+./setup.sh        # Windows: ./setup.ps1   ·   nur prüfen: ./setup.sh --check
+```
+
 ### Claude Code
 ```bash
 /plugin marketplace add https://github.com/BoxLogoDev/sapstack
