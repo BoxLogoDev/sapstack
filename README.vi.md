@@ -2,13 +2,18 @@
 
 # 🏛 sapstack
 
-<img src="docs/assets/mascot/standard-en.png" alt="Standard — linh vật của sapstack" width="280" />
+<img src="docs/assets/mascot/standard-en.png" alt="Ms. Standard — linh vật của sapstack" width="280" />
 
 _"Trong SAP, đây là tiêu chuẩn nên không thể thay đổi." — Ms. Standard ([hướng dẫn thương hiệu](MASCOT.md))_
 
 ### Nền tảng SAP Enterprise Operations cho AI Coding Assistants
 
-**24 plugins · 20 agents · 22+ commands · MCP (npm publish) · VS Code extension v0.1 · Tương thích 8 AI tool · 6 quốc gia · 6 ngôn ngữ · Sẵn sàng tuân thủ**
+[![npm](https://img.shields.io/npm/v/@boxlogodev/sapstack-mcp?label=npm&color=cb3837)](https://www.npmjs.com/package/@boxlogodev/sapstack-mcp)
+[![release](https://img.shields.io/github/v/release/BoxLogoDev/sapstack?label=release&color=2ea043)](https://github.com/BoxLogoDev/sapstack/releases)
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![languages](https://img.shields.io/badge/languages-6-orange)](#)
+
+**24 plugin · 20 agent · 22 lệnh · MCP 23 công cụ (npm) · VS Code extension v2.3.3 · Tương thích 8 AI tool · 6 quốc gia · 6 ngôn ngữ · Sẵn sàng tuân thủ**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 
@@ -18,17 +23,29 @@ _"Trong SAP, đây là tiêu chuẩn nên không thể thay đổi." — Ms. Sta
 
 ## sapstack là gì?
 
-**sapstack** là một nền tảng mã nguồn mở giúp đưa **chuyên môn SAP** vào các công cụ AI như Claude, Copilot và Cursor. Nó bao gồm toàn bộ vòng đời hoạt động SAP — **Cấu hình → Triển khai → Vận hành → Chẩn đoán → Tối ưu hóa** — với chẩn đoán dựa trên bằng chứng.
+**sapstack** tiêm **kiến thức chuyên môn SAP** vào các công cụ AI như Claude, Copilot, Cursor. Bao phủ toàn bộ vòng đời vận hành SAP — **Configure → Implement → Operate → Diagnose → Optimize**.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ Nhà vận hành SAP ──┐                                         │
-│                  ├─→ [Công cụ AI] ←── sapstack ──→ Chuyên môn│
-│ Người đào tạo ────┤      ↓                        + IMG Guides│
-│                  ├── Evidence Loop               + Best Pract│
-│ Tư vấn viên ──────┘   (Chẩn đoán 4 lượt)         + Compliance│
+│ Người vận hành ┐                                              │
+│ SAP           ├─→ [AI Tool] ←── sapstack ──→ Kiến thức SAP   │
+│ Người đào tạo ─┤      ↓                       + Hướng dẫn IMG │
+│ nhân viên mới ├── Evidence Loop               + Best Practice │
+│ Tư vấn ────────┘   (chẩn đoán 4 lượt)         + Tuân thủ      │
 └──────────────────────────────────────────────────────────────┘
 ```
+
+> Nguyên tắc ra quyết định nằm ở [**ETHOS.md**](ETHOS.md) — Ground-truth · Bằng chứng trước · Không hardcode · ECC≠S/4 · Ngôn ngữ hiện trường · Người vận hành quyết định.
+
+---
+
+## 👥 Dành cho ai
+
+| Bạn là… | sapstack làm điều này |
+|---|---|
+| **Người vận hành SAP** (hiện trường, chạy đua chốt sổ) | Chẩn đoán sự cố qua **Evidence Loop (4 lượt)** — giả thuyết→bằng chứng→xác minh→rollback, không cần truy cập trực tiếp. Bắt đầu ngay với lệnh theo triệu chứng (`/sap-migo-debug`, `/sap-payment-run-debug` …). |
+| **Người đào tạo / nhân viên mới** | `sap-tutor` phân loại câu hỏi, ủy quyền cho chuyên gia module, và dịch câu trả lời sang ngôn ngữ người mới. Luôn kèm T-code + đường dẫn menu. |
+| **Tư vấn / đối tác SAP** | Tiêm 24 module kiến thức + cấu hình IMG + 3-Tier Best Practice + tuân thủ vào công cụ AI, áp dụng nhanh theo từng môi trường khách hàng. |
 
 ---
 
@@ -49,37 +66,56 @@ Không phải công cụ rời rạc, mà là **một con đường**. Hướng 
 
 ---
 
+## ✅ Xem nó hoạt động (See it work)
+
+**Tình huống**: _"Tôi cố nhập kho bằng MIGO nhưng cứ thất bại."_ — Evidence Loop thu hẹp bằng bằng chứng, không phải khẳng định.
+
+```
+Turn 1 · INTAKE      Môi trường trước: ECC(EhP?) / S/4(release?), loại chuyển động (MvT),
+                     toàn văn thông báo lỗi (M7 xxx).
+Turn 2 · HYPOTHESIS  A: kỳ ghi sổ chưa mở — kiểm tra: MMRV có cho thấy kỳ hiện tại
+                     khớp ngày ghi sổ không? (phản chứng: nếu khớp thì loại A)
+                     B: loại chuyển động / xác định tài khoản (OBYC) — kiểm tra: …
+Turn 3 · COLLECT     (người vận hành chạy MMRV → báo kết quả)
+Turn 4 · VERIFY      Xác nhận lệch kỳ → Fix: chuyển kỳ bằng MMPV (mô phỏng trước,
+                     qua Transport). Kèm kế hoạch rollback + con trỏ SAP Note liên quan.
+```
+
+> Mỗi giả thuyết có **tiêu chí phản chứng**, mỗi bản sửa có **kế hoạch rollback**. Không ghi trực tiếp vào production — người vận hành quyết định. (→ [ETHOS](ETHOS.md))
+
+---
+
 ## Các tính năng chính
 
-### 🎯 Bao gồm đầy đủ các mô-đun SAP
-FI · CO · TR · MM · SD · PP · HCM · PM · QM · WM · EWM · ABAP · BASIS · BTP · SFSF · S4 Migration · GTS · BC · **Cloud PE** · Session
+### 🎯 Bao phủ toàn bộ module SAP
+FI · CO · TR · MM · SD · PP · HCM · PM · QM · WM · EWM · ABAP · BASIS · BTP · SFSF · S4Mig · GTS · BC · **Cloud PE** · Session
 
-### 🤖 15 Agents chuyên gia + 1 SAP Tutor
-11 Module Consultants + ABAP Developer + BASIS Consultant + Integration Advisor + S/4 Migration Advisor + **SAP Tutor** (onboarding nhân viên mới)
+### 🤖 19 agent chuyên môn + 1 SAP tutor
+16 consultant module (FI·CO·TR·MM·SD·PP·PM·QM·EWM·HCM·IBP·SAC·Ariba·Integration-Cloud·Cloud·BASIS) + ABAP developer + Integration advisor + S4 migration advisor + **SAP tutor** (đào tạo nhân viên mới)
 
 ### 🔁 Evidence Loop (v1.5+)
-Chẩn đoán mà không cần truy cập SAP trực tiếp — cấu trúc **INTAKE → HYPOTHESIS → COLLECT → VERIFY** 4 lượt, yêu cầu tiêu chí phản chứng, bắt buộc rollback pair
+Chẩn đoán không cần truy cập SAP trực tiếp — cấu trúc 4 lượt **INTAKE → HYPOTHESIS → COLLECT → VERIFY**, bắt buộc tiêu chí phản chứng, bắt buộc cặp rollback
 
-### 🏗 IMG Configuration Framework (v1.6+)
-55+ hướng dẫn cấu hình dựa trên SPRO — các bước thiết lập, sự khác biệt ECC vs S/4, phương pháp xác thực bao gồm
+### 🏗 Khung cấu hình IMG (v1.6+)
+76 hướng dẫn cấu hình dựa trên SPRO — các bước cấu hình, khác biệt ECC vs S/4, phương pháp xác minh
 
-### 📋 Best Practice 3-Tier
-**Operational** (hàng ngày) · **Period-End** (đóng cửa) · **Governance** (audit) — áp dụng một cách hệ thống trên 11 mô-đun
+### 📋 3-Tier Best Practice
+**Operational** (hàng ngày) · **Period-End** (khóa sổ) · **Governance** (quản trị) — áp dụng cho 23 module
 
 ### 🌐 Hỗ trợ 6 ngôn ngữ (v1.7+)
-한국어 · English · 中文 · 日本語 · Deutsch · Tiếng Việt
+한국어 · English · 中文 · 日本語 · Deutsch · Tiếng Việt — 24 module × 5 ngôn ngữ = 120 quick-guide
 
-### ☁️ S/4HANA Cloud PE Ready
+### ☁️ Sẵn sàng S/4HANA Cloud PE
 Clean Core · Key User Extensibility · 3-Tier Extension · Fit-to-Standard · Cloud ALM
 
 ### 🚀 MCP Runtime (v2.0+)
-`@boxlogodev/sapstack-mcp` — chạy Evidence Loop đầy đủ trong Claude Desktop. 5 công cụ đọc + 3 công cụ ghi.
+`@boxlogodev/sapstack-mcp` — chạy toàn bộ Evidence Loop từ Claude Desktop. **23 công cụ + 12 prompt + 9 resource**.
 
-### 💻 VS Code Extension (v2.0+)
-Session sidebar · YAML validation · Webview rendering · File Watcher
+### 💻 VS Code Extension (v2.3.3)
+Thanh bên quản lý session · Kiểm tra YAML · Render Webview · File Watcher
 
-### 🛡 Compliance Ready (v2.0+)
-K-SOX · SOC 2 · ISO 27001 · GDPR · Triển khai khoảng không khí · Tự động che dấu PII
+### 🛡 Sẵn sàng tuân thủ (v2.0+)
+K-SOX · SOC 2 · ISO 27001 · GDPR · triển khai mạng cô lập · tự động che PII
 
 ---
 
@@ -91,14 +127,14 @@ K-SOX · SOC 2 · ISO 27001 · GDPR · Triển khai khoảng không khí · Tự
 /plugin install sap-fi@sapstack sap-session@sapstack
 ```
 
-### NPM (MCP Server)
+### NPM (MCP server)
 ```bash
 npm install -g @boxlogodev/sapstack-mcp
 sapstack-mcp --sessions-dir ~/.sapstack/sessions
 ```
 
 ### VS Code Extension
-Tìm kiếm "sapstack" trong VS Code Marketplace → Cài đặt
+Tìm "sapstack" trong VS Code Marketplace → Install ·(hoặc cài `.vsix` trực tiếp từ [GitHub Release](https://github.com/BoxLogoDev/sapstack/releases))
 
 ### Amazon Kiro IDE
 ```bash
@@ -107,79 +143,83 @@ cp sapstack/.kiro/settings/mcp.json .kiro/settings/
 cp sapstack/.kiro/steering/*.md .kiro/steering/
 ```
 
-### Các nền tảng khác (Codex / Copilot / Cursor / Continue.dev / Aider)
-Clone repository → tự động phát hiện. Chi tiết: [docs/multi-ai-compatibility.md](docs/multi-ai-compatibility.md)
+### Khác (Codex / Copilot / Cursor / Continue.dev / Aider)
+Clone repo → tự động nhận diện. Chi tiết: [docs/multi-ai-compatibility.md](docs/multi-ai-compatibility.md)
 
 ---
 
 ## Universal Rules
 
-1. **Không bao giờ hardcode mã công ty** — Không có mã công ty cố định, tài khoản GL, trung tâm chi phí hoặc đơn vị tổ chức
-2. **Intake môi trường trước tiên** — Xác nhận phiên bản SAP, mô hình triển khai và cấu trúc công ty trước
-3. **ECC vs S/4HANA rõ ràng** — Hành vi cụ thể theo phiên bản phải được phân biệt rõ ràng
-4. **Yêu cầu Transport** — Tất cả các thay đổi sản xuất đều cần yêu cầu transport
-5. **Mô phỏng trước khi thực thi** — Chạy AFAB, F.13, FAGL_FC_VAL, MR11, F110 trong kiểm tra trước tiên
-6. **Không chỉnh sửa SE16N** — Không khuyến khích sửa đổi dữ liệu trực tiếp trong sản xuất
-7. **T-code + SPRO path** — Cung cấp cả hai cho mỗi hành động
-8. **Chẩn đoán dựa trên bằng chứng** — Mỗi giả thuyết cần tiêu chí phản chứng
+1. **Tuyệt đối không hardcode** — không cố định mã công ty, tài khoản GL, đơn vị tổ chức
+2. **Thu thập môi trường trước** — xác nhận release SAP, mô hình triển khai, mã công ty trước
+3. **Phân biệt rõ ECC vs S/4HANA** — làm rõ hành vi theo phiên bản
+4. **Bắt buộc Transport** — thay đổi production luôn qua Transport
+5. **Mô phỏng trước** — AFAB, F.13, FAGL_FC_VAL, MR11, F110, v.v.
+6. **Không sửa SE16N** — không khuyến nghị sửa trực tiếp dữ liệu production
+7. **T-code + đường dẫn SPRO** — cung cấp cả hai cho mọi thao tác
+8. **Tiếng Hàn ưu tiên ngôn ngữ hiện trường** — ghi kép "코스트 센터 (원가센터, KOSTL)"
+
+> *Lý do* đằng sau các quy tắc này nằm ở [**ETHOS.md**](ETHOS.md), toàn bộ quy tắc vận hành ở [CLAUDE.md](CLAUDE.md).
 
 ---
 
-## Đường dẫn học tập
+## Lộ trình học
 
-| Mức độ | Đường dẫn |
-|-------|------|
-| 🆕 **Người mới bắt đầu** | [Hướng dẫn (15 phút)](docs/tutorial.md) → [Câu hỏi thường gặp](docs/faq.md) |
-| 📘 **Thực hành** | [5 Kịch bản](docs/scenarios/) → [Thuật ngữ](docs/glossary.md) |
-| 🏗 **Nâng cao** | [Kiến trúc](docs/architecture.md) → [Hướng dẫn Multi-AI](docs/multi-ai-compatibility.md) |
+| Cấp độ | Lộ trình |
+|------|------|
+| 🆕 **Nhập môn** | [Hướng dẫn (15 phút)](docs/tutorial.md) → [FAQ](docs/faq.md) |
+| 📘 **Thực chiến** | [5 kịch bản](docs/scenarios/) → [Bảng thuật ngữ](docs/glossary.md) |
+| 🧭 **Workflow** | [Golden Path](docs/workflow.md) → [Phân tích khoảng cách](docs/gstack-gap-analysis.md) |
+| 🏗 **Chuyên sâu** | [Kiến trúc](docs/architecture.md) → [Hướng dẫn Multi-AI](docs/multi-ai-compatibility.md) |
 | 🔒 **Bảo mật** | [SECURITY.md](SECURITY.md) → [Tuân thủ](docs/compliance/) |
 | 🤝 **Đóng góp** | [CONTRIBUTING](CONTRIBUTING.md) → [Lộ trình](docs/roadmap.md) |
 
 ---
 
-## Data Assets
+## Tài sản dữ liệu
 
 | Tài sản | Số lượng | Tệp |
-|-------|------|------|
-| Validated T-codes | 340+ | [`data/tcodes.yaml`](data/tcodes.yaml) |
-| Natural Language Symptom Index | 62 (6 ngôn ngữ) | [`data/symptom-index.yaml`](data/symptom-index.yaml) |
-| SAP Notes | 57+ | [`data/sap-notes.yaml`](data/sap-notes.yaml) |
-| Multilingual Synonyms | 80+ terms × 6 languages | [`data/synonyms.yaml`](data/synonyms.yaml) |
-| Period-End Sequence | 24 steps | [`data/period-end-sequence.yaml`](data/period-end-sequence.yaml) |
-| Industry Matrix | 3 sectors | [`data/industry-matrix.yaml`](data/industry-matrix.yaml) |
+|------|------|------|
+| T-code đã xác minh | 361 | [`data/tcodes.yaml`](data/tcodes.yaml) |
+| Chỉ mục triệu chứng ngôn ngữ tự nhiên | 90 (6 ngôn ngữ) | [`data/symptom-index.yaml`](data/symptom-index.yaml) |
+| SAP Note/KBA đã xác minh | 112 | [`data/sap-notes.yaml`](data/sap-notes.yaml) |
+| Synonym đa ngôn ngữ | 80+ terms × 6 langs | [`data/synonyms.yaml`](data/synonyms.yaml) |
+| Trình tự khóa sổ kỳ | 24 bước | [`data/period-end-sequence.yaml`](data/period-end-sequence.yaml) |
+| Ma trận ngành | 7 industries | [`data/industry-matrix.yaml`](data/industry-matrix.yaml) |
 
 ---
 
-## Plugin Catalog
+## Danh mục plugin
 
-| Lĩnh vực | Plugins |
-|--------|---------|
+| Lĩnh vực | Plugin |
+|------|----------|
 | 💰 **Tài chính** | [sap-fi](plugins/sap-fi/) · [sap-co](plugins/sap-co/) · [sap-tr](plugins/sap-tr/) |
 | 📦 **Logistics** | [sap-mm](plugins/sap-mm/) · [sap-sd](plugins/sap-sd/) · [sap-pp](plugins/sap-pp/) · [sap-pm](plugins/sap-pm/) · [sap-qm](plugins/sap-qm/) · [sap-wm](plugins/sap-wm/) · [sap-ewm](plugins/sap-ewm/) |
 | 👥 **Nhân sự** | [sap-hcm](plugins/sap-hcm/) · [sap-sfsf](plugins/sap-sfsf/) |
 | 💻 **Công nghệ** | [sap-abap](plugins/sap-abap/) · [sap-s4-migration](plugins/sap-s4-migration/) · [sap-btp](plugins/sap-btp/) · [sap-basis](plugins/sap-basis/) · [sap-cloud](plugins/sap-cloud/) |
-| 🌍 **Toàn cầu** | [sap-bc](plugins/sap-bc/) · [sap-gts](plugins/sap-gts/) |
+| ☁️ **Cloud/Tích hợp** | [sap-ibp](plugins/sap-ibp/) · [sap-sac](plugins/sap-sac/) · [sap-ariba](plugins/sap-ariba/) · [sap-integration-cloud](plugins/sap-integration-cloud/) |
+| 🇰🇷 **Hàn Quốc/Toàn cầu** | [sap-bc](plugins/sap-bc/) · [sap-gts](plugins/sap-gts/) |
 | 🔁 **Meta** | [sap-session](plugins/sap-session/) (Evidence Loop) |
 
 ---
 
-## Đóng góp dịch thuật
+## Review bản dịch — Hoan nghênh đóng góp
 
-Quick-guide 5 ngôn ngữ (en/zh/ja/de/vi) là **bản nháp do Claude soạn**. Hoan nghênh người bản ngữ + chuyên gia SAP rà soát.
+Các quick-guide 5 ngôn ngữ (en/zh/ja/de/vi) là **bản nháp do Claude soạn**. Hoan nghênh review từ người bản ngữ + chuyên gia lĩnh vực SAP.
 
-- Quy trình·tiêu chí·định dạng PR: **[docs/TRANSLATION-REVIEW.md](docs/TRANSLATION-REVIEW.md)**
+- Quy trình · tiêu chí · định dạng PR: **[docs/TRANSLATION-REVIEW.md](docs/TRANSLATION-REVIEW.md)**
 - Phản hồi: [Translation Feedback issue](https://github.com/BoxLogoDev/sapstack/issues/new?template=translation-feedback.md)
-- T-code / số Note không dịch (giữ nguyên dạng gốc)
+- Số T-code/Note không dịch (giữ nguyên)
 
 ---
 
-## Giấy phép và Đóng góp
+## Giấy phép & Đóng góp
 
-**MIT License** — Miễn phí cho cả sử dụng thương mại và không thương mại. Cần ghi công.
+**MIT License** — tự do dùng cho mục đích thương mại và phi thương mại. Giữ thông báo bản quyền.
 
-- 🐛 [Báo cáo lỗi](https://github.com/BoxLogoDev/sapstack/issues/new?template=bug_report.md)
+- 🐛 [Báo lỗi](https://github.com/BoxLogoDev/sapstack/issues/new?template=bug_report.md)
 - ✨ [Yêu cầu tính năng](https://github.com/BoxLogoDev/sapstack/issues/new?template=feature_request.md)
-- 💬 [Bắt đầu thảo luận](https://github.com/BoxLogoDev/sapstack/discussions)
+- 💬 [Thảo luận](https://github.com/BoxLogoDev/sapstack/discussions)
 - 📖 [Hướng dẫn đóng góp](CONTRIBUTING.md)
 
 ---
@@ -187,6 +227,6 @@ Quick-guide 5 ngôn ngữ (en/zh/ja/de/vi) là **bản nháp do Claude soạn**.
 <div align="center">
 
 **Made with 🇰🇷 by [@BoxLogoDev](https://github.com/BoxLogoDev)**
-Xây dựng cho các chuyên gia SAP toàn cầu · Chia sẻ với cộng đồng mã nguồn mở
+Built for Korean SAP consultants · Shared with the global community
 
 </div>

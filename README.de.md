@@ -2,13 +2,18 @@
 
 # 🏛 sapstack
 
-<img src="docs/assets/mascot/standard-en.png" alt="Standard — das sapstack-Maskottchen" width="280" />
+<img src="docs/assets/mascot/standard-en.png" alt="Ms. Standard — das sapstack-Maskottchen" width="280" />
 
 _„In SAP ist das Standard, also kann es nicht geändert werden." — Ms. Standard ([Markenrichtlinie](MASCOT.md))_
 
 ### AI-Codierungsassistent für SAP-Unternehmensoperationen
 
-**24 Plugins · 20 Agenten · 22+ Befehle · MCP (npm publish) · VS Code-Erweiterung v0.1 · 8 KI-Tool-Kompatibilität · 6 Länder · 6 Sprachen · Konformitätsbereit**
+[![npm](https://img.shields.io/npm/v/@boxlogodev/sapstack-mcp?label=npm&color=cb3837)](https://www.npmjs.com/package/@boxlogodev/sapstack-mcp)
+[![release](https://img.shields.io/github/v/release/BoxLogoDev/sapstack?label=release&color=2ea043)](https://github.com/BoxLogoDev/sapstack/releases)
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![languages](https://img.shields.io/badge/languages-6-orange)](#)
+
+**24 Plugins · 20 Agenten · 22 Befehle · MCP 23 Tools (npm) · VS Code-Erweiterung v2.3.3 · 8 KI-Tool-Kompatibilität · 6 Länder · 6 Sprachen · Konformitätsbereit**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 
@@ -18,17 +23,29 @@ _„In SAP ist das Standard, also kann es nicht geändert werden." — Ms. Stand
 
 ## Was ist sapstack?
 
-**sapstack** ist eine Open-Source-Plattform, die **SAP-Fachkompetenz** in AI-Tools wie Claude, Copilot und Cursor einbringt. Sie umfasst den gesamten SAP-Operationszyklus — **Konfigurieren → Implementieren → Betreiben → Diagnostizieren → Optimieren** — mit evidenzgestützter Diagnostik.
+**sapstack** spritzt **SAP-Fachwissen** in KI-Tools wie Claude, Copilot und Cursor ein. Es deckt den gesamten SAP-Betriebslebenszyklus ab — **Configure → Implement → Operate → Diagnose → Optimize**.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ SAP-Betreiber ─────┐                                         │
-│                  ├─→ [AI-Tool] ←── sapstack ──→ SAP-Know-how│
-│ Trainer ─────────┤      ↓                      + IMG-Guides  │
-│                  ├── Evidence Loop             + Best Pract. │
-│ Berater ────────┘    (4-Turn-Diagnose)        + Compliance  │
+│ SAP-Betreiber ┐                                               │
+│              ├─→ [AI Tool] ←── sapstack ──→ SAP-Wissen       │
+│ Trainer für ──┤      ↓                       + IMG-Leitfäden  │
+│ Neulinge     ├── Evidence Loop               + Best Practice  │
+│ Berater ──────┘   (4-Turn-Diagnose)          + Compliance     │
 └──────────────────────────────────────────────────────────────┘
 ```
+
+> Die Entscheidungsprinzipien stehen in [**ETHOS.md**](ETHOS.md) — Ground-truth · Evidenz zuerst · Kein Hardcoding · ECC≠S/4 · Feldsprache · Betreiber entscheidet.
+
+---
+
+## 👥 Für wen das ist
+
+| Sie sind… | sapstack macht das |
+|---|---|
+| **SAP-Betreiber** (im Tagesgeschäft, im Abschlussstress) | Störungen über den **Evidence Loop (4 Runden)** diagnostizieren — Hypothese→Evidenz→Verifizierung→Rollback, ohne Live-Zugriff. Direkt einsteigen mit Symptom-Befehlen (`/sap-migo-debug`, `/sap-payment-run-debug` …). |
+| **Trainer für Neulinge / neue Mitarbeitende** | `sap-tutor` klassifiziert die Frage, delegiert an einen Modulspezialisten und übersetzt die Antwort in Anfängersprache. T-Code + Menüpfad immer gepaart. |
+| **SAP-Berater / Partner** | 24 Module Wissen + IMG-Konfiguration + 3-Tier Best Practice + Compliance in KI-Tools einspeisen, pro Kundenlandschaft angepasst. |
 
 ---
 
@@ -49,37 +66,56 @@ Keine verstreuten Werkzeuge, sondern **ein Weg**. Vollständige Anleitung: **[do
 
 ---
 
+## ✅ So funktioniert es (See it work)
+
+**Szenario**: _„Ich versuche, einen Wareneingang in MIGO zu buchen, aber es schlägt immer fehl."_ — der Evidence Loop grenzt mit Evidenz ein, nicht mit Behauptungen.
+
+```
+Turn 1 · INTAKE      Zuerst die Umgebung: ECC(EhP?) / S/4(Release?), Bewegungsart (BWA),
+                     vollständige Fehlermeldung (M7 xxx).
+Turn 2 · HYPOTHESIS  A: Buchungsperiode nicht offen — Prüfung: Zeigt MMRV die aktuelle
+                     Periode passend zum Buchungsdatum? (Falsifikation: passt sie, A verwerfen)
+                     B: Bewegungsart / Kontenfindung (OBYC) — Prüfung: …
+Turn 3 · COLLECT     (Betreiber führt MMRV aus → meldet das Ergebnis)
+Turn 4 · VERIFY      Periodenkonflikt bestätigt → Fix: Periode mit MMPV verschieben
+                     (zuerst simulieren, via Transport). Rollback-Plan + relevanter SAP-Note-Verweis.
+```
+
+> Jede Hypothese trägt ein **Falsifikationskriterium**, jeder Fix einen **Rollback-Plan**. Keine direkten Produktivschreibvorgänge — der Betreiber entscheidet. (→ [ETHOS](ETHOS.md))
+
+---
+
 ## Kernfunktionen
 
 ### 🎯 Vollständige SAP-Modulabdeckung
-FI · CO · TR · MM · SD · PP · HCM · PM · QM · WM · EWM · ABAP · BASIS · BTP · SFSF · S4-Migration · GTS · BC · **Cloud PE** · Session
+FI · CO · TR · MM · SD · PP · HCM · PM · QM · WM · EWM · ABAP · BASIS · BTP · SFSF · S4Mig · GTS · BC · **Cloud PE** · Session
 
-### 🤖 15 Spezialisten-Agenten + 1 SAP-Tutor
-11 Modulberater + ABAP-Entwickler + BASIS-Berater + Integrations-Advisor + S/4-Migrations-Advisor + **SAP-Tutor** (Onboarding neuer Mitarbeiter)
+### 🤖 19 Spezialagenten + 1 SAP-Tutor
+16 Modulberater (FI·CO·TR·MM·SD·PP·PM·QM·EWM·HCM·IBP·SAC·Ariba·Integration-Cloud·Cloud·BASIS) + ABAP developer + Integration advisor + S4 migration advisor + **SAP tutor** (Einarbeitung)
 
 ### 🔁 Evidence Loop (v1.5+)
-Diagnose ohne Live-SAP-Zugriff — **Aufnahme → Hypothese → Erfassung → Verifikation** 4-Turn-Struktur, Falsifizierungskriterien erforderlich, Rollback-Paar obligatorisch
+Diagnose ohne Live-SAP-Zugriff — **INTAKE → HYPOTHESIS → COLLECT → VERIFY** 4-Runden-Struktur, Falsifikationskriterien erforderlich, Rollback-Paarung erforderlich
 
-### 🏗 IMG-Konfigurationsrahmen (v1.6+)
-55+ SPRO-basierte Konfigurationshandbücher — Schritte, ECC vs S/4 Unterschiede, Validierungsmethoden enthalten
+### 🏗 IMG-Konfigurationsframework (v1.6+)
+76 SPRO-basierte Konfigurationsleitfäden — Konfigurationsschritte, ECC vs. S/4-Unterschiede, Verifizierungsmethoden
 
-### 📋 3-Schicht-Best-Practices
-**Betrieb** (täglich) · **Periodenabschluss** (Abschluss) · **Governance** (Audit) — systematisch über 11 Module angewendet
+### 📋 3-Tier Best Practice
+**Operational** (täglich) · **Period-End** (Abschluss) · **Governance** — auf 23 Module angewandt
 
-### 🌐 6-Sprachunterstützung (v1.7+)
-한국어 · English · 中文 · 日本語 · Deutsch · Tiếng Việt
+### 🌐 6-Sprachen-Unterstützung (v1.7+)
+한국어 · English · 中文 · 日本語 · Deutsch · Tiếng Việt — 24 Module × 5 Sprachen = 120 Quick-Guides
 
-### ☁️ S/4HANA Cloud PE-ready
-Clean Core · Key User Extensibility · 3-Schicht-Erweiterung · Fit-to-Standard · Cloud ALM
+### ☁️ S/4HANA Cloud PE bereit
+Clean Core · Key User Extensibility · 3-Tier Extension · Fit-to-Standard · Cloud ALM
 
-### 🚀 MCP-Laufzeit (v2.0+)
-`@boxlogodev/sapstack-mcp` — vollständige Evidence Loop in Claude Desktop ausführen. 5 Lesewerkzeuge + 3 Schreibwerkzeuge.
+### 🚀 MCP Runtime (v2.0+)
+`@boxlogodev/sapstack-mcp` — den vollständigen Evidence Loop aus Claude Desktop ausführen. **23 Tools + 12 Prompts + 9 Ressourcen**.
 
-### 💻 VS Code-Erweiterung (v2.0+)
-Sitzungs-Seitenleiste · YAML-Validierung · Webview-Rendering · Datei-Watcher
+### 💻 VS Code Extension (v2.3.3)
+Sitzungs-Seitenleiste · YAML-Validierung · Webview-Rendering · File Watcher
 
 ### 🛡 Konformitätsbereit (v2.0+)
-K-SOX · SOC 2 · ISO 27001 · GDPR · Air-gapped-Bereitstellung · Automatisches PII-Masking
+K-SOX · SOC 2 · ISO 27001 · GDPR · Air-Gap-Bereitstellung · automatische PII-Maskierung
 
 ---
 
@@ -97,8 +133,8 @@ npm install -g @boxlogodev/sapstack-mcp
 sapstack-mcp --sessions-dir ~/.sapstack/sessions
 ```
 
-### VS Code-Erweiterung
-Im VS Code Marketplace nach "sapstack" suchen → Installieren
+### VS Code Extension
+Im VS Code Marketplace nach "sapstack" suchen → Install ·(oder die `.vsix` direkt aus einem [GitHub Release](https://github.com/BoxLogoDev/sapstack/releases) installieren)
 
 ### Amazon Kiro IDE
 ```bash
@@ -107,79 +143,83 @@ cp sapstack/.kiro/settings/mcp.json .kiro/settings/
 cp sapstack/.kiro/steering/*.md .kiro/steering/
 ```
 
-### Andere Plattformen (Codex / Copilot / Cursor / Continue.dev / Aider)
-Repository klonen → automatisch erkannt. Details: [docs/multi-ai-compatibility.md](docs/multi-ai-compatibility.md)
+### Andere (Codex / Copilot / Cursor / Continue.dev / Aider)
+Repo klonen → automatisch erkannt. Details: [docs/multi-ai-compatibility.md](docs/multi-ai-compatibility.md)
 
 ---
 
-## Universelle Regeln
+## Universal Rules
 
-1. **Gesellschaftscodes niemals hardcodieren** — Keine festen Gesellschaftscodes, GL-Konten, Kostenstellen oder Organisationseinheiten
-2. **Umgebungsaufnahme zuerst** — SAP-Release, Bereitstellungsmodell und Unternehmensstruktur zuerst bestätigen
-3. **ECC vs S/4HANA explizit unterscheiden** — Versionsspezifische Verhaltensweisen müssen klar unterschieden werden
-4. **Transportanforderung erforderlich** — Alle Produktionsänderungen benötigen eine Transportanforderung
-5. **Vor tatsächlicher Ausführung simulieren** — AFAB, F.13, FAGL_FC_VAL, MR11, F110 zuerst im Test ausführen
-6. **Keine SE16N-Bearbeitungen** — Direktes Ändern von Produktionsdaten nicht empfohlen
-7. **T-Code + SPRO-Pfad** — Beide für jede Aktion bereitstellen
-8. **Evidenzgestützte Diagnostik** — Jede Hypothese benötigt Falsifizierungskriterien
+1. **Niemals hardcoden** — keine festen Buchungskreise, Sachkonten oder Org-Einheiten
+2. **Umgebungsabfrage zuerst** — SAP-Release, Bereitstellungsmodell, Buchungskreis klären
+3. **ECC vs. S/4HANA explizit unterscheiden** — versionsspezifisches Verhalten klar machen
+4. **Transport erforderlich** — Produktivänderungen immer über Transport
+5. **Zuerst simulieren** — AFAB, F.13, FAGL_FC_VAL, MR11, F110 usw.
+6. **Keine SE16N-Bearbeitung** — direkte Produktivdatenänderungen nicht empfehlen
+7. **T-Code + SPRO-Pfad** — für jede Aktion beides angeben
+8. **Koreanisch: Feldsprache zuerst** — Doppelnotation "코스트 센터 (원가센터, KOSTL)"
+
+> Das *Warum* hinter diesen Regeln steht in [**ETHOS.md**](ETHOS.md), die vollständigen Betriebsregeln in [CLAUDE.md](CLAUDE.md).
 
 ---
 
 ## Lernpfad
 
 | Stufe | Pfad |
-|-------|------|
-| 🆕 **Anfänger** | [Anleitung (15 Min.)](docs/tutorial.md) → [FAQ](docs/faq.md) |
-| 📘 **Praktisch** | [5 Szenarien](docs/scenarios/) → [Glossar](docs/glossary.md) |
-| 🏗 **Fortgeschrittene** | [Architektur](docs/architecture.md) → [Multi-AI-Handbuch](docs/multi-ai-compatibility.md) |
-| 🔒 **Sicherheit** | [SECURITY.md](SECURITY.md) → [Konformität](docs/compliance/) |
+|------|------|
+| 🆕 **Einstieg** | [Tutorial (15 Min.)](docs/tutorial.md) → [FAQ](docs/faq.md) |
+| 📘 **Praxis** | [5 Szenarien](docs/scenarios/) → [Glossar](docs/glossary.md) |
+| 🧭 **Workflow** | [Golden Path](docs/workflow.md) → [Gap-Analyse](docs/gstack-gap-analysis.md) |
+| 🏗 **Vertiefung** | [Architektur](docs/architecture.md) → [Multi-AI-Leitfaden](docs/multi-ai-compatibility.md) |
+| 🔒 **Sicherheit** | [SECURITY.md](SECURITY.md) → [Compliance](docs/compliance/) |
 | 🤝 **Beitragen** | [CONTRIBUTING](CONTRIBUTING.md) → [Roadmap](docs/roadmap.md) |
 
 ---
 
 ## Datenbestände
 
-| Bestand | Menge | Datei |
-|-------|------|------|
-| Validierte T-codes | 340+ | [`data/tcodes.yaml`](data/tcodes.yaml) |
-| Natural Language Symptom Index | 62 (6 Sprachen) | [`data/symptom-index.yaml`](data/symptom-index.yaml) |
-| SAP-Hinweise | 57+ | [`data/sap-notes.yaml`](data/sap-notes.yaml) |
-| Mehrsprachige Synonyme | 80+ Begriffe × 6 Sprachen | [`data/synonyms.yaml`](data/synonyms.yaml) |
-| Periodenabschlussfolge | 24 Schritte | [`data/period-end-sequence.yaml`](data/period-end-sequence.yaml) |
-| Branchenmatrix | 3 Branchen | [`data/industry-matrix.yaml`](data/industry-matrix.yaml) |
+| Asset | Anzahl | Datei |
+|------|------|------|
+| Verifizierte T-Codes | 361 | [`data/tcodes.yaml`](data/tcodes.yaml) |
+| Natürlichsprachiger Symptomindex | 90 (6 Sprachen) | [`data/symptom-index.yaml`](data/symptom-index.yaml) |
+| Verifizierte SAP Notes/KBAs | 112 | [`data/sap-notes.yaml`](data/sap-notes.yaml) |
+| Mehrsprachige Synonyme | 80+ terms × 6 langs | [`data/synonyms.yaml`](data/synonyms.yaml) |
+| Periodenabschlusssequenz | 24 Schritte | [`data/period-end-sequence.yaml`](data/period-end-sequence.yaml) |
+| Branchenmatrix | 7 industries | [`data/industry-matrix.yaml`](data/industry-matrix.yaml) |
 
 ---
 
 ## Plugin-Katalog
 
 | Bereich | Plugins |
-|--------|---------|
+|------|----------|
 | 💰 **Finanzen** | [sap-fi](plugins/sap-fi/) · [sap-co](plugins/sap-co/) · [sap-tr](plugins/sap-tr/) |
 | 📦 **Logistik** | [sap-mm](plugins/sap-mm/) · [sap-sd](plugins/sap-sd/) · [sap-pp](plugins/sap-pp/) · [sap-pm](plugins/sap-pm/) · [sap-qm](plugins/sap-qm/) · [sap-wm](plugins/sap-wm/) · [sap-ewm](plugins/sap-ewm/) |
-| 👥 **Personalwirtschaft** | [sap-hcm](plugins/sap-hcm/) · [sap-sfsf](plugins/sap-sfsf/) |
+| 👥 **Personal** | [sap-hcm](plugins/sap-hcm/) · [sap-sfsf](plugins/sap-sfsf/) |
 | 💻 **Technologie** | [sap-abap](plugins/sap-abap/) · [sap-s4-migration](plugins/sap-s4-migration/) · [sap-btp](plugins/sap-btp/) · [sap-basis](plugins/sap-basis/) · [sap-cloud](plugins/sap-cloud/) |
-| 🌍 **Global** | [sap-bc](plugins/sap-bc/) · [sap-gts](plugins/sap-gts/) |
+| ☁️ **Cloud/Integration** | [sap-ibp](plugins/sap-ibp/) · [sap-sac](plugins/sap-sac/) · [sap-ariba](plugins/sap-ariba/) · [sap-integration-cloud](plugins/sap-integration-cloud/) |
+| 🇰🇷 **Korea/Global** | [sap-bc](plugins/sap-bc/) · [sap-gts](plugins/sap-gts/) |
 | 🔁 **Meta** | [sap-session](plugins/sap-session/) (Evidence Loop) |
 
 ---
 
-## Übersetzungen beitragen
+## Übersetzungsreview — Beiträge willkommen
 
-Die 5-sprachigen Quick-Guides (en/zh/ja/de/vi) sind **Claude-erstellte Entwürfe**. Muttersprachler + SAP-Domänenexperten sind zur Prüfung eingeladen.
+Die Quick-Guides in 5 Sprachen (en/zh/ja/de/vi) sind **von Claude erstellte Entwürfe**. Review durch Muttersprachler + SAP-Fachexperten ist willkommen.
 
-- Ablauf, Kriterien, PR-Format: **[docs/TRANSLATION-REVIEW.md](docs/TRANSLATION-REVIEW.md)**
-- Feedback: [Translation-Feedback-Issue](https://github.com/BoxLogoDev/sapstack/issues/new?template=translation-feedback.md)
-- T-Codes / Note-Nummern werden nicht übersetzt (Originalform beibehalten)
+- Prozess · Kriterien · PR-Format: **[docs/TRANSLATION-REVIEW.md](docs/TRANSLATION-REVIEW.md)**
+- Feedback: [Translation Feedback Issue](https://github.com/BoxLogoDev/sapstack/issues/new?template=translation-feedback.md)
+- T-Code/Note-Nummern werden nicht übersetzt (wortgetreu beibehalten)
 
 ---
 
-## Lizenz & Beiträge
+## Lizenz & Beitrag
 
-**MIT-Lizenz** — frei für kommerzielle und nichtkommerzielle Nutzung. Namensnennung erforderlich.
+**MIT License** — frei für kommerzielle und nicht-kommerzielle Nutzung. Copyright-Hinweis beibehalten.
 
-- 🐛 [Bug melden](https://github.com/BoxLogoDev/sapstack/issues/new?template=bug_report.md)
-- ✨ [Feature anfordern](https://github.com/BoxLogoDev/sapstack/issues/new?template=feature_request.md)
-- 💬 [Diskussion starten](https://github.com/BoxLogoDev/sapstack/discussions)
+- 🐛 [Fehlerbericht](https://github.com/BoxLogoDev/sapstack/issues/new?template=bug_report.md)
+- ✨ [Funktionswunsch](https://github.com/BoxLogoDev/sapstack/issues/new?template=feature_request.md)
+- 💬 [Diskussionen](https://github.com/BoxLogoDev/sapstack/discussions)
 - 📖 [Beitragsleitfaden](CONTRIBUTING.md)
 
 ---
@@ -187,6 +227,6 @@ Die 5-sprachigen Quick-Guides (en/zh/ja/de/vi) sind **Claude-erstellte Entwürfe
 <div align="center">
 
 **Made with 🇰🇷 by [@BoxLogoDev](https://github.com/BoxLogoDev)**
-Entwickelt für SAP-Profis weltweit · Open Source für die globale Community
+Built for Korean SAP consultants · Shared with the global community
 
 </div>
