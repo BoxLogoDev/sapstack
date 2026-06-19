@@ -12,10 +12,15 @@
 // 의존성: Node 20+ 내장 fetch + js-yaml (mcp/node_modules 에서 NODE_PATH 로 해결)
 //   → scripts/eval-diagnosis.sh 가 NODE_PATH 를 세팅해 호출. 직접 실행도 가능.
 //
+// Provider (자동 선택): ANTHROPIC_API_KEY 있으면 'api', 없고 claude CLI 있으면
+//   'claude-cli'(구독·추가비용 0), 둘 다 없으면 dry-run. EVAL_PROVIDER 로 강제 가능.
+//
 // 환경변수:
-//   ANTHROPIC_API_KEY — 필수 (없으면 --dry-run 만 가능)
-//   EVAL_MODEL        — 답변 생성 모델 (기본 claude-sonnet-4-6)
-//   EVAL_JUDGE_MODEL  — 채점 모델 (기본 EVAL_MODEL 과 동일)
+//   EVAL_PROVIDER     — api | claude-cli (미지정 시 자동)
+//   ANTHROPIC_API_KEY — provider=api 일 때 필요
+//   EVAL_MODEL        — 답변 모델 (api: claude-sonnet-4-6 / cli: sonnet)
+//   EVAL_JUDGE_MODEL  — 채점 모델 (기본 EVAL_MODEL)
+//   EVAL_CLI_MAX_TURNS(기본 6) / EVAL_CLI_RETRIES(기본 2) / EVAL_CLI_PACE_MS(기본 2000)
 //
 // 사용:
 //   node scripts/eval/run.mjs --dry-run
@@ -23,9 +28,11 @@
 //   node scripts/eval/run.mjs --module FI
 //   node scripts/eval/run.mjs --all --limit 5
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { tmpdir } from 'node:os';
+import { spawnSync } from 'node:child_process';
 import yaml from 'js-yaml';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -45,7 +52,17 @@ const MODULE_AGENT = {
 };
 
 const API_URL = 'https://api.anthropic.com/v1/messages';
-const MODEL = process.env.EVAL_MODEL || 'claude-sonnet-4-6';
+
+// Provider 선택: 유료 API 키가 있으면 api, 없으면 구독 claude CLI(추가 비용 0), 둘 다 없으면 none.
+// EVAL_PROVIDER 로 명시 가능 (api | claude-cli).
+const HAS_API = !!process.env.ANTHROPIC_API_KEY;
+let HAS_CLI = false;
+// Windows 의 claude 는 셸 래퍼라 shell:true 로 탐지/호출 (Node 직접 spawn 불가)
+try { HAS_CLI = spawnSync('claude --version', { shell: true, encoding: 'utf8' }).status === 0; } catch { /* no cli */ }
+const PROVIDER = process.env.EVAL_PROVIDER || (HAS_API ? 'api' : (HAS_CLI ? 'claude-cli' : 'none'));
+
+// 모델: API 는 정식 id, CLI 는 별칭(sonnet/opus/haiku).
+const MODEL = process.env.EVAL_MODEL || (PROVIDER === 'claude-cli' ? 'sonnet' : 'claude-sonnet-4-6');
 const JUDGE_MODEL = process.env.EVAL_JUDGE_MODEL || MODEL;
 
 function parseArgs(argv) {
@@ -108,6 +125,50 @@ async function callAnthropic(system, user, model) {
   return (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('\n');
 }
 
+// 구독 claude CLI 백엔드 (추가 비용 0 — 사용자 Claude Code 플랜 사용).
+// 도구 비활성 + 동적 시스템섹션 제외로 순수 Q&A 재현. system 은 길어서 파일로 전달.
+// 동기 sleep (재시도 백오프 — Node 단일 스레드에서 spawnSync 와 함께 쓰기 위함)
+function sleepSync(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+// 구독 플랜은 빠른 연속 헤드리스 호출에 일시 rate limit 이 걸릴 수 있어 재시도+백오프.
+const CLI_RETRIES = Number(process.env.EVAL_CLI_RETRIES || 2);
+const CLI_MAX_TURNS = Number(process.env.EVAL_CLI_MAX_TURNS || 6);
+const CLI_PACE_MS = Number(process.env.EVAL_CLI_PACE_MS || 2000);
+
+function callClaudeCLI(system, user, model) {
+  const tmp = join(tmpdir(), `eval-sys-${process.pid}-${Math.random().toString(36).slice(2)}.txt`);
+  writeFileSync(tmp, system, 'utf8');
+  // shell:true (Windows 래퍼) + 프롬프트는 stdin 으로 → 셸 이스케이프 회피.
+  const cmd = `claude -p --system-prompt-file "${tmp}" --model ${model}`
+    + ` --exclude-dynamic-system-prompt-sections`
+    + ` --disallowed-tools Read Grep Glob Bash Edit Write WebFetch WebSearch --max-turns ${CLI_MAX_TURNS}`;
+  try {
+    let lastErr = '';
+    for (let attempt = 1; attempt <= CLI_RETRIES; attempt++) {
+      const r = spawnSync(cmd, {
+        shell: true, input: user, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
+      });
+      if (!r.error && r.status === 0 && (r.stdout || '').trim()) {
+        sleepSync(CLI_PACE_MS); // 페이싱 — 다음 호출 전 짧은 간격
+        return r.stdout.trim();
+      }
+      lastErr = (r.error && r.error.message) || (r.stderr || '') || (r.stdout || '') || `exit ${r.status}`;
+      if (attempt < CLI_RETRIES) sleepSync(attempt * 8000); // 8s, 16s 백오프
+    }
+    throw new Error(`claude CLI 실패(${CLI_RETRIES}회): ${String(lastErr).slice(0, 300)}`);
+  } finally {
+    try { rmSync(tmp); } catch { /* ignore */ }
+  }
+}
+
+// Provider 디스패처
+async function complete(system, user, model) {
+  if (PROVIDER === 'claude-cli') return callClaudeCLI(system, user, model);
+  return callAnthropic(system, user, model);
+}
+
 function judgePrompt(c, answer) {
   const exp = c.expected;
   return [
@@ -150,6 +211,7 @@ function dryRun(cases) {
   console.log(`대상 case: ${cases.length}건`);
   console.log('모듈 분포:', JSON.stringify(byModule));
   console.log('난이도 분포:', JSON.stringify(byDiff));
+  console.log(`provider: ${PROVIDER} (api키=${HAS_API ? 'O' : 'X'}, claude CLI=${HAS_CLI ? 'O' : 'X'})`);
   console.log(`답변 모델: ${MODEL} / 채점 모델: ${JUDGE_MODEL}`);
   console.log('에이전트 매핑 점검:');
   for (const c of cases) {
@@ -174,8 +236,8 @@ async function liveRun(cases) {
     const system = stripFrontmatter(readFileSync(agentFile, 'utf8'));
     process.stderr.write(`▶ ${c.id} (${c.module}) … `);
     try {
-      const answer = await callAnthropic(system, c.prompt, MODEL);
-      const verdictText = await callAnthropic(
+      const answer = await complete(system, c.prompt, MODEL);
+      const verdictText = await complete(
         'You output only JSON.', judgePrompt(c, answer), JUDGE_MODEL);
       const v = safeParseJson(verdictText);
       results.push({ id: c.id, module: c.module, difficulty: c.difficulty, ...v });
@@ -246,8 +308,8 @@ async function main() {
     process.exit(1);
   }
 
-  if (args.dryRun || !process.env.ANTHROPIC_API_KEY) {
-    if (!args.dryRun) console.error('ℹ ANTHROPIC_API_KEY 미설정 → dry-run 으로 전환합니다.');
+  if (args.dryRun || PROVIDER === 'none') {
+    if (!args.dryRun) console.error('ℹ ANTHROPIC_API_KEY 도 claude CLI 도 없음 → dry-run 으로 전환합니다.');
     dryRun(cases);
     return;
   }
