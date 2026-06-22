@@ -1895,3 +1895,21 @@ EDOC_COCKPIT:
   name: eDocument Cockpit (electronic document / e-invoice monitor)
   modules: [FI]
   release: both
+
+# eval gold-set 확장 (v2.4, 21→32건) — symptom-index 참조하나 미등록이던 실존 T-code
+KEPM:
+  name: CO-PA Planning (Profitability Analysis planning framework)
+  modules: [CO]
+  release: both
+NACE:
+  name: Output Condition Records / Message Determination (output management)
+  modules: [SD, MM]
+  release: both
+CO09:
+  name: Availability Overview (ATP check)
+  modules: [SD, PP]
+  release: both
+CM25:
+  name: Capacity Planning Table (graphical)
+  modules: [PP]
+  release: both

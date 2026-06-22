@@ -26,7 +26,7 @@
 
 ## 기여 가이드 (케이스 추가)
 
-현재 **21건**(대표 모듈 시드). 목표 **30~50건**. 추가 절차:
+현재 **32건** — 18개 SAP 모듈 전체 커버(FI/CO/TR/MM/SD/PP/HCM/ABAP/BASIS/PM/QM/WM/EWM/BTP/IBP/SAC/Ariba/IC). 목표 **30~50건** 달성. 추가 절차:
 
 1. `data/symptom-index.yaml` 에서 ground-truth 가 명확한 증상을 고른다
    (`typical_causes` 첫 항목이 단일·확실한 것).

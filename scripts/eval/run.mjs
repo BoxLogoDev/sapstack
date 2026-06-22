@@ -49,6 +49,9 @@ const MODULE_AGENT = {
   PM: 'sap-pm-consultant', QM: 'sap-qm-consultant', EWM: 'sap-ewm-consultant',
   IBP: 'sap-ibp-consultant', SAC: 'sap-sac-consultant', Ariba: 'sap-ariba-consultant',
   IC: 'sap-integration-cloud-consultant',
+  // 전용 에이전트 없는 모듈 → 가장 인접한 에이전트로 라우팅(eval 용)
+  WM: 'sap-ewm-consultant',   // WM(레거시 창고) → EWM 컨설턴트가 창고 도메인 최근접
+  BTP: 'sap-cloud-consultant', // BTP → Cloud 컨설턴트(플랫폼/클라우드 영역)
 };
 
 const API_URL = 'https://api.anthropic.com/v1/messages';
