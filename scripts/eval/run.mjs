@@ -135,6 +135,8 @@ function sleepSync(ms) {
 // 구독 플랜은 빠른 연속 헤드리스 호출에 일시 rate limit 이 걸릴 수 있어 재시도+백오프.
 const CLI_RETRIES = Number(process.env.EVAL_CLI_RETRIES || 2);
 const CLI_MAX_TURNS = Number(process.env.EVAL_CLI_MAX_TURNS || 6);
+// judge 다수결 표 수 (홀수 권장). 1 이면 단일 judge(기존 동작). 분산 감소용.
+const JUDGE_VOTES = Math.max(1, Number(process.env.EVAL_JUDGE_VOTES || 3));
 const CLI_PACE_MS = Number(process.env.EVAL_CLI_PACE_MS || 2000);
 
 function callClaudeCLI(system, user, model) {
@@ -202,6 +204,45 @@ function safeParseJson(text) {
   return JSON.parse(m[0]);
 }
 
+function median(nums) {
+  const a = [...nums].sort((x, y) => x - y);
+  if (!a.length) return 0;
+  const mid = Math.floor(a.length / 2);
+  return a.length % 2 ? a[mid] : (a[mid - 1] + a[mid]) / 2;
+}
+
+function modeOf(arr, order) {
+  const count = {};
+  for (const x of arr) count[x] = (count[x] || 0) + 1;
+  // 최빈값. 동률이면 order 상 더 보수적인(낮은) 쪽 선택 — 과대평가 방지(ETHOS).
+  return [...new Set(arr)].sort((a, b) =>
+    (count[b] - count[a]) || (order.indexOf(a) - order.indexOf(b)))[0];
+}
+
+// 여러 judge verdict 을 합의로 집계. score 는 구성요소 합의값으로 재계산(평균 금지).
+function aggregateVerdicts(verdicts) {
+  const rc = modeOf(verdicts.map((v) => v.root_cause_match || 'miss'),
+    ['miss', 'partial', 'full']); // 동률 시 보수적
+  const tcodeRecall = median(verdicts.map((v) => Number(v.tcode_recall) || 0));
+  const checkCov = median(verdicts.map((v) => Number(v.check_coverage) || 0));
+  // ethos 위반: 과반 judge 가 든 위반만 채택
+  const ethosCount = {};
+  for (const v of verdicts) for (const e of v.ethos_violations || []) ethosCount[e] = (ethosCount[e] || 0) + 1;
+  const ethos = Object.entries(ethosCount).filter(([, n]) => n * 2 > verdicts.length).map(([e]) => e);
+  const rcScore = rc === 'full' ? 1 : rc === 'partial' ? 0.5 : 0;
+  const score = Math.max(0, 0.5 * rcScore + 0.25 * tcodeRecall + 0.25 * checkCov - 0.1 * ethos.length);
+  return {
+    root_cause_match: rc,
+    tcode_recall: tcodeRecall,
+    check_coverage: checkCov,
+    ethos_violations: ethos,
+    score,
+    judge_votes: verdicts.length,
+    score_spread: +(Math.max(...verdicts.map((v) => Number(v.score) || 0))
+      - Math.min(...verdicts.map((v) => Number(v.score) || 0))).toFixed(2),
+  };
+}
+
 function dryRun(cases) {
   const byModule = {};
   for (const c of cases) byModule[c.module] = (byModule[c.module] || 0) + 1;
@@ -212,7 +253,8 @@ function dryRun(cases) {
   console.log('모듈 분포:', JSON.stringify(byModule));
   console.log('난이도 분포:', JSON.stringify(byDiff));
   console.log(`provider: ${PROVIDER} (api키=${HAS_API ? 'O' : 'X'}, claude CLI=${HAS_CLI ? 'O' : 'X'})`);
-  console.log(`답변 모델: ${MODEL} / 채점 모델: ${JUDGE_MODEL}`);
+  console.log(`답변 모델: ${MODEL} / 채점 모델: ${JUDGE_MODEL} / judge 표수: ${JUDGE_VOTES}`);
+  console.log(`예상 LLM 호출: ${cases.length} 답변 + ${cases.length * JUDGE_VOTES} 채점 = ${cases.length * (1 + JUDGE_VOTES)}`);
   console.log('에이전트 매핑 점검:');
   for (const c of cases) {
     const agent = MODULE_AGENT[c.module];
@@ -236,12 +278,21 @@ async function liveRun(cases) {
     const system = stripFrontmatter(readFileSync(agentFile, 'utf8'));
     process.stderr.write(`▶ ${c.id} (${c.module}) … `);
     try {
+      // 답변은 1회만 생성(비용↑). 분산의 주범인 judge 만 N회 호출 → 합의 집계.
       const answer = await complete(system, c.prompt, MODEL);
-      const verdictText = await complete(
-        'You output only JSON.', judgePrompt(c, answer), JUDGE_MODEL);
-      const v = safeParseJson(verdictText);
+      const verdicts = [];
+      for (let i = 0; i < JUDGE_VOTES; i++) {
+        try {
+          verdicts.push(safeParseJson(
+            await complete('You output only JSON.', judgePrompt(c, answer), JUDGE_MODEL)));
+        } catch (je) {
+          if (verdicts.length === 0 && i === JUDGE_VOTES - 1) throw je; // 전부 실패 시에만 throw
+        }
+      }
+      const v = aggregateVerdicts(verdicts);
       results.push({ id: c.id, module: c.module, difficulty: c.difficulty, ...v });
-      process.stderr.write(`score=${(v.score ?? 0).toFixed(2)} (${v.root_cause_match})\n`);
+      process.stderr.write(
+        `score=${v.score.toFixed(2)} (${v.root_cause_match}) [${v.judge_votes}표, spread ${v.score_spread}]\n`);
     } catch (e) {
       console.error(`\n✗ ${c.id}: ${e.message}`);
       results.push({ id: c.id, module: c.module, error: e.message });
@@ -264,6 +315,8 @@ function summarize(results) {
     avg_check_coverage: +avg('check_coverage').toFixed(3),
     root_cause_full_rate: n ? +(fullRC / n).toFixed(3) : 0,
     ethos_violations_total: ethos,
+    judge_votes: JUDGE_VOTES,
+    avg_judge_spread: n ? +avg('score_spread').toFixed(3) : 0,
   };
 }
 
@@ -273,12 +326,13 @@ function writeReport(summary, results) {
   const lines = [];
   lines.push(`\n## Run ${ts}`);
   lines.push('');
-  lines.push(`- 모델(답변/채점): \`${MODEL}\` / \`${JUDGE_MODEL}\``);
+  lines.push(`- 모델(답변/채점): \`${MODEL}\` / \`${JUDGE_MODEL}\` · judge ${summary.judge_votes}표 합의`);
   lines.push(`- 채점 case: ${summary.cases_scored} / 오류: ${summary.cases_errored}`);
   lines.push(`- **평균 score: ${summary.avg_score}**`);
   lines.push(`- root cause full rate: ${summary.root_cause_full_rate}`);
   lines.push(`- 평균 tcode recall: ${summary.avg_tcode_recall} / check coverage: ${summary.avg_check_coverage}`);
   lines.push(`- ETHOS 위반 합계: ${summary.ethos_violations_total}`);
+  lines.push(`- 평균 judge score spread(분산 지표): ${summary.avg_judge_spread} (낮을수록 합의 강함)`);
   lines.push('');
   lines.push('| case | module | score | root_cause | tcode_recall | ethos |');
   lines.push('|---|---|---|---|---|---|');
