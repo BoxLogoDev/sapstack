@@ -350,3 +350,178 @@ cases:
         - "/SCWM/MON 에서 해당 자재 가용재고 확인"
       sap_note: null
     ethos_flags: [no_hardcode, ecc_s4_distinction]
+
+  # ═══════════════════════════ v2.4 확장 (미커버 모듈 + 보강) ═══════════════════════════
+  # ── PM ──
+  - id: eval-pm-order-settlement-fail
+    symptom_ref: sym-pm-order-settlement-fail
+    module: PM
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "KO88 로 보전 오더(PM order) 정산하는데 안 돼요."
+    expected:
+      primary_root_cause: "보전 오더 상태가 정산 불가(이미 정산됨/삭제예정 등)"
+      must_tcodes: [KO88]
+      must_checks:
+        - "오더 시스템 상태 확인(AUFK)"
+        - "정산규칙(settlement rule) 존재/유효 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── WM ──
+  - id: eval-wm-to-confirmation-error
+    symptom_ref: sym-wm-to-confirmation-error
+    module: WM
+    difficulty: medium
+    env: { release: ecc, deployment: on-prem, country: any }
+    prompt: "WM 에서 TO(Transfer Order) confirm 이 안 돼요."
+    expected:
+      primary_root_cause: "TO 라인의 원본 빈(Source Bin)에 실제 재고가 없음"
+      must_tcodes: [LT06, LT01]
+      must_checks:
+        - "LS24 로 해당 빈/quant 재고 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode, ecc_s4_distinction]
+
+  # ── BTP ──
+  - id: eval-btp-destination-fail
+    symptom_ref: sym-btp-destination-fail
+    module: BTP
+    difficulty: medium
+    env: { release: s4, deployment: any, country: any }
+    prompt: "BTP Destination 연결이 실패해요. 백엔드 호출이 안 됩니다."
+    expected:
+      primary_root_cause: "Destination 설정의 URL/인증 타입 오류 또는 백엔드 SICF 노드 비활성"
+      must_tcodes: [SICF, SM59]
+      must_checks:
+        - "SICF 서비스 노드 활성 여부 확인"
+        - "Destination URL/인증 타입 점검"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── SAC ──
+  - id: eval-sac-live-connection-fail
+    symptom_ref: sym-sac-live-connection-fail
+    module: SAC
+    difficulty: hard
+    env: { release: s4, deployment: any, country: any }
+    prompt: "SAC Live Connection 이 S/4 에 안 붙어요."
+    expected:
+      primary_root_cause: "S/4·BW 측 OData/InA 서비스 비활성(SICF 노드 inactive)"
+      must_tcodes: [SICF, SAML2]
+      must_checks:
+        - "SICF 에서 InA/OData 서비스 노드 활성 확인"
+        - "SAML2 신뢰 설정 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── IBP ──
+  - id: eval-ibp-pir-not-in-s4-mrp
+    symptom_ref: sym-ibp-pir-not-in-s4-mrp
+    module: IBP
+    difficulty: hard
+    env: { release: s4, deployment: any, country: any }
+    prompt: "IBP 에서 릴리스한 PIR 이 S/4 MRP(MD04)에 안 보여요."
+    expected:
+      primary_root_cause: "IBP Application Job(PIR 릴리스)이 실패 또는 미완료"
+      must_tcodes: [MD63, MD04]
+      must_checks:
+        - "MD63 에서 PIR 존재 확인"
+        - "IBP→S/4 통합 작업 로그 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── Ariba ──
+  - id: eval-ariba-invoice-mismatch
+    symptom_ref: sym-ariba-invoice-mismatch
+    module: Ariba
+    difficulty: medium
+    env: { release: s4, deployment: any, country: any }
+    prompt: "Ariba 인보이스가 PO 랑 안 맞아서 매칭 실패해요."
+    expected:
+      primary_root_cause: "수량/단가가 PO 대비 tolerance 초과"
+      must_tcodes: [MIRO, ME2N]
+      must_checks:
+        - "ME2N 으로 PO 수량/단가 확인"
+        - "tolerance 설정 점검"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── IC (Integration Cloud) ──
+  - id: eval-ic-cpi-iflow-message-fail
+    symptom_ref: sym-ic-cpi-iflow-message-fail
+    module: IC
+    difficulty: hard
+    env: { release: s4, deployment: any, country: any }
+    prompt: "CPI iFlow 메시지가 계속 실패해요."
+    expected:
+      primary_root_cause: "iFlow 메시지 매핑(Message Mapping) 오류"
+      must_tcodes: [SXMB_MONI, SRT_MONI]
+      must_checks:
+        - "SXMB_MONI/SRT_MONI 에서 실패 메시지 페이로드 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── CO 보강 (CO-PA) ──
+  - id: eval-co-copa-variance
+    symptom_ref: sym-co-copa-variance
+    module: CO
+    difficulty: hard
+    env: { release: s4, deployment: any, country: any }
+    prompt: "KE30 수익성분석(CO-PA) 보고서가 FI-GL 과 차이가 나요."
+    expected:
+      primary_root_cause: "CO-PA 평가 방법(Valuation)이 FI-GL 과 달라 금액 차이 발생"
+      must_tcodes: [KE30, KEPM]
+      must_checks:
+        - "원가요소→가치필드 매핑(KEI1) 완전성 확인"
+        - "CO-PA valuation 설정 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode, ecc_s4_distinction]
+
+  # ── SD 보강 (출력) ──
+  - id: eval-sd-output-not-issued
+    symptom_ref: sym-sd-output-not-issued
+    module: SD
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "빌링 했는데 청구서 출력(Output)이 안 나가요."
+    expected:
+      primary_root_cause: "출력 타입(Output Type) 정의 누락 또는 미활성화"
+      must_tcodes: [NACE, VF03]
+      must_checks:
+        - "NACE 에서 출력 타입/조건레코드 확인"
+        - "VF03 출력 처리 상태(처리됨/오류) 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── PP 보강 (작업확인) ──
+  - id: eval-pp-order-confirmation-error
+    symptom_ref: sym-pp-order-confirmation-error
+    module: PP
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "CO11N 으로 작업 확인(confirmation)하는데 에러가 나요."
+    expected:
+      primary_root_cause: "작업(Operation) 상태가 이미 'Confirmed'/'Completed'"
+      must_tcodes: [CO11N, CO09]
+      must_checks:
+        - "오더 작업 상태 확인"
+        - "CO09 로 가용성(ATP) 점검"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── PP 보강 (능력소요) ──
+  - id: eval-pp-capacity-overload
+    symptom_ref: sym-pp-capacity-overload
+    module: PP
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "작업센터 능력(capacity)이 초과됐다고 떠요."
+    expected:
+      primary_root_cause: "일정된 작업들이 리소스(작업센터) 용량을 초과"
+      must_tcodes: [CM25, CR01]
+      must_checks:
+        - "CM25 능력소요 테이블에서 과부하 구간 확인"
+        - "작업센터 가용능력(CR01) 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
