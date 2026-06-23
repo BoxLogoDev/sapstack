@@ -17,7 +17,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, join, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import yaml from 'js-yaml';
+import yaml from '../../mcp/node_modules/js-yaml/dist/js-yaml.mjs';
 import { scrubPII, KOREAN_PII_PATTERNS, INTERNATIONAL_PII_PATTERNS } from '../../mcp/dist/pii-scrubber.js';
 
 // 구조적 PII(주민/사업자/카드/계좌/전화/이메일/SSN/IP)만 스크럽.
