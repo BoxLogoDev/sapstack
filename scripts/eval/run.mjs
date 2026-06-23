@@ -9,7 +9,8 @@
 //   4. judge 모델이 expected 대비 채점 (root_cause / tcode_recall / check_coverage / ethos)
 //   5. 요약 JSON 출력 + docs/eval/REPORT.md 누적
 //
-// 의존성: Node 20+ 내장 fetch + js-yaml (mcp/node_modules 에서 NODE_PATH 로 해결)
+// 의존성: Node 20+ 내장 fetch + js-yaml (mcp/node_modules 상대경로 직접 import —
+//   ESM 은 NODE_PATH 를 무시하므로 상대경로가 CI 에서도 확실)
 //   → scripts/eval-diagnosis.sh 가 NODE_PATH 를 세팅해 호출. 직접 실행도 가능.
 //
 // Provider (자동 선택): ANTHROPIC_API_KEY 있으면 'api', 없고 claude CLI 있으면
@@ -33,7 +34,7 @@ import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
-import yaml from 'js-yaml';
+import yaml from '../../mcp/node_modules/js-yaml/dist/js-yaml.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(__dirname, '..', '..');
