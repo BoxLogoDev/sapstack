@@ -69,7 +69,7 @@ const MODEL = process.env.EVAL_MODEL || (PROVIDER === 'claude-cli' ? 'sonnet' : 
 const JUDGE_MODEL = process.env.EVAL_JUDGE_MODEL || MODEL;
 
 function parseArgs(argv) {
-  const a = { dryRun: false, case: null, module: null, all: false, limit: Infinity };
+  const a = { dryRun: false, case: null, module: null, all: false, limit: Infinity, jsonOut: null };
   for (let i = 0; i < argv.length; i++) {
     const x = argv[i];
     if (x === '--dry-run') a.dryRun = true;
@@ -77,6 +77,7 @@ function parseArgs(argv) {
     else if (x === '--case') a.case = argv[++i];
     else if (x === '--module') a.module = argv[++i];
     else if (x === '--limit') a.limit = parseInt(argv[++i], 10);
+    else if (x === '--json') a.jsonOut = argv[++i]; // 요약 JSON 을 파일로 저장(CI 아티팩트용)
   }
   return a;
 }
@@ -103,29 +104,42 @@ function selectCases(gold, args) {
   return cases;
 }
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const API_RETRIES = Number(process.env.EVAL_API_RETRIES || 3);
+
 async function callAnthropic(system, user, model) {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error('ANTHROPIC_API_KEY 미설정 — --dry-run 만 가능');
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'x-api-key': key,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      model,
-      max_tokens: 2048,
-      system,
-      messages: [{ role: 'user', content: user }],
-    }),
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Anthropic API ${res.status}: ${body.slice(0, 300)}`);
+  let lastErr = '';
+  for (let attempt = 1; attempt <= API_RETRIES; attempt++) {
+    let res;
+    try {
+      res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ model, max_tokens: 2048, system, messages: [{ role: 'user', content: user }] }),
+      });
+    } catch (e) {
+      lastErr = e.message;
+      if (attempt < API_RETRIES) { await sleep(attempt * 5000); continue; }
+      throw new Error(`Anthropic API 네트워크 오류(${API_RETRIES}회): ${lastErr}`);
+    }
+    if (res.ok) {
+      const data = await res.json();
+      return (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('\n');
+    }
+    lastErr = `${res.status}: ${(await res.text()).slice(0, 200)}`;
+    // 429/5xx 는 일시적 → 재시도, 4xx(인증 등)는 즉시 실패
+    if ((res.status === 429 || res.status >= 500) && attempt < API_RETRIES) {
+      await sleep(attempt * 5000); continue;
+    }
+    throw new Error(`Anthropic API ${lastErr}`);
   }
-  const data = await res.json();
-  return (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('\n');
+  throw new Error(`Anthropic API 실패(${API_RETRIES}회): ${lastErr}`);
 }
 
 // 구독 claude CLI 백엔드 (추가 비용 0 — 사용자 Claude Code 플랜 사용).
@@ -377,6 +391,10 @@ async function main() {
   console.log(JSON.stringify(summary, null, 2));
   writeReport(summary, results);
   console.log(`\n📄 REPORT 갱신: docs/eval/REPORT.md`);
+  if (args.jsonOut) {
+    writeFileSync(args.jsonOut, JSON.stringify({ ...summary, generated_at: new Date().toISOString(), provider: PROVIDER, model: MODEL }, null, 2));
+    console.log(`📄 요약 JSON: ${args.jsonOut}`);
+  }
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
