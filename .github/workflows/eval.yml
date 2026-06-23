@@ -1,0 +1,65 @@
+name: sapstack Eval (진단 품질)
+
+# 진단 품질 LLM-judge eval. 비용이 들어 per-PR 아님 — 수동 dispatch + 주간 스케줄.
+# ANTHROPIC_API_KEY secret 이 있을 때만 실제 채점(없으면 무료 정합성 게이트만).
+on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: "채점 범위 (--all / --module FI / --case <id>)"
+        required: false
+        default: "--all"
+      judge_votes:
+        description: "judge 다수결 표 수"
+        required: false
+        default: "3"
+  schedule:
+    # 매주 월요일 00:00 UTC (주간 회귀 추적)
+    - cron: "0 0 * * 1"
+
+jobs:
+  goldset-integrity:
+    name: Gold-set 무결성 (무료, 항상)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: chmod +x scripts/*.sh
+      - name: Gold-set 참조 무결성 (API 불필요)
+        run: ./scripts/check-eval-goldset.sh --strict
+      - name: dry-run (에이전트 매핑 점검)
+        run: ./scripts/eval-diagnosis.sh --dry-run
+
+  diagnosis-quality:
+    name: 진단 품질 채점 (API 키 있을 때만)
+    runs-on: ubuntu-latest
+    needs: goldset-integrity
+    # secret 미설정 시 조용히 skip — fork PR/키 없는 환경에서 빨간불 방지
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: mcp deps (js-yaml)
+        run: cd mcp && npm ci --ignore-scripts
+      - run: chmod +x scripts/*.sh
+      - name: eval 실행 (provider=api)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EVAL_PROVIDER: api
+          EVAL_JUDGE_VOTES: ${{ github.event.inputs.judge_votes || '3' }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::notice::ANTHROPIC_API_KEY secret 미설정 — 채점 skip (무료 게이트만 통과)."
+            exit 0
+          fi
+          ./scripts/eval-diagnosis.sh ${{ github.event.inputs.scope || '--all' }} --json eval-summary.json
+      - name: 요약 아티팩트 업로드
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-summary
+          path: |
+            eval-summary.json
+            docs/eval/REPORT.md
+          if-no-files-found: ignore

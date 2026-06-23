@@ -99,4 +99,18 @@ EVAL_JUDGE_VOTES=1 ./scripts/eval-diagnosis.sh --all   # 빠르게(단일 judge,
 # 3b. (선택) 유료 API 키로 채점
 export ANTHROPIC_API_KEY=sk-...
 EVAL_PROVIDER=api ./scripts/eval-diagnosis.sh --all
+
+# 요약을 JSON 파일로(CI 아티팩트/회귀 추적용)
+./scripts/eval-diagnosis.sh --all --json eval-summary.json
 ```
+
+## CI 자동화 (`.github/workflows/eval.yml`)
+
+- **goldset-integrity** (무료, 항상): `check-eval-goldset --strict` + `--dry-run` 매핑 점검.
+  per-PR CI(`ci.yml`)에도 이미 포함 — 참조 무결성 회귀는 항상 차단.
+- **diagnosis-quality** (유료, 조건부): 실제 LLM 채점. **수동 dispatch + 주간 스케줄**(월요일).
+  `ANTHROPIC_API_KEY` repo secret 이 있을 때만 채점하고, 없으면 조용히 skip(빨간불 방지).
+  결과는 `eval-summary.json` + `REPORT.md` 아티팩트로 업로드.
+
+> 비용 통제: per-PR 자동 채점은 하지 않는다(비용↑). 추세 추적은 주간 1회로 충분.
+> API 키가 없으면 로컬에서 구독 CLI 로 측정(추가 비용 0).
