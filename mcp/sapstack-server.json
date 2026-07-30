@@ -2,15 +2,14 @@
   "$schema": "https://schema.modelcontextprotocol.io/server/v1",
   "name": "sapstack",
   "version": "2.4.0",
-  "description": "SAP operations advisory + Evidence Loop session manager — 22 tools, 10 prompts, knowledge base integration (T-codes, SAP Notes, synonyms, period-end sequences, industry matrix)",
+  "description": "SAP operations advisory and Evidence Loop — 23 tools, 12 prompts, 9 resources/templates",
   "author": "BoxLogoDev",
   "license": "MIT",
   "homepage": "https://github.com/BoxLogoDev/sapstack",
-
   "capabilities": {
     "resources": {
-      "subscribe": true,
-      "listChanged": true
+      "subscribe": false,
+      "listChanged": false
     },
     "prompts": {
       "listChanged": false
@@ -19,151 +18,177 @@
       "listChanged": false
     }
   },
-
   "resources": [
     {
       "uri": "sapstack://rules/universal",
       "name": "sapstack Universal Rules",
-      "description": "Universal rules + Standard Response Format (dual mode: Quick Advisory + Evidence Loop)",
       "mimeType": "text/markdown"
     },
     {
       "uri": "sapstack://data/tcodes",
       "name": "Verified T-code Registry",
-      "description": "279 verified SAP T-codes with module mapping and ECC/S4 classification",
       "mimeType": "application/yaml"
     },
     {
       "uri": "sapstack://data/sap-notes",
       "name": "Verified SAP Notes",
-      "description": "50+ verified SAP Notes catalog with keywords",
       "mimeType": "application/yaml"
     },
     {
       "uri": "sapstack://data/symptom-index",
-      "name": "Symptom Index (NEW in v1.5.0)",
-      "description": "20 natural-language symptom → module/T-code mappings, multilingual (ko/en + de/ja seed)",
-      "mimeType": "application/yaml"
-    },
-    {
-      "uri": "sapstack://skill/{module}",
-      "name": "Module SKILL.md",
-      "description": "14 SAP module skills + sap-session (Evidence Loop orchestrator)",
-      "mimeType": "text/markdown"
-    },
-    {
-      "uri": "sapstack://schema/{schema}",
-      "name": "Evidence Loop Schemas (NEW in v1.5.0)",
-      "description": "5 JSON Schemas: evidence-bundle, followup-request, hypothesis, verdict, session-state",
-      "mimeType": "application/yaml"
-    },
-    {
-      "uri": "sapstack://session/{session_id}",
-      "name": "Evidence Loop Session State (NEW in v1.5.0)",
-      "description": "Read current state of a session: turns, bundles, hypotheses, verdicts, audit trail",
-      "mimeType": "application/yaml"
-    },
-    {
-      "uri": "sapstack://session/{session_id}/bundle/{bundle_id}",
-      "name": "Session Evidence Bundle",
-      "description": "Read a specific evidence bundle's items",
+      "name": "Symptom Index",
       "mimeType": "application/yaml"
     },
     {
       "uri": "sapstack://sessions/list",
-      "name": "Active Sessions Index",
-      "description": "List all sessions in the workspace with status and last_updated",
+      "name": "Canonical Sessions Index",
       "mimeType": "application/json"
     }
   ],
-
+  "resourceTemplates": [
+    {
+      "uriTemplate": "sapstack://skill/{module}",
+      "name": "Module skill",
+      "mimeType": "text/markdown"
+    },
+    {
+      "uriTemplate": "sapstack://schema/{schema}",
+      "name": "Evidence Loop schema",
+      "mimeType": "application/yaml"
+    },
+    {
+      "uriTemplate": "sapstack://session/{session_id}",
+      "name": "Canonical session",
+      "mimeType": "application/yaml"
+    },
+    {
+      "uriTemplate": "sapstack://session/{session_id}/bundle/{bundle_id}",
+      "name": "Evidence bundle",
+      "mimeType": "application/yaml"
+    }
+  ],
   "prompts": [
     {
       "name": "sap-fi-consultant",
-      "description": "FI consultant agent prompt — systematic diagnosis of FI issues",
+      "description": "FI consultant systematic diagnosis",
       "arguments": [
-        { "name": "issue", "description": "FI issue description", "required": true }
+        {
+          "name": "issue",
+          "required": true
+        }
       ]
     },
     {
       "name": "sap-abap-developer",
-      "description": "ABAP code reviewer — Clean Core, HANA optimization, ATC",
+      "description": "ABAP Clean Core and HANA code review",
       "arguments": [
-        { "name": "code", "description": "ABAP code to review", "required": true }
+        {
+          "name": "code",
+          "required": true
+        }
       ]
     },
     {
       "name": "sap-s4-migration-advisor",
-      "description": "S/4HANA migration path advisor",
+      "description": "S/4HANA migration advisory",
       "arguments": [
-        { "name": "scenario", "description": "Migration scenario", "required": true }
+        {
+          "name": "scenario",
+          "required": true
+        }
       ]
     },
     {
       "name": "sap-basis-consultant",
-      "description": "Basis issue routing — dumps, WP hang, transport",
+      "description": "Basis issue routing",
       "arguments": [
-        { "name": "symptom", "description": "Observed symptom", "required": true }
+        {
+          "name": "symptom",
+          "required": true
+        }
       ]
     },
     {
       "name": "sap-mm-consultant",
-      "description": "MM consultant — procurement, inventory, GR/IR",
+      "description": "MM procurement and inventory diagnosis",
       "arguments": [
-        { "name": "issue", "description": "MM issue", "required": true }
+        {
+          "name": "issue",
+          "required": true
+        }
       ]
     },
     {
       "name": "sap-session-turn2-hypothesis",
-      "description": "Evidence Loop Turn 2 — generate 2-4 falsifiable hypotheses with follow-up request (NEW in v1.5.0)",
+      "description": "Evidence Loop Turn 2 hypothesis generation",
       "arguments": [
-        { "name": "session_id", "description": "Existing session id", "required": true }
+        {
+          "name": "bundle_data",
+          "required": true
+        }
       ]
     },
     {
       "name": "sap-session-turn4-verify",
-      "description": "Evidence Loop Turn 4 — verdict with mandatory fix+rollback plans (NEW in v1.5.0)",
+      "description": "Evidence Loop Turn 4 verification",
       "arguments": [
-        { "name": "session_id", "description": "Existing session id", "required": true }
+        {
+          "name": "session_data",
+          "required": true
+        }
       ]
     },
     {
       "name": "korean-field-language",
-      "description": "Field Korean translation prompt using synonyms.yaml (NEW in v1.7.0)",
+      "description": "Korean SAP field-language conversion",
       "arguments": [
-        { "name": "text", "description": "Dictionary Korean text to translate", "required": true }
+        {
+          "name": "text",
+          "required": true
+        }
       ]
     },
     {
       "name": "img-config-walk",
-      "description": "IMG configuration step-by-step walkthrough guide (NEW in v1.7.0)",
+      "description": "IMG configuration walkthrough",
       "arguments": [
-        { "name": "topic", "description": "Configuration topic (module + config area)", "required": true }
+        {
+          "name": "topic",
+          "required": true
+        }
       ]
     },
     {
       "name": "best-practice-review",
-      "description": "SAP setup review against 3-Tier Best Practice framework (NEW in v1.7.0)",
+      "description": "Three-tier SAP best-practice review",
       "arguments": [
-        { "name": "setup_description", "description": "Description of current SAP setup", "required": true }
+        {
+          "name": "setup_description",
+          "required": true
+        }
       ]
     },
     {
       "name": "evidence-loop-turn2",
-      "description": "Evidence Loop Turn 2 — hypothesis generation from evidence bundle (NEW in v1.7.0)",
+      "description": "Compatibility alias for Evidence Loop Turn 2",
       "arguments": [
-        { "name": "bundle_data", "description": "Evidence bundle YAML", "required": true }
+        {
+          "name": "bundle_data",
+          "required": true
+        }
       ]
     },
     {
       "name": "evidence-loop-turn4",
-      "description": "Evidence Loop Turn 4 — verdict generation with fix+rollback plans (NEW in v1.7.0)",
+      "description": "Compatibility alias for Evidence Loop Turn 4",
       "arguments": [
-        { "name": "session_data", "description": "Session state and evidence", "required": true }
+        {
+          "name": "session_data",
+          "required": true
+        }
       ]
     }
   ],
-
   "tools": [
     {
       "name": "resolve_sap_note",
@@ -171,312 +196,470 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "keyword": { "type": "string", "description": "Search keyword (English or Korean)" }
+          "keyword": {
+            "type": "string"
+          }
         },
-        "required": ["keyword"]
+        "required": [
+          "keyword"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "check_tcode",
-      "description": "Verify if a T-code is in the verified registry",
+      "description": "Verify T-code existence in the sapstack registry",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "tcode": { "type": "string", "description": "SAP T-code" }
+          "tcode": {
+            "type": "string"
+          }
         },
-        "required": ["tcode"]
+        "required": [
+          "tcode"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "list_plugins",
-      "description": "List all sapstack plugin modules (14 + sap-session)",
+      "description": "List all sapstack plugins",
       "inputSchema": {
         "type": "object",
-        "properties": {}
+        "properties": {},
+        "additionalProperties": false
       }
     },
     {
       "name": "resolve_symptom",
-      "description": "Fuzzy-match natural language symptom against data/symptom-index.yaml (NEW in v1.5.0)",
+      "description": "Fuzzy-match a symptom against the multilingual symptom index",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "query": { "type": "string", "description": "Symptom description in any supported language" },
-          "language": { "type": "string", "enum": ["ko", "en", "de", "ja"], "default": "ko" },
-          "country": { "type": "string", "enum": ["kr", "de", "us", "jp", "none"], "default": "none" },
-          "top_n": { "type": "integer", "minimum": 1, "maximum": 10, "default": 5 }
+          "query": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "top_n": {
+            "type": "integer"
+          }
         },
-        "required": ["query"]
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "start_session",
-      "description": "Start a new Evidence Loop session (Stable in v1.6.0)",
+      "description": "Start a canonical Evidence Loop session",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "symptom": { "type": "string", "description": "Initial symptom description" },
-          "reporter_role": { "type": "string", "enum": ["end_user", "operator", "consultant"], "default": "operator" },
-          "country_iso": { "type": "string" },
-          "release": { "type": "string" },
-          "deployment": { "type": "string", "enum": ["on_premise", "private_cloud", "public_cloud"] },
-          "client": { "type": "string", "pattern": "^[0-9]{3}$" },
-          "language": { "type": "string", "enum": ["ko", "en", "de", "ja"], "default": "ko" }
+          "symptom": {
+            "type": "string"
+          },
+          "reporter_role": {
+            "type": "string"
+          },
+          "country_iso": {
+            "type": "string"
+          },
+          "release": {
+            "type": "string"
+          },
+          "deployment": {
+            "type": "string"
+          },
+          "industry": {
+            "type": "string"
+          },
+          "client": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          }
         },
-        "required": ["symptom"]
+        "required": [
+          "symptom"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "add_evidence",
-      "description": "Add an evidence bundle to an existing session (Stable in v1.6.0)",
+      "description": "Validate and append an Evidence Bundle",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "session_id": { "type": "string", "pattern": "^sess-[0-9]{8}-[a-z0-9]{6}$" },
-          "bundle_yaml": { "type": "string", "description": "Inline YAML conforming to evidence-bundle.schema.yaml" }
+          "session_id": {
+            "type": "string"
+          },
+          "bundle_yaml": {
+            "type": "string"
+          }
         },
-        "required": ["session_id", "bundle_yaml"]
+        "required": [
+          "session_id",
+          "bundle_yaml"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "next_turn",
-      "description": "Run the next Evidence Loop turn (Hypothesis or Verify) for a session (Stable in v1.6.0)",
+      "description": "Advance the Evidence Loop state machine",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "session_id": { "type": "string", "pattern": "^sess-[0-9]{8}-[a-z0-9]{6}$" },
-          "force_hypothesize": { "type": "boolean", "default": false }
+          "session_id": {
+            "type": "string"
+          },
+          "force_hypothesize": {
+            "type": "boolean"
+          }
         },
-        "required": ["session_id"]
+        "required": [
+          "session_id"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "list_sessions",
-      "description": "List all Evidence Loop sessions in workspace with status filters (NEW in v1.5.0)",
+      "description": "List canonical Evidence Loop sessions",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "status": { "type": "string", "enum": ["intake", "hypothesizing", "awaiting_evidence", "verifying", "resolved", "escalated", "abandoned", "reopened", "any"], "default": "any" },
-          "country_iso": { "type": "string" },
-          "limit": { "type": "integer", "default": 20 }
-        }
+          "status": {
+            "type": "string"
+          },
+          "country_iso": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
       }
     },
     {
       "name": "validate_session_file",
-      "description": "Validate a session YAML file against its schema (Stable in v1.6.0)",
+      "description": "Validate a canonical session artifact against its schema",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "path": { "type": "string", "description": "Relative path to YAML file under .sapstack/sessions/" },
-          "schema": { "type": "string", "enum": ["session-state", "evidence-bundle", "hypothesis", "followup-request", "verdict"] }
+          "path": {
+            "type": "string"
+          },
+          "schema": {
+            "type": "string",
+            "enum": [
+              "session-state",
+              "evidence-bundle",
+              "hypothesis",
+              "followup-request",
+              "verdict"
+            ]
+          }
         },
-        "required": ["path", "schema"]
+        "required": [
+          "path",
+          "schema"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "list_tcodes_by_module",
-      "description": "List all T-codes in a specific SAP module (NEW in v1.7.0)",
+      "description": "List verified T-codes for an SAP module",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "module": { "type": "string", "description": "SAP module code: FI, CO, MM, SD, PP, HCM, QM, PM, WM, EWM, GTS, BTP, ABAP, BASIS" }
+          "module": {
+            "type": "string"
+          }
         },
-        "required": ["module"]
+        "required": [
+          "module"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "list_agents_for_industry",
-      "description": "List prioritized consultant agents by industry vertical (NEW in v1.7.0)",
+      "description": "List prioritized sapstack agents for an industry",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "industry": { "type": "string", "description": "Industry: manufacturing, retail, financial-services, healthcare, etc." },
-          "top_n": { "type": "integer", "minimum": 1, "maximum": 20, "default": 10 }
+          "industry": {
+            "type": "string"
+          },
+          "top_n": {
+            "type": "integer"
+          }
         },
-        "required": ["industry"]
+        "required": [
+          "industry"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "get_period_end_sequence",
-      "description": "Return ordered period-end closing steps with dependencies (monthly/quarterly/yearly) (NEW in v1.7.0)",
+      "description": "Return period-end steps with dependencies and safety gates",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "modules": { "type": "array", "items": { "type": "string" }, "description": "Optional: filter by module(s)" }
-        }
+          "modules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
       }
     },
     {
       "name": "lookup_synonym",
-      "description": "Find canonical term and all variants from Korean field language synonyms.yaml (NEW in v1.7.0)",
+      "description": "Resolve a field-language synonym to its canonical term",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "term": { "type": "string", "description": "Term to look up (Korean or English)" },
-          "lang": { "type": "string", "enum": ["ko", "en", "de", "ja"], "default": "ko" }
+          "term": {
+            "type": "string"
+          },
+          "lang": {
+            "type": "string"
+          }
         },
-        "required": ["term"]
+        "required": [
+          "term"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "list_img_guides",
-      "description": "List IMG configuration step-by-step guides by module (NEW in v1.7.0)",
+      "description": "List IMG configuration guides",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "module": { "type": "string", "description": "Optional: SAP module code (FI, CO, MM, etc.)" }
-        }
+          "module": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       }
     },
     {
       "name": "list_best_practices",
-      "description": "List best practices by module and tier (Operational, Period-End, Governance) (NEW in v1.7.0)",
+      "description": "List SAP best-practice references by module and tier",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "module": { "type": "string", "description": "Optional: SAP module code" },
-          "tier": { "type": "string", "enum": ["operational", "period_end", "governance"], "description": "Optional: BP tier level" }
-        }
+          "module": {
+            "type": "string"
+          },
+          "tier": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       }
     },
     {
       "name": "get_master_data_rules",
-      "description": "Get required fields and validation rules for master data types (vendor, customer, material, cost-center, gl-account) (NEW in v1.7.0)",
+      "description": "Get sapstack master-data governance rules",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "master_type": { "type": "string", "enum": ["vendor", "customer", "material", "cost-center", "gl-account"] }
+          "master_type": {
+            "type": "string"
+          }
         },
-        "required": ["master_type"]
+        "required": [
+          "master_type"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "find_sap_note_by_module",
-      "description": "Search SAP Notes by module with filtering (NEW in v1.7.0)",
+      "description": "Search verified SAP Notes by module",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "module": { "type": "string", "description": "SAP module code" },
-          "max": { "type": "integer", "minimum": 1, "maximum": 50, "default": 10 }
+          "module": {
+            "type": "string"
+          },
+          "max": {
+            "type": "integer"
+          }
         },
-        "required": ["module"]
+        "required": [
+          "module"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "add_followup_request",
-      "description": "Add follow-up checklist items to session (Turn 2 evidence collection) (NEW in v1.7.0)",
+      "description": "Append a read-only Evidence Loop follow-up checklist",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "session_id": { "type": "string", "pattern": "^sess-[0-9]{8}-[a-z0-9]{6}$" },
-          "turn_number": { "type": "integer", "description": "Optional: override current turn" },
-          "items": { "type": "array", "description": "Check items with purpose, action, expected_outcome, priority, estimated_minutes" },
-          "summary": { "type": "string", "description": "Optional: custom summary" }
+          "session_id": {
+            "type": "string"
+          },
+          "turn_number": {
+            "type": "integer"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "summary": {
+            "type": "string"
+          }
         },
-        "required": ["session_id", "items"]
+        "required": [
+          "session_id",
+          "items"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "submit_hypothesis",
-      "description": "Submit 2-4 hypotheses with falsification criteria to session (Turn 2) (NEW in v1.7.0)",
+      "description": "Submit 2-4 falsifiable hypotheses",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "session_id": { "type": "string", "pattern": "^sess-[0-9]{8}-[a-z0-9]{6}$" },
-          "turn_number": { "type": "integer", "description": "Optional: override current turn" },
-          "hypotheses": { "type": "array", "description": "Hypothesis objects with statement, technical_chain, confidence_tier, falsification_evidence" }
+          "session_id": {
+            "type": "string"
+          },
+          "turn_number": {
+            "type": "integer"
+          },
+          "hypotheses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          }
         },
-        "required": ["session_id", "hypotheses"]
+        "required": [
+          "session_id",
+          "hypotheses"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "submit_verdict",
-      "description": "Submit verdict with fix plans and rollback procedures (Turn 4) (NEW in v1.7.0)",
+      "description": "Submit a verdict with mandatory Fix and Rollback pairing",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "session_id": { "type": "string", "pattern": "^sess-[0-9]{8}-[a-z0-9]{6}$" },
-          "turn_number": { "type": "integer", "description": "Optional: override current turn" },
-          "overall_state": { "type": "string", "enum": ["resolved", "needs_next_loop", "escalated", "insufficient_evidence"] },
-          "summary": { "type": "string", "description": "Verdict summary" },
-          "resolutions": { "type": "array", "description": "Resolution objects with hypothesis_id, status, fix_plan, rollback_plan" }
+          "session_id": {
+            "type": "string"
+          },
+          "turn_number": {
+            "type": "integer"
+          },
+          "overall_state": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "resolutions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          }
         },
-        "required": ["session_id", "overall_state", "summary", "resolutions"]
+        "required": [
+          "session_id",
+          "overall_state",
+          "summary",
+          "resolutions"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "find_img_node_by_keyword",
-      "description": "Search IMG/cockpit configuration guides by keyword across all modules — returns matched files, lines, and SPRO paths (NEW in v2.3)",
+      "description": "Search IMG guides and SPRO paths by keyword",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "keyword": { "type": "string", "description": "Configuration keyword (e.g. 'depreciation area', 'partner profile', 'replication flow')" }
+          "keyword": {
+            "type": "string"
+          }
         },
-        "required": ["keyword"]
+        "required": [
+          "keyword"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "symptom_to_agent_auto",
-      "description": "Match a natural-language symptom to symptom-index entries and recommend consultant agents via likely_modules (NEW in v2.3)",
+      "description": "Route a symptom to matching consultant agents",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "symptom": { "type": "string", "description": "Free-text symptom (Korean or English)" }
+          "symptom": {
+            "type": "string"
+          }
         },
-        "required": ["symptom"]
+        "required": [
+          "symptom"
+        ],
+        "additionalProperties": false
       }
     },
     {
       "name": "sap_note_steps",
-      "description": "Return SAP Note pointer metadata + diagnostic steps assembled from symptom-index back-references (sap-notes.yaml is pointer-only; body is on SAP Support Portal) (NEW in v2.3)",
+      "description": "Return verified SAP Note metadata with symptom-linked diagnostic steps",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "note_id": { "type": "string", "description": "SAP Note number (string)" }
+          "note_id": {
+            "type": "string"
+          }
         },
-        "required": ["note_id"]
+        "required": [
+          "note_id"
+        ],
+        "additionalProperties": false
       }
     }
   ],
-
-  "sapstack": {
-    "stage": "stable",
-    "version": "1.7.0",
-    "implementation": {
-      "manifest": "complete",
-      "runtime_entry": "mcp/server.ts (v1.7.0)",
-      "dependency_strategy": "minimal — @modelcontextprotocol/sdk + ajv + js-yaml",
-      "session_storage": "file system (.sapstack/sessions/) — no database",
-      "schema_validation": "ajv against schemas/*.schema.yaml",
-      "tools_count": 22,
-      "prompts_count": 10,
-      "write_tools": "9 tools — start_session, add_evidence, next_turn, validate_session_file, add_followup_request, submit_hypothesis, submit_verdict"
-    },
-    "v1_7_0_new_features": [
-      "8 new read tools — list_tcodes_by_module, list_agents_for_industry, get_period_end_sequence, lookup_synonym, list_img_guides, list_best_practices, get_master_data_rules, find_sap_note_by_module",
-      "3 new write tools — add_followup_request, submit_hypothesis, submit_verdict",
-      "5 new prompts — korean-field-language, img-config-walk, best-practice-review, evidence-loop-turn2, evidence-loop-turn4",
-      "Knowledge base integration — T-codes, SAP Notes, period-end sequences, industry matrix, synonyms",
-      "Synonym query expansion for Korean field language",
-      "Period-end orchestration with dependency management",
-      "Best practice compliance checks (3-Tier framework: Operational, Period-End, Governance)"
-    ],
-    "v1_6_0_features": [
-      "Session creation with state machine (intake → hypothesizing → awaiting_evidence → verifying → resolved)",
-      "Evidence bundle validation with Ajv against evidence-bundle.schema.yaml",
-      "State machine transitions with turn management",
-      "Atomic writes (write-to-temp, rename) for data integrity",
-      "Audit trail append-only logging",
-      "Schema validation on all write operations"
-    ],
-    "notes": [
-      "The manifest defines the complete contract for MCP-aware clients.",
-      "All tools (read and write) are production-ready with full validation.",
-      "All sessions stored in .sapstack/sessions/ (workspace-relative).",
-      "No live SAP connection — all operations use local knowledge base files.",
-      "Prompts can be used by LLM clients for structured reasoning (Evidence Loop turns, Korean field language translation, IMG configuration guidance, BP compliance review).",
-      "Knowledge base files: tcodes.yaml (279+ T-codes), sap-notes.yaml (50+ notes), symptom-index.yaml (20+ symptoms), synonyms.yaml (58 terms), period-end-sequence.yaml (30+ steps), industry-matrix.yaml (6 industries)."
-    ]
+  "metadata": {
+    "toolCount": 23,
+    "promptCount": 12,
+    "resourceCount": 9,
+    "runtime": "@boxlogodev/sapstack-runtime"
   }
 }

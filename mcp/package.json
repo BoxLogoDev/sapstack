@@ -8,11 +8,13 @@
     "sapstack-mcp": "dist/cli.js"
   },
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js",
+    "build": "tsx generate-manifest.ts && tsc -p tsconfig.json && node build.mjs",
+    "start": "node dist/cli.js",
     "cli": "node dist/cli.js",
     "dev": "tsx server.ts",
-    "test": "tsx tests/write-path.test.ts",
+    "test": "tsx --test tests/contract.test.ts",
+    "test:pack": "node tests/pack-smoke.mjs",
+    "prepack": "npm run build",
     "clean": "rimraf dist"
   },
   "keywords": [
@@ -37,6 +39,7 @@
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.0.0",
+    "esbuild": "^0.25.0",
     "rimraf": "^5.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.4.0"
@@ -46,6 +49,7 @@
   },
   "files": [
     "dist",
+    "assets",
     "README.md",
     "sapstack-server.json"
   ],
@@ -54,6 +58,6 @@
   },
   "sapstack": {
     "stage": "implementation",
-    "runtime_status": "v1.6.0 — write-path tools fully implemented (start_session, add_evidence, next_turn, validate_session_file)"
+    "runtime_status": "Shared SapstackRuntime with 23 registry-backed tools"
   }
 }

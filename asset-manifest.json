@@ -1,0 +1,32 @@
+{
+  "$schema": "./schemas/asset-manifest.schema.json",
+  "formatVersion": 1,
+  "productVersion": "2.4.0",
+  "generatedAt": "2026-07-28T00:00:00.000Z",
+  "counts": {
+    "plugins": 24,
+    "agents": 20,
+    "commands": 22,
+    "tools": 23,
+    "prompts": 12,
+    "resources": 9
+  },
+  "roots": [
+    "plugins",
+    "agents",
+    "commands",
+    "data",
+    "schemas"
+  ],
+  "required": [
+    "data/tcodes.yaml",
+    "data/sap-notes.yaml",
+    "data/symptom-index.yaml",
+    "data/synonyms.yaml",
+    "schemas/evidence-bundle.schema.yaml",
+    "schemas/followup-request.schema.yaml",
+    "schemas/hypothesis.schema.yaml",
+    "schemas/verdict.schema.yaml",
+    "schemas/session-state.schema.yaml"
+  ]
+}

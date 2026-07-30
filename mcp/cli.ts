@@ -8,6 +8,8 @@
  */
 
 import { parseArgs } from "node:util";
+import { startStdio } from "./server.js";
+import { VERSION } from "./version.js";
 
 async function main() {
   const { values, positionals } = parseArgs({
@@ -23,7 +25,7 @@ async function main() {
 
   if (values.help) {
     console.log(`
-sapstack MCP Server v1.6.0
+sapstack MCP Server v${VERSION}
 
 Usage:
   sapstack-mcp [OPTIONS]
@@ -43,7 +45,7 @@ Examples:
   }
 
   if (values.version) {
-    console.log("sapstack MCP v1.6.0");
+    console.log(`sapstack MCP v${VERSION}`);
     process.exit(0);
   }
 
@@ -60,17 +62,11 @@ Examples:
     console.error(`[sapstack MCP] Sessions directory: ${options.sessionsDir}`);
   }
 
-  // Start the server (stdio transport is set up in server.ts top-level main)
   console.error("[sapstack MCP] Server starting...");
-  // Pass CLI options via env vars before importing server (server reads them at module load)
-  if (options.sessionsDir) {
-    process.env.SAPSTACK_SESSIONS_DIR = options.sessionsDir;
-  }
   if (options.offline) {
     process.env.SAPSTACK_OFFLINE = "1";
   }
-  // Dynamic import triggers server.ts top-level main()
-  await import("./server.js");
+  await startStdio({ sessionsDir: options.sessionsDir });
 }
 
 main().catch((err) => {

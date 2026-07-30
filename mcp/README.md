@@ -1,10 +1,14 @@
-# sapstack MCP Server v1.6.0
+# sapstack MCP Server v2.4.0
+
+<!-- sapstack-stats: version=2.4.0 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
 
 Production-ready **Model Context Protocol** server implementing the complete **Evidence Loop** session management for SAP diagnostics.
 
-## Status: Production (v1.6.0)
+## Status: Shared runtime contract
 
-All write-path tools fully implemented and tested:
+The server uses the same `SapstackRuntime` implementation as sapstack Desktop.
+Its 23 tools, 12 prompts, and 9 static resources/templates are generated from
+one registry and covered by a real MCP client contract test.
 
 ### ✅ Fully Working
 - **Read-only tools** (v1.5.0+): `resolve_symptom`, `check_tcode`, `resolve_sap_note`, `list_plugins`, `list_sessions`

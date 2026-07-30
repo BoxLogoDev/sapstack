@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://boxlogodev.github.io/sapstack/schemas/asset-manifest.schema.json",
+  "type": "object",
+  "required": ["formatVersion", "productVersion", "counts", "roots", "required"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "formatVersion": { "const": 1 },
+    "productVersion": { "type": "string" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "counts": {
+      "type": "object",
+      "required": ["plugins", "agents", "commands", "tools", "prompts", "resources"],
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "roots": { "type": "array", "items": { "type": "string" } },
+    "required": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}
