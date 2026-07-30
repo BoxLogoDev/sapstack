@@ -1,0 +1,8 @@
+sapstack
+Copyright 2026 BoxLogoDev
+
+apps/desktop is derived from craft-ai-agents/craft-agents-oss v0.11.2 at
+commit a60ebc1a5a7cb0a6af7a77d5eed0512c5fc07658, licensed under the Apache
+License 2.0. Its original LICENSE, NOTICE, and TRADEMARK.md are retained under
+apps/desktop. sapstack Desktop is an independent product and does not use the
+Craft Agents product name.

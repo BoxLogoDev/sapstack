@@ -1,0 +1,38 @@
+{
+  "name": "@sapstack-desktop/server",
+  "version": "0.11.2",
+  "description": "Standalone headless sapstack Desktop server (Bun runtime)",
+  "type": "module",
+  "main": "src/index.ts",
+  "bin": {
+    "craft-server": "src/index.ts"
+  },
+  "files": [
+    "src/"
+  ],
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "author": {
+    "name": "Craft Docs Ltd.",
+    "email": "boxlogodev@users.noreply.github.com"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://boxlogodev.github.io/sapstack",
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "generate-token": "bun run src/index.ts --generate-token",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sapstack-desktop/core": "workspace:*",
+    "@sapstack-desktop/messaging-gateway": "workspace:*",
+    "@sapstack-desktop/server-core": "workspace:*",
+    "@sapstack-desktop/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2",
+    "@types/node": "^22.0.0",
+    "ws": "^8.16.0"
+  }
+}

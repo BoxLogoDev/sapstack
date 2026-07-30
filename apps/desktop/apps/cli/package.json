@@ -1,0 +1,25 @@
+{
+  "name": "@sapstack-desktop/cli",
+  "version": "0.11.2",
+  "license": "Apache-2.0",
+  "description": "Terminal client for sapstack Desktop server",
+  "type": "module",
+  "main": "src/index.ts",
+  "bin": {
+    "craft-cli": "src/index.ts"
+  },
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test src/"
+  },
+  "dependencies": {
+    "@sapstack-desktop/shared": "workspace:*",
+    "@sapstack-desktop/server-core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2",
+    "@types/node": "^22.0.0",
+    "@types/bun": "latest"
+  }
+}

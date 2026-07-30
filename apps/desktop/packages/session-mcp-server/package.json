@@ -1,0 +1,24 @@
+{
+  "name": "@sapstack-desktop/session-mcp-server",
+  "version": "0.11.2",
+  "license": "Apache-2.0",
+  "description": "MCP server that provides session-scoped tools (SubmitPlan, config_validate, etc.) to Codex via stdio transport",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "bin": {
+    "session-mcp-server": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "bun build src/index.ts --outdir=dist --target=node --format=cjs",
+    "dev": "bun run src/index.ts"
+  },
+  "dependencies": {
+    "@sapstack-desktop/session-tools-core": "workspace:*",
+    "@sapstack-desktop/shared": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0"
+  }
+}

@@ -1,0 +1,230 @@
+appId: dev.boxlogo.sapstack.desktop
+productName: sapstack Desktop
+copyright: Copyright © 2026 BoxLogoDev and Craft OSS contributors
+
+protocols:
+  - name: sapstack Desktop
+    schemes:
+      - sapstack-desktop
+
+electronVersion: "39.2.7"
+
+# Hook to compile macOS 26+ Liquid Glass icon after packaging
+afterPack: scripts/afterPack.cjs
+
+directories:
+  output: release
+  buildResources: resources
+
+files:
+  - dist/**/*
+  - "!dist/renderer/src/**"
+  - "!**/*.map"
+  - package.json
+  # Include bundled MCP servers (bridge + session) for Codex sessions
+  - resources/bridge-mcp-server/**/*
+  - resources/session-mcp-server/**/*
+  # Include Pi agent server subprocess for Pi SDK sessions
+  - resources/pi-agent-server/**/*
+  # Note: Bundled assets (docs, themes, permissions, tool-icons) are in resources/
+  # and copied to dist/resources/ by build:copy. They're included via dist/**/* above.
+  # Include network interceptor for API error capture and MCP schema injection
+  - packages/shared/src/unified-network-interceptor.ts
+  - packages/shared/src/interceptor-common.ts
+  - packages/shared/src/feature-flags.ts
+  - packages/shared/src/interceptor-request-utils.ts
+  # Include CLI tool Python scripts (platform-independent)
+  - resources/scripts/**/*
+  # Include CLI tool shell wrappers (platform-independent, both Unix and Windows)
+  - resources/bin/markitdown
+  - resources/bin/markitdown.cmd
+  - resources/bin/pdf-tool
+  - resources/bin/pdf-tool.cmd
+  - resources/bin/xlsx-tool
+  - resources/bin/xlsx-tool.cmd
+  - resources/bin/doc-diff
+  - resources/bin/doc-diff.cmd
+  - resources/bin/img-tool
+  - resources/bin/img-tool.cmd
+  - resources/bin/docx-tool
+  - resources/bin/docx-tool.cmd
+  - resources/bin/pptx-tool
+  - resources/bin/pptx-tool.cmd
+  - resources/bin/ical-tool
+  - resources/bin/ical-tool.cmd
+  # Include bundled uv binary (platform-specific, only the relevant one ships per build)
+  - resources/bin/darwin-arm64/**/*
+  - resources/bin/darwin-x64/**/*
+  - resources/bin/win32-x64/**/*
+  - resources/bin/linux-x64/**/*
+  # Include bundled Bun runtime (platform-specific, set by build script)
+  - vendor/bun/**/*
+  # Exclude everything from node_modules (will use extraResources for SDK)
+  - "!node_modules/**/*"
+
+# Since SDK 0.2.113 the SDK ships a thin core (`@anthropic-ai/claude-agent-sdk`)
+# and a per-platform optional dependency (`-darwin-arm64`, `-darwin-x64`, etc.)
+# containing the ~210 MB native `claude` binary. We bundle both as extraResources
+# below — only the binary matching the build target is shipped per artifact, so
+# the platform `files` rules below also exclude the wrong-platform binaries.
+#
+# Why extraResources instead of `files`: since electron-builder v20.15.2,
+# `node_modules` directories are auto-excluded from `files`. extraResources
+# bypasses that. See: https://github.com/electron-userland/electron-builder/issues/3104
+#
+# Ripgrep is sourced from `@vscode/ripgrep` (was previously bundled inside the
+# SDK as `vendor/ripgrep/<platform>/rg`; removed in 0.2.113).
+
+extraMetadata:
+  main: dist/main.cjs
+
+# Auto-update: electron-updater fetches from this URL for update manifests (.yml files)
+publish:
+  provider: generic
+  url: https://boxlogodev.github.io/sapstack/electron/latest
+
+# Disable ASAR to avoid decompression overhead and click delays
+asar: false
+
+mac:
+  category: public.app-category.productivity
+  icon: resources/icon.icns
+  # macOS 26+ Liquid Glass: Tell macOS to look for icon in Assets.car
+  # The value must match --app-icon used in actool (see afterPack.js)
+  extendInfo:
+    CFBundleIconName: AppIcon
+    # Required for macOS to list the app under Privacy & Security > Local Network
+    # and prompt for permission. Without it the app is silently denied LAN access
+    # and never appears in the privacy pane (sapstack-desktops-oss#938).
+    NSLocalNetworkUsageDescription: "sapstack Desktop uses your local network to reach LAN addresses and devices you ask an agent to access, such as local servers or APIs."
+  target:
+    - target: dmg
+      arch:
+        - arm64
+        - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  extraResources:
+    # Thin core SDK (sdk.mjs + types). ~4 MB — present on every platform.
+    - from: node_modules/@anthropic-ai/claude-agent-sdk
+      to: app/node_modules/@anthropic-ai/claude-agent-sdk
+    # Stable alias pointing at the target-arch native binary package.
+    # Populated by build-dmg.sh / build-linux.sh / build-win.ps1 before
+    # electron-builder runs (`apps/electron/node_modules/@anthropic-ai/claude-agent-sdk-binary/`).
+    # The runtime resolver (runtime-resolver.ts) looks here first.
+    - from: node_modules/@anthropic-ai/claude-agent-sdk-binary
+      to: app/node_modules/@anthropic-ai/claude-agent-sdk-binary
+    # ripgrep (used by packages/server-core/src/services/search.ts).
+    - from: node_modules/@vscode/ripgrep
+      to: app/node_modules/@vscode/ripgrep
+    # WhatsApp worker subprocess (self-contained; Baileys bundled in).
+    - from: ../../packages/messaging-whatsapp-worker/dist/worker.cjs
+      to: messaging-whatsapp-worker/worker.cjs
+  # Exclude binaries for other platforms
+  files:
+    - "!**/resources/bin/win32-*/**"
+    - "!**/resources/bin/linux-*/**"
+  # Use predictable naming for macOS packages (applies to zip; dmg uses its own config below)
+  artifactName: "sapstack-Desktop-${version}-${arch}.${ext}"
+  # Code signing & notarization (disabled by default for local builds)
+  # To enable: set CSC_LINK, APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID
+  # notarize:
+  #   teamId: ${APPLE_TEAM_ID}
+
+dmg:
+  # Use predictable naming: Craft-Agents-arm64.dmg, Craft-Agents-x64.dmg
+  artifactName: "sapstack-Desktop-${version}-${arch}.dmg"
+  # Custom background (multi-resolution TIFF with 1x+2x for retina support)
+  background: resources/dmg-background.tiff
+  # Use app icon as the mounted volume icon in Finder
+  icon: resources/icon.icns
+  iconSize: 80
+  title: "sapstack Desktop"
+  contents:
+    - x: 130
+      y: 200
+    - x: 410
+      y: 200
+      type: link
+      path: /Applications
+  window:
+    width: 540
+    height: 380
+
+win:
+  icon: resources/icon.png
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+  # Use predictable naming: Craft-Agents-x64.exe
+  artifactName: "sapstack-Desktop-${version}-Setup-${arch}.${ext}"
+  files:
+    # Exclude binaries for other platforms
+    - "!**/resources/bin/darwin-*/**"
+    - "!**/resources/bin/linux-*/**"
+    # WORKAROUND: Exclude bun and uv from regular files on Windows.
+    # electron-builder's npm node module collector causes EBUSY errors when copying
+    # .exe files because it scans/locks files while simultaneously trying to copy them.
+    # Moving them to extraResources avoids this by copying before the collector runs.
+    # See: https://github.com/electron-userland/electron-builder/issues/8250
+    - "!vendor/bun/**/*"
+    - "!**/resources/bin/win32-x64/**"
+  # Copy executables as extraResources to avoid EBUSY file locking (see comment above)
+  extraResources:
+    - from: node_modules/@anthropic-ai/claude-agent-sdk
+      to: app/node_modules/@anthropic-ai/claude-agent-sdk
+    - from: node_modules/@anthropic-ai/claude-agent-sdk-binary
+      to: app/node_modules/@anthropic-ai/claude-agent-sdk-binary
+    - from: node_modules/@vscode/ripgrep
+      to: app/node_modules/@vscode/ripgrep
+    - from: vendor/bun/bun.exe
+      to: vendor/bun/bun.exe
+    - from: resources/bin/win32-x64
+      to: app/resources/bin/win32-x64
+    # WhatsApp worker subprocess (self-contained; Baileys bundled in).
+    - from: ../../packages/messaging-whatsapp-worker/dist/worker.cjs
+      to: messaging-whatsapp-worker/worker.cjs
+
+nsis:
+  oneClick: true
+  # Per-user install to %LOCALAPPDATA%\Programs\ (not Program Files).
+  # Bun subprocess cannot read/write files in Program Files due to Windows permissions.
+  perMachine: false
+  deleteAppDataOnUninstall: false
+
+portable:
+  artifactName: "sapstack-Desktop-${version}-Portable-${arch}.${ext}"
+
+linux:
+  icon: resources/icon.png
+  category: Utility
+  maintainer: "BoxLogoDev <boxlogodev@users.noreply.github.com>"
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  artifactName: "sapstack-Desktop-${version}-${arch}.${ext}"
+  extraResources:
+    - from: node_modules/@anthropic-ai/claude-agent-sdk
+      to: app/node_modules/@anthropic-ai/claude-agent-sdk
+    - from: node_modules/@anthropic-ai/claude-agent-sdk-binary
+      to: app/node_modules/@anthropic-ai/claude-agent-sdk-binary
+    - from: node_modules/@vscode/ripgrep
+      to: app/node_modules/@vscode/ripgrep
+    # WhatsApp worker subprocess (self-contained; Baileys bundled in).
+    - from: ../../packages/messaging-whatsapp-worker/dist/worker.cjs
+      to: messaging-whatsapp-worker/worker.cjs
+  # Exclude binaries for other platforms
+  files:
+    - "!**/resources/bin/darwin-*/**"
+    - "!**/resources/bin/win32-*/**"

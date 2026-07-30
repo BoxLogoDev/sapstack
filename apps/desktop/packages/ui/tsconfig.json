@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "declaration": true,
+    "declarationDir": "./dist",
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "paths": {
+      "@sapstack-desktop/core": ["../core/src/index.ts"],
+      "@sapstack-desktop/core/*": ["../core/src/*"],
+      "prosemirror-model": ["node_modules/prosemirror-model"],
+      "prosemirror-transform": ["node_modules/prosemirror-transform"],
+      "prosemirror-view": ["node_modules/prosemirror-view"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "src/**/__tests__"]
+}
