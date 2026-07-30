@@ -1,5 +1,7 @@
 # sapstack × Kiro Integration Guide
 
+<!-- sapstack-stats: version=2.4.0 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
+
 > Amazon **Kiro IDE**에서 sapstack 전체 기능(Evidence Loop · 14 SAP 모듈 ·
 > 현장체 언어 레이어 · MCP 툴)을 사용하는 방법. 5분 퀵스타트보다 깊은
 > 아키텍처 이해가 필요할 때 이 문서를 참조하세요.

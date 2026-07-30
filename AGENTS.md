@@ -1,5 +1,7 @@
 # AGENTS.md — sapstack (v1.5.0)
 
+<!-- sapstack-stats: version=2.4.0 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
+
 > 이 파일은 **AGENTS.md 표준을 지원하는 모든 AI 에이전트**(OpenAI Codex CLI,
 > **Amazon Kiro IDE**, 그 외)에게 sapstack의 사용 규칙을 전달합니다.
 > Claude Code 사용자는 `plugins/*/skills/*/SKILL.md`와 `CLAUDE.md`를 직접

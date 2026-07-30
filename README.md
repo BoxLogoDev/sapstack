@@ -1,3 +1,4 @@
+<!-- sapstack-stats: version=2.4.0 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
 <div align="center">
 
 # 🏛 sapstack

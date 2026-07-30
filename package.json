@@ -16,5 +16,22 @@
   "bugs": {
     "url": "https://github.com/BoxLogoDev/sapstack/issues"
   },
-  "homepage": "https://github.com/BoxLogoDev/sapstack#readme"
+  "homepage": "https://github.com/BoxLogoDev/sapstack#readme",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "mcp",
+    "extension"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "npm run build --workspace @boxlogodev/sapstack-runtime && npm run build --workspace @boxlogodev/sapstack-mcp",
+    "test": "npm run test --workspace @boxlogodev/sapstack-runtime && npm run test --workspace @boxlogodev/sapstack-mcp",
+    "build:desktop": "bun run --cwd apps/desktop electron:build",
+    "test:desktop": "bun run --cwd apps/desktop typecheck:shared && bun run --cwd apps/desktop typecheck:electron",
+    "check:doc-stats": "node scripts/check-doc-stats.mjs",
+    "check:assets": "node scripts/generate-asset-manifest.mjs --check"
+  }
 }

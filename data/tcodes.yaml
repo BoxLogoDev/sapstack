@@ -537,7 +537,7 @@ MR11:
   release: both
   note: Test Run 필수
 MRBR:
-  name: Release Blocked Invoices
+  name: Release Blocked Invoices (Invoice Verification)
   modules: [MM]
   release: both
 OMSY:
@@ -646,11 +646,11 @@ CA02:
   release: both
 CR01:
   name: Create Work Center
-  modules: [PP]
+  modules: [PM, PP]
   release: both
 CR02:
   name: Change Work Center
-  modules: [PP]
+  modules: [PM, PP]
   release: both
 CO01:
   name: Create Production Order
@@ -928,10 +928,6 @@ MSC1N:
   release: both
 MSC3N:
   name: Display Batch
-  modules: [MM]
-  release: both
-MRBR:
-  name: Release Blocked Invoices (Invoice Verification)
   modules: [MM]
   release: both
 MIR4:
@@ -1358,14 +1354,6 @@ IA05:
   name: Task List for Functional Location
   modules: [PM]
   release: both
-CR01:
-  name: Create Work Center
-  modules: [PM, PP]
-  release: both
-CR02:
-  name: Change Work Center
-  modules: [PM, PP]
-  release: both
 CR03:
   name: Display Work Center
   modules: [PM, PP]
@@ -1709,14 +1697,6 @@ CO40:
   name: Convert Planned Order to Production Order
   modules: [PP]
   release: both
-COR1:
-  name: Create Process Order
-  modules: [PP]
-  release: both
-COR2:
-  name: Change Process Order
-  modules: [PP]
-  release: both
 COR3:
   name: Display Process Order
   modules: [PP]
@@ -1745,11 +1725,6 @@ F-43:
   name: Vendor Invoice (Direct Entry)
   modules: [FI]
   release: both
-F-44:
-  name: Vendor Open Item Clearing
-  modules: [FI]
-  release: both
-
 # ─────────────────────────────────────────────────────────
 # v2.3 B3 — 신규 4 클라우드 모듈 연동 T-code
 # IBP/SAC/Ariba/Integration Cloud 는 BTP SaaS 라 자체 SAP GUI

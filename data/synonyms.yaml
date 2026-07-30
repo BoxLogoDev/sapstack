@@ -1014,6 +1014,8 @@ terms:
     ko:
       primary: "지엠피"
       variants: ["GMP", "우수제조관리기준", "우수 제조 관리 기준"]
+    ja: { primary: "GMP", variants: ['医薬品等の製造管理及び品質管理の基準'] }
+    de: { primary: "GMP" }
     notes: |
       제약·식품 산업 품질 표준. QM 모듈 활용 범위 확대 분야.
 
@@ -1061,9 +1063,6 @@ abbreviations:
 # ═══════════════════════════════════════════════════════════════
 
 business_time_expressions:
-    ja: { primary: "GMP", variants: ['医薬品等の製造管理及び品質管理の基準'] }
-    de: { primary: "GMP" }
-
   - canonical: d_minus_1
     ko: "D-1"
     ko_variants: ["디마이너스원", "디 마이너스 원", "전일", "하루 전", "one day before"]

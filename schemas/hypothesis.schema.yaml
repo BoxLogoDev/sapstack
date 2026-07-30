@@ -92,7 +92,7 @@ properties:
 
   falsification_evidence:
     type: array
-    minItems: 1
+    minItems: 2
     description: |
       MANDATORY. What observation would REFUTE this hypothesis?
       This is the Popperian guard against self-deception.

@@ -7,13 +7,18 @@ on:
     branches: [main]
 
 jobs:
-  quality-gates:
-    name: Quality Gates
+  content-gates:
+    name: Content Gates
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -70,3 +75,73 @@ jobs:
 
       - name: Check eval gold-set integrity (strict, API-free)
         run: ./scripts/check-eval-goldset.sh --strict
+
+      - name: Check generated asset and documentation statistics
+        run: |
+          node scripts/generate-asset-manifest.mjs --check
+          node scripts/check-doc-stats.mjs
+
+  runtime-contract:
+    name: Runtime & MCP (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install runtime dependencies
+        working-directory: packages/runtime
+        run: npm ci --workspaces=false
+      - name: Install MCP dependencies
+        working-directory: mcp
+        run: npm ci --workspaces=false
+      - name: Build shared runtime and MCP
+        run: npm run build
+      - name: Run unit and real MCP client contract tests
+        run: npm test
+
+  mcp-clean-install:
+    name: MCP npm pack & clean install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - working-directory: mcp
+        run: npm ci --workspaces=false
+      - working-directory: mcp
+        run: npm run test:pack --workspaces=false
+
+  extension-compile:
+    name: VS Code Extension compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - working-directory: extension
+        run: npm ci
+      - working-directory: extension
+        run: npm run compile
+
+  desktop-typecheck:
+    name: sapstack Desktop typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.14'
+      - working-directory: apps/desktop
+        run: bun install --frozen-lockfile --ignore-scripts
+      - working-directory: apps/desktop
+        run: bun run typecheck:shared
+      - working-directory: apps/desktop
+        run: bun run typecheck:electron

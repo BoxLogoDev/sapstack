@@ -1,5 +1,7 @@
 # sapstack 아키텍처
 
+<!-- sapstack-stats: version=2.4.0 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
+
 > 버전: v1.4.0
 > 최종 업데이트: 2026-04-11
 
