@@ -30,6 +30,9 @@ jobs:
         id: version
         run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
+      - name: Enforce public beta diagnostic quality baseline
+        run: node scripts/eval/check-gate.mjs docs/eval/latest.json
+
       - name: Verify tag matches package versions
         run: |
           chmod +x scripts/bump-version.sh

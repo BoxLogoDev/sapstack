@@ -46,6 +46,7 @@ jobs:
       - name: dry-run (에이전트 매핑 점검 — 채점 전 가드)
         run: ./scripts/eval-diagnosis.sh --dry-run
       - name: eval 실행 (provider=api)
+        id: diagnosis
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           EVAL_PROVIDER: api
@@ -53,15 +54,20 @@ jobs:
         run: |
           if [ -z "$ANTHROPIC_API_KEY" ]; then
             echo "::notice::ANTHROPIC_API_KEY secret 미설정 — 채점 skip (무료 게이트만 통과)."
+            echo "ran=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          ./scripts/eval-diagnosis.sh ${{ github.event.inputs.scope || '--all' }} --json eval-summary.json
+          ./scripts/eval-diagnosis.sh ${{ github.event.inputs.scope || '--all' }} --json docs/eval/latest.json
+          echo "ran=true" >> "$GITHUB_OUTPUT"
+      - name: Public beta 진단 품질 gate
+        if: steps.diagnosis.outputs.ran == 'true'
+        run: node scripts/eval/check-gate.mjs docs/eval/latest.json
       - name: 요약 아티팩트 업로드
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: eval-summary
           path: |
-            eval-summary.json
+            docs/eval/latest.json
             docs/eval/REPORT.md
           if-no-files-found: ignore

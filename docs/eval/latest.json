@@ -1,0 +1,14 @@
+{
+  "cases_scored": 32,
+  "cases_errored": 0,
+  "avg_score": 0.51,
+  "avg_tcode_recall": 0.625,
+  "avg_check_coverage": 0.541,
+  "root_cause_full_rate": 0.156,
+  "ethos_violations_total": 0,
+  "judge_votes": 3,
+  "avg_judge_spread": 0.153,
+  "generated_at": "2026-08-10T13:12:33.195Z",
+  "provider": "claude-cli",
+  "model": "sonnet"
+}
