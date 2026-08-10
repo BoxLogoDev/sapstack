@@ -10,6 +10,7 @@ export * from "./catalog.js";
 export * from "./knowledge.js";
 export * from "./sessions.js";
 export * from "./security.js";
+export * from "./support.js";
 
 export interface SapstackRuntimeOptions extends DefaultAssetProviderOptions {
   assets?: AssetProvider;

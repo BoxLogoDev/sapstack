@@ -51,7 +51,7 @@ properties:
 
   originating_surface:
     type: string
-    enum: [cli, vscode_extension, web_triage, mcp_client, email]
+    enum: [cli, vscode_extension, web_triage, mcp_client, desktop, email]
     description: "Which Surface the session was born on (A/B/C)"
 
   handoff_history:
@@ -62,8 +62,8 @@ properties:
       required: [at, from_surface, to_surface, reason]
       properties:
         at: { type: string, format: date-time }
-        from_surface: { type: string, enum: [cli, vscode_extension, web_triage, mcp_client, email] }
-        to_surface: { type: string, enum: [cli, vscode_extension, web_triage, mcp_client, email] }
+        from_surface: { type: string, enum: [cli, vscode_extension, web_triage, mcp_client, desktop, email] }
+        to_surface: { type: string, enum: [cli, vscode_extension, web_triage, mcp_client, desktop, email] }
         from_role: { type: string }
         to_role: { type: string }
         reason: { type: string }
@@ -210,7 +210,7 @@ $defs:
         enum: [pending, active, complete, abandoned]
       surface:
         type: string
-        enum: [cli, vscode_extension, web_triage, mcp_client, email]
+        enum: [cli, vscode_extension, web_triage, mcp_client, desktop, email]
       artifact_refs:
         type: object
         description: "Which IDs from the parent session this turn produced"

@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
-import { FileSystemAssetProvider, SapstackRuntime } from "../src/index.js";
+import { buildSupportBundle, FileSystemAssetProvider, SapstackRuntime } from "../src/index.js";
 
 const repositoryRoot = path.resolve(fileURLToPath(new URL("../../../", import.meta.url)));
 
@@ -70,6 +70,29 @@ test("security scrubs PII and rejects path traversal", async t => {
   assert.equal(result.hitCount, 3);
   assert.doesNotMatch(result.scrubbedText, /900101-1234567|010-1234-5678/);
   assert.throws(() => runtime.security.resolveInside(sessionsDir, "../outside"), /traversal/);
+});
+
+test("support bundles contain diagnostics without customer data", async t => {
+  const { runtime, sessionsDir } = await runtimeFixture();
+  t.after(() => rm(sessionsDir, { recursive: true, force: true }));
+
+  const bundle = buildSupportBundle({
+    appVersion: "1.5.0",
+    platform: "win32",
+    arch: "x64",
+    runtime: await runtime.assets.manifest(),
+    environment: {
+      release: "S4_2022",
+      deployment: "on_premise",
+      language: "ko",
+      industry: "Secret Customer Industry",
+      client: "100",
+    },
+  });
+  const serialized = JSON.stringify(bundle);
+  assert.equal(bundle.environment.release, "S4_2022");
+  assert.doesNotMatch(serialized, /Secret Customer Industry|"100"/);
+  assert.ok(bundle.excluded.includes("evidence"));
 });
 
 test("Evidence Loop completes the canonical four-turn flow", async t => {
@@ -147,6 +170,18 @@ test("session mutations are serialized without lost evidence", async t => {
     bundle: evidence(started.session_id, index + 1),
   })));
   assert.equal((await runtime.sessions.get(started.session_id)).bundles.length, 12);
+});
+
+test("Desktop sessions preserve their originating surface in the audit trail", async t => {
+  const { runtime, sessionsDir } = await runtimeFixture();
+  t.after(() => rm(sessionsDir, { recursive: true, force: true }));
+  const started = await runtime.sessions.start({ symptom: "Desktop intake", surface: "desktop" });
+  await runtime.sessions.addEvidence({ session_id: started.session_id, bundle: evidence(started.session_id), surface: "desktop" });
+
+  const state = await runtime.sessions.get(started.session_id);
+  assert.equal(state.originating_surface, "desktop");
+  assert.equal(state.turns[0].surface, "desktop");
+  assert.deepEqual(state.audit_trail.map((entry: any) => entry.actor.surface), ["desktop", "desktop"]);
 });
 
 test("resolved verdicts require environment, fix, and rollback", async t => {

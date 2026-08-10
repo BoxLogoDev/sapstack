@@ -120,7 +120,10 @@ export interface StartSessionInput {
   industry?: string;
   client?: string;
   language?: string;
+  surface?: SessionSurface;
 }
+
+export type SessionSurface = "cli" | "vscode_extension" | "web_triage" | "mcp_client" | "desktop" | "email";
 
 export class SessionService {
   private readonly queue = new SessionMutationQueue();
@@ -160,13 +163,14 @@ export class SessionService {
     const sessionId = generateId("sess");
     const now = new Date().toISOString();
     const role = input.reporter_role || "operator";
+    const surface = input.surface || "mcp_client";
     const state: any = {
       session_id: sessionId,
       schema_version: "1.0.0",
       created_at: now,
       last_updated_at: now,
       created_by: { role },
-      originating_surface: "mcp_client",
+      originating_surface: surface,
       status: "intake",
       initial_symptom: {
         description: input.symptom.trim(),
@@ -182,13 +186,13 @@ export class SessionService {
         ...(input.country_iso ? { country_iso: input.country_iso.toLowerCase() } : {}),
         language: input.language || "ko",
       },
-      turns: [{ turn_number: 1, turn_type: "intake", started_at: now, status: "active", surface: "mcp_client" }],
+      turns: [{ turn_number: 1, turn_type: "intake", started_at: now, status: "active", surface }],
       current_turn_number: 1,
       hypotheses: [],
       bundles: [],
       followup_requests: [],
       verdicts: [],
-      audit_trail: [{ at: now, action: "session_created", actor: { role, surface: "mcp_client" } }],
+      audit_trail: [{ at: now, action: "session_created", actor: { role, surface } }],
       tags: [],
     };
     await this.assertValid("session-state", state);
@@ -211,7 +215,7 @@ export class SessionService {
       .map(state => ({ session_id: state.session_id, status: state.status, country_iso: state.initial_symptom?.country_iso, last_updated_at: state.last_updated_at, description: state.initial_symptom?.description?.slice(0, 120) || "" }));
   }
 
-  async addEvidence(args: { session_id: string; bundle_yaml?: string; bundle?: any }) {
+  async addEvidence(args: { session_id: string; bundle_yaml?: string; bundle?: any; surface?: SessionSurface }) {
     return this.queue.run(args.session_id, async () => {
       const state = await this.store.read(args.session_id);
       let bundle: any;
@@ -236,7 +240,7 @@ export class SessionService {
       state.bundles.push(bundle);
       state.last_updated_at = new Date().toISOString();
       state.audit_trail ||= [];
-      state.audit_trail.push({ at: state.last_updated_at, action: "bundle_added", actor: { role: bundle.collected_by.role, surface: "mcp_client" }, ref_id: bundle.bundle_id });
+      state.audit_trail.push({ at: state.last_updated_at, action: "bundle_added", actor: { role: bundle.collected_by.role, surface: args.surface || "mcp_client" }, ref_id: bundle.bundle_id });
       if (state.status === "intake") state.status = "hypothesizing";
       await this.assertValid("session-state", state);
       await this.store.write(args.session_id, state);
@@ -244,14 +248,14 @@ export class SessionService {
     });
   }
 
-  async submitHypotheses(args: { session_id: string; turn_number?: number; hypotheses: any[] }) {
+  async submitHypotheses(args: { session_id: string; turn_number?: number; hypotheses: any[]; surface?: SessionSurface }) {
     if (!Array.isArray(args.hypotheses) || args.hypotheses.length < 2 || args.hypotheses.length > 4) {
       throw new Error("Evidence Loop requires 2-4 hypotheses");
     }
     return this.queue.run(args.session_id, async () => {
       const state = await this.store.read(args.session_id);
       const now = new Date().toISOString();
-      if ((state.current_turn_number || 1) < 2) this.openTurn(state, 2, "hypothesis", now);
+      if ((state.current_turn_number || 1) < 2) this.openTurn(state, 2, "hypothesis", now, args.surface);
       const turnNumber = args.turn_number || state.current_turn_number || 2;
       const offset = state.hypotheses?.length || 0;
       const confidence: Record<string, number> = { high: 0.8, medium: 0.5, low: 0.2 };
@@ -281,14 +285,14 @@ export class SessionService {
       state.status = "hypothesizing";
       state.last_updated_at = now;
       state.audit_trail ||= [];
-      for (const hypothesis of created) state.audit_trail.push({ at: now, action: "hypothesis_proposed", actor: { surface: "mcp_client" }, ref_id: hypothesis.hypothesis_id });
+      for (const hypothesis of created) state.audit_trail.push({ at: now, action: "hypothesis_proposed", actor: { surface: args.surface || "mcp_client" }, ref_id: hypothesis.hypothesis_id });
       await this.assertValid("session-state", state);
       await this.store.write(args.session_id, state);
       return { session_id: args.session_id, turn_number: turnNumber, hypotheses_created: created.length, hypothesis_ids: created.map(item => item.hypothesis_id) };
     });
   }
 
-  async addFollowup(args: { session_id: string; turn_number?: number; items: any[]; summary?: string }) {
+  async addFollowup(args: { session_id: string; turn_number?: number; items: any[]; summary?: string; surface?: SessionSurface }) {
     if (!Array.isArray(args.items) || !args.items.length) throw new Error("items must be a non-empty array");
     return this.queue.run(args.session_id, async () => {
       const state = await this.store.read(args.session_id);
@@ -326,7 +330,7 @@ export class SessionService {
       state.status = "awaiting_evidence";
       state.last_updated_at = now;
       state.audit_trail ||= [];
-      state.audit_trail.push({ at: now, action: "followup_requested", actor: { surface: "mcp_client" }, ref_id: request.request_id });
+      state.audit_trail.push({ at: now, action: "followup_requested", actor: { surface: args.surface || "mcp_client" }, ref_id: request.request_id });
       await this.assertValid("session-state", state);
       await this.store.writeArtifact(args.session_id, `${request.request_id}.yaml`, request);
       await this.store.write(args.session_id, state);
@@ -334,7 +338,7 @@ export class SessionService {
     });
   }
 
-  async submitVerdict(args: { session_id: string; turn_number?: number; overall_state: string; summary: string; resolutions: any[] }) {
+  async submitVerdict(args: { session_id: string; turn_number?: number; overall_state: string; summary: string; resolutions: any[]; surface?: SessionSurface }) {
     if (!args.summary?.trim()) throw new Error("summary is required");
     if (!Array.isArray(args.resolutions) || !args.resolutions.length) throw new Error("resolutions must be a non-empty array");
     return this.queue.run(args.session_id, async () => {
@@ -357,7 +361,7 @@ export class SessionService {
         }
       }
       const now = new Date().toISOString();
-      if ((state.current_turn_number || 1) < 4) this.openTurn(state, 4, "verify", now);
+      if ((state.current_turn_number || 1) < 4) this.openTurn(state, 4, "verify", now, args.surface);
       const verdict = {
         verdict_id: generateId("vdc"),
         session_id: args.session_id,
@@ -373,8 +377,8 @@ export class SessionService {
       state.status = args.overall_state === "resolved" ? "resolved" : args.overall_state === "escalated" ? "escalated" : "verifying";
       state.last_updated_at = now;
       state.audit_trail ||= [];
-      state.audit_trail.push({ at: now, action: "verdict_issued", actor: { surface: "mcp_client" }, ref_id: verdict.verdict_id });
-      if (state.status === "resolved") state.audit_trail.push({ at: now, action: "closed", actor: { surface: "mcp_client" }, ref_id: verdict.verdict_id });
+      state.audit_trail.push({ at: now, action: "verdict_issued", actor: { surface: args.surface || "mcp_client" }, ref_id: verdict.verdict_id });
+      if (state.status === "resolved") state.audit_trail.push({ at: now, action: "closed", actor: { surface: args.surface || "mcp_client" }, ref_id: verdict.verdict_id });
       await this.assertValid("session-state", state);
       await this.store.writeArtifact(args.session_id, `${verdict.verdict_id}.yaml`, verdict);
       await this.store.write(args.session_id, state);
@@ -382,26 +386,26 @@ export class SessionService {
     });
   }
 
-  async next(args: { session_id: string; force_hypothesize?: boolean }) {
+  async next(args: { session_id: string; force_hypothesize?: boolean; surface?: SessionSurface }) {
     return this.queue.run(args.session_id, async () => {
       const state = await this.store.read(args.session_id);
       const now = new Date().toISOString();
       let signal = "no_transition";
       if (state.status === "intake" && state.bundles?.length) {
         state.status = "hypothesizing";
-        this.openTurn(state, (state.current_turn_number || 1) + 1, "hypothesis", now);
+        this.openTurn(state, (state.current_turn_number || 1) + 1, "hypothesis", now, args.surface);
         signal = "generate_hypotheses";
       } else if (state.status === "hypothesizing" && state.hypotheses?.length && state.followup_requests?.length) {
         state.status = "awaiting_evidence";
         this.completeCurrentTurn(state, now);
-        this.openTurn(state, (state.current_turn_number || 2) + 1, "collect", now);
+        this.openTurn(state, (state.current_turn_number || 2) + 1, "collect", now, args.surface);
         signal = "waiting_for_evidence";
       } else if (state.status === "hypothesizing" && args.force_hypothesize) {
         signal = "generate_hypotheses";
       } else if (state.status === "awaiting_evidence" && state.bundles?.length > 1) {
         state.status = "verifying";
         this.completeCurrentTurn(state, now);
-        this.openTurn(state, (state.current_turn_number || 3) + 1, "verify", now);
+        this.openTurn(state, (state.current_turn_number || 3) + 1, "verify", now, args.surface);
         signal = "verify_hypotheses";
       } else if (state.status === "verifying" && state.verdicts?.length) {
         const latest = state.verdicts.at(-1);
@@ -412,7 +416,7 @@ export class SessionService {
         } else if (latest.overall_state === "needs_next_loop") {
           state.status = "hypothesizing";
           this.completeCurrentTurn(state, now);
-          this.openTurn(state, (state.current_turn_number || 4) + 1, "hypothesis", now);
+          this.openTurn(state, (state.current_turn_number || 4) + 1, "hypothesis", now, args.surface);
           signal = "generate_hypotheses";
         }
       }
@@ -434,11 +438,11 @@ export class SessionService {
     if (turn) { turn.status = "complete"; turn.completed_at = now; }
   }
 
-  private openTurn(state: any, turnNumber: number, turnType: string, now: string) {
+  private openTurn(state: any, turnNumber: number, turnType: string, now: string, surface?: SessionSurface) {
     this.completeCurrentTurn(state, now);
     state.turns ||= [];
     if (!state.turns.some((entry: any) => entry.turn_number === turnNumber)) {
-      state.turns.push({ turn_number: turnNumber, turn_type: turnType, started_at: now, status: "active", surface: "mcp_client" });
+      state.turns.push({ turn_number: turnNumber, turn_type: turnType, started_at: now, status: "active", surface: surface || "mcp_client" });
     }
     state.current_turn_number = turnNumber;
   }
