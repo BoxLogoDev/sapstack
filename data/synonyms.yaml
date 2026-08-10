@@ -159,6 +159,7 @@ terms:
     vi: { primary: "Khách hàng", variants: ['Khách', 'Bên mua', 'KUNNR'] }
 
   - canonical: payment_method
+    vi: { primary: "Phương thức thanh toán", variants: ['Cách thanh toán', 'ZWELS'] }
     module: FI
     field_forms: [ZWELS, LFB1-ZWELS, ZLSCH, BSIK-ZLSCH]
     en: Payment Method
@@ -171,6 +172,7 @@ terms:
     zh: { primary: "支付方式", variants: ['付款方式', '支付方法', 'ZWELS'] }
 
   - canonical: payment_block
+    zh: { primary: "支付冻结", variants: ['付款冻结', '支付锁定', 'ZAHLS'] }
     module: FI
     field_forms: [ZAHLS, LFB1-ZAHLS, BSIK-ZLSPR]
     en: Payment Block
@@ -183,6 +185,7 @@ terms:
     vi: { primary: "Khóa thanh toán", variants: ['Cấm thanh toán', 'ZAHLS'] }
 
   - canonical: payment_run
+    vi: { primary: "Chạy thanh toán", variants: ['Xử lý thanh toán', 'F110'] }
     module: FI
     field_forms: [REGUH, REGUP, LAUFD, LAUFI]
     en: Payment Run
@@ -195,6 +198,7 @@ terms:
     zh: { primary: "支付运行", variants: ['批量支付', '支付处理', 'F110'] }
 
   - canonical: accounts_payable
+    zh: { primary: "应付账款", variants: ['应付', '债权人', 'BSIK'] }
     module: FI
     field_forms: [BSIK, BSAK, LFB1]
     en: Accounts Payable
@@ -207,6 +211,7 @@ terms:
     vi: { primary: "Công nợ phải trả", variants: ['Nợ phải trả', 'BSIK'] }
 
   - canonical: accounts_receivable
+    vi: { primary: "Công nợ phải thu", variants: ['Nợ phải thu', 'BSID'] }
     module: FI
     field_forms: [BSID, BSAD, KNB1]
     en: Accounts Receivable
@@ -219,6 +224,7 @@ terms:
     zh: { primary: "应收账款", variants: ['应收', '债务人', 'BSID'] }
 
   - canonical: special_gl
+    zh: { primary: "特殊总账", variants: ['特殊G/L', '特殊原账', 'UMSKZ'] }
     module: FI
     field_forms: [UMSKZ, UMSKS, BSEG-UMSKZ]
     en: Special G/L Indicator
@@ -231,6 +237,7 @@ terms:
     vi: { primary: "Sổ cái đặc biệt", variants: ['GL đặc biệt', 'UMSKZ'] }
 
   - canonical: withholding_tax
+    vi: { primary: "Thuế khấu trừ", variants: ['Thuế tạm giữ', 'WHT'] }
     module: FI
     field_forms: [WITHT, WT_QSCOD, WITH_ITEM, LFBW]
     en: Withholding Tax
@@ -245,6 +252,7 @@ terms:
     zh: { primary: "代扣税", variants: ['所得税代扣', '代扣', 'WHT'] }
 
   - canonical: tax_code
+    zh: { primary: "税码", variants: ['税种代码', '税金代码', 'MWSKZ'] }
     module: FI
     field_forms: [MWSKZ, T007A, BSEG-MWSKZ]
     en: Tax Code
@@ -257,6 +265,7 @@ terms:
     vi: { primary: "Mã thuế", variants: ['Mã loại thuế', 'MWSKZ'] }
 
   - canonical: house_bank
+    vi: { primary: "Ngân hàng công ty", variants: ['Ngân hàng nội bộ', 'HBKID'] }
     module: FI
     field_forms: [HBKID, T012, T012K]
     en: House Bank
@@ -269,6 +278,7 @@ terms:
     zh: { primary: "公司银行", variants: ['自有银行', '内部银行', 'HBKID'] }
 
   - canonical: period_close
+    zh: { primary: "期间关闭", variants: ['月末关闭', '会计期间关闭', '月结'] }
     module: FI
     field_forms: [T001B, OB52]
     en: Period-End Close
@@ -283,6 +293,7 @@ terms:
     vi: { primary: "Đóng kỳ", variants: ['Đóng tháng', 'Kết thúc kỳ', 'D+3'] }
 
   - canonical: foreign_currency_valuation
+    vi: { primary: "Định giá ngoại tệ", variants: ['Đánh giá tiền tệ nước ngoài', 'FCV'] }
     module: FI
     field_forms: [BKPF-WAERS, FAGL_FCV]
     en: Foreign Currency Valuation
@@ -299,6 +310,7 @@ terms:
     zh: { primary: "外币估值", variants: ['外汇估值', '外币重估', 'FCV'] }
 
   - canonical: cost_element
+    zh: { primary: "成本要素", variants: ['原价要素', '成本科目', 'KSTAR'] }
     module: CO
     field_forms: [KSTAR, CSKA, CSKB]
     en: Cost Element
@@ -313,6 +325,7 @@ terms:
     vi: { primary: "Yếu tố chi phí", variants: ['Loại chi phí', 'KSTAR'] }
 
   - canonical: internal_order
+    vi: { primary: "Lệnh nội bộ", variants: ['Đơn đặt hàng nội bộ', 'IO'] }
     module: CO
     field_forms: [AUFNR, AUFK]
     en: Internal Order
@@ -325,6 +338,8 @@ terms:
     zh: { primary: "内部订单", variants: ['内部指令', '内部命令', 'IO'] }
 
   - canonical: wbs_element
+    zh: { primary: "WBS要素", variants: ['工作分解结构', 'WBS'] }
+    vi: { primary: "Yếu tố WBS", variants: ['Phần tử cấu trúc phân tách công việc', 'WBS'] }
     module: CO
     field_forms: [PRPS, POSID, PSPNR]
     en: WBS Element
@@ -336,6 +351,7 @@ terms:
     related_tcodes: [CJ20N, CJ03, CN41N]
 
   - canonical: activity_type
+    zh: { primary: "活动类型", variants: ['活动种类', '作业类型', 'LSTAR'] }
     module: CO
     field_forms: [LSTAR, CSLA, CSLT]
     en: Activity Type
@@ -348,6 +364,7 @@ terms:
     vi: { primary: "Loại hoạt động", variants: ['Hình thức hoạt động', 'LSTAR'] }
 
   - canonical: assessment
+    vi: { primary: "Phân bổ", variants: ['Đánh giá', 'RKEB'] }
     module: CO
     field_forms: [RKEB, CCSSBA]
     en: Assessment
@@ -360,6 +377,8 @@ terms:
     zh: { primary: "分摊", variants: ['评估', '费用分摊', 'RKEB'] }
 
   - canonical: distribution
+    zh: { primary: "分配", variants: ['分布', '成本分配', 'RKE'] }
+    vi: { primary: "Phân phối", variants: ['Phân chia', 'RKE'] }
     module: CO
     field_forms: [T811, RKE]
     en: Distribution (CO)
@@ -371,6 +390,7 @@ terms:
     related_tcodes: [KSV1, KSV5]
 
   - canonical: settlement
+    zh: { primary: "结算", variants: ['清算', '解决', 'COBL'] }
     module: CO
     field_forms: [COBL, AUFK, T838A]
     en: Settlement
@@ -383,6 +403,7 @@ terms:
     vi: { primary: "Quyết toán", variants: ['Thanh toán', 'COBL'] }
 
   - canonical: co_pa
+    vi: { primary: "Phân tích lợi nhuận", variants: ['CO-PA', 'Phân tích khả năng sinh lời'] }
     module: CO
     field_forms: [CE1XXXX, CE2XXXX, CE4XXXX]
     en: Profitability Analysis (CO-PA)
@@ -399,6 +420,8 @@ terms:
     zh: { primary: "利润分析", variants: ['收益分析', 'CO-PA', '盈利能力分析'] }
 
   - canonical: material
+    zh: { primary: "物料", variants: ['物品', '商品', 'MATNR'] }
+    vi: { primary: "Vật liệu", variants: ['Hàng hóa', 'Sản phẩm', 'MATNR'] }
     module: MM
     field_forms: [MATNR, MARA, MARC, MARD]
     en: Material
@@ -410,6 +433,7 @@ terms:
     related_tcodes: [MM01, MM02, MM03, MM60]
 
   - canonical: plant
+    zh: { primary: "工厂", variants: ['生产工厂', '厂房', 'WERKS'] }
     module: MM
     field_forms: [WERKS, T001W]
     en: Plant
@@ -460,6 +484,8 @@ terms:
     vi: { primary: "Biên lai nhận hàng", variants: ['Nhận hàng', 'Biên bản nhận', 'MIGO'] }
 
   - canonical: goods_issue
+    zh: { primary: "出库", variants: ['货物签收单', '物料扣减', 'MI02'] }
+    vi: { primary: "Phát hành hàng", variants: ['Xuất kho', 'MI02'] }
     module: MM
     field_forms: [MSEG, MKPF]
     en: Goods Issue
@@ -471,6 +497,8 @@ terms:
     related_tcodes: [MIGO, MB1A, MB1C]
 
   - canonical: purchase_order
+    zh: { primary: "采购订单", variants: ['PO', '采购单', 'EKKO'] }
+    vi: { primary: "Đơn đặt hàng mua", variants: ['PO', 'EKKO'] }
     module: MM
     field_forms: [EBELN, EKKO, EKPO]
     en: Purchase Order
@@ -547,6 +575,8 @@ terms:
 # ═══════════════════════════════════════════════════════════════
 
   - canonical: sales_order
+    zh: { primary: "销售订单", variants: ['销售单', 'SO', 'VBAK'] }
+    vi: { primary: "Đơn đặt hàng bán", variants: ['SO', 'VBAK'] }
     module: SD
     field_forms: [VBELN, VBAK, VBAP]
     en: Sales Order
@@ -758,6 +788,8 @@ terms:
 # ═══════════════════════════════════════════════════════════════
 
   - canonical: maintenance_order
+    ja: { primary: "保守作業指図", variants: ['メンテナンスオーダー'] }
+    de: { primary: "Instandhaltungsauftrag" }
     module: PM
     field_forms: [AUFNR, AUFK]
     en: Maintenance Order
@@ -771,6 +803,10 @@ terms:
     vi: { primary: "Lệnh bảo trì", variants: ['Đơn bảo dưỡng', 'AUFNR'] }
 
   - canonical: inspection_lot
+    zh: { primary: "检验批", variants: ['检验单位', '批号', 'QALS'] }
+    vi: { primary: "Lô kiểm tra", variants: ['Đơn vị kiểm tra', 'QALS'] }
+    ja: { primary: "検査ロット", variants: ['ロット'] }
+    de: { primary: "Inspektionslos" }
     module: QM
     field_forms: [LSING, QALS, QAMR]
     en: Inspection Lot
@@ -780,6 +816,10 @@ terms:
     related_tcodes: [QA01, QA03, QA11, QA25]
 
   - canonical: usage_decision
+    zh: { primary: "使用决定", variants: ['用途决定', 'QMAT'] }
+    vi: { primary: "Quyết định sử dụng", variants: ['Quyết định dùng', 'QMAT'] }
+    ja: { primary: "使用決定", variants: ['ユーザー判定'] }
+    de: { primary: "Verwendungsentscheidung" }
     module: QM
     field_forms: [QAMR-ELOSNR, QAMR-ELOSLS]
     en: Usage Decision
@@ -791,6 +831,8 @@ terms:
       QM의 최종 결과. Accept(A), Reject(R), Conditional(C), Scrap(S) 등.
 
   - canonical: picking
+    zh: { primary: "拣货", variants: ['分拣', '拿货', 'LIPS'] }
+    vi: { primary: "Lấy hàng", variants: ['Chọn hàng', 'LIPS'] }
     module: WM/EWM
     field_forms: [LTAP-LGPBE, "/SCWM/PICK"]
     en: Picking
@@ -804,6 +846,8 @@ terms:
     de: { primary: "Kommissionierung" }
 
   - canonical: putaway
+    ja: { primary: "入庫", variants: ['納品'] }
+    de: { primary: "Einlagerung" }
     module: WM/EWM
     field_forms: [LTAP-LGPBE, "/SCWM/PUTAWAY"]
     en: Putaway
@@ -817,6 +861,10 @@ terms:
     vi: { primary: "Lưu trữ hàng", variants: ['Đặt vào kho', 'Phục vụ'] }
 
   - canonical: wave
+    zh: { primary: "波次", variants: ['批次', '轮次'] }
+    vi: { primary: "Làn sóng", variants: ['Đợt', 'Lô hàng'] }
+    ja: { primary: "波動", variants: ['ウェーブ'] }
+    de: { primary: "Welle" }
     module: EWM
     field_forms: ["/SCWM/WAVE"]
     en: Wave
@@ -828,6 +876,10 @@ terms:
       EWM에서 여러 주문을 묶어 처리하는 배치 단위.
 
   - canonical: packing
+    zh: { primary: "打包", variants: ['包装', '装箱'] }
+    vi: { primary: "Đóng gói", variants: ['Bao bì', 'Gói'] }
+    ja: { primary: "梱包", variants: ['パッキング'] }
+    de: { primary: "Packung" }
     module: EWM
     field_forms: ["/SCWM/PACK"]
     en: Packing
@@ -837,6 +889,8 @@ terms:
     related_tcodes: ["/SCWM/PACK", "/SCWM/MON"]
 
   - canonical: equipment
+    zh: { primary: "设备", variants: ['机器', '装置', 'EQUNR'] }
+    vi: { primary: "Thiết bị", variants: ['Máy móc', 'EQUNR'] }
     module: PM
     field_forms: [EQUI, EQKT, IE02]
     en: Equipment
@@ -850,6 +904,10 @@ terms:
     de: { primary: "Ausrüstung" }
 
   - canonical: func_loc
+    zh: { primary: "功能位置", variants: ['功位', '设备位置', 'TPLNR'] }
+    vi: { primary: "Vị trí chức năng", variants: ['Vị trí làm việc', 'TPLNR'] }
+    ja: { primary: "機能位置", variants: ['ファンクショナルロケーション'] }
+    de: { primary: "Funktionsort" }
     module: PM
     field_forms: [ILOA, IFLO, IL01]
     en: Functional Location
@@ -865,6 +923,8 @@ terms:
 # ═══════════════════════════════════════════════════════════════
 
   - canonical: mtbf
+    ja: { primary: "平均故障間隔", variants: ['MTBF'] }
+    de: { primary: "MTBF" }
     module: PM
     field_forms: []
     en: Mean Time Between Failures
@@ -877,6 +937,10 @@ terms:
     vi: { primary: "Thời gian trung bình giữa các lỗi", variants: ['MTBF'] }
 
   - canonical: mttr
+    zh: { primary: "平均修复时间", variants: ['MTTR', '平均维修时间'] }
+    vi: { primary: "Thời gian trung bình để sửa chữa", variants: ['MTTR'] }
+    ja: { primary: "平均修復時間", variants: ['MTTR'] }
+    de: { primary: "MTTR" }
     module: PM
     field_forms: []
     en: Mean Time To Repair
@@ -887,6 +951,8 @@ terms:
       설비 유지보수 효율 지표. 낮을수록 빠른 복구.
 
   - canonical: oee
+    zh: { primary: "综合设备效率", variants: ['OEE', '全局设备效率'] }
+    vi: { primary: "Hiệu suất thiết bị toàn cầu", variants: ['OEE'] }
     module: PM
     field_forms: []
     en: Overall Equipment Effectiveness
@@ -899,6 +965,10 @@ terms:
     de: { primary: "OEE" }
 
   - canonical: damage_code
+    zh: { primary: "缺陷代码", variants: ['损伤代码', '问题代码'] }
+    vi: { primary: "Mã hư hỏng", variants: ['Mã sự cố', 'Mã lỗi'] }
+    ja: { primary: "ダメージコード", variants: ['損傷コード'] }
+    de: { primary: "Schadenskennung" }
     module: PM/QM
     field_forms: []
     en: Damage Code / Failure Code
@@ -908,6 +978,10 @@ terms:
     related_tcodes: [IW21, IW23]
 
   - canonical: mic
+    zh: { primary: "关键检验特性", variants: ['MIC', '检验标准'] }
+    vi: { primary: "Đặc tính quan trọng đo lường", variants: ['MIC'] }
+    ja: { primary: "許容基準", variants: ['MIC'] }
+    de: { primary: "MIC" }
     module: QM
     field_forms: [QPLA, QPLS, QC21]
     en: Master Inspection Characteristic
@@ -923,6 +997,8 @@ terms:
 # ═══════════════════════════════════════════════════════════════
 
   - canonical: handhold_terminal
+    ja: { primary: "ハンドヘルド端末", variants: ['携帯端末'] }
+    de: { primary: "Handheld-Terminal" }
     module: WM/EWM
     field_forms: ["/SCWM/RF"]
     en: Hand-held Terminal / RF Scanner
@@ -936,6 +1012,10 @@ terms:
     vi: { primary: "Thiết bị cầm tay", variants: ['Máy móc cầm tay', 'Thiết bị di động'] }
 
   - canonical: transfer_order
+    zh: { primary: "转移单", variants: ['库存移动', '调拨单'] }
+    vi: { primary: "Lệnh chuyển hàng", variants: ['Lệnh di chuyển', 'Phiếu chuyển'] }
+    ja: { primary: "移動指図", variants: ['転送オーダー'] }
+    de: { primary: "Umlagerungsauftrag" }
     module: WM
     field_forms: [LTAP, LTAK]
     en: Transfer Order
@@ -947,6 +1027,8 @@ terms:
       창고 내 위치 간 물품 이동 지시.
 
   - canonical: transfer_requirement
+    zh: { primary: "转移需求", variants: ['转移申请', '调拨申请'] }
+    vi: { primary: "Yêu cầu chuyển hàng", variants: ['Yêu cầu di chuyển', 'UMLGO'] }
     module: MM
     field_forms: [LBKP, LBPOS]
     en: Transfer Requirement
@@ -960,6 +1042,10 @@ terms:
     de: { primary: "Umlagerungsanforderung" }
 
   - canonical: warehouse_order
+    zh: { primary: "仓库订单", variants: ['仓储单', '库存单'] }
+    vi: { primary: "Lệnh kho", variants: ['Lệnh lưu trữ', 'LQUAS'] }
+    ja: { primary: "倉庫指図", variants: ['ウェアハウスオーダー'] }
+    de: { primary: "Lagerauftrag" }
     module: EWM
     field_forms: ["/SCWM/ORDH", "/SCWM/ORDL"]
     en: Warehouse Order
@@ -969,6 +1055,10 @@ terms:
     related_tcodes: ["/SCWM/MON", "/SCWM/WAVE"]
 
   - canonical: handling_unit
+    zh: { primary: "处理单元", variants: ['处理单位', '搬运单位', 'VHILM'] }
+    vi: { primary: "Đơn vị xử lý", variants: ['Đơn vị xử lý', 'VHILM'] }
+    ja: { primary: "取扱単位", variants: ['ハンドリングユニット'] }
+    de: { primary: "Handhabungseinheit" }
     module: EWM
     field_forms: ["/SCWM/HUME", "/SCWM/HUMO"]
     en: Handling Unit
@@ -984,6 +1074,8 @@ terms:
 # ═══════════════════════════════════════════════════════════════
 
   - canonical: certificate_of_analysis
+    ja: { primary: "分析証明書", variants: ['CoA'] }
+    de: { primary: "Analysezertifikat" }
     module: QM
     field_forms: [QCMA, QCALC]
     en: Certificate of Analysis / CoA
@@ -997,6 +1089,10 @@ terms:
     vi: { primary: "Chứng chỉ phân tích", variants: ['CoA', 'Báo cáo phân tích'] }
 
   - canonical: preventive_maintenance
+    zh: { primary: "预防性维护", variants: ['预防保全', '预防性保养'] }
+    vi: { primary: "Bảo trì phòng ngừa", variants: ['Bảo dưỡng phòng chống', 'Duy trì phòng chống'] }
+    ja: { primary: "予防保全", variants: ['予防メンテナンス'] }
+    de: { primary: "Vorbeugende Instandhaltung" }
     module: PM
     field_forms: [IVPLAN, IP01, IP10]
     en: Preventive Maintenance
@@ -1008,6 +1104,8 @@ terms:
       설비 고장 사전 예방을 위한 정기적 점검·정비.
 
   - canonical: gmp
+    zh: { primary: "GMP", variants: ['良好生产规范', '药品生产质量管理规范'] }
+    vi: { primary: "GMP", variants: ['Thực hành sản xuất tốt', 'Tiêu chuẩn GMP'] }
     module: QM
     field_forms: []
     en: Good Manufacturing Practice
@@ -1064,6 +1162,8 @@ abbreviations:
 
 business_time_expressions:
   - canonical: d_minus_1
+    ja: { primary: "D-1" }
+    de: { primary: "D-1" }
     ko: "D-1"
     ko_variants: ["디마이너스원", "디 마이너스 원", "전일", "하루 전", "one day before"]
     meaning: "Reference day minus one. 마감 기준일 하루 전"
@@ -1072,51 +1172,89 @@ business_time_expressions:
     vi: { primary: "D-1", variants: ['Hôm trước', 'Ngày D-1'] }
 
   - canonical: d_day
+    zh: { primary: "D日", variants: ['指定日期', '关键日期'] }
+    vi: { primary: "Ngày D", variants: ['Hôm quy định', 'Ngày chỉ định'] }
+    ja: { primary: "Dデー", variants: ['D日'] }
+    de: { primary: "D-Tag" }
     ko: "D-Day"
     ko_variants: ["디데이", "D-0", "기준일", "당일"]
     meaning: "Target execution day"
 
   - canonical: beginning_of_month
+    zh: { primary: "月初", variants: ['月开始', '月首'] }
+    vi: { primary: "Đầu tháng", variants: ['Ngày đầu tháng', 'Đầu kỳ'] }
+    ja: { primary: "月初", variants: ['月頭'] }
+    de: { primary: "Monatsanfang" }
     ko: "월초"
     ko_variants: ["월 초", "BOM", "beginning of month", "월초반"]
     meaning: "First few business days of a month"
 
   - canonical: end_of_month
+    zh: { primary: "月末", variants: ['月终', '月底'] }
+    vi: { primary: "Cuối tháng", variants: ['Ngày cuối tháng', 'Cuối kỳ'] }
+    ja: { primary: "月末", variants: ['月終'] }
+    de: { primary: "Monatsende" }
     ko: "월말"
     ko_variants: ["월 말", "EOM", "end of month", "월말경"]
     meaning: "Last few business days of a month"
 
   - canonical: monthly_close
+    zh: { primary: "月度结算", variants: ['月度关闭', '月度决算'] }
+    vi: { primary: "Đóng tháng", variants: ['Kết toán tháng', 'Quy trình đóng tháng'] }
+    ja: { primary: "月次決算", variants: ['月間決算'] }
+    de: { primary: "Monatsabschluss" }
     ko: "월마감"
     ko_variants: ["월 마감", "monthly close", "월결산", "월결"]
     meaning: "Monthly closing process (보통 익월 D+3~D+5 영업일)"
 
   - canonical: quarterly_close
+    zh: { primary: "季度结算", variants: ['季度关闭', '季度决算'] }
+    vi: { primary: "Đóng quý", variants: ['Kết toán quý', 'Quy trình đóng quý'] }
+    ja: { primary: "四半期決算", variants: ['四半期閉鎖'] }
+    de: { primary: "Quartalsabschluss" }
     ko: "분기마감"
     ko_variants: ["분기 마감", "Q마감", "quarterly close", "분기결산"]
     meaning: "End-of-quarter close — 감사 대상"
 
   - canonical: year_end_close
+    zh: { primary: "年度结算", variants: ['年度关闭', '年度决算', '年结'] }
+    vi: { primary: "Đóng năm", variants: ['Kết toán năm', 'Quy trình đóng năm'] }
+    ja: { primary: "年度決算", variants: ['年間決算', '年次決算'] }
+    de: { primary: "Jahresabschluss" }
     ko: "연마감"
     ko_variants: ["연 마감", "연말결산", "year-end close", "결산", "확정결산"]
     meaning: "Year-end close — K-IFRS + 세법 + 외부감사 대응"
 
   - canonical: semi_annual
+    zh: { primary: "半年度结算", variants: ['中期决算', '中期结算'] }
+    vi: { primary: "Đóng nửa năm", variants: ['Kết toán nửa năm', 'Kết toán giữa năm'] }
+    ja: { primary: "半年決算", variants: ['中間決算'] }
+    de: { primary: "Halbjahresabschluss" }
     ko: "반기"
     ko_variants: ["반기결산", "H1", "H2", "상반기", "하반기", "semi-annual"]
     meaning: "Half-year reporting period (H1=1-6월, H2=7-12월)"
 
   - canonical: preliminary_close
+    zh: { primary: "试算结算", variants: ['暂定决算', '初步结算'] }
+    vi: { primary: "Đóng tạm", variants: ['Kết toán tạm', 'Kết toán sơ bộ'] }
+    ja: { primary: "仮決算", variants: ['仮確定'] }
+    de: { primary: "Vorläufiger Abschluss" }
     ko: "가결산"
     ko_variants: ["가 결산", "가결", "preliminary close", "잠정결산", "임시결산"]
     meaning: "Preliminary close before final numbers"
 
   - canonical: final_close
+    zh: { primary: "最终结算", variants: ['确定决算', '最终决算'] }
+    vi: { primary: "Đóng chính thức", variants: ['Kết toán cuối cùng', 'Kết toán chính thức'] }
+    ja: { primary: "最終決算", variants: ['確定決算'] }
+    de: { primary: "Finaler Abschluss" }
     ko: "확정결산"
     ko_variants: ["확정 결산", "final close", "정식 결산"]
     meaning: "Final, audited close"
 
   - canonical: business_day
+    zh: { primary: "工作日", variants: ['营业日', '业务日'] }
+    vi: { primary: "Ngày làm việc", variants: ['Ngày kinh doanh', 'Ngày buôn bán'] }
     ko: "영업일"
     ko_variants: ["영업 일", "근무일", "business day", "평일"]
     meaning: "Business working day (주말·공휴일 제외)"
@@ -1124,6 +1262,8 @@ business_time_expressions:
     de: { primary: "Geschäftstag" }
 
   - canonical: d_day_plus_n
+    ja: { primary: "D+n" }
+    de: { primary: "D+n" }
     ko: "D+N"
     ko_variants: ["디플러스엔", "익일", "익월", "D+1", "D+3", "D+5"]
     meaning: "N days after reference day"
@@ -1133,11 +1273,19 @@ business_time_expressions:
     vi: { primary: "D+n", variants: ['Ngày D cộng n', 'D+N'] }
 
   - canonical: provisional
+    zh: { primary: "暂定", variants: ['临时', '试算', '初步'] }
+    vi: { primary: "Tạm", variants: ['Tạm thời', 'Sơ bộ'] }
+    ja: { primary: "仮", variants: ['暫定'] }
+    de: { primary: "Vorläufig" }
     ko: "잠정치"
     ko_variants: ["잠정 치", "prelim", "잠정값", "임시값"]
     meaning: "Provisional / not-yet-finalized value"
 
   - canonical: finalized
+    zh: { primary: "确定", variants: ['最终', '正式确定', '锁定'] }
+    vi: { primary: "Chính thức", variants: ['Hoàn tất', 'Xác nhận'] }
+    ja: { primary: "確定", variants: ['最終確定'] }
+    de: { primary: "Endgültig" }
     ko: "확정치"
     ko_variants: ["확정 치", "final", "확정값"]
     meaning: "Finalized / audit-ready value"
