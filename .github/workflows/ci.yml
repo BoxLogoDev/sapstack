@@ -113,6 +113,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      # mcp/tsconfig.json 이 ../packages/runtime/src 를 함께 컴파일한다.
+      # runtime 소스의 import 는 packages/runtime/node_modules 에서 해석되므로
+      # 여기를 설치하지 않으면 prepack 의 tsc 가 js-yaml/ajv 를 못 찾는다.
+      - name: Install runtime dependencies
+        working-directory: packages/runtime
+        run: npm ci --workspaces=false
       - working-directory: mcp
         run: npm ci --workspaces=false
       - working-directory: mcp
@@ -126,8 +132,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      # 루트에 package-lock.json 이 없어서, 워크스페이스 루트로 올라가면
+      # extension/package-lock.json 을 두고도 lockfile 을 못 찾는다.
       - working-directory: extension
-        run: npm ci
+        run: npm ci --workspaces=false
       - working-directory: extension
         run: npm run compile
 
@@ -139,6 +147,14 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.3.14'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      # electron 의 tsc 는 packages/runtime/src 까지 들어간다. runtime 소스의
+      # import 는 packages/runtime/node_modules 에서 해석되므로 함께 설치한다.
+      - name: Install runtime dependencies
+        working-directory: packages/runtime
+        run: npm ci --workspaces=false
       - working-directory: apps/desktop
         run: bun install --frozen-lockfile --ignore-scripts
       - working-directory: apps/desktop

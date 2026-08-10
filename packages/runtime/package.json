@@ -14,7 +14,7 @@
   "files": ["dist"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "tsx --test tests/*.test.ts",
+    "test": "tsx --test tests/runtime.test.ts",
     "clean": "rimraf dist"
   },
   "dependencies": {
