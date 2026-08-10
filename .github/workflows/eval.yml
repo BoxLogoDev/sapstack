@@ -38,8 +38,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+      # 루트에 lockfile 이 없어서 --workspaces=false 없이는
+      # 워크스페이스 루트로 올라가 npm ci 가 실패한다 (ci.yml 과 동일)
       - name: mcp deps (js-yaml)
-        run: cd mcp && npm ci --ignore-scripts
+        run: cd mcp && npm ci --ignore-scripts --workspaces=false
       - run: chmod +x scripts/*.sh
       - name: dry-run (에이전트 매핑 점검 — 채점 전 가드)
         run: ./scripts/eval-diagnosis.sh --dry-run

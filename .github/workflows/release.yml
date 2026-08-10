@@ -42,8 +42,13 @@ jobs:
           fi
           echo "✅ Tag and package.json both at $PKG_VERSION"
 
+      # 루트에 lockfile 이 없어서 --workspaces=false 가 필요하고,
+      # mcp 빌드는 packages/runtime/src 까지 컴파일하므로 그쪽 의존성도 있어야 한다
+      - name: Install runtime dependencies
+        run: cd packages/runtime && npm ci --workspaces=false
+
       - name: Install MCP dependencies
-        run: cd mcp && npm ci
+        run: cd mcp && npm ci --workspaces=false
 
       - name: Build MCP package
         run: cd mcp && npm run build
@@ -71,7 +76,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Install VS Code Extension dependencies
-        run: cd extension && npm ci
+        run: cd extension && npm ci --workspaces=false
 
       - name: Build VS Code Extension
         run: cd extension && npm run compile && npm run package
