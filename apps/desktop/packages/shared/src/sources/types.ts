@@ -407,6 +407,18 @@ export interface LocalSourceConfig {
 }
 
 /**
+ * Extra policy for opt-in SAP system connectors.
+ * Public beta connectors are deliberately limited to exact, reviewed read-only tools.
+ */
+export interface SapConnectorPolicy {
+  access: 'read_only';
+  environment: 'development' | 'quality' | 'sandbox';
+  allowedTools: string[];
+  outboundDisclosure: string;
+  license: string;
+}
+
+/**
  * Source connection status
  * - 'connected': Source is connected and working
  * - 'needs_auth': Source requires authentication
@@ -454,6 +466,9 @@ export interface FolderSourceConfig {
   mcp?: McpSourceConfig;
   api?: ApiSourceConfig;
   local?: LocalSourceConfig;
+
+  // Hard read-only policy for SAP MCP connectors. Enforced independently of session permission mode.
+  sapConnector?: SapConnectorPolicy;
 
   // Icon: emoji or URL
   // Config is the source of truth. Local icon files are auto-discovered only when icon is undefined.
@@ -537,6 +552,7 @@ export interface CreateSourceInput {
   mcp?: McpSourceConfig;
   api?: ApiSourceConfig;
   local?: LocalSourceConfig;
+  sapConnector?: SapConnectorPolicy;
   icon?: string; // Emoji or URL (auto-downloaded)
   enabled?: boolean;
 }

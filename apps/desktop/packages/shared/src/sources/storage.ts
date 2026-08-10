@@ -515,6 +515,7 @@ export async function createSource(
     type: input.type,
     createdAt: now,
     updatedAt: now,
+    ...(input.sapConnector ? { sapConnector: input.sapConnector } : {}),
   };
 
   // Add type-specific config

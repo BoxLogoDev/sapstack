@@ -48,6 +48,7 @@ import {
 import { permissionsConfigCache, type PermissionsContext } from '../permissions-config.ts';
 import type { PrerequisiteCheckResult } from './prerequisite-manager.ts';
 import { rewriteBashWithRtk } from './rtk-rewrite.ts';
+import { evaluateSapConnectorTool } from '../../sources/sap-connector-policy.ts';
 
 // ============================================================
 // TYPES
@@ -675,6 +676,7 @@ const FILE_WRITE_TOOLS = new Set(['Write', 'Edit', 'MultiEdit', 'NotebookEdit'])
  * user prompting) is handled by the calling agent based on the result type.
  *
  * Pipeline:
+ * 0. SAP connector hard read-only policy
  * 1. Permission mode check (shouldAllowToolInMode)
  * 2. Source blocking (inactive MCP sources)
  * 3. Prerequisite check (guide.md before source tools)
@@ -733,6 +735,12 @@ export function runPreToolUseChecks(ctx: PreToolUseInput): PreToolUseCheckResult
       `[ModeSync] sessionId=${sessionId} incomingMode=${permissionMode} effectiveMode=${effectivePermissionMode} ` +
       `modeVersion=${diagnostics.modeVersion} changedBy=${diagnostics.lastChangedBy} changedAt=${diagnostics.lastChangedAt}`
     );
+  }
+
+  const sapConnectorDecision = evaluateSapConnectorTool(workspaceRootPath, toolName);
+  if (sapConnectorDecision && !sapConnectorDecision.allowed) {
+    onDebug?.(`[SapConnectorPolicy] blocking ${toolName} — ${sapConnectorDecision.reason}`);
+    return { type: 'block', reason: sapConnectorDecision.reason! };
   }
 
   // ============================================================

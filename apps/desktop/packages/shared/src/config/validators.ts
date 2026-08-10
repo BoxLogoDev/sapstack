@@ -455,6 +455,14 @@ const SourceBrandSchema = z.object({
   color: EntityColorSchema.optional(),
 });
 
+const SapConnectorPolicySchema = z.object({
+  access: z.literal('read_only'),
+  environment: z.enum(['development', 'quality', 'sandbox']),
+  allowedTools: z.array(z.string().min(1)).min(1),
+  outboundDisclosure: z.string().min(1),
+  license: z.string().min(1),
+});
+
 export const FolderSourceConfigSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
@@ -465,6 +473,7 @@ export const FolderSourceConfigSchema = z.object({
   mcp: McpSourceConfigSchema.optional(),
   api: ApiSourceConfigSchema.optional(),
   local: LocalSourceConfigSchema.optional(),
+  sapConnector: SapConnectorPolicySchema.optional(),
   brand: SourceBrandSchema.optional(),
   isAuthenticated: z.boolean().optional(),
   lastTestedAt: z.number().int().min(0).optional(),

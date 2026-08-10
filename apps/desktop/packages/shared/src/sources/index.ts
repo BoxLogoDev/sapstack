@@ -15,6 +15,7 @@ export type {
   McpSourceConfig,
   ApiSourceConfig,
   LocalSourceConfig,
+  SapConnectorPolicy,
   SourceConnectionStatus,
   FolderSourceConfig,
   SourceGuide,
