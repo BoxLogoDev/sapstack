@@ -1,11 +1,12 @@
 import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
-import { ipcMain } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain } from 'electron'
 import * as yaml from 'js-yaml'
 import {
   FileSystemAssetProvider,
   SapstackRuntime,
+  buildSupportBundle,
 } from '../../../../../../packages/runtime/src/index.js'
 
 export const SAPSTACK_IPC = {
@@ -26,6 +27,7 @@ export const SAPSTACK_IPC = {
   scrub: 'sapstack:security:scrub',
   getEnvironment: 'sapstack:environment:get',
   saveEnvironment: 'sapstack:environment:save',
+  exportSupportBundle: 'sapstack:support:export',
 } as const
 
 let runtimePromise: Promise<SapstackRuntime> | undefined
@@ -60,28 +62,55 @@ export function registerSapstackRuntimeHandlers(): void {
   ipcMain.handle(SAPSTACK_IPC.resolveSapNote, async (_event, keyword) => (await getRuntime()).knowledge.resolveSapNote(keyword))
   ipcMain.handle(SAPSTACK_IPC.lookupSynonym, async (_event, term) => (await getRuntime()).knowledge.lookupSynonym(term))
   ipcMain.handle(SAPSTACK_IPC.getPrompt, async (_event, name, args) => (await getRuntime()).knowledge.getPrompt(name, args))
-  ipcMain.handle(SAPSTACK_IPC.startSession, async (_event, input) => (await getRuntime()).sessions.start(input))
-  ipcMain.handle(SAPSTACK_IPC.addEvidence, async (_event, input) => (await getRuntime()).sessions.addEvidence(input))
-  ipcMain.handle(SAPSTACK_IPC.submitHypotheses, async (_event, input) => (await getRuntime()).sessions.submitHypotheses(input))
-  ipcMain.handle(SAPSTACK_IPC.addFollowup, async (_event, input) => (await getRuntime()).sessions.addFollowup(input))
-  ipcMain.handle(SAPSTACK_IPC.submitVerdict, async (_event, input) => (await getRuntime()).sessions.submitVerdict(input))
-  ipcMain.handle(SAPSTACK_IPC.nextSession, async (_event, input) => (await getRuntime()).sessions.next(input))
+  ipcMain.handle(SAPSTACK_IPC.startSession, async (_event, input) => (await getRuntime()).sessions.start(desktopSessionInput(input)))
+  ipcMain.handle(SAPSTACK_IPC.addEvidence, async (_event, input) => (await getRuntime()).sessions.addEvidence(desktopSessionInput(input)))
+  ipcMain.handle(SAPSTACK_IPC.submitHypotheses, async (_event, input) => (await getRuntime()).sessions.submitHypotheses(desktopSessionInput(input)))
+  ipcMain.handle(SAPSTACK_IPC.addFollowup, async (_event, input) => (await getRuntime()).sessions.addFollowup(desktopSessionInput(input)))
+  ipcMain.handle(SAPSTACK_IPC.submitVerdict, async (_event, input) => (await getRuntime()).sessions.submitVerdict(desktopSessionInput(input)))
+  ipcMain.handle(SAPSTACK_IPC.nextSession, async (_event, input) => (await getRuntime()).sessions.next(desktopSessionInput(input)))
   ipcMain.handle(SAPSTACK_IPC.getSession, async (_event, sessionId) => (await getRuntime()).sessions.get(sessionId))
   ipcMain.handle(SAPSTACK_IPC.listSessions, async (_event, filter) => (await getRuntime()).sessions.list(filter))
   ipcMain.handle(SAPSTACK_IPC.scrub, async (_event, text) => (await getRuntime()).security.scrub(text))
-  ipcMain.handle(SAPSTACK_IPC.getEnvironment, async () => {
-    try {
-      return yaml.load(await readFile(environmentProfilePath(), 'utf8'))
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null
-      throw error
-    }
-  })
+  ipcMain.handle(SAPSTACK_IPC.getEnvironment, async () => readEnvironmentProfile())
   ipcMain.handle(SAPSTACK_IPC.saveEnvironment, async (_event, profile) => saveEnvironmentProfile(profile))
+  ipcMain.handle(SAPSTACK_IPC.exportSupportBundle, async (event) => {
+    const runtime = await getRuntime()
+    const bundle = buildSupportBundle({
+      appVersion: app.getVersion(),
+      platform: process.platform,
+      arch: process.arch,
+      runtime: await runtime.assets.manifest(),
+      environment: await readEnvironmentProfile(),
+    })
+    const options = {
+      title: 'sapstack support bundle 저장',
+      defaultPath: `sapstack-support-${new Date().toISOString().slice(0, 10)}.json`,
+      filters: [{ name: 'JSON', extensions: ['json'] }],
+    }
+    const owner = BrowserWindow.fromWebContents(event.sender)
+    const result = owner ? await dialog.showSaveDialog(owner, options) : await dialog.showSaveDialog(options)
+    if (result.canceled || !result.filePath) return { saved: false }
+    await writeFile(result.filePath, `${JSON.stringify(bundle, null, 2)}\n`, 'utf8')
+    return { saved: true }
+  })
+}
+
+function desktopSessionInput(input: any): any {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Session input must be an object')
+  return { ...input, surface: 'desktop' }
 }
 
 function environmentProfilePath(): string {
   return join(process.env.SAPSTACK_WORKSPACE || homedir(), '.sapstack', 'config.yaml')
+}
+
+async function readEnvironmentProfile(): Promise<unknown> {
+  try {
+    return yaml.load(await readFile(environmentProfilePath(), 'utf8'))
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null
+    throw error
+  }
 }
 
 async function saveEnvironmentProfile(input: Record<string, unknown>): Promise<Record<string, unknown>> {

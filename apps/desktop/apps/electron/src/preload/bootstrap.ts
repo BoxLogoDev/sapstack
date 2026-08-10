@@ -474,4 +474,7 @@ contextBridge.exposeInMainWorld('sapstack', {
     get: () => ipcRenderer.invoke('sapstack:environment:get'),
     save: (profile: unknown) => ipcRenderer.invoke('sapstack:environment:save', profile),
   },
+  support: {
+    export: () => ipcRenderer.invoke('sapstack:support:export'),
+  },
 })

@@ -1,7 +1,8 @@
-import { useEffect, useState, type ComponentType } from 'react'
-import { BookOpen, CalendarCheck, Code2, MessageSquareText, Stethoscope } from 'lucide-react'
+import { useEffect, useState, type ComponentType, type FormEvent } from 'react'
+import { BookOpen, CalendarCheck, Code2, Download, MessageSquareText, Stethoscope } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { NewChatActionParams } from '../../../shared/types'
+import { buildGuidedChat, selectAdvisoryMode, type SymptomMatch } from './sap-golden-path'
 
 interface CatalogSummary {
   plugins: number
@@ -51,6 +52,12 @@ const paths: GoldenPathItem[] = [
 
 export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatActionParams) => Promise<void> }) {
   const [catalog, setCatalog] = useState<CatalogSummary>()
+  const [catalogUnavailable, setCatalogUnavailable] = useState(false)
+  const [request, setRequest] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [notice, setNotice] = useState<string>()
+  const [error, setError] = useState<string>()
+  const [exportingSupport, setExportingSupport] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -64,9 +71,77 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
           commands: value.commands?.length ?? 0,
         })
       })
-      .catch(() => {})
+      .catch(() => { if (active) setCatalogUnavailable(true) })
     return () => { active = false }
   }, [])
+
+  const startGuidedRequest = async (event: FormEvent) => {
+    event.preventDefault()
+    const query = request.trim()
+    if (!query || submitting || !onOpenChat) return
+    setSubmitting(true)
+    setNotice(undefined)
+    setError(undefined)
+    try {
+      const scrub = await window.sapstack.security.scrub(query) as { scrubbedText?: unknown; hitCount?: unknown }
+      if (typeof scrub.scrubbedText === 'string' && Number(scrub.hitCount) > 0 && scrub.scrubbedText !== query) {
+        setRequest(scrub.scrubbedText)
+        setNotice(`민감정보 ${Number(scrub.hitCount)}건을 가렸습니다. 내용을 확인한 뒤 다시 시작해 주세요.`)
+        return
+      }
+
+      const environment = await window.sapstack.environment.get()
+      if (!environment) throw new Error('SAP 환경 프로필이 없습니다. 앱을 다시 시작해 환경을 설정해 주세요.')
+      const rawMatches = await window.sapstack.knowledge.resolveSymptom({
+        query,
+        language: environment.language,
+        country: environment.country_iso,
+        top_n: 3,
+      })
+      const matches = Array.isArray(rawMatches)
+        ? rawMatches.filter((match): match is SymptomMatch => Boolean(
+            match && typeof match === 'object' && typeof match.id === 'string' &&
+            typeof match.confidence === 'number' && Array.isArray(match.likely_modules) &&
+            Array.isArray(match.first_check_tcodes),
+          ))
+        : []
+      const mode = selectAdvisoryMode(query, matches)
+      let sessionId: string | undefined
+      if (mode === 'evidence') {
+        const started = await window.sapstack.sessions.start({
+          symptom: query,
+          reporter_role: 'operator',
+          release: environment.release,
+          deployment: environment.deployment,
+          industry: environment.industry,
+          language: environment.language,
+          country_iso: environment.country_iso,
+          client: environment.client,
+        }) as { session_id?: unknown }
+        if (typeof started.session_id !== 'string') throw new Error('Evidence Loop 세션 ID를 받지 못했습니다.')
+        sessionId = started.session_id
+      }
+      await onOpenChat(buildGuidedChat({ query, mode, environment, matches, sessionId }))
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'SAP 진단을 시작하지 못했습니다.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const exportSupportBundle = async () => {
+    if (exportingSupport) return
+    setExportingSupport(true)
+    setError(undefined)
+    try {
+      const result = await window.sapstack.support.export()
+      if (result.saved) setNotice('민감정보를 제외한 support bundle을 저장했습니다.')
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Support bundle을 저장하지 못했습니다.')
+    } finally {
+      setExportingSupport(false)
+    }
+  }
 
   return (
     <div className="flex h-full items-center justify-center overflow-y-auto p-6 text-foreground">
@@ -77,9 +152,37 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
           <p className="mt-2 text-sm text-muted-foreground">
             {catalog
               ? `${catalog.plugins}개 플러그인 · ${catalog.agents}개 에이전트 · ${catalog.commands}개 커맨드가 내장되어 있습니다.`
-              : '내장 sapstack 카탈로그를 불러오는 중입니다.'}
+              : catalogUnavailable
+                ? '내장 카탈로그를 불러오지 못했습니다. 진단은 계속 시작할 수 있습니다.'
+                : '내장 sapstack 카탈로그를 불러오는 중입니다.'}
           </p>
         </div>
+
+        <form className="mb-5 rounded-xl border border-foreground/10 bg-foreground/[0.025] p-4 shadow-minimal" onSubmit={startGuidedRequest}>
+          <label className="mb-2 block text-sm font-semibold" htmlFor="sap-guided-request">증상이나 질문을 입력하세요</label>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <textarea
+              id="sap-guided-request"
+              value={request}
+              onChange={(event) => setRequest(event.target.value)}
+              rows={2}
+              maxLength={2000}
+              placeholder="예: F110 돌렸는데 한 벤더만 지급방법 오류가 뜨네요"
+              className="min-h-20 flex-1 resize-y rounded-lg border border-foreground/15 bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus:ring-1 focus:ring-foreground/30"
+            />
+            <button
+              type="submit"
+              disabled={!request.trim() || submitting || !onOpenChat}
+              aria-busy={submitting}
+              className="min-h-10 rounded-lg bg-foreground px-4 text-sm font-medium text-background disabled:cursor-not-allowed disabled:opacity-50 sm:self-end"
+            >
+              {submitting ? '분석 중…' : '진단 시작'}
+            </button>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">환경과 증상 매칭을 확인해 Quick Advisory 또는 Evidence Loop로 자동 연결합니다.</p>
+          {notice && <p role="status" className="mt-2 text-sm text-foreground">{notice}</p>}
+          {error && <p role="alert" className="mt-2 text-sm text-destructive">{error}</p>}
+        </form>
 
         <div className="grid gap-3 sm:grid-cols-2">
           {paths.map((path, index) => {
@@ -106,9 +209,18 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
           })}
         </div>
 
-        <p className="mt-5 text-center text-xs text-muted-foreground">
-          회사코드·G/L 계정·코스트 센터·조직값은 입력하기 전까지 가정하지 않습니다.
-        </p>
+        <div className="mt-5 flex flex-col items-center gap-2 text-center text-xs text-muted-foreground">
+          <p>회사코드·G/L 계정·코스트 센터·조직값은 입력하기 전까지 가정하지 않습니다.</p>
+          <button
+            type="button"
+            onClick={exportSupportBundle}
+            disabled={exportingSupport}
+            className="inline-flex min-h-9 items-center gap-2 rounded-lg px-3 hover:bg-foreground/[0.055] disabled:opacity-50"
+          >
+            <Download className="size-4" aria-hidden="true" />
+            {exportingSupport ? 'Support bundle 저장 중…' : 'Support bundle 저장'}
+          </button>
+        </div>
       </div>
     </div>
   )

@@ -1110,6 +1110,9 @@ declare global {
         get(): Promise<SapEnvironmentProfile | null>
         save(profile: Omit<SapEnvironmentProfile, 'profile_version'>): Promise<SapEnvironmentProfile>
       }
+      support: {
+        export(): Promise<{ saved: boolean }>
+      }
     }
   }
 }
