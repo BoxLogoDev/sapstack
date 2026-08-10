@@ -1,7 +1,3 @@
-<div align="center">
-  <a href="https://trendshift.io/repositories/20714" target="_blank"><img src="https://trendshift.io/api/badge/repositories/20714" alt="craft-ai-agents%2Fsapstack-desktops-oss | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-</div>
-
 # sapstack Desktop
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
@@ -79,8 +75,8 @@ irm https://boxlogodev.github.io/sapstack/install-app.ps1 | iex
 ### Build from Source
 
 ```bash
-git clone https://github.com/lukilabs/sapstack-desktops-oss.git
-cd sapstack-desktops-oss
+git clone https://github.com/BoxLogoDev/sapstack.git
+cd sapstack/apps/desktop
 bun install
 bun run electron:start
 ```
