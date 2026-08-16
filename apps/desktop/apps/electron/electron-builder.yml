@@ -130,6 +130,14 @@ mac:
     # WhatsApp worker subprocess (self-contained; Baileys bundled in).
     - from: ../../packages/messaging-whatsapp-worker/dist/worker.cjs
       to: messaging-whatsapp-worker/worker.cjs
+    # upstream(craft-ai-agents/craft-agents-oss) 고지. Apache-2.0 은 파생물을
+    # 배포할 때 라이선스 사본과 NOTICE 를 함께 제공하도록 요구한다.
+    - from: ../../LICENSE
+      to: licenses/craft-agents-oss/LICENSE
+    - from: ../../NOTICE
+      to: licenses/craft-agents-oss/NOTICE
+    - from: ../../TRADEMARK.md
+      to: licenses/craft-agents-oss/TRADEMARK.md
   # Exclude binaries for other platforms
   files:
     - "!**/resources/bin/win32-*/**"
@@ -198,6 +206,14 @@ win:
     # WhatsApp worker subprocess (self-contained; Baileys bundled in).
     - from: ../../packages/messaging-whatsapp-worker/dist/worker.cjs
       to: messaging-whatsapp-worker/worker.cjs
+    # upstream(craft-ai-agents/craft-agents-oss) 고지. Apache-2.0 은 파생물을
+    # 배포할 때 라이선스 사본과 NOTICE 를 함께 제공하도록 요구한다.
+    - from: ../../LICENSE
+      to: licenses/craft-agents-oss/LICENSE
+    - from: ../../NOTICE
+      to: licenses/craft-agents-oss/NOTICE
+    - from: ../../TRADEMARK.md
+      to: licenses/craft-agents-oss/TRADEMARK.md
 
 nsis:
   oneClick: true
@@ -228,6 +244,14 @@ linux:
     # WhatsApp worker subprocess (self-contained; Baileys bundled in).
     - from: ../../packages/messaging-whatsapp-worker/dist/worker.cjs
       to: messaging-whatsapp-worker/worker.cjs
+    # upstream(craft-ai-agents/craft-agents-oss) 고지. Apache-2.0 은 파생물을
+    # 배포할 때 라이선스 사본과 NOTICE 를 함께 제공하도록 요구한다.
+    - from: ../../LICENSE
+      to: licenses/craft-agents-oss/LICENSE
+    - from: ../../NOTICE
+      to: licenses/craft-agents-oss/NOTICE
+    - from: ../../TRADEMARK.md
+      to: licenses/craft-agents-oss/TRADEMARK.md
   # Exclude binaries for other platforms
   files:
     - "!**/resources/bin/darwin-*/**"
