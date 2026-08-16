@@ -11,6 +11,16 @@
 #   - mcp/package.json
 #   - mcp/sapstack-server.json
 #   - extension/package.json
+#   - packages/runtime/package.json
+#   - apps/desktop/package.json
+#   - apps/desktop/apps/electron/package.json
+#
+# 데스크톱 2개는 홀로 3.0.0-beta.0 이었다가 제품 버전으로 통합됐다.
+# electron-builder 의 artifactName 이 이 값을 쓰므로, 설치파일 이름이 태그 버전과
+# 어긋나지 않으려면 반드시 여기서 함께 갱신돼야 한다.
+# 주의: apps/desktop/bun.lock 에도 워크스페이스 버전이 기록되므로, 버전 변경 후
+# `cd apps/desktop && bun install` 로 lockfile 을 갱신해야 CI 의
+# --frozen-lockfile 이 통과한다.
 #
 # Phase 0 (v2.2.0) 확장: root package.json + sapstack-server.json 추가,
 # --check 모드 도입으로 CI에서 sync 위반 자동 감지.
@@ -27,6 +37,9 @@ TARGETS=(
   "mcp/package.json"
   "mcp/sapstack-server.json"
   "extension/package.json"
+  "packages/runtime/package.json"
+  "apps/desktop/package.json"
+  "apps/desktop/apps/electron/package.json"
 )
 
 # version 필드를 추출 (jq 없이 sed로, 첫 매치만)

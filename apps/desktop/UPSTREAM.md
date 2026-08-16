@@ -10,5 +10,6 @@ from [craft-ai-agents/craft-agents-oss](https://github.com/craft-ai-agents/craft
 - Product branding: `sapstack Desktop` (not Craft Agents)
 
 The upstream `LICENSE`, `NOTICE`, and `TRADEMARK.md` files are retained in this
-directory. The source version is intentionally recorded independently from the
-integrated sapstack product version (`3.0.0-beta.0`).
+directory. The upstream version above is recorded independently of the sapstack
+product version, which now tracks the repository release version — see
+`scripts/bump-version.sh` for the files kept in sync.

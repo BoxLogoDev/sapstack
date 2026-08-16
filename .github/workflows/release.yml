@@ -10,8 +10,56 @@ permissions:
   packages: write
 
 jobs:
+  desktop-windows:
+    name: Desktop installer (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.14'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # electron 의 tsc 는 packages/runtime/src 까지 들어간다. runtime 소스의
+      # import 는 packages/runtime/node_modules 에서 해석되므로 함께 설치한다.
+      - name: Install runtime dependencies
+        working-directory: packages/runtime
+        run: npm ci --workspaces=false
+
+      - name: Install desktop dependencies
+        working-directory: apps/desktop
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      # build-win.ps1 이 Windows 빌드 전체를 담당한다: bun 바이너리 다운로드(SHA 검증) →
+      # 루트 node_modules 에서 SDK 복사 + claude-agent-sdk-binary alias 생성 →
+      # ripgrep/interceptor 복사 → electron 빌드 → electron-builder --win → 설치파일 검증.
+      # electron-builder 를 직접 호출하면 alias 가 없어 extraResources 복사가 깨진다
+      # (electron-builder.yml 118행 주석 참조).
+      - name: Build Windows installer
+        working-directory: apps/desktop/apps/electron
+        run: powershell -ExecutionPolicy Bypass -File scripts/build-win.ps1
+        env:
+          # 코드 서명 인증서가 secret 으로 설정돼 있으면 electron-builder 가 자동 서명한다.
+          # 없으면 서명 없이 빌드되고 설치 시 SmartScreen 경고가 뜬다.
+          CSC_LINK: ${{ secrets.WINDOWS_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CSC_KEY_PASSWORD }}
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-windows
+          path: apps/desktop/apps/electron/release/*.exe
+          if-no-files-found: error
+
   release:
     name: Build & Release
+    needs: [desktop-windows]
     runs-on: ubuntu-latest
 
     steps:
@@ -90,6 +138,12 @@ jobs:
           bash scripts/generate-release-notes.sh "${{ steps.version.outputs.version }}" > RELEASE_NOTES.md
           echo "notes_file=RELEASE_NOTES.md" >> $GITHUB_OUTPUT
 
+      - name: Download desktop installer
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-windows
+          path: desktop-dist
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -101,3 +155,4 @@ jobs:
           files: |
             mcp/*.tgz
             extension/*.vsix
+            desktop-dist/*.exe
