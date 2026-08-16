@@ -169,8 +169,12 @@ scan_file() {
       continue
     fi
 
-    # 확정 리스트 확인
-    if ! echo "$KNOWN_TCODES" | grep -qx "$tcode"; then
+    # 확정 리스트 확인.
+    # herestring 을 쓴다. `echo "$KNOWN_TCODES" | grep -q` 는 grep 이 첫 매치에서
+    # 즉시 끝나며 echo 가 SIGPIPE(141) 로 죽고, pipefail 이 그 141 을 파이프라인
+    # 결과로 삼는다. 부정 조건이라 "등록된 T-code 를 미등록으로 보고"하는 거짓
+    # 양성이 된다. 목록이 400개를 넘어 매치가 앞쪽에서 날수록 잘 터진다.
+    if ! grep -qx "$tcode" <<< "$KNOWN_TCODES"; then
       SEEN_UNKNOWN[$tcode]=1
       echo "⚠️  [$file] 미등록 T-code: $tcode"
       UNKNOWN_FOUND=$((UNKNOWN_FOUND + 1))

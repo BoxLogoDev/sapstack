@@ -40,15 +40,20 @@ for skill_file in $(find plugins -name SKILL.md -type f 2>/dev/null); do
   has_ecc=0
   has_s4=0
 
+  # herestring 을 쓴다. `echo "$body" | grep -q` 는 grep 이 첫 매치에서 즉시
+  # 종료하면서 echo 가 SIGPIPE(141) 로 죽고, 15행의 `set -o pipefail` 이 그
+  # 141 을 파이프라인 exit code 로 삼는다. 그러면 키워드를 찾았는데도 조건이
+  # 거짓이 된다. body 가 클수록 잘 터지는 경합이라, 실제로 SKILL.md 를 보강해
+  # 파일이 길어지자 CI 에서만 재현됐다.
   for kw in "${ECC_KEYWORDS[@]}"; do
-    if echo "$body" | grep -Eq "$kw"; then
+    if grep -Eq "$kw" <<< "$body"; then
       has_ecc=1
       break
     fi
   done
 
   for kw in "${S4_KEYWORDS[@]}"; do
-    if echo "$body" | grep -Eq "$kw"; then
+    if grep -Eq "$kw" <<< "$body"; then
       has_s4=1
       break
     fi
