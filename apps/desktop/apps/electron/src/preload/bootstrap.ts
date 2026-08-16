@@ -470,6 +470,9 @@ contextBridge.exposeInMainWorld('sapstack', {
   security: {
     scrub: (text: string) => ipcRenderer.invoke('sapstack:security:scrub', text),
   },
+  learning: {
+    inspect: () => ipcRenderer.invoke('sapstack:learning:inspect'),
+  },
   environment: {
     get: () => ipcRenderer.invoke('sapstack:environment:get'),
     save: (profile: unknown) => ipcRenderer.invoke('sapstack:environment:save', profile),

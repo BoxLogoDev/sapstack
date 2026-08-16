@@ -25,6 +25,7 @@ export const SAPSTACK_IPC = {
   getSession: 'sapstack:sessions:get',
   listSessions: 'sapstack:sessions:list',
   scrub: 'sapstack:security:scrub',
+  inspectLearning: 'sapstack:learning:inspect',
   getEnvironment: 'sapstack:environment:get',
   saveEnvironment: 'sapstack:environment:save',
   exportSupportBundle: 'sapstack:support:export',
@@ -71,6 +72,7 @@ export function registerSapstackRuntimeHandlers(): void {
   ipcMain.handle(SAPSTACK_IPC.getSession, async (_event, sessionId) => (await getRuntime()).sessions.get(sessionId))
   ipcMain.handle(SAPSTACK_IPC.listSessions, async (_event, filter) => (await getRuntime()).sessions.list(filter))
   ipcMain.handle(SAPSTACK_IPC.scrub, async (_event, text) => (await getRuntime()).security.scrub(text))
+  ipcMain.handle(SAPSTACK_IPC.inspectLearning, async () => (await getRuntime()).learning.inspect())
   ipcMain.handle(SAPSTACK_IPC.getEnvironment, async () => readEnvironmentProfile())
   ipcMain.handle(SAPSTACK_IPC.saveEnvironment, async (_event, profile) => saveEnvironmentProfile(profile))
   ipcMain.handle(SAPSTACK_IPC.exportSupportBundle, async (event) => {

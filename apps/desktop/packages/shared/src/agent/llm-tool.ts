@@ -93,6 +93,15 @@ const MAX_FILE_BYTES = 500_000; // 500KB per text file
 const MAX_ATTACHMENTS = 20;
 const MAX_TOTAL_CONTENT_BYTES = 2_000_000; // 2MB total across all attachments
 
+function rejectCallLlmAttachments(attachments: unknown[] | undefined): void {
+  if (attachments?.length) {
+    throw new Error(
+      'call_llm file attachments are disabled until an outbound-data approval policy is configured. ' +
+      'Use synthetic or public text directly in the prompt.'
+    );
+  }
+}
+
 // ============================================================================
 // PREDEFINED OUTPUT FORMATS
 // These provide structured output schemas for common use cases
@@ -187,6 +196,7 @@ export async function buildCallLlmRequest(
   // Process attachments
   const textParts: string[] = [];
   const attachments = input.attachments as Array<string | { path: string; startLine?: number; endLine?: number }> | undefined;
+  rejectCallLlmAttachments(attachments);
 
   if (attachments?.length) {
     for (let i = 0; i < attachments.length; i++) {
@@ -603,6 +613,12 @@ For large files (>2000 lines), use {path, startLine, endLine} to select a portio
 
       if (!args.prompt?.trim()) {
         return errorResponse('Prompt is required and cannot be empty.');
+      }
+
+      try {
+        rejectCallLlmAttachments(args.attachments);
+      } catch (error) {
+        return errorResponse((error as Error).message);
       }
 
       if (args.outputFormat && args.outputSchema) {

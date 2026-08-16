@@ -1106,6 +1106,14 @@ declare global {
         list(filter?: unknown): Promise<unknown>
       }
       security: { scrub(text: string): Promise<unknown> }
+      learning: {
+        inspect(): Promise<{
+          total_sessions: number
+          resolved_sessions: number
+          candidates: Array<{ candidate_id: string; kind: 'gold_set' | 'codify'; symptom_ref?: string; modules: string[] }>
+          privacy: { contains_free_text: false; contains_environment: false; auto_apply: false }
+        }>
+      }
       environment: {
         get(): Promise<SapEnvironmentProfile | null>
         save(profile: Omit<SapEnvironmentProfile, 'profile_version'>): Promise<SapEnvironmentProfile>

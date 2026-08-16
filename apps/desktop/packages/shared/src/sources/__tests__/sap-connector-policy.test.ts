@@ -44,4 +44,42 @@ describe('SAP connector policy', () => {
     }))
     expect(evaluateSapConnectorTool(workspace, 'mcp__sap-adt__writeObject')?.allowed).toBe(false)
   })
+
+  test('fails closed when an SAP-labelled source policy is missing or unreadable', () => {
+    workspace = mkdtempSync(join(process.cwd(), '.tmp-sap-connector-policy-'))
+    const sourceDir = join(workspace, 'sources', 'sap-rfc')
+    mkdirSync(sourceDir, { recursive: true })
+    const configPath = join(sourceDir, 'config.json')
+
+    writeFileSync(configPath, JSON.stringify({
+      id: 'sap-rfc',
+      name: 'SAP RFC',
+      slug: 'sap-rfc',
+      enabled: true,
+      provider: 'sap-rfc-mcp',
+      type: 'mcp',
+      mcp: { transport: 'stdio', command: 'sap-rfc-mcp' },
+    }))
+    expect(evaluateSapConnectorTool(workspace, 'mcp__sap-rfc__readTable')).toEqual({
+      allowed: false,
+      reason: 'SAP connector "sap-rfc" is missing its required read-only policy.',
+    })
+
+    writeFileSync(configPath, '{broken json')
+    expect(evaluateSapConnectorTool(workspace, 'mcp__sap-rfc__readTable')).toEqual({
+      allowed: false,
+      reason: 'SAP connector "sap-rfc" policy could not be loaded.',
+    })
+  })
+
+  test('does not apply SAP policy to unrelated sources', () => {
+    workspace = mkdtempSync(join(process.cwd(), '.tmp-sap-connector-policy-'))
+    const sourceDir = join(workspace, 'sources', 'github')
+    mkdirSync(sourceDir, { recursive: true })
+    writeFileSync(join(sourceDir, 'config.json'), JSON.stringify({
+      id: 'github', name: 'GitHub', slug: 'github', enabled: true, provider: 'github', type: 'mcp',
+      mcp: { transport: 'http', url: 'https://example.test/mcp', authType: 'none' },
+    }))
+    expect(evaluateSapConnectorTool(workspace, 'mcp__github__listIssues')).toBeNull()
+  })
 })

@@ -1,5 +1,5 @@
 import { useEffect, useState, type ComponentType, type FormEvent } from 'react'
-import { BookOpen, CalendarCheck, Code2, Download, MessageSquareText, Stethoscope } from 'lucide-react'
+import { BookOpen, CalendarCheck, Code2, Download, MessageSquareText, RefreshCw, Stethoscope } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { NewChatActionParams } from '../../../shared/types'
 import { buildGuidedChat, selectAdvisoryMode, type SymptomMatch } from './sap-golden-path'
@@ -15,6 +15,12 @@ interface GoldenPathItem {
   description: string
   icon: ComponentType<{ className?: string }>
   chat: NewChatActionParams
+}
+
+interface LearningSummary {
+  total_sessions: number
+  resolved_sessions: number
+  candidates: Array<{ candidate_id: string; kind: 'gold_set' | 'codify'; symptom_ref?: string; modules: string[] }>
 }
 
 const paths: GoldenPathItem[] = [
@@ -58,6 +64,8 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
   const [notice, setNotice] = useState<string>()
   const [error, setError] = useState<string>()
   const [exportingSupport, setExportingSupport] = useState(false)
+  const [learning, setLearning] = useState<LearningSummary>()
+  const [inspectingLearning, setInspectingLearning] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -108,8 +116,10 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
       const mode = selectAdvisoryMode(query, matches)
       let sessionId: string | undefined
       if (mode === 'evidence') {
+        const matchedSymptom = matches.find(match => match.confidence >= 0.6)?.id
         const started = await window.sapstack.sessions.start({
           symptom: query,
+          matched_symptom_index_entry: matchedSymptom,
           reporter_role: 'operator',
           release: environment.release,
           deployment: environment.deployment,
@@ -140,6 +150,19 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
       setError(cause instanceof Error ? cause.message : 'Support bundle을 저장하지 못했습니다.')
     } finally {
       setExportingSupport(false)
+    }
+  }
+
+  const inspectLearning = async () => {
+    if (inspectingLearning) return
+    setInspectingLearning(true)
+    setError(undefined)
+    try {
+      setLearning(await window.sapstack.learning.inspect())
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : '개선 후보를 확인하지 못했습니다.')
+    } finally {
+      setInspectingLearning(false)
     }
   }
 
@@ -208,6 +231,40 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
             )
           })}
         </div>
+
+        <section className="mt-5 rounded-xl border border-foreground/10 bg-foreground/[0.025] p-4 shadow-minimal" aria-labelledby="sap-learning-title">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 id="sap-learning-title" className="text-sm font-semibold">로컬 개선 후보</h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                해결된 Evidence Loop의 비식별 메트릭만 확인합니다. 후보는 자동 적용·외부 전송되지 않습니다.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={inspectLearning}
+              disabled={inspectingLearning}
+              className="inline-flex min-h-9 shrink-0 items-center justify-center gap-2 rounded-lg px-3 text-sm hover:bg-foreground/[0.055] disabled:opacity-50"
+            >
+              <RefreshCw className={cn('size-4', inspectingLearning && 'animate-spin')} aria-hidden="true" />
+              {inspectingLearning ? '확인 중…' : '후보 확인'}
+            </button>
+          </div>
+          {learning && (
+            <div className="mt-3 border-t border-foreground/10 pt-3 text-xs text-muted-foreground" role="status">
+              해결 {learning.resolved_sessions}/{learning.total_sessions}개 · 검수 대기 {learning.candidates.length}건
+              {learning.candidates.length > 0 && (
+                <ul className="mt-2 space-y-1">
+                  {learning.candidates.slice(0, 5).map(candidate => (
+                    <li key={candidate.candidate_id}>
+                      {candidate.kind === 'gold_set' ? 'Eval 후보' : '지식 후보'} · {candidate.symptom_ref || candidate.candidate_id} · {candidate.modules.join('/') || '모듈 미확정'}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </section>
 
         <div className="mt-5 flex flex-col items-center gap-2 text-center text-xs text-muted-foreground">
           <p>회사코드·G/L 계정·코스트 센터·조직값은 입력하기 전까지 가정하지 않습니다.</p>
