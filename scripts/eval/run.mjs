@@ -42,6 +42,7 @@ const REPO = resolve(__dirname, '..', '..');
 const GOLD_PATH = resolve(REPO, 'data/eval/gold-set.yaml');
 const REPORT_PATH = resolve(REPO, 'docs/eval/REPORT.md');
 const AGENTS_DIR = resolve(REPO, 'agents');
+const UNIVERSAL_RULES = readFileSync(resolve(REPO, 'CLAUDE.md'), 'utf8');
 
 const MODULE_AGENT = {
   FI: 'sap-fi-consultant', CO: 'sap-co-consultant', TR: 'sap-tr-consultant',
@@ -52,7 +53,7 @@ const MODULE_AGENT = {
   IC: 'sap-integration-cloud-consultant',
   // 전용 에이전트 없는 모듈 → 가장 인접한 에이전트로 라우팅(eval 용)
   WM: 'sap-ewm-consultant',   // WM(레거시 창고) → EWM 컨설턴트가 창고 도메인 최근접
-  BTP: 'sap-cloud-consultant', // BTP → Cloud 컨설턴트(플랫폼/클라우드 영역)
+  BTP: 'sap-integration-advisor', // BTP destination/backend 진단은 integration advisor가 관련 T-code를 보유
 };
 
 const API_URL = 'https://api.anthropic.com/v1/messages';
@@ -61,8 +62,10 @@ const API_URL = 'https://api.anthropic.com/v1/messages';
 // EVAL_PROVIDER 로 명시 가능 (api | claude-cli).
 const HAS_API = !!process.env.ANTHROPIC_API_KEY;
 let HAS_CLI = false;
-// Windows 의 claude 는 셸 래퍼라 shell:true 로 탐지/호출 (Node 직접 spawn 불가)
-try { HAS_CLI = spawnSync('claude --version', { shell: true, encoding: 'utf8' }).status === 0; } catch { /* no cli */ }
+try {
+  HAS_CLI = spawnSync(process.platform === 'win32' ? 'where.exe' : 'which', ['claude'],
+    { encoding: 'utf8' }).status === 0;
+} catch { /* no cli */ }
 const PROVIDER = process.env.EVAL_PROVIDER || (HAS_API ? 'api' : (HAS_CLI ? 'claude-cli' : 'none'));
 
 // 모델: API 는 정식 id, CLI 는 별칭(sonnet/opus/haiku).
@@ -293,11 +296,16 @@ async function liveRun(cases) {
       results.push({ id: c.id, module: c.module, error: 'agent-missing' });
       continue;
     }
-    const system = stripFrontmatter(readFileSync(agentFile, 'utf8'));
+    const system = `${UNIVERSAL_RULES}\n\n# Assigned SAP specialist\n\n${stripFrontmatter(readFileSync(agentFile, 'utf8'))}`;
     process.stderr.write(`▶ ${c.id} (${c.module}) … `);
     try {
       // 답변은 1회만 생성(비용↑). 분산의 주범인 judge 만 N회 호출 → 합의 집계.
-      const answer = await complete(system, c.prompt, MODEL);
+      const userPrompt = [
+        `SAP environment: ${JSON.stringify(c.env || {})}`,
+        'Use this supplied environment directly. Do not stop at an environment question.',
+        c.prompt,
+      ].join('\n');
+      const answer = await complete(system, userPrompt, MODEL);
       const verdicts = [];
       for (let i = 0; i < JUDGE_VOTES; i++) {
         try {
@@ -390,12 +398,17 @@ async function main() {
   const summary = summarize(results);
   console.log('\n── 요약 ──');
   console.log(JSON.stringify(summary, null, 2));
-  writeReport(summary, results);
-  console.log(`\n📄 REPORT 갱신: docs/eval/REPORT.md`);
+  if (args.all) {
+    writeReport(summary, results);
+    console.log(`\n📄 REPORT 갱신: docs/eval/REPORT.md`);
+  } else {
+    console.log('\nℹ 타깃 실행은 REPORT를 갱신하지 않습니다. 공식 전체 실행은 --all을 사용하세요.');
+  }
   if (args.jsonOut) {
     writeFileSync(args.jsonOut, JSON.stringify({ ...summary, generated_at: new Date().toISOString(), provider: PROVIDER, model: MODEL }, null, 2));
     console.log(`📄 요약 JSON: ${args.jsonOut}`);
   }
+  if (summary.cases_errored > 0) process.exitCode = 1;
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

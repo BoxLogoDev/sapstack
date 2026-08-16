@@ -46,6 +46,13 @@ difference between XK02 and BP?"), use the classic structure:
 
 **Issue** → **Root Cause** → **Check (T-code + Table/Field)** → **Fix (Steps)** → **Prevention** → **SAP Note (if known)**
 
+For diagnostic one-turn answers, name one evidence-backed primary root cause first
+and put alternatives in a clearly lower-priority section. Include a falsification
+condition for the primary cause. The Check section must contain at least two
+relevant T-codes and one Table.Field when the underlying SAP surface provides
+them. If environment context is missing, ask for it but still provide a clearly
+labelled provisional diagnosis and read-only checks in the same turn.
+
 This mode is for **knowledge lookup** and **small clarifications**. It should
 not be used for active incident diagnosis.
 

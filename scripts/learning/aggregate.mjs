@@ -79,8 +79,10 @@ function main() {
       }
     }
     for (const h of s.hypotheses || []) {
-      if (confirmedHyp.has(h.hypothesis_id))
-        for (const m of h.likely_modules || []) byModule[m] = (byModule[m] || 0) + 1;
+      if (confirmedHyp.has(h.hypothesis_id)) {
+        const modules = Array.isArray(h.impacted_modules) && h.impacted_modules.length ? h.impacted_modules : h.likely_modules;
+        for (const m of modules || []) byModule[m] = (byModule[m] || 0) + 1;
+      }
     }
 
     if (s.status === 'resolved') {

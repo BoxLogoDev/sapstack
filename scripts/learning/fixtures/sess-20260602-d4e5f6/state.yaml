@@ -26,7 +26,7 @@ hypotheses:
   - hypothesis_id: h-001
     statement: "원가요소→가치필드 매핑(KEI1) 누락으로 일부 금액 미반영"
     falsification: "KEI1 매핑이 완전하면 기각"
-    likely_modules: [CO]
+    impacted_modules: [CO]
 
 verdicts:
   - verdict_id: vdc-20260602-cc22dd
