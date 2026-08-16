@@ -34,8 +34,19 @@ CHECKED=0
 for skill_file in $(find plugins -name SKILL.md -type f 2>/dev/null); do
   CHECKED=$((CHECKED + 1))
 
-  # 프론트매터 제외 본문
-  body=$(awk 'BEGIN{fm=0} /^---$/{fm=!fm; next} !fm{print}' "$skill_file")
+  # 프론트매터 제외 본문.
+  # 두 가지를 고쳤다.
+  #  1) \r? — CRLF 체크아웃(Windows)에서 /^---$/ 가 매치되지 않아 프론트매터가
+  #     제거되지 않고, 로컬과 CI 의 검사 결과가 달라졌다.
+  #  2) 첫 줄 기준 — 기존 토글 방식은 본문의 마크다운 구분선(---)까지 프론트매터
+  #     경계로 세어, 구분선이 많은 SKILL.md 는 본문 일부가 검사에서 빠졌다.
+  #     프론트매터는 파일 맨 앞 첫 블록 하나뿐이다.
+  body=$(awk '
+    BEGIN { fm = 0 }
+    NR == 1 && /^---\r?$/ { fm = 1; next }
+    fm && /^---\r?$/      { fm = 0; next }
+    !fm                   { print }
+  ' "$skill_file")
 
   has_ecc=0
   has_s4=0
