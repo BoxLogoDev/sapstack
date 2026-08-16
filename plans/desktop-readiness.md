@@ -126,9 +126,29 @@ BSL 파라미터도 정해야 한다 — Change Date(통상 4년), Change Licens
 
 관찰된 실패는 `deriveSelectionFlags('/')` 가 `folderName` 을 `undefined` 대신 `"/"` 로 반환하는 유형 — **Windows 경로 처리 차이로 보인다** (POSIX `basename('/')` 는 빈 문자열).
 
-> ⚠️ **미확인**: 71개가 전부 플랫폼 차이인지, 실제 결함이 섞여 있는지. 저는 Windows 에서만 돌렸다. CI(ubuntu)에서 한 번 받아봐야 판정 가능.
+> ✅ **판정 완료.** CI(ubuntu)에 관찰 모드로 넣어 양쪽 결과를 얻었다.
 
-권장: CI 에 `continue-on-error: true` 로 먼저 넣어 ubuntu 결과를 확보한 뒤, 플랫폼 차이면 Windows 스킵 처리, 실제 결함이면 수정.
+| 환경         | pass  | skip | fail   | 소요  |
+| ------------ | ----- | ---- | ------ | ----- |
+| Windows 로컬 | 4,827 | 1    | **71** | 625초 |
+| ubuntu CI    | 4,853 | 12   | **32** | 132초 |
+
+**39건은 Windows 전용**으로 확정됐다(경로 처리 등). 남은 **32건은 양쪽에서 실패**한다.
+
+실패는 세 모듈에 집중된다 — `BrowserCDP`, `BrowserPaneManager`,
+`refreshConnectionRuntime`. 에러는 전부 평범한 assertion 실패
+(`toBe` 8, `toHaveLength` 5, `toHaveBeenCalled` 3, `toContain` 3 …)이고
+"Chrome 을 찾을 수 없음" 류의 환경 에러가 아니다.
+**즉 환경 의존이 아니라 실제 로직 불일치다.** 환경 탓으로 넘길 수 없다.
+
+다만 셋 다 브라우저 자동화 영역이고 SAP 진단 경로와 무관하다. upstream 이관
+과정에서 딸려온 것으로 보이나, **upstream 원본에서 같은 테스트가 통과하는지는
+확인하지 않았다** — 그것까지 봐야 "우리가 깨뜨린 것"인지 판별된다.
+
+판단: `continue-on-error` 를 유지하되 방치하지 않는다. 브라우저 기능을 제품에서
+어떻게 다룰지(제거 / 플래그로 숨김 / 유지)가 정해지면 함께 결론 낸다. 폐쇄망에서는
+브라우저 툴이 무용하므로 5번 항목과 같은 결정에 묶인다. 결정이 "숨김"이면 이
+32건은 비활성 기능의 테스트가 되므로 skip 처리가 정당해진다.
 
 ---
 
