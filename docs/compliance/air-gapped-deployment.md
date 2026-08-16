@@ -42,14 +42,14 @@
 # 인터넷 있는 PC에서 실행
 cd /tmp
 npm pack sapstack
-# Output: sapstack-1.7.0.tgz (약 15MB)
+# Output: sapstack-2.4.0.tgz (약 15MB)
 
 # 체크섬 생성 (무결성 검증용)
-sha256sum sapstack-1.7.0.tgz > sapstack-1.7.0.tgz.sha256
-# Output: abc123def456...  sapstack-1.7.0.tgz
+sha256sum sapstack-2.4.0.tgz > sapstack-2.4.0.tgz.sha256
+# Output: abc123def456...  sapstack-2.4.0.tgz
 
 # GitHub Release 페이지에서 공식 체크섬 확인
-# https://github.com/BoxLogoDev/sapstack/releases/tag/v1.7.0
+# https://github.com/BoxLogoDev/sapstack/releases/tag/v2.4.0
 # 발표된 sha256과 비교 → 일치 여부 확인 ✓
 ```
 
@@ -73,15 +73,15 @@ find node_modules -name "package.json" -exec sha256sum {} \; > /tmp/dependencies
 
 ```bash
 # sapstack 소스 + 의존성 + npm 캐시 한 세트로 압축
-tar czf /tmp/sapstack-offline-1.7.0.tar.gz \
-  sapstack-1.7.0.tgz \
+tar czf /tmp/sapstack-offline-2.4.0.tar.gz \
+  sapstack-2.4.0.tgz \
   npm-cache/ \
   npm-dependencies.txt \
   dependencies.sha256 \
   README-OFFLINE.md
 
 # 최종 체크섬 (무결성 보증)
-sha256sum /tmp/sapstack-offline-1.7.0.tar.gz > /tmp/bundle.sha256
+sha256sum /tmp/sapstack-offline-2.4.0.tar.gz > /tmp/bundle.sha256
 ```
 
 ### Step 4: 전송 매체 준비
@@ -90,7 +90,7 @@ sha256sum /tmp/sapstack-offline-1.7.0.tar.gz > /tmp/bundle.sha256
 # 옵션 1: USB 드라이브 (정책이 허용하면)
 #  - 8GB 이상 권장
 #  - FAT32 또는 exFAT (호환성)
-cp /tmp/sapstack-offline-1.7.0.tar.gz /media/usb/
+cp /tmp/sapstack-offline-2.4.0.tar.gz /media/usb/
 cp /tmp/bundle.sha256 /media/usb/
 mkdir -p /media/usb/docs
 cp SECURITY.md /media/usb/docs/
@@ -99,14 +99,14 @@ cp docs/compliance/* /media/usb/docs/
 # 옵션 2: 암호화된 외장 HDD (권장)
 #  - BitLocker (Windows) 또는 LUKS (Linux) 암호화
 #  - 비밀번호: 분리되어 전달 (다른 채널)
-mkdir -p /mnt/encrypted/sapstack-1.7.0
-cp /tmp/sapstack-offline-1.7.0.tar.gz /mnt/encrypted/sapstack-1.7.0/
+mkdir -p /mnt/encrypted/sapstack-2.4.0
+cp /tmp/sapstack-offline-2.4.0.tar.gz /mnt/encrypted/sapstack-2.4.0/
 # 암호화 후 전송
 
 # 옵션 3: 보안 파일 서버 (망분리 내부에 있는 경우)
 #  - 내부망 파일 서버에 업로드
 #  - 망분리 내 PC에서 접근 가능
-scp -P 2222 /tmp/sapstack-offline-1.7.0.tar.gz \
+scp -P 2222 /tmp/sapstack-offline-2.4.0.tar.gz \
   it-admin@internal-server:/secure/sapstack-repo/
 ```
 
@@ -120,40 +120,40 @@ scp -P 2222 /tmp/sapstack-offline-1.7.0.tar.gz \
 # 망분리 내 PC (인터넷 없음)에서:
 
 # USB에서 복사
-cp /media/usb/sapstack-offline-1.7.0.tar.gz /tmp/
+cp /media/usb/sapstack-offline-2.4.0.tar.gz /tmp/
 cp /media/usb/bundle.sha256 /tmp/
 
 # 또는 내부 파일 서버에서 다운로드
-wget http://internal-server/sapstack-repo/sapstack-offline-1.7.0.tar.gz
+wget http://internal-server/sapstack-repo/sapstack-offline-2.4.0.tar.gz
 
 # 체크섬 검증 (무결성 확인)
 cd /tmp
 sha256sum -c bundle.sha256
-# Output: sapstack-offline-1.7.0.tar.gz: OK ✓
+# Output: sapstack-offline-2.4.0.tar.gz: OK ✓
 ```
 
 ### Step 2: 오프라인 설치
 
 ```bash
 # 번들 추출
-tar xzf /tmp/sapstack-offline-1.7.0.tar.gz -C /opt
-cd /opt/sapstack-offline-1.7.0
+tar xzf /tmp/sapstack-offline-2.4.0.tar.gz -C /opt
+cd /opt/sapstack-offline-2.4.0
 
 # npm 캐시 설정 (외부 registry 사용 금지)
-npm config set registry file:///opt/sapstack-offline-1.7.0/npm-cache
+npm config set registry file:///opt/sapstack-offline-2.4.0/npm-cache
 npm config set offline true
 
 # 설치 (--offline 플래그)
 npm install --offline \
-  --registry file:///opt/sapstack-offline-1.7.0/npm-cache \
+  --registry file:///opt/sapstack-offline-2.4.0/npm-cache \
   --no-optional \
   --no-package-lock \
   --save-exact \
-  sapstack-1.7.0.tgz
+  sapstack-2.4.0.tgz
 
 # 설치 확인
 ./node_modules/.bin/sapstack --version
-# Output: 1.7.0 ✓
+# Output: 2.4.0 ✓
 
 # 의존성 검증 (감청 감지)
 npm ls --production > /tmp/dependencies-installed.txt
@@ -239,19 +239,20 @@ MCP 서버 동작:
   3. 외부 API 호출 없음
   4. 모든 동작 감사추적에 기록
 
-예제: GL 잔액 조회
-  입력:  "GL 1101000 2026-03의 잔액?"
-  처리:  SAP 시스템의 로컬 ABAP 런타임 호출 (네트워크 X)
-  출력:  "GL 1101000: 5,234,567 KRW"
+예제: GL 잔액 이상 — 운영자가 조회 결과를 붙여넣음
+  (sapstack 은 SAP 시스템에 붙지 않는다. 라이브 RFC/ABAP 호출은 명시적 비목표이며 fail-closed.)
+  입력:  운영자가 FAGLB03/FS10N 조회 화면 또는 다운로드 결과를 세션에 붙여넣음
+  처리:  로컬 파일(붙여넣은 증거)만 읽고 가설·체크리스트를 생성. SAP 런타임 호출 없음
+  출력:  "붙여넣은 잔액·오픈아이템을 기준으로 확인할 T-code 목록"
   기록:  audit-trail.jsonl에 기록
-         {"timestamp": "2026-04-13T10:00:00Z", 
-          "who": "FIN_OPERATOR", 
-          "what": "query_gl", 
+         {"timestamp": "2026-04-13T10:00:00Z",
+          "who": "FIN_OPERATOR",
+          "what": "ingest_operator_export",
           "result": "success"}
 
 클로드(Claude) 호출:
-  ❌ 불가능 (인터넷 없음)
-  → 대신: 로컬 패턴 매칭 + 규칙 기반 응답 사용
+  ❌ 현재: 인터넷 없으면 클라우드 LLM 호출 없음
+  → 온디바이스 로컬 모델 지원 예정 (v2.5). 실제 동작 서술은 확정 후 이 자리를 채운다.
 ```
 
 ---
@@ -314,11 +315,11 @@ sapstack show-session sess_2026_04_001
 
 ## Update Process: 분기별 업데이트
 
-### Q2 2026: sapstack v1.8.0 업그레이드 예시
+### Q2 2026: sapstack v2.5.0 업그레이드 예시
 
 ```
 Timeline:
-  2026-04-30  (화)  IT팀이 v1.8.0 공지 + Bundle 준비
+  2026-04-30  (화)  IT팀이 v2.5.0 공지 + Bundle 준비
   2026-05-07  (화)  Bundle를 USB/암호화 HDD로 전달
   2026-05-14  (화)  테스트 환경에서 설치 & 테스트 (1주)
   2026-05-21  (화)  변경 통제 승인회의
@@ -331,20 +332,20 @@ Timeline:
 ```bash
 # Step 1: 새 Bundle 받음 (USB 또는 파일 서버)
 cd /tmp
-cp /media/usb/sapstack-offline-1.8.0.tar.gz ./
-sha256sum -c /media/usb/bundle-1.8.0.sha256
+cp /media/usb/sapstack-offline-2.5.0.tar.gz ./
+sha256sum -c /media/usb/bundle-2.5.0.sha256
 # Output: OK ✓
 
 # Step 2: 테스트 환경에서 설치 및 테스트
 cd /opt/test
-tar xzf /tmp/sapstack-offline-1.8.0.tar.gz
+tar xzf /tmp/sapstack-offline-2.5.0.tar.gz
 # ... 기존 절차대로 설치
 # ... 샘플 Evidence Loop 실행 테스트
 # ... 감사추적 기록 확인
 
 # Step 3: Change Control 문서
 cat > /tmp/change-request-2026-05-28.md << 'EOF'
-Change Request: sapstack v1.7.0 → v1.8.0 upgrade
+Change Request: sapstack v2.4.0 → v2.5.0 upgrade
 ================================================
 Requested By: IT Operations
 Date: 2026-05-28
@@ -352,15 +353,15 @@ Reason: Bug fixes + new features (air-gap improvements)
 
 Test Results:
   - Evidence Loop creation: PASS
-  - GL query: PASS
+  - Operator-pasted evidence ingest: PASS
   - Audit trail: PASS
   - PII masking: PASS
   - Rollback procedure tested: PASS
 
 Rollback Plan:
-  If issues occur, revert to v1.7.0:
+  If issues occur, revert to v2.4.0:
   1. systemctl stop sapstack-mcp
-  2. Restore /opt/sapstack from v1.7.0.tar.gz backup
+  2. Restore /opt/sapstack from v2.4.0.tar.gz backup
   3. systemctl start sapstack-mcp
   4. Verify audit trail (JSONL format unchanged)
   
@@ -375,10 +376,10 @@ cd /opt/sapstack
 sudo systemctl stop sapstack-mcp
 
 # 백업 (이전 버전)
-sudo tar czf /opt/backups/sapstack-1.7.0-backup-2026-05-28.tar.gz .
+sudo tar czf /opt/backups/sapstack-2.4.0-backup-2026-05-28.tar.gz .
 
 # 업그레이드
-sudo tar xzf /tmp/sapstack-offline-1.8.0.tar.gz --strip-components=1 -C /opt/sapstack
+sudo tar xzf /tmp/sapstack-offline-2.5.0.tar.gz --strip-components=1 -C /opt/sapstack
 
 # 확인
 sudo systemctl start sapstack-mcp
@@ -386,13 +387,13 @@ sudo systemctl status sapstack-mcp
 
 # Step 5: 업그레이드 검증
 sapstack --version
-# Output: 1.8.0 ✓
+# Output: 2.5.0 ✓
 
 # 감사추적 확인 (연속성)
 tail -5 .sapstack/audit-trail.jsonl
 # Output: 
 #   ... (이전 entries 그대로)
-#   {"timestamp": "2026-05-28T22:00:00Z", "who": "admin", "what": "upgrade", "from": "1.7.0", "to": "1.8.0", "result": "success"}
+#   {"timestamp": "2026-05-28T22:00:00Z", "who": "admin", "what": "upgrade", "from": "2.4.0", "to": "2.5.0", "result": "success"}
 ```
 
 ---
@@ -407,7 +408,7 @@ SAP:       ECC 6.0 (on-premise)
 네트워크:  망분리 Tier 1 (사용자층/운영층 분리)
 
 배포:
-  1. 개발팀 PC (인터넷 있음) → sapstack 1.7.0 Bundle 다운로드
+  1. 개발팀 PC (인터넷 있음) → sapstack 2.4.0 Bundle 다운로드
   2. USB로 망분리 경계 통과 (보안부 승인 필요)
   3. 망분리 내 IT팀 서버에 설치
   4. 운영팀 (FIN_OPERATOR 역할)이 매달 GL reconciliation 할 때 사용
@@ -486,10 +487,10 @@ SAP:       ECC 6.0 (on-premise, TS-2023-1 준수 필수)
   # registry가 file:///... 를 가리키는지 확인
   
   잘못됨: https://registry.npmjs.org/
-  맞음:   file:///opt/sapstack-offline-1.7.0/npm-cache
+  맞음:   file:///opt/sapstack-offline-2.4.0/npm-cache
   
   수정:
-  npm config set registry file:///opt/sapstack-offline-1.7.0/npm-cache
+  npm config set registry file:///opt/sapstack-offline-2.4.0/npm-cache
   npm install --offline
 ```
 
@@ -520,7 +521,7 @@ SAP:       ECC 6.0 (on-premise, TS-2023-1 준수 필수)
   해결: 파일 권한 확인
   $ ls -la /opt/sapstack/
   
-  /opt/sapstack/audit-trail.jsonl는 777 (쓰기 가능)이어야 함
+  /opt/sapstack/audit-trail.jsonl 은 소유자 쓰기만 (600 또는 640). 777 금지.
 ```
 
 ---
@@ -595,10 +596,10 @@ sapstack 응답:
 ## FAQ: 망분리 환경
 
 **Q: 인터넷이 없으면 Claude AI 기능은?**
-A: MCP 서버 = 로컬 진단 엔진만 작동. Claude 호출 없음. 대신 규칙 기반 분석 (더 빠름).
+A: 온디바이스 로컬 모델 지원 예정 (v2.5). 지금은 클라우드 Claude 호출 없음. 실제 동작(로컬 모델 vs 규칙 기반)은 확정 후 이 FAQ를 갱신한다.
 
 **Q: 업그레이드가 분기마다 와야 하는가?**
-A: 아니오. 필요할 때만 업그레이드. sapstack v1.7.0은 안정적이므로 연간 1-2회 정도.
+A: 아니오. 필요할 때만 업그레이드. sapstack v2.4.0은 안정적이므로 연간 1-2회 정도.
 
 **Q: 외부 개발팀이 원격 접근할 수 있는가?**
 A: 망분리 정책상 불가. 대신 IT팀을 거쳐야 함.
@@ -611,6 +612,6 @@ A: Audit trail JSONL를 주기적으로 백업 (별도 암호화 HDD). 복구 �
 
 ---
 
-**Last Updated**: 2026-04-13  
-**Version**: 1.0  
-**Applicable**: sapstack v1.7.0+, Korean financial/government/defense enterprises
+**Last Updated**: 2026-08-16  
+**Version**: 1.1  
+**Applicable**: sapstack v2.4.0+, Korean financial/government/defense enterprises

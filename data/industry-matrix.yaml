@@ -1,10 +1,16 @@
 # sapstack — 업종별 모듈 활성화/중요도 매트릭스
 #
 # 목적: 업종별 어떤 SAP 모듈이 핵심인지, 어떤 에이전트를 우선 라우팅할지 결정
-# 참조: docs/industry/manufacturing.md, retail.md, financial-services.md
+# 참조: docs/industry/manufacturing.md, retail.md, financial-services.md,
+#       automotive.md, chemicals.md, healthcare.md, public-sector.md
 #
 # importance: critical (핵심), high (높음), medium (보통), low (낮음), none (미사용)
-# agent: 우선 라우팅 에이전트
+# agent: 우선 라우팅 에이전트 (agents/*.md 에 실재하는 것만)
+#   - importance != none 이면 agent 필수 (MCP list_agents_for_industry 라우팅)
+#   - importance == none 이면 agent 생략이 정상
+#   - BTP 폴백: sap-integration-advisor (scripts/eval/run.mjs MODULE_AGENT 와 동일)
+#   - GTS 폴백: sap-sd-consultant (전용 에이전트 없음 — 근거는 파일 하단 주석)
+# 모듈 중요도·노트는 해당 docs/industry/*.md 본문에서만 파생. 창작 금지.
 
 manufacturing:
   name: 제조업
@@ -24,8 +30,8 @@ manufacturing:
     TR: { importance: low, agent: sap-tr-consultant }
     ABAP: { importance: high, agent: sap-abap-developer, note: "MES 연동 커스텀 개발" }
     BASIS: { importance: medium, agent: sap-basis-consultant }
-    BTP: { importance: low }
-    GTS: { importance: low, note: "수출입 기업만" }
+    BTP: { importance: low, agent: sap-integration-advisor }
+    GTS: { importance: low, agent: sap-sd-consultant, note: "수출입 기업만" }
 
 retail:
   name: 유통업
@@ -45,8 +51,8 @@ retail:
     TR: { importance: low, agent: sap-tr-consultant }
     ABAP: { importance: high, agent: sap-abap-developer, note: "POS/EDI 연동" }
     BASIS: { importance: medium, agent: sap-basis-consultant }
-    BTP: { importance: medium, note: "이커머스 연동" }
-    GTS: { importance: medium, note: "해외 직구/수입" }
+    BTP: { importance: medium, agent: sap-integration-advisor, note: "이커머스 연동" }
+    GTS: { importance: medium, agent: sap-sd-consultant, note: "해외 직구/수입" }
 
 financial_services:
   name: 금융업
@@ -60,11 +66,108 @@ financial_services:
     MM: { importance: medium, agent: sap-mm-consultant, note: "간접 구매(IT, 사무용품)" }
     BASIS: { importance: critical, agent: sap-basis-consultant, note: "보안, 감사, SoD" }
     ABAP: { importance: medium, agent: sap-abap-developer, note: "코어뱅킹 인터페이스" }
-    BTP: { importance: medium, note: "디지털 채널" }
-    SD: { importance: low, note: "일부 상품 판매" }
+    BTP: { importance: medium, agent: sap-integration-advisor, note: "디지털 채널" }
+    SD: { importance: low, agent: sap-sd-consultant, note: "일부 상품 판매" }
     PP: { importance: none }
     QM: { importance: none }
-    PM: { importance: low, note: "ATM/단말기 관리" }
+    PM: { importance: low, agent: sap-pm-consultant, note: "ATM/단말기 관리" }
     WM: { importance: none }
     EWM: { importance: none }
-    GTS: { importance: low, note: "해외 송금 규제" }
+    GTS: { importance: low, agent: sap-sd-consultant, note: "해외 송금 규제" }
+
+# ── 아래 4개 업종은 docs/industry/{automotive,chemicals,healthcare,public-sector}.md 에서 파생 ──
+
+automotive:
+  name: 자동차
+  description: 자동차·부품. Series 생산, Variant Configuration, BOM 복잡성, Dealer Network, JIT/JIS, OEM-Tier 협업.
+  korean_examples: 현대자동차, 기아, KGM, 현대모비스, 만도
+  modules:
+    PP: { importance: critical, agent: sap-pp-consultant, note: "Repetitive Manufacturing, Run Schedule, Variant Configuration" }
+    SD: { importance: critical, agent: sap-sd-consultant, note: "Vehicle Sales (VMS), Dealer Network" }
+    MM: { importance: critical, agent: sap-mm-consultant, note: "Procurement·JIT/JIS OEM-Tier 호출" }
+    EWM: { importance: high, agent: sap-ewm-consultant, note: "Warehouse·Yard" }
+    GTS: { importance: high, agent: sap-sd-consultant, note: "수출 통관·FTA" }
+    QM: { importance: medium, agent: sap-qm-consultant, note: "리콜·안전 기준 대응 (EHS/Recall)" }
+    PM: { importance: medium, agent: sap-pm-consultant, note: "Warranty Claim 은 CS 영역 — 설비 보전은 일반 수준" }
+    FI: { importance: medium, agent: sap-fi-consultant }
+    CO: { importance: medium, agent: sap-co-consultant, note: "Variant Pricing / 원가 복잡도" }
+    WM: { importance: medium, agent: sap-ewm-consultant, note: "ECC 레거시 창고" }
+    HCM: { importance: low, agent: sap-hcm-consultant }
+    TR: { importance: low, agent: sap-tr-consultant }
+    ABAP: { importance: high, agent: sap-abap-developer, note: "OEM EDI·JIT 인터페이스" }
+    BASIS: { importance: medium, agent: sap-basis-consultant }
+    BTP: { importance: low, agent: sap-integration-advisor, note: "자율주행·Telematics 는 가이드 Out of Scope" }
+
+chemicals:
+  name: 화학·제약
+  description: 화학(Chemicals), 제약(Pharmaceuticals), 정밀화학·바이오. GxP 규제·Batch 추적·원산지·유통기한 핵심.
+  korean_examples: 정밀화학, 제약, 바이오, 화장품
+  modules:
+    PP: { importance: critical, agent: sap-pp-consultant, note: "PP-PI Process Order, Recipe, PI Sheet" }
+    QM: { importance: critical, agent: sap-qm-consultant, note: "Inspection Lot, Sample Plan, Batch Release" }
+    MM: { importance: critical, agent: sap-mm-consultant, note: "Vendor batch tracking" }
+    EWM: { importance: critical, agent: sap-ewm-consultant, note: "Batch 관리·유통기한 FEFO" }
+    WM: { importance: high, agent: sap-ewm-consultant, note: "ECC 레거시 창고 + FEFO" }
+    GTS: { importance: high, agent: sap-sd-consultant, note: "전구체·이중용도 수출 통제·원산지" }
+    CO: { importance: high, agent: sap-co-consultant, note: "Process Order Settlement (KO88), 부산물·재작업" }
+    FI: { importance: medium, agent: sap-fi-consultant }
+    SD: { importance: medium, agent: sap-sd-consultant, note: "Batch Determination (VCH1)" }
+    PM: { importance: low, agent: sap-pm-consultant }
+    HCM: { importance: low, agent: sap-hcm-consultant }
+    TR: { importance: low, agent: sap-tr-consultant }
+    ABAP: { importance: medium, agent: sap-abap-developer, note: "EBR / GxP 로깅 확장" }
+    BASIS: { importance: high, agent: sap-basis-consultant, note: "21 CFR Part 11 Audit Trail, IQ/OQ/PQ" }
+    BTP: { importance: none }
+
+healthcare:
+  name: 의료·헬스케어
+  description: 병원·의료기기·헬스케어 서비스. IS-H, 환자 청구, HIPAA·PIPA 개인정보 보호 핵심.
+  korean_examples: 종합병원, 의료기기 제조, 헬스케어 그룹
+  modules:
+    FI: { importance: critical, agent: sap-fi-consultant, note: "보험·환자 청구 + NHIS DRG 정산" }
+    MM: { importance: critical, agent: sap-mm-consultant, note: "의약품·의료기기 조달, Lot/Serial" }
+    HCM: { importance: critical, agent: sap-hcm-consultant, note: "의료진·간호사·행정직" }
+    QM: { importance: high, agent: sap-qm-consultant, note: "의료기기 품질·교정 (Calibration)" }
+    PM: { importance: high, agent: sap-pm-consultant, note: "의료기기 maintenance plan" }
+    BASIS: { importance: high, agent: sap-basis-consultant, note: "PIPA / HIPAA-like 개인정보 보호" }
+    CO: { importance: medium, agent: sap-co-consultant }
+    EWM: { importance: medium, agent: sap-ewm-consultant, note: "의약품 batch FEFO" }
+    WM: { importance: low, agent: sap-ewm-consultant }
+    SD: { importance: low, agent: sap-sd-consultant }
+    PP: { importance: none }
+    TR: { importance: low, agent: sap-tr-consultant }
+    ABAP: { importance: medium, agent: sap-abap-developer, note: "NHIS EDI 청구 인터페이스" }
+    BTP: { importance: low, agent: sap-integration-advisor, note: "의료 AI 는 가이드 Out of Scope" }
+    GTS: { importance: none }
+
+public_sector:
+  name: 공공·국방
+  description: 중앙정부·지자체·국방·공기업. 공공 조달법·예산 회계·감사 추적·망분리 환경 핵심.
+  korean_examples: 중앙정부, 지자체, 공기업, 방산 협력사
+  modules:
+    FI: { importance: critical, agent: sap-fi-consultant, note: "정부회계·예산 (FM Funds Management), PSCD" }
+    MM: { importance: critical, agent: sap-mm-consultant, note: "공공 조달 (나라장터/KONEPS, 입찰·계약)" }
+    HCM: { importance: critical, agent: sap-hcm-consultant, note: "공무원 관리" }
+    BASIS: { importance: critical, agent: sap-basis-consultant, note: "망분리·K-SOX·감사원/국정감사 trail" }
+    PM: { importance: high, agent: sap-pm-consultant, note: "시설·인프라 유지보수" }
+    ABAP: { importance: high, agent: sap-abap-developer, note: "KONEPS(G2B) 연동" }
+    CO: { importance: medium, agent: sap-co-consultant }
+    SD: { importance: none }
+    PP: { importance: none }
+    QM: { importance: none }
+    WM: { importance: none }
+    EWM: { importance: none }
+    TR: { importance: low, agent: sap-tr-consultant }
+    BTP: { importance: low, agent: sap-integration-advisor, note: "망분리로 SAP 클라우드 사용 제한" }
+    GTS: { importance: none }
+
+# GTS 라우팅 근거 (전용 sap-gts-consultant 없음, 2026-08-16):
+#   - agents/*.md 20개 중 GTS 전용 없음. plugins/sap-gts 는 지식 플러그인만.
+#   - scripts/eval/run.mjs MODULE_AGENT 에도 GTS 키 없음 (스키마 모듈 enum 밖).
+#   - 최근접 도메인은 sap-sd-consultant: symptom-index 의 GTS 인접 증상
+#     (sym-kr-unipass-reject, sym-kr-strategic-material) likely_modules[0] = SD,
+#     조회 면은 VF01 빌링. WM→EWM 과 같은 "인접 도메인 폴백".
+#   - sap-integration-advisor 는 UNI-PASS 행이 있지만 BTP 폴백으로 이미 쓰이므로
+#     GTS 까지 겹치면 list_agents_for_industry 가 두 모듈을 한 에이전트로 뭉갠다.
+#   - 한계: retail "직구/수입"·financial_services "해외 송금 규제"는 SD 가 약함.
+#     인터페이스 장애는 운영자가 sap-integration-advisor 로 재위임해야 함.

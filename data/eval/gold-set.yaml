@@ -24,11 +24,13 @@
 # 스키마: schemas/eval-gold-set.schema.json
 #
 # 확장:
-#   현재 21건(대표 모듈 커버). 목표 30~50건. symptom-index 90건에서
-#   ground-truth 가 명확한 것 위주로 확장. 기여 가이드: data/eval/README.md
+#   현재 58건(symptom-index 90건 중 ground-truth 가 typical_causes[0] 으로
+#   확정되고 must_tcodes 가 tcodes.yaml 에 실재하는 것만). 미측정 32건은
+#   first_check_tcodes 미등록 또는 typical_causes 출처 불명으로 보류.
+#   기여 가이드: data/eval/README.md
 
 schema_version: "1.0.0"
-generated: 2026-06-18
+generated: 2026-08-16
 source: sapstack authors (derived from data/symptom-index.yaml)
 license: MIT
 
@@ -525,3 +527,407 @@ cases:
         - "작업센터 가용능력(CR01) 확인"
       sap_note: null
     ethos_flags: [no_hardcode]
+
+  # ═══════════════════════════ v2.4 커버리지 확장 (32→58, 저커버 모듈 우선) ═══════════════════════════
+  # primary_root_cause 는 전부 data/symptom-index.yaml typical_causes[0] 파생.
+
+  # ── QM ──
+  - id: eval-qm-usage-decision-block
+    symptom_ref: sym-qm-usage-decision-block
+    module: QM
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "QA11 사용결정 했는데 재고가 안 넘어가요. 격리된 채로 있어요."
+    expected:
+      primary_root_cause: "사용 결정(Usage Decision)이 '격리'(Blocked) 상태로 설정됨"
+      must_tcodes: [QA11, QA01]
+      must_checks:
+        - "QA11 사용결정 상세에서 UD 코드가 Blocked/격리인지 확인"
+        - "재고 전환(Movement Type) 자동화 설정 여부 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-qm-notification-workflow
+    symptom_ref: sym-qm-notification-workflow
+    module: QM
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "QM01 품질통보 올렸는데 워크플로가 안 돌아요. 담당자에게 안 갑니다."
+    expected:
+      primary_root_cause: "Workflow가 정의되지 않았거나 비활성화 상태"
+      must_tcodes: [QM01, QM02, QM03]
+      must_checks:
+        - "QM01/QM02 통보 상태와 워크플로 기동 여부 확인"
+        - "담당자(Responsible) 역할 할당 여부 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-qm-plan-not-assigned
+    symptom_ref: sym-qm-plan-not-assigned
+    module: QM
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "QA01 검사로트 만들었는데 검사계획이 자동으로 안 붙어요."
+    expected:
+      primary_root_cause: "자재(Material)·공급업체(Vendor) 별로 검사계획(Inspection Plan) 정의 누락"
+      must_tcodes: [QA01]
+      must_checks:
+        - "QA01 에서 해당 자재/공급업체 검사계획 검색 결과 확인"
+        - "검사계획 유효기간이 오늘을 포함하는지 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-qm-certificate-error
+    symptom_ref: sym-qm-certificate-error
+    module: QM
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "QC21 로 CoA(시험성적서) 뽑는데 생성이 실패해요."
+    expected:
+      primary_root_cause: "CoA 템플릿(Template) 정의 누락 또는 해당 자재에 미할당"
+      must_tcodes: [QC21]
+      must_checks:
+        - "QC21 생성 오류 메시지 확인"
+        - "해당 자재에 CoA 템플릿 할당 여부 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── HCM ──
+  - id: eval-hcm-time-quota-mismatch
+    symptom_ref: sym-hcm-time-quota-mismatch
+    module: HCM
+    difficulty: medium
+    env: { release: both, deployment: on-prem, country: any }
+    prompt: "PT60 근태 평가 돌렸는데 잔여 연차가 실제랑 안 맞아요."
+    expected:
+      primary_root_cause: "휴가 유형(Leave Type) 정의가 급여 년도 경계와 맞지 않음"
+      must_tcodes: [PT60]
+      must_checks:
+        - "PT60 평가 결과의 잔여 쿼타 확인"
+        - "휴가 유형의 년도 경계(급여년도) 정의 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-hcm-org-assignment
+    symptom_ref: sym-hcm-org-assignment
+    module: HCM
+    difficulty: medium
+    env: { release: both, deployment: on-prem, country: any }
+    prompt: "PA30 IT0001 조직 배정이 현재 조직이랑 안 맞아요."
+    expected:
+      primary_root_cause: "조직 단위(Org Unit), 직책(Job) 정의가 유효 기간 범위를 벗어남"
+      must_tcodes: [PA30, PA20]
+      must_checks:
+        - "PA30 IT0001 이력에서 유효기간 공백/중복 확인"
+        - "Org Unit·Job 마스터 유효기간이 배정일을 포함하는지 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-hcm-four-insurance
+    symptom_ref: sym-hcm-four-insurance
+    module: HCM
+    difficulty: hard
+    env: { release: both, deployment: on-prem, country: KR }
+    prompt: "4대보험 신고 금액이 급여 계산이랑 안 맞아요."
+    expected:
+      primary_root_cause: "급여 계산 중 사회보험료 공제(Health/Pension/Employment/Industrial Injury Insurance) 비율 오류"
+      must_tcodes: [PC00_M99]
+      must_checks:
+        - "해당 인원의 4대보험 공제 비율/기준보수 확인"
+        - "MOLGA 국가그룹(KR) 별 처리 차이 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── EWM ──
+  - id: eval-ewm-stock-discrepancy
+    symptom_ref: sym-ewm-stock-discrepancy
+    module: EWM
+    difficulty: hard
+    env: { release: s4, deployment: any, country: any }
+    prompt: "EWM 재고랑 ERP(MMBE) 재고가 안 맞아요."
+    expected:
+      primary_root_cause: "EWM 실사(Physical Count)가 완료됐으나 ERP와 동기화되지 않음"
+      must_tcodes: ["/SCWM/MON", MMBE]
+      must_checks:
+        - "/SCWM/MON 과 MMBE 재고 수량 비교"
+        - "실사(Physical Count) 후 ERP 동기화 상태 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode, ecc_s4_distinction]
+
+  - id: eval-ewm-wave-not-released
+    symptom_ref: sym-ewm-wave-not-released
+    module: EWM
+    difficulty: hard
+    env: { release: s4, deployment: any, country: any }
+    prompt: "EWM Wave 가 릴리스가 안 되고 task 도 안 생겨요."
+    expected:
+      primary_root_cause: "Wave template/조건 미충족 (capacity, cutoff)"
+      must_tcodes: [SLG1]
+      must_checks:
+        - "SLG1 에서 Wave 릴리스 실패 로그 확인"
+        - "Wave template 의 capacity/cutoff 조건 충족 여부 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode, ecc_s4_distinction]
+
+  # ── PM ──
+  - id: eval-pm-breakdown-notification
+    symptom_ref: sym-pm-breakdown-notification
+    module: PM
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "IW21 긴급 고장 통보 올렸는데 보전 오더가 안 생겨요."
+    expected:
+      primary_root_cause: "Notification Type(IW21)이 자동으로 Maintenance Order를 생성하지 않음"
+      must_tcodes: [IW21, IW23]
+      must_checks:
+        - "IW21/IW23 통보 타입의 자동 오더 생성 설정 확인"
+        - "설비(IE02) 상태가 오더 생성을 막는지 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-pm-preventive-overdue
+    symptom_ref: sym-pm-preventive-overdue
+    module: PM
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "IP30 예방보전 기한이 지났는데 알림이 계속 떠요."
+    expected:
+      primary_root_cause: "예방보전 계획(Maintenance Plan)의 주기(Cycle) 또는 기한이 현실과 맞지 않음"
+      must_tcodes: [IP30, IP01, IP10]
+      must_checks:
+        - "IP30 기한초과 항목의 Maintenance Plan 주기 확인"
+        - "IP10 스케줄이 실제 가동 주기와 맞는지 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-pm-equipment-status
+    symptom_ref: sym-pm-equipment-status
+    module: PM
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "IE02 에서 설비 상태를 바꾸려는데 안 바뀌어요."
+    expected:
+      primary_root_cause: "설비의 현재 상태(Equipment Status)에서 대상 상태로의 전환이 허용되지 않음 (상태 다이어그램 제약)"
+      must_tcodes: [IE02, IE01]
+      must_checks:
+        - "IE02 현재 시스템/사용자 상태 확인"
+        - "상태 전환 다이어그램에서 대상 상태 허용 여부 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── WM ──
+  - id: eval-wm-transfer-order-fail
+    symptom_ref: sym-wm-transfer-order-fail
+    module: WM
+    difficulty: medium
+    env: { release: ecc, deployment: on-prem, country: any }
+    prompt: "레거시 WM 에서 Transfer Order 생성/확인이 안 돼요."
+    expected:
+      primary_root_cause: "Storage bin/quant 데이터 불일치 (LS24)"
+      must_tcodes: [LT03, LS24]
+      must_checks:
+        - "LS24 로 해당 빈/quant 재고 확인"
+        - "LT03 TO 생성 오류 메시지 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode, ecc_s4_distinction]
+
+  - id: eval-wm-im-wm-mismatch
+    symptom_ref: sym-wm-im-wm-mismatch
+    module: WM
+    difficulty: medium
+    env: { release: ecc, deployment: on-prem, country: any }
+    prompt: "IM 재고랑 WM 재고가 안 맞아요."
+    expected:
+      primary_root_cause: "LB10 transfer requirement 미처리 누적"
+      must_tcodes: [LB10, LS24]
+      must_checks:
+        - "LB10 미처리 Transfer Requirement 확인"
+        - "LS24 WM 재고와 IM 재고 비교"
+      sap_note: null
+    ethos_flags: [no_hardcode, ecc_s4_distinction]
+
+  # ── SAC ──
+  - id: eval-sac-import-schedule-fail
+    symptom_ref: sym-sac-import-schedule-fail
+    module: SAC
+    difficulty: hard
+    env: { release: s4, deployment: any, country: any }
+    prompt: "SAC Import Connection 스케줄이 자꾸 실패해요."
+    expected:
+      primary_root_cause: "Data Provisioning Agent(DPA) 다운 또는 버전 불일치"
+      must_tcodes: [RSA1, RSRT]
+      must_checks:
+        - "DPA 상태/버전 확인"
+        - "RSA1/RSRT 로 소스 쿼리 자체 실행 가능 여부 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-sac-story-performance
+    symptom_ref: sym-sac-story-performance
+    module: SAC
+    difficulty: medium
+    env: { release: s4, deployment: any, country: any }
+    prompt: "SAC Story 로딩이 너무 느려요. 대시보드가 안 떠요."
+    expected:
+      primary_root_cause: "Live connection에서 대량 행 fetch — 집계 미적용"
+      must_tcodes: [RSRT]
+      must_checks:
+        - "RSRT 로 백엔드 쿼리 실행 시간 확인"
+        - "Story 가 집계 없이 대량 행을 fetch 하는지 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── IBP ──
+  - id: eval-ibp-cpi-integration-fail
+    symptom_ref: sym-ibp-cpi-integration-fail
+    module: IBP
+    difficulty: hard
+    env: { release: s4, deployment: any, country: any }
+    prompt: "IBP-S/4 CPI 연동이 실패해요. 마스터가 안 맞아요."
+    expected:
+      primary_root_cause: "CPI iFlow 메시지 매핑 오류 — S/4 마스터 변경 후 ID mismatch"
+      must_tcodes: [SXMB_MONI, SRT_MONI]
+      must_checks:
+        - "SXMB_MONI/SRT_MONI 실패 메시지 페이로드에서 ID 매핑 확인"
+        - "S/4 마스터 변경 이후 iFlow 매핑 갱신 여부 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── Ariba ──
+  - id: eval-ariba-po-not-sent
+    symptom_ref: sym-ariba-po-not-sent
+    module: Ariba
+    difficulty: medium
+    env: { release: s4, deployment: any, country: any }
+    prompt: "Ariba PO 가 공급사에게 전송이 안 돼요."
+    expected:
+      primary_root_cause: "공급사 Trading Relationship 미수립 또는 Network 미등록"
+      must_tcodes: [SLG1, ME2N]
+      must_checks:
+        - "ME2N 으로 PO 생성/전송 상태 확인"
+        - "SLG1 연동 로그에서 Network/Trading Relationship 오류 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-ariba-cig-message-fail
+    symptom_ref: sym-ariba-cig-message-fail
+    module: Ariba
+    difficulty: hard
+    env: { release: s4, deployment: any, country: any }
+    prompt: "Ariba-S/4 CIG 연동 메시지가 실패해요."
+    expected:
+      primary_root_cause: "ERP Integration Add-on for Ariba 비활성 또는 버전 불일치"
+      must_tcodes: [SLG1, SXMB_MONI]
+      must_checks:
+        - "SLG1/SXMB_MONI 에서 CIG 메시지 실패 원인 확인"
+        - "ERP Integration Add-on for Ariba 활성/버전 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── IC ──
+  - id: eval-ic-datasphere-replication-fail
+    symptom_ref: sym-ic-datasphere-replication-fail
+    module: IC
+    difficulty: hard
+    env: { release: s4, deployment: any, country: any }
+    prompt: "Datasphere Replication Flow 가 실패하거나 지연돼요."
+    expected:
+      primary_root_cause: "SLT 마이그레이션 서버 부하 또는 job 중단 (LTRC)"
+      must_tcodes: [LTRC, LTRS, ODQMON]
+      must_checks:
+        - "LTRC 에서 SLT job 상태/부하 확인"
+        - "ODQMON 구독/복제 큐 적체 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-ic-cloud-connector-down
+    symptom_ref: sym-ic-cloud-connector-down
+    module: IC
+    difficulty: medium
+    env: { release: s4, deployment: any, country: any }
+    prompt: "Cloud Connector 가 끊겨서 온프레미스 연동이 안 돼요."
+    expected:
+      primary_root_cause: "Cloud Connector 서비스 중단 또는 subaccount 연결 해제"
+      must_tcodes: [SICF, SM59]
+      must_checks:
+        - "Cloud Connector 서비스/subaccount 연결 상태 확인"
+        - "SM59/SICF 백엔드 도달 가능 여부 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-ic-odata-auth-expired
+    symptom_ref: sym-ic-odata-auth-expired
+    module: IC
+    difficulty: medium
+    env: { release: s4, deployment: any, country: any }
+    prompt: "OData/SOAP 서비스가 401 나요. 인증이 만료된 것 같아요."
+    expected:
+      primary_root_cause: "OAuth client secret/certificate 만료"
+      must_tcodes: [SOAMANAGER, SICF, SAML2]
+      must_checks:
+        - "OAuth client secret/인증서 유효기간 확인"
+        - "SICF/SAML2 서비스 활성 및 신뢰 설정 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-ic-idoc-adapter-stuck
+    symptom_ref: sym-ic-idoc-adapter-stuck
+    module: IC
+    difficulty: hard
+    env: { release: s4, deployment: any, country: any }
+    prompt: "CPI IDoc 어댑터 메시지가 처리 안 되고 쌓여요."
+    expected:
+      primary_root_cause: "Partner Profile(WE20) 인바운드/아웃바운드 파라미터 누락"
+      must_tcodes: [WE20, WE21, IDX1, IDX2]
+      must_checks:
+        - "WE20 파트너 프로파일 인바운드/아웃바운드 파라미터 확인"
+        - "WE21/IDX1/IDX2 포트·메타데이터 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── TR ──
+  - id: eval-tr-liquidity-forecast
+    symptom_ref: sym-tr-liquidity-forecast
+    module: TR
+    difficulty: medium
+    env: { release: both, deployment: any, country: any }
+    prompt: "FF7B 유동성 예측이 이상하게 나와요."
+    expected:
+      primary_root_cause: "현금 흐름(Cash Flow) 예측 매개변수 설정 오류"
+      must_tcodes: [FF7B]
+      must_checks:
+        - "FF7B 예측 매개변수(기간·구조) 확인"
+        - "원천 현금흐름 항목이 예측에 포함되는지 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  # ── ABAP ──
+  - id: eval-abap-tsv-tnew-page-alloc
+    symptom_ref: sym-tsv-tnew-page-alloc
+    module: ABAP
+    difficulty: hard
+    env: { release: both, deployment: on-prem, country: any }
+    prompt: "TSV_TNEW_PAGE_ALLOC_FAILED 덤프가 계속 떠요."
+    expected:
+      primary_root_cause: "인터널 테이블(internal table)에서 메모리 과다 사용 — 큰 SELECT 의심"
+      must_tcodes: [ST22, ST06, SM50, RZ10]
+      must_checks:
+        - "ST22 덤프에서 인터널 테이블/SELECT 위치 확인"
+        - "RZ10 메모리 파라미터(em/max_size_MB, heap) 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode]
+
+  - id: eval-abap-amdp-runtime-error
+    symptom_ref: sym-abap-amdp-runtime-error
+    module: ABAP
+    difficulty: hard
+    env: { release: s4, deployment: any, country: any }
+    prompt: "AMDP/CDS 에서 런타임 에러가 나요. HANA push-down 이 실패하는 것 같아요."
+    expected:
+      primary_root_cause: "AMDP SQLScript 문법 오류 또는 미지원 함수"
+      must_tcodes: [ST22, SE11, ST05]
+      must_checks:
+        - "ST22 에서 AMDP/SQLScript 예외 위치 확인"
+        - "SE11/ST05 로 CDS/AMDP 정의와 실행 트레이스 확인"
+      sap_note: null
+    ethos_flags: [no_hardcode, ecc_s4_distinction]
