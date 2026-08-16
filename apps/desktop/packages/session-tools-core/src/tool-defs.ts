@@ -610,11 +610,6 @@ export interface SessionToolFilterOptions {
    * operations deployments.
    */
   includeMessaging?: boolean;
-  /**
-   * Include the browser automation tool. Callers gate this with
-   * FEATURE_FLAGS.browserTool — default off for SAP operations deployments.
-   */
-  includeBrowserTool?: boolean;
 }
 
 /** Platform-messaging tools removed when includeMessaging is false. */
@@ -629,16 +624,12 @@ const MESSAGING_TOOL_NAMES = new Set(['list_messaging_channels', 'unbind_messagi
 export function getSessionToolDefs(options?: SessionToolFilterOptions): SessionToolDef[] {
   const includeDeveloperFeedback = options?.includeDeveloperFeedback ?? true;
   const includeMessaging = options?.includeMessaging ?? true;
-  const includeBrowserTool = options?.includeBrowserTool ?? true;
 
   return SESSION_TOOL_DEFS.filter(def => {
     if (!includeDeveloperFeedback && def.name === 'send_developer_feedback') {
       return false;
     }
     if (!includeMessaging && MESSAGING_TOOL_NAMES.has(def.name)) {
-      return false;
-    }
-    if (!includeBrowserTool && def.name === 'browser_tool') {
       return false;
     }
     return true;

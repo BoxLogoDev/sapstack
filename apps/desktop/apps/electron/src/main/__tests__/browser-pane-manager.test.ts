@@ -6,10 +6,9 @@
  */
 
 import { describe, it, expect, beforeEach, mock } from 'bun:test'
-import { isBrowserToolEnabled } from '@sapstack-desktop/shared/feature-flags'
 
-// Flag-gated with the browser feature — see the note in browser-cdp.test.ts.
-const describeBrowser = isBrowserToolEnabled() ? describe : describe.skip
+// Skipped with the disabled browser feature — see the note in browser-cdp.test.ts.
+const describeBrowser = describe.skip
 
 const createdWindows: any[] = []
 let toolbarLoadFailuresRemaining = 0

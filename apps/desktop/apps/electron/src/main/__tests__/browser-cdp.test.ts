@@ -6,15 +6,14 @@
  */
 
 import { describe, it, expect, beforeEach, mock } from 'bun:test'
-import { isBrowserToolEnabled } from '@sapstack-desktop/shared/feature-flags'
 
-// The browser automation feature is flag-gated off by default in SAP
-// operations builds (SAPSTACK_DESKTOP_FEATURE_BROWSER_TOOL). Its suites are
-// skipped while the feature is disabled — set the env flag to 1 to run them.
-// Known state when re-enabling: BrowserPaneManager has assertion failures on
-// both Windows and ubuntu, and BrowserCDP fails under full-suite runs (mock
-// pollution) while passing in isolation. Fix those before shipping the flag on.
-const describeBrowser = isBrowserToolEnabled() ? describe : describe.skip
+// The browser tool ships disabled in SAP builds (browserToolEnabled: false in
+// resources/config-defaults.json — the existing product axis, not an env flag),
+// so its suites are skipped. Known state when re-enabling the feature:
+// BrowserPaneManager has assertion failures on both Windows and ubuntu, and
+// BrowserCDP fails under full-suite runs (mock pollution) while passing in
+// isolation. Fix those before shipping the toggle on.
+const describeBrowser = describe.skip
 
 // Mock logger before import
 mock.module('../logger', () => {

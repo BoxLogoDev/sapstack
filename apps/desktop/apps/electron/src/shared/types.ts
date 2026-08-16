@@ -388,9 +388,10 @@ export interface ElectronAPI {
   getSystemWarnings(): Promise<{ vcredistMissing: boolean; downloadUrl?: string }>
 
   // Feature flags — evaluated once in preload from env (constant for the app
-  // lifetime). Renderer gates upstream-inherited features (messaging, browser
-  // automation) that default off in SAP operations builds.
-  featureFlags: { messaging: boolean; browserTool: boolean }
+  // lifetime). Renderer gates upstream-inherited features that default off in
+  // SAP operations builds. (Browser tool is gated by its own settings axis —
+  // getBrowserToolEnabled — not here.)
+  featureFlags: { messaging: boolean }
 
   // Shell operations
   openUrl(url: string): Promise<void>

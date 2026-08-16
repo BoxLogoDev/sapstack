@@ -73,18 +73,11 @@ export function isMessagingEnabled(): boolean {
   return false;
 }
 
-/**
- * Runtime-evaluated check for the browser automation tool.
- *
- * Same rationale as messaging: upstream-inherited, unrelated to SAP diagnosis,
- * and inert in air-gapped deployments. Defaults to disabled.
- * Override with SAPSTACK_DESKTOP_FEATURE_BROWSER_TOOL=1|0.
- */
-export function isBrowserToolEnabled(): boolean {
-  const override = parseBooleanEnv(getEnv('SAPSTACK_DESKTOP_FEATURE_BROWSER_TOOL'));
-  if (override !== undefined) return override;
-  return false;
-}
+// NOTE: the browser automation tool is intentionally NOT flagged here — it has
+// an existing product axis: `getBrowserToolEnabled()` in config/storage.ts
+// (user setting → bundled config-defaults.json), enforced in
+// session-scoped-tools, pi-agent, prerequisite-manager, and the system prompt.
+// SAP builds ship browserToolEnabled: false in the bundled defaults instead.
 
 export const FEATURE_FLAGS = {
   /** Enable Opus 4.7 fast mode (speed:"fast" + beta header). 6x pricing. */
@@ -122,13 +115,5 @@ export const FEATURE_FLAGS = {
    */
   get messaging(): boolean {
     return isMessagingEnabled();
-  },
-  /**
-   * Enable the browser automation tool.
-   *
-   * Defaults to disabled. Override with SAPSTACK_DESKTOP_FEATURE_BROWSER_TOOL=1|0.
-   */
-  get browserTool(): boolean {
-    return isBrowserToolEnabled();
   },
 } as const;

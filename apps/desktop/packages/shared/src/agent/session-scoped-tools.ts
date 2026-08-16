@@ -264,7 +264,6 @@ export function getSessionScopedTools(
     tools = getSessionToolDefs({
       includeDeveloperFeedback: FEATURE_FLAGS.developerFeedback,
       includeMessaging: FEATURE_FLAGS.messaging,
-      includeBrowserTool: FEATURE_FLAGS.browserTool,
     })
       .filter(def => def.handler !== null) // Skip backend-specific tools (call_llm)
       .map(def => registryTool(def.name, def.inputSchema.shape));

@@ -169,10 +169,18 @@ function syncConfigDefaults(): void {
  */
 export function loadConfigDefaults(): ConfigDefaults {
   if (!existsSync(CONFIG_DEFAULTS_FILE)) {
-    throw new Error('config-defaults.json not found at ' + CONFIG_DEFAULTS_FILE + '. Ensure ensureConfigDir() was called at startup.');
+    // Self-heal instead of throwing. Clean environments (CI, fresh checkouts,
+    // tests that never ran app startup) have no home copy; throwing here made
+    // every system-prompt construction die on such machines while passing on
+    // dev machines where the app had run once — an order-dependent flake.
+    // syncConfigDefaults() is idempotent and already handles the no-bundled-
+    // assets case by writing FALLBACK_CONFIG_DEFAULTS.
+    syncConfigDefaults();
   }
 
-  const defaults = readJsonFileSync<ConfigDefaults>(CONFIG_DEFAULTS_FILE);
+  const defaults = existsSync(CONFIG_DEFAULTS_FILE)
+    ? readJsonFileSync<ConfigDefaults>(CONFIG_DEFAULTS_FILE)
+    : structuredClone(FALLBACK_CONFIG_DEFAULTS);
 
   const parsedPermissionMode =
     typeof defaults.workspaceDefaults?.permissionMode === 'string'

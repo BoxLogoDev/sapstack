@@ -433,10 +433,10 @@ client.onConnectionStateChanged((state) => {
 
 // Feature flags — evaluated once in preload (same process.env as main; the
 // renderer cannot read env). Constant for the app lifetime, so a plain object
-// is enough — same pattern as getSystemWarnings above.
+// is enough — same pattern as getSystemWarnings above. The browser tool is
+// NOT here: it has its own product axis (getBrowserToolEnabled → settings RPC).
 ;(api as ElectronAPI).featureFlags = {
   messaging: FEATURE_FLAGS.messaging,
-  browserTool: FEATURE_FLAGS.browserTool,
 }
 
 // i18n: sync language changes to main process (for native menus/dialogs)
