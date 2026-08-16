@@ -1,3 +1,6 @@
+// MUST be first — pins SAPSTACK_DESKTOP_CONFIG_DIR to a hermetic fixture before
+// any transitive import captures CONFIG_DIR. See the fixture header for why.
+import './__fixtures__/hermetic-config-env.ts'
 import { afterEach, beforeEach, describe, expect, it, jest } from 'bun:test'
 import { mkdtempSync, rmSync } from 'fs'
 import { tmpdir } from 'os'

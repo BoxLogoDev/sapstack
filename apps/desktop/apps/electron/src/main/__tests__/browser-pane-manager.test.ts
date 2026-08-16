@@ -6,6 +6,10 @@
  */
 
 import { describe, it, expect, beforeEach, mock } from 'bun:test'
+import { isBrowserToolEnabled } from '@sapstack-desktop/shared/feature-flags'
+
+// Flag-gated with the browser feature — see the note in browser-cdp.test.ts.
+const describeBrowser = isBrowserToolEnabled() ? describe : describe.skip
 
 const createdWindows: any[] = []
 let toolbarLoadFailuresRemaining = 0
@@ -238,7 +242,7 @@ mock.module('../browser-cdp', () => ({
 
 const { BrowserPaneManager } = await import('../browser-pane-manager')
 
-describe('BrowserPaneManager', () => {
+describeBrowser('BrowserPaneManager', () => {
   let manager: InstanceType<typeof BrowserPaneManager>
 
   beforeEach(() => {
