@@ -113,6 +113,7 @@ class SessionMutationQueue {
 
 export interface StartSessionInput {
   symptom: string;
+  matched_symptom_index_entry?: string;
   reporter_role?: "end_user" | "operator" | "consultant" | "basis";
   country_iso?: string;
   release?: string;
@@ -177,6 +178,7 @@ export class SessionService {
         reporter_role: role,
         language: input.language || "ko",
         ...(input.country_iso ? { country_iso: input.country_iso.toLowerCase() } : {}),
+        ...(input.matched_symptom_index_entry ? { matched_symptom_index_entry: input.matched_symptom_index_entry } : {}),
       },
       sap_context: {
         ...(input.release ? { release: input.release } : {}),

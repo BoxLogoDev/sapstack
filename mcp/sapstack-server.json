@@ -265,6 +265,9 @@
           "symptom": {
             "type": "string"
           },
+          "matched_symptom_index_entry": {
+            "type": "string"
+          },
           "reporter_role": {
             "type": "string"
           },

@@ -101,6 +101,7 @@ test("Evidence Loop completes the canonical four-turn flow", async t => {
 
   const started = await runtime.sessions.start({
     symptom: "F110 proposal fails for one vendor",
+    matched_symptom_index_entry: "sym-new-desktop-case",
     reporter_role: "operator",
     release: "S4_2022",
     deployment: "on_premise",
@@ -158,6 +159,15 @@ test("Evidence Loop completes the canonical four-turn flow", async t => {
   assert.equal(state.turns.at(-1).turn_type, "verify");
   assert.equal(state.bundles.length, 2);
   assert.equal(state.verdicts.length, 1);
+
+  const learning = await runtime.learning.inspect();
+  assert.equal(learning.resolved_sessions, 1);
+  assert.equal(learning.module_distribution.FI, 1);
+  assert.deepEqual(learning.candidates.map(candidate => ({ kind: candidate.kind, symptom_ref: candidate.symptom_ref })), [
+    { kind: "gold_set", symptom_ref: "sym-new-desktop-case" },
+  ]);
+  assert.deepEqual(learning.privacy, { contains_free_text: false, contains_environment: false, auto_apply: false });
+  assert.doesNotMatch(JSON.stringify(learning), /vendor|manufacturing|S4_2022/i);
 });
 
 test("session mutations are serialized without lost evidence", async t => {
@@ -175,11 +185,16 @@ test("session mutations are serialized without lost evidence", async t => {
 test("Desktop sessions preserve their originating surface in the audit trail", async t => {
   const { runtime, sessionsDir } = await runtimeFixture();
   t.after(() => rm(sessionsDir, { recursive: true, force: true }));
-  const started = await runtime.sessions.start({ symptom: "Desktop intake", surface: "desktop" });
+  const started = await runtime.sessions.start({
+    symptom: "Desktop intake",
+    matched_symptom_index_entry: "sym-f110-no-payment-method",
+    surface: "desktop",
+  });
   await runtime.sessions.addEvidence({ session_id: started.session_id, bundle: evidence(started.session_id), surface: "desktop" });
 
   const state = await runtime.sessions.get(started.session_id);
   assert.equal(state.originating_surface, "desktop");
+  assert.equal(state.initial_symptom.matched_symptom_index_entry, "sym-f110-no-payment-method");
   assert.equal(state.turns[0].surface, "desktop");
   assert.deepEqual(state.audit_trail.map((entry: any) => entry.actor.surface), ["desktop", "desktop"]);
 });
