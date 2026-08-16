@@ -1,4 +1,24 @@
-import { describe, expect, it } from 'bun:test'
+import { describe, expect, it, mock } from 'bun:test'
+
+// Mock the logger before importing deep-link. deep-link → ./logger →
+// electron-log → electron, whose index.js throws when the electron binary is
+// absent (CI installs with --ignore-scripts, so the postinstall that downloads
+// it never runs). The routing logic under test never touches the logger's
+// behavior. Same pattern as browser-cdp.test.ts.
+mock.module('../logger', () => {
+  const stubLog = { info: () => {}, error: () => {}, warn: () => {}, debug: () => {} }
+  return {
+    mainLog: stubLog,
+    sessionLog: stubLog,
+    handlerLog: stubLog,
+    windowLog: stubLog,
+    agentLog: stubLog,
+    searchLog: stubLog,
+    isDebugMode: false,
+    getLogFilePath: () => '/tmp/main.log',
+  }
+})
+
 import { handleDeepLink } from '../deep-link'
 import { RPC_CHANNELS } from '../../shared/types'
 import type { EventSink } from '@sapstack-desktop/server-core/transport'
