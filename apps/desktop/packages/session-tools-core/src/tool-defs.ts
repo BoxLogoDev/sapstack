@@ -603,7 +603,22 @@ export const SESSION_TOOL_DEFS: SessionToolDef[] = [
 export interface SessionToolFilterOptions {
   /** Include the experimental send_developer_feedback tool. */
   includeDeveloperFeedback?: boolean;
+  /**
+   * Include platform messaging gateway tools (list_messaging_channels,
+   * unbind_messaging_channel). Inter-session send_agent_message is unaffected.
+   * Callers gate this with FEATURE_FLAGS.messaging — default off for SAP
+   * operations deployments.
+   */
+  includeMessaging?: boolean;
+  /**
+   * Include the browser automation tool. Callers gate this with
+   * FEATURE_FLAGS.browserTool — default off for SAP operations deployments.
+   */
+  includeBrowserTool?: boolean;
 }
+
+/** Platform-messaging tools removed when includeMessaging is false. */
+const MESSAGING_TOOL_NAMES = new Set(['list_messaging_channels', 'unbind_messaging_channel']);
 
 /**
  * Return session tools with optional feature filtering.
@@ -613,9 +628,17 @@ export interface SessionToolFilterOptions {
  */
 export function getSessionToolDefs(options?: SessionToolFilterOptions): SessionToolDef[] {
   const includeDeveloperFeedback = options?.includeDeveloperFeedback ?? true;
+  const includeMessaging = options?.includeMessaging ?? true;
+  const includeBrowserTool = options?.includeBrowserTool ?? true;
 
   return SESSION_TOOL_DEFS.filter(def => {
     if (!includeDeveloperFeedback && def.name === 'send_developer_feedback') {
+      return false;
+    }
+    if (!includeMessaging && MESSAGING_TOOL_NAMES.has(def.name)) {
+      return false;
+    }
+    if (!includeBrowserTool && def.name === 'browser_tool') {
       return false;
     }
     return true;
@@ -726,12 +749,11 @@ export interface JsonSchemaToolDef {
  * @param opts.includeDeveloperFeedback - Include experimental feedback tool in output
  * @returns Array of tool definitions with JSON Schema inputSchema
  */
-export function getToolDefsAsJsonSchema(opts?: {
+export function getToolDefsAsJsonSchema(opts?: SessionToolFilterOptions & {
   prefix?: string;
-  includeDeveloperFeedback?: boolean;
 }): JsonSchemaToolDef[] {
   const prefix = opts?.prefix || '';
-  const defs = getSessionToolDefs({ includeDeveloperFeedback: opts?.includeDeveloperFeedback });
+  const defs = getSessionToolDefs(opts);
 
   return defs.map(def => {
     // Explicit `as any` avoids TS2589 ("type instantiation is excessively deep")

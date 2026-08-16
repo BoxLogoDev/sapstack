@@ -23,6 +23,7 @@ import { RoutedClient } from '../transport/routed-client'
 import { buildClientApi } from '../transport/build-api'
 import { CHANNEL_MAP } from '../transport/channel-map'
 import { createCallbackServer } from '@sapstack-desktop/shared/auth/callback-server'
+import { FEATURE_FLAGS } from '@sapstack-desktop/shared/feature-flags'
 import { CHATGPT_OAUTH_CONFIG } from '@sapstack-desktop/shared/auth/chatgpt-oauth-config'
 import {
   CLIENT_OPEN_EXTERNAL,
@@ -429,6 +430,14 @@ client.onConnectionStateChanged((state) => {
   vcredistMissing: process.env.SAPSTACK_DESKTOP_VCREDIST_MISSING === '1',
   downloadUrl: process.env.SAPSTACK_DESKTOP_VCREDIST_URL,
 })
+
+// Feature flags — evaluated once in preload (same process.env as main; the
+// renderer cannot read env). Constant for the app lifetime, so a plain object
+// is enough — same pattern as getSystemWarnings above.
+;(api as ElectronAPI).featureFlags = {
+  messaging: FEATURE_FLAGS.messaging,
+  browserTool: FEATURE_FLAGS.browserTool,
+}
 
 // i18n: sync language changes to main process (for native menus/dialogs)
 ;(api as ElectronAPI).changeLanguage = (lang: string) => ipcRenderer.invoke('i18n:changeLanguage', lang)

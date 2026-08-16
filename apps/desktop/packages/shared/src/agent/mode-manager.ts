@@ -2014,6 +2014,8 @@ export function shouldAllowToolInMode(
       const safeAllowedSessionTools = getSessionSafeAllowedToolNames({
         prefix: 'mcp__session__',
         includeDeveloperFeedback: FEATURE_FLAGS.developerFeedback,
+        includeMessaging: FEATURE_FLAGS.messaging,
+        includeBrowserTool: FEATURE_FLAGS.browserTool,
       });
 
       if (safeAllowedSessionTools.has(toolName)) {

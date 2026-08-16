@@ -59,6 +59,33 @@ export function isEmbeddedServerEnabled(): boolean {
   return false;
 }
 
+/**
+ * Runtime-evaluated check for platform messaging (WhatsApp / Telegram / Lark).
+ *
+ * sapstack Desktop ships to SAP operations teams, often in air-gapped networks.
+ * Messaging gateways are inherited from upstream, add outbound network surface
+ * that security reviews must account for, and are useless without internet —
+ * so they default to disabled. Override with SAPSTACK_DESKTOP_FEATURE_MESSAGING=1|0.
+ */
+export function isMessagingEnabled(): boolean {
+  const override = parseBooleanEnv(getEnv('SAPSTACK_DESKTOP_FEATURE_MESSAGING'));
+  if (override !== undefined) return override;
+  return false;
+}
+
+/**
+ * Runtime-evaluated check for the browser automation tool.
+ *
+ * Same rationale as messaging: upstream-inherited, unrelated to SAP diagnosis,
+ * and inert in air-gapped deployments. Defaults to disabled.
+ * Override with SAPSTACK_DESKTOP_FEATURE_BROWSER_TOOL=1|0.
+ */
+export function isBrowserToolEnabled(): boolean {
+  const override = parseBooleanEnv(getEnv('SAPSTACK_DESKTOP_FEATURE_BROWSER_TOOL'));
+  if (override !== undefined) return override;
+  return false;
+}
+
 export const FEATURE_FLAGS = {
   /** Enable Opus 4.7 fast mode (speed:"fast" + beta header). 6x pricing. */
   fastMode: false,
@@ -86,5 +113,22 @@ export const FEATURE_FLAGS = {
    */
   get embeddedServer(): boolean {
     return isEmbeddedServerEnabled();
+  },
+  /**
+   * Enable platform messaging (WhatsApp / Telegram / Lark).
+   *
+   * Defaults to disabled for SAP operations deployments.
+   * Override with SAPSTACK_DESKTOP_FEATURE_MESSAGING=1|0.
+   */
+  get messaging(): boolean {
+    return isMessagingEnabled();
+  },
+  /**
+   * Enable the browser automation tool.
+   *
+   * Defaults to disabled. Override with SAPSTACK_DESKTOP_FEATURE_BROWSER_TOOL=1|0.
+   */
+  get browserTool(): boolean {
+    return isBrowserToolEnabled();
   },
 } as const;
