@@ -324,14 +324,20 @@ function parseCommand(command: string): ParseResult {
   const scriptPath = getParserScriptPath();
 
   try {
+    // The command is passed via environment variable, NOT argv. Windows argv
+    // quoting between the spawn layer and powershell.exe consumes backslashes
+    // ('C:\Users\test' arrived as 'C:Users<TAB>est'), silently breaking every
+    // Windows-path extraction (plans-folder writes were always "blocked").
+    // Env vars have no escaping layer, so the string round-trips losslessly.
     const result = spawnSync(
       powershellPath,
-      ['-NoProfile', '-NonInteractive', '-File', scriptPath, '-Command', command],
+      ['-NoProfile', '-NonInteractive', '-File', scriptPath],
       {
         stdio: ['ignore', 'pipe', 'pipe'],
         timeout: 10000,
         encoding: 'utf8',
         maxBuffer: 10 * 1024 * 1024, // 10MB for large ASTs
+        env: { ...process.env, SAPSTACK_PS_PARSE_COMMAND: command },
       }
     );
 

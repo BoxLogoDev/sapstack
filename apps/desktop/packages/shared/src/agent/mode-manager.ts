@@ -15,7 +15,7 @@
 import { homedir } from 'os';
 import { existsSync, realpathSync } from 'fs';
 import { debug } from '../utils/debug.ts';
-import { dirname, isAbsolute, relative, resolve } from 'path';
+import { dirname, isAbsolute, join, relative, resolve } from 'path';
 import { getSessionSafeAllowedToolNames } from '@sapstack-desktop/session-tools-core';
 import { FEATURE_FLAGS } from '../feature-flags.ts';
 import { isBrowserToolNameOrAlias } from './browser-tool-names.ts';
@@ -209,7 +209,25 @@ function isPathWithinDirectory(targetPath: string, baseDir: string): boolean {
   while (true) {
     if (existsSync(current)) {
       const realCurrent = realpathSync.native(current);
-      return isWithin(realBase, realCurrent);
+      if (isWithin(realBase, realCurrent)) {
+        // The ancestor lives inside the base tree — its realpath stayed put,
+        // so no symlink component escapes the base.
+        return true;
+      }
+      // The nearest existing ancestor sits at or ABOVE the base directory —
+      // i.e. the base itself doesn't exist yet (a brand-new session plans
+      // folder whose directories are created on first write). The old code
+      // returned isWithin(realBase, realCurrent) here, which is false by
+      // construction for any above-base ancestor, so every write into a
+      // not-yet-created base was rejected even though the literal containment
+      // check above had passed. Re-anchor BOTH paths through the ancestor's
+      // realpath instead: a symlinked ancestor shifts base and target equally,
+      // so containment is preserved exactly when it genuinely holds.
+      const realTarget = join(realCurrent, relative(current, resolvedTarget));
+      const reAnchoredBase = isWithin(current, resolvedBase)
+        ? join(realCurrent, relative(current, resolvedBase))
+        : realBase;
+      return isWithin(reAnchoredBase, realTarget);
     }
     const parent = dirname(current);
     if (parent === current) {
