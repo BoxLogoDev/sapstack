@@ -167,13 +167,11 @@ jobs:
       - working-directory: apps/desktop
         run: bun run typecheck:electron
 
-      # 테스트 4,899건(370 파일)은 지금까지 CI 에서 한 번도 돌지 않았다.
-      # Windows 로컬에서는 71건이 실패하는데, 관찰된 것은 경로 처리
-      # (deriveSelectionFlags('/') 가 folderName 을 undefined 대신 '/' 로 반환)라
-      # 플랫폼 차이로 보이지만 확정하지 못했다. ubuntu 결과를 확보하기 전에는
-      # 실패를 강제할 수 없으므로, 우선 관찰 모드로 돌려 판정 근거를 만든다.
-      # 판정 후 continue-on-error 를 제거하는 것이 목표다.
-      - name: Run desktop tests (observation only — see comment)
+      # 관찰 모드(continue-on-error)로 확보한 판정: ubuntu 실패 32건은
+      # 브라우저 자동화 스위트(feature flag 로 기본 off, 스위트도 함께 skip)와
+      # 환경 의존이던 refreshConnectionRuntime 테스트(hermetic 픽스처로 고정)
+      # 였다. 둘 다 처리됐으므로 정식 게이트로 승격한다. Windows 전용 실패
+      # 39건은 ubuntu 러너와 무관하다.
+      - name: Run desktop tests
         working-directory: apps/desktop
-        continue-on-error: true
         run: bun test
