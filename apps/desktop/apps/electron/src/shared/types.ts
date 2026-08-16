@@ -1111,6 +1111,17 @@ declare global {
         get(sessionId: string): Promise<unknown>
         list(filter?: unknown): Promise<unknown>
       }
+      localLlm: {
+        status(): Promise<{
+          serverBundled: boolean
+          modelFile: string | null
+          modelsDir: string
+          running: boolean
+          endpoint: string | null
+          modelId: string
+          lastError: string | null
+        }>
+      }
       security: { scrub(text: string): Promise<unknown> }
       learning: {
         inspect(): Promise<{

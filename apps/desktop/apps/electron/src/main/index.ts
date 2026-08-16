@@ -101,6 +101,7 @@ import { setSearchPlatform, setImageProcessor } from '@sapstack-desktop/server-c
 import { createApplicationMenu } from './menu'
 import { WindowManager } from './window-manager'
 import { registerSapstackRuntimeHandlers } from './sapstack-runtime'
+import { initLocalLlm } from './local-llm'
 import { loadWindowState, saveWindowState } from './window-state'
 import { getWorkspaces, getWorkspaceByNameOrId, loadStoredConfig, addWorkspace, saveConfig } from '@sapstack-desktop/shared/config'
 import { getDefaultWorkspacesDir } from '@sapstack-desktop/shared/workspaces'
@@ -394,6 +395,10 @@ app.whenReady().then(async () => {
   // sapstack's canonical knowledge and Evidence Loop run in-process. External
   // MCP remains available for third-party sources but is not required here.
   registerSapstackRuntimeHandlers()
+
+  // Bundled local LLM engine (llama-server + operator-imported model pack).
+  // No-op when either piece is absent; loopback-only, air-gapped safe.
+  initLocalLlm()
 
   // Initialize backend runtime bootstrapping (Codex vendor root, Claude SDK runtime paths).
   initializeBackendHostRuntime({

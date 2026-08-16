@@ -1,11 +1,16 @@
 /**
- * LocalModelStep — Onboarding step for local model configuration (Ollama).
+ * LocalModelStep — Onboarding step for local model configuration.
  *
  * Shows endpoint URL and model fields only — no API key input.
  * Pre-filled with Ollama defaults (localhost:11434, qwen3-coder).
+ *
+ * When the app ships with the bundled llama-server engine AND the operator has
+ * dropped a GGUF model pack into ~/.sapstack/models, the bundled endpoint is
+ * detected via `window.sapstack.localLlm.status()` and pre-filled instead —
+ * air-gapped operators cannot download Ollama, so this is their only path.
  */
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -42,6 +47,33 @@ export function LocalModelStep({
   const [baseUrl, setBaseUrl] = useState('http://localhost:11434')
   const [model, setModel] = useState('qwen3-coder')
   const [modelError, setModelError] = useState<string | null>(null)
+  const [bundledRunning, setBundledRunning] = useState(false)
+  const [modelPackDir, setModelPackDir] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    window.sapstack?.localLlm
+      ?.status()
+      .then((s) => {
+        if (cancelled) return
+        if (s.running && s.endpoint) {
+          // Bundled engine is live — pre-fill it (operator can still edit).
+          setBundledRunning(true)
+          setBaseUrl(s.endpoint)
+          setModel(s.modelId)
+        } else if (s.serverBundled && !s.modelFile) {
+          // Engine shipped but no model pack imported yet — tell the operator
+          // exactly where to drop it instead of failing with a raw error later.
+          setModelPackDir(s.modelsDir)
+        }
+      })
+      .catch(() => {
+        // Bridge unavailable (e.g. playground) — keep Ollama defaults.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const isDisabled = status === 'validating'
 
@@ -85,6 +117,16 @@ export function LocalModelStep({
       }
     >
       <form id="local-model-form" onSubmit={handleSubmit} className="space-y-6">
+        {bundledRunning && (
+          <p className="text-xs rounded-md bg-foreground/5 px-3 py-2 text-foreground/70">
+            {t("onboarding.localModel.bundledDetected")}
+          </p>
+        )}
+        {!bundledRunning && modelPackDir && (
+          <p className="text-xs rounded-md bg-foreground/5 px-3 py-2 text-foreground/70">
+            {t("onboarding.localModel.modelPackHint", { dir: modelPackDir })}
+          </p>
+        )}
         {/* Endpoint URL */}
         <div className="space-y-2">
           <Label htmlFor="local-base-url">{t("onboarding.localModel.endpoint")}</Label>

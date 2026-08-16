@@ -476,6 +476,9 @@ contextBridge.exposeInMainWorld('sapstack', {
     get: (sessionId: string) => ipcRenderer.invoke('sapstack:sessions:get', sessionId),
     list: (filter?: unknown) => ipcRenderer.invoke('sapstack:sessions:list', filter || {}),
   },
+  localLlm: {
+    status: () => ipcRenderer.invoke('sapstack:localLlm:status'),
+  },
   security: {
     scrub: (text: string) => ipcRenderer.invoke('sapstack:security:scrub', text),
   },
