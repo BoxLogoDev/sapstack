@@ -90,7 +90,23 @@ craft-agents-oss 파생이라 SAP 운영과 관계없는 기능이 딸려 왔다
 
 제거는 설치 파일 크기와 보안 심사 표면을 동시에 줄인다. 현재 설치 파일에 이미 claude 네이티브 바이너리(~210MB) + Bun 런타임 + uv 가 들어간다.
 
-> ⚠️ **미확인**: 이 기능들이 실제 UI 에 노출되는지(설정 화면·메뉴), 아니면 코드만 있고 비활성인지 확인하지 않았다. 노출 여부에 따라 우선순위가 달라진다.
+> ✅ **확인함.** messaging 은 코드만 있는 게 아니라 UI 에 깊이 박혀 있다.
+> `components/messaging/{WhatsApp,Telegram,Lark}ConnectDialog.tsx` 는 물론
+> `TopBar` · `SessionMenu` · `SessionItem` · `CompactSessionMenu` · `AppShell`,
+> 그리고 **온보딩 `WelcomeStep`** 까지 걸쳐 있다. 통째로 들어내면 수정 범위가
+> 넓고 upstream 동기화도 깨진다. 제거는 비용 대비 이득이 낮다.
+>
+> **더 싼 길이 있다.** `packages/shared/src/feature-flags.ts` 에 이미 플래그
+> 체계가 있다 — `isDeveloperFeedbackEnabled` / `isCraftAgentsCliEnabled` /
+> `isEmbeddedServerEnabled` 가 모두 `SAPSTACK_DESKTOP_FEATURE_*` 환경변수 +
+> 기본값 패턴을 쓴다. 여기에 `isMessagingEnabled()` 를 기본 false 로 추가하고
+> 노출 지점을 감싸면 된다. 다만 렌더러에서는 `getEnv` 가 undefined 를 반환해
+> 항상 기본값을 타므로, 플래그를 렌더러까지 넘길 경로가 필요한지 먼저 확인해야 한다.
+>
+> `apps/marketing` 과 `apps/online-docs` 는 `electron:build` 체인에 없어
+> **설치파일에 애초에 들어가지 않는다.** 제거 우선순위가 낮다.
+>
+> 이건 제품 결정이라 결론을 내지 않고 선택지만 둔다 — 제거 / 플래그로 숨김 / 유지.
 
 ### 6. 라이선스 표시 (BSL 전환 + Apache-2.0 고지)
 
@@ -145,6 +161,17 @@ BSL 파라미터도 정해야 한다 — Change Date(통상 4년), Change Licens
 - ✅ 릴리스 워크플로에 `desktop-windows` job 추가 (build-win.ps1 경유, 서명 secret 배선, artifact → Release 첨부)
 - ✅ 버전 단일출처 통합 — 데스크톱 `3.0.0-beta.0` → `2.4.0`, `bump-version.sh` 대상 5→8개, `bun.lock` 갱신, `--frozen-lockfile` 통과 확인
 - ✅ `UPSTREAM.md` stale 문구 정리
+- ✅ **자동 업데이트 경로 수정** — publish provider 가 generic + GitHub Pages 였는데
+  Pages 는 파일당 100MB 제한이라 이 설치파일을 애초에 담을 수 없었다. 즉 코드는
+  있었지만 받을 파일이 존재할 수 없는 상태였다. GitHub Releases 로 바꾸고
+  `latest.yml` 을 함께 게시하도록 했다.
+- ✅ **Air-gapped 모드 구현** (`main/airgap.ts`) — `SAPSTACK_AIRGAPPED` 또는
+  `~/.sapstack/config.yaml` 의 `air_gapped: true` 로 Sentry 와 업데이트 폴링을
+  시작 자체를 막는다. Sentry init 보다 먼저 평가돼야 해서 동기 판정이다.
+- ✅ 데스크톱 테스트 4,899건을 CI 에 관찰 모드(`continue-on-error`)로 편입 —
+  ubuntu 결과를 확보해 71건 실패가 플랫폼 차이인지 판정하기 위함
+- ✅ 게이트 신뢰성 복구 — `echo | grep -q` + `pipefail` 이 SIGPIPE 로 오판하던
+  버그 8곳, 줄바꿈 혼재로 로컬과 CI 결과가 갈리던 문제(`.gitattributes`)
 
 ---
 
