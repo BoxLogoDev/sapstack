@@ -7,6 +7,7 @@ import { app, BrowserWindow, dialog, ipcMain, nativeImage, nativeTheme, shell } 
 import { createHash, randomUUID } from 'crypto'
 import { hostname, homedir } from 'os'
 import * as Sentry from '@sentry/electron/main'
+import { isAirGapped } from './airgap'
 
 // Initialize Sentry error tracking as early as possible after app import.
 // Only enabled in production (packaged) builds to avoid noise during development.
@@ -23,7 +24,9 @@ Sentry.init({
   release: app.getVersion(),
   // Enabled whenever the ingest URL is available — works in both production (baked via CI)
   // and development (injected via .env / 1Password). Filter by environment in Sentry dashboard.
-  enabled: !!process.env.SENTRY_ELECTRON_INGEST_URL,
+  // 폐쇄망 모드에서는 DSN 이 있어도 전송하지 않는다. 스택트레이스에 SAP 데이터가
+  // 실릴 수 있고, 외부 전송 경로의 존재 자체가 보안 심사 탈락 사유가 된다.
+  enabled: !!process.env.SENTRY_ELECTRON_INGEST_URL && !isAirGapped(),
 
   // Scrub sensitive data before sending to Sentry.
   // Removes authorization headers, API keys/tokens, and credential-like values.
@@ -1114,7 +1117,11 @@ app.whenReady().then(async () => {
     // before-quit firing; saving from before-quit alone would overwrite
     // window-state.json with an empty array.
     setBeforeUpdateQuitHook(() => captureAndSaveWindowState('pre-update'))
-    if (app.isPackaged) {
+    if (isAirGapped()) {
+      // 폐쇄망에서는 업데이트 폴링 자체를 시작하지 않는다. 새 버전은 IT 팀이
+      // 승인된 매체로 반입한다(docs/compliance/air-gapped-deployment.md).
+      mainLog.info('[auto-update] Skipping update check — air-gapped mode')
+    } else if (app.isPackaged) {
       checkForUpdatesOnLaunch().catch(err => {
         mainLog.error('[auto-update] Launch check failed:', err)
       })

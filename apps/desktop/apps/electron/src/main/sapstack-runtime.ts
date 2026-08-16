@@ -132,6 +132,9 @@ async function saveEnvironmentProfile(input: Record<string, unknown>): Promise<R
     language: input.language || 'ko',
     ...(input.country_iso ? { country_iso: String(input.country_iso).toLowerCase() } : {}),
     ...(input.client ? { client: String(input.client) } : {}),
+    // 폐쇄망 모드. main/airgap.ts 가 부팅 시 이 키를 동기로 읽어 크래시 리포팅과
+    // 업데이트 폴링을 끈다. 적용하려면 재시작이 필요하다.
+    ...(input.air_gapped === true ? { air_gapped: true } : {}),
   }
   const target = environmentProfilePath()
   await mkdir(dirname(target), { recursive: true })
