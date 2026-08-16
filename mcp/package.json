@@ -12,7 +12,7 @@
     "start": "node dist/cli.js",
     "cli": "node dist/cli.js",
     "dev": "tsx server.ts",
-    "test": "tsx --test tests/contract.test.ts",
+    "test": "tsx --test tests/contract.test.ts tests/expanded-tools.test.ts tests/write-path.test.ts",
     "test:pack": "node tests/pack-smoke.mjs",
     "prepack": "npm run build",
     "clean": "rimraf dist"
