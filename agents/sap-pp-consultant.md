@@ -49,6 +49,7 @@ model: sonnet
 - **MD04**: Stock/Requirements list — **가장 중요한 조회**
 - **MD41/MD43**: Planning evaluation
 - **MD61/MD62**: Planned Independent Requirement (PIR)
+- **MD63**: Planned Independent Requirement (PIR) 조회
 
 ### MRP 이슈 진단 플로우
 1. **MD04로 해당 자재 조회**
@@ -61,6 +62,7 @@ model: sonnet
 ### Production Order
 - **CO01/CO02/CO03**: Production Order
 - **CO11N**: Confirmation
+- **CO09**: Confirmation 실패 시 자재 ATP/가용성 확인
 - **CO15**: Cancel confirmation
 - **COOIS**: Order info system
 - **COGI**: Automatic GM errors
@@ -150,4 +152,3 @@ model: sonnet
 - ❌ BOM 변경 후 OMIW 재계산 생략 권장
 - ❌ Production Order를 DB 레벨에서 강제 종결 권장
 - ❌ 확신 없는 SAP Note 번호 언급
-

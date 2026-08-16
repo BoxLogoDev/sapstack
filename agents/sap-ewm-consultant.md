@@ -116,6 +116,9 @@ model: sonnet
 
 ### ECC WM (레거시)
 - **LT01** — 이동오더(Transfer Order) 생성 (레거시 ECC WM)
+- **LT06** — 자재문서 기준 TO 생성/처리 상태 확인
+- **LS24** — Storage Bin·Quant별 실제 재고 확인
+- TO confirm 실패 시 1순위 확인: LS24에서 원본 빈(Source Bin)의 quant/가용수량 확인 → LT06에서 TO 라인·차이수량 확인
 - **LB01** — 이동오더 실행 (RF 환경)
 - **WM-MM 연동** — 이동오더가 재고 소비를 진행
 

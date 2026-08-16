@@ -1876,6 +1876,10 @@ KEPM:
   name: CO-PA Planning (Profitability Analysis planning framework)
   modules: [CO]
   release: both
+KEI1:
+  name: Maintain CO-PA Assignment to Value Fields
+  modules: [CO]
+  release: both
 NACE:
   name: Output Condition Records / Message Determination (output management)
   modules: [SD, MM]

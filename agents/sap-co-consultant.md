@@ -68,6 +68,8 @@ model: sonnet
 - **Account-based** (S/4 기본): ACDOCA 소스, 실시간
 - **Costing-based** (ECC 기본): CE1~CE4 테이블, Value Field
 - **KE30**: 보고서 실행
+- **KEPM**: CO-PA 계획·평가 설정 확인
+- **KEI1**: 원가요소→가치필드 매핑 확인
 - **KEU5**: Top-down Distribution
 - **KE24**: Line Items
 
