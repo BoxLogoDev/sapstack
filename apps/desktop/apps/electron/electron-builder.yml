@@ -78,10 +78,14 @@ files:
 extraMetadata:
   main: dist/main.cjs
 
-# Auto-update: electron-updater fetches from this URL for update manifests (.yml files)
+# Auto-update: electron-updater 가 GitHub Releases 에서 latest.yml 과 설치파일을 받는다.
+# generic + GitHub Pages 였으나 Pages 는 파일당 100MB 제한이 있어 맞지 않는다
+# (설치파일에 claude 네이티브 바이너리 ~210MB 와 Bun 런타임이 들어간다).
+# Releases 는 파일당 2GB 까지 허용하고, 릴리스 워크플로가 이미 여기에 산출물을 올린다.
 publish:
-  provider: generic
-  url: https://boxlogodev.github.io/sapstack/electron/latest
+  provider: github
+  owner: BoxLogoDev
+  repo: sapstack
 
 # Disable ASAR to avoid decompression overhead and click delays
 asar: false
