@@ -616,6 +616,10 @@ VK12:
   name: Change Condition Record
   modules: [SD]
   release: both
+V/06:
+  name: Maintain Pricing Condition Types
+  modules: [SD]
+  release: both
 VOFM:
   name: Maintain Formulas and Routines
   modules: [SD]
@@ -655,6 +659,10 @@ CR01:
 CR02:
   name: Change Work Center
   modules: [PM, PP]
+  release: both
+CM01:
+  name: Capacity Planning — Work Center Load
+  modules: [PP]
   release: both
 CO01:
   name: Create Production Order
@@ -1323,7 +1331,7 @@ IW39:
   modules: [PM]
   release: both
 IW65:
-  name: Measurement Document List
+  name: Display Activities (PM Notification List)
   modules: [PM]
   release: both
 IP01:
@@ -1929,10 +1937,6 @@ VA03:
 ML81N:
   name: Service Entry Sheet
   modules: [MM, PM]
-  release: both
-IW65:
-  name: Change PM Notification / Counter reading list
-  modules: [PM]
   release: both
 OB29:
   name: Fiscal Year Variant

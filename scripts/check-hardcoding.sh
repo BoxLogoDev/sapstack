@@ -60,7 +60,8 @@ extract_body() {
   local file="$1"
   awk '
     BEGIN { fm=0; code=0 }
-    /^---$/ { fm = !fm; next }
+    NR==1 && /^---\r?$/ { fm=1; next }
+    fm && /^---\r?$/ { fm=0; next }
     fm { next }
     /^```/ { code = !code; next }
     !code { print NR": "$0 }
@@ -73,7 +74,7 @@ scan_file() {
 
   local body
   if (( STRICT )); then
-    body=$(awk '/^---$/{fm=!fm; next} !fm{print NR": "$0}' "$file")
+    body=$(awk 'NR==1 && /^---\r?$/ {fm=1; next} fm && /^---\r?$/ {fm=0; next} !fm {print NR": "$0}' "$file")
   else
     body=$(extract_body "$file")
   fi
