@@ -214,7 +214,9 @@ async function callLocalLlm(system, user) {
         { role: 'system', content: system },
         { role: 'user', content: user },
       ],
-      max_tokens: 1024,
+      // 카드 기반 직답 형식이라 512 로 충분 — CPU 추론에서 토큰 상한이 곧
+      // 벽시계 시간이다 (90건 전수의 소요를 절반으로 줄인다).
+      max_tokens: Number(process.env.EVAL_LOCAL_MAX_TOKENS) || 512,
       temperature: 0.3,
     }),
   });
