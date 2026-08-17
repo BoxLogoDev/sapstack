@@ -141,3 +141,60 @@
 - 의료기기 (별도 IS-MD 검토)
 - 의료 진료 시스템 (IS-H)
 - 식품 (별도 IS-Food 검토)
+
+---
+
+## 13. 모듈 활성화 매트릭스 (`data/industry-matrix.yaml` 과 동일)
+
+| 모듈 | importance | 라우팅 | 노트 |
+|------|------------|--------|------|
+| PP | critical | sap-pp-consultant | PP-PI, Process Order, Recipe |
+| QM | critical | sap-qm-consultant | Inspection, Batch Release |
+| MM | critical | sap-mm-consultant | Vendor batch |
+| EWM | critical | sap-ewm-consultant | FEFO |
+| WM | high | sap-ewm-consultant | ECC FEFO |
+| GTS | high | sap-sd-consultant | 전구체·이중용도 |
+| CO | high | sap-co-consultant | KO88, 부산물 |
+| BASIS | high | sap-basis-consultant | 21 CFR Part 11 trail |
+| FI / SD | medium | 해당 컨설턴트 | VCH1 Batch Determination |
+| BTP | **none** | (agent 없음) | 매트릭스와 동일 |
+| PM / HCM / TR | low | 해당 컨설턴트 | |
+
+## 14. ECC vs S/4
+
+| 주제 | ECC | S/4 |
+|------|-----|-----|
+| 배치 | MSC1N/2N/3N | 동일 + 고도화 특성 |
+| 창고 FEFO | WM 전략 | EWM 입출고 전략 |
+| 원가 | 별도 cost element (KA01) | G/L = cost element (FS00) |
+| EBR | DMS + PI Sheet | 동일 패턴. 클라우드 PE 는 별도 |
+
+## 15. 체크리스트
+
+### 구축
+- [ ] Batch class 특성(CSV%, pH 등)이 출하 FEFO 정렬에 쓰이는지
+- [ ] VCH1 전략 — 고객×자재
+- [ ] GxP: CDHDR/CDPOS + 별도 감사 로그. 777 금지 (`docs/compliance/air-gapped-deployment.md`)
+- [ ] GTS 이중용도 분류 — 수출 전
+
+### 운영
+- [ ] QA32 → UD 전 FEFO 빈 확인
+- [ ] COR3 PI Sheet 누락 step
+- [ ] 유통기한 임박 배치 출고 차단 (VCH1 sort)
+- [ ] KO88 부산물/재작업 정산 규칙
+
+### 거버넌스
+- [ ] 21 CFR Part 11 전자서명 대상 트랜잭션 목록
+- [ ] Recall 전후방 추적 리허설
+- [ ] 본문 Note 2419822 / 2701018 / 3010175 — **인용 전 확인 필요**
+
+## 16. 한국 시나리오 (보강)
+
+정밀화학·제약·화장품은 본문 8절. 추가로:
+- 식약처 KGMP 와 SAP 배치 릴리스(UD) 를 같은 상태 기계로 맞출 것
+- 일본·대만 수출 시 GTS 원산지·기술유출은 SD 에이전트 + 운영자 허가번호 (sym-kr-strategic-material)
+
+---
+
+**Last Updated**: 2026-08-16  
+**Matrix**: `data/industry-matrix.yaml` chemicals

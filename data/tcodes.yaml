@@ -1896,3 +1896,45 @@ CM25:
   name: Capacity Planning Table (graphical)
   modules: [PP]
   release: both
+
+# gold-set 58→90 — symptom-index first_check 에 있으나 미등록이던 실존 T-code
+SM58:
+  name: Transactional RFC (tRFC) Error Log
+  modules: [BASIS, BC]
+  release: both
+ST03N:
+  name: Workload and Performance Statistics
+  modules: [BASIS, BC]
+  release: both
+OKP1:
+  name: Maintain CO Period Lock
+  modules: [CO]
+  release: both
+CS13:
+  name: BOM Explosion (where-used / multi-level)
+  modules: [PP, MM]
+  release: both
+DMEE:
+  name: Data Medium Exchange Engine (payment file format tree)
+  modules: [FI, TR]
+  release: both
+OBPM1:
+  name: Payment Medium Workbench — Payment Methods / Format
+  modules: [FI, TR]
+  release: both
+VA03:
+  name: Display Sales Order
+  modules: [SD]
+  release: both
+ML81N:
+  name: Service Entry Sheet
+  modules: [MM, PM]
+  release: both
+IW65:
+  name: Change PM Notification / Counter reading list
+  modules: [PM]
+  release: both
+OB29:
+  name: Fiscal Year Variant
+  modules: [FI]
+  release: both

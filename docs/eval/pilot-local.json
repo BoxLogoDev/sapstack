@@ -1,0 +1,15 @@
+{
+  "cases_scored": 4,
+  "cases_errored": 0,
+  "avg_score": 0.316,
+  "avg_tcode_recall": 0.375,
+  "avg_check_coverage": 0.138,
+  "root_cause_full_rate": 0,
+  "ethos_violations_total": 0,
+  "judge_votes": 3,
+  "avg_judge_spread": 0.1,
+  "avg_answer_seconds": 85.5,
+  "generated_at": "2026-08-17T01:46:54.404Z",
+  "provider": "local",
+  "model": "sapstack-local"
+}

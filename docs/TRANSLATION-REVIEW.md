@@ -10,7 +10,25 @@
 
 ```
 plugins/sap-{module}/skills/sap-{module}/references/{en,zh,ja,de,vi}/quick-guide-{lang}.md
+data/symptom-index.yaml   # symptom_zh / symptom_ja / symptom_de / symptom_vi
 ```
+
+### 1.1 symptom-index 다국어 (2026-08-16 추가)
+
+`data/symptom-index.yaml` 90건의 `symptom_zh` / `symptom_ja` / `symptom_de` / `symptom_vi` 를
+전수 채웠다. **ko/en 기존분 + 신규 초안**이다.
+
+| 필드 | 건수 | 상태 |
+|------|------|------|
+| symptom_ko / symptom_en | 90 | 기존 |
+| symptom_zh / ja / de / vi | 90 | **pending-native** (Grok draft) |
+
+식별:
+- 파일 상단 주석 `다국어 검수 상태` 및 `translation_review: pending-native`
+- 배지 관행: `<!-- Grok-authored draft (community review welcome) -->`
+- T-code 는 번역하지 않음. SAP UI 용어 확신이 없으면 영어 병기.
+
+검수 PR 제목 예: `docs(i18n): {zh\|ja\|de\|vi} review — symptom-index`
 
 | 언어 | 코드 | 디렉토리 | 비고 |
 |---|---|---|---|

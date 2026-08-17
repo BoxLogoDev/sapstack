@@ -76,7 +76,7 @@ LLM-judge 는 같은 답변을 run 마다 다르게 채점하는 분산이 있�
 
 - **LLM-judge 의 분산**: judge 자체가 모델이라 ±변동이 있다. **다수결(3표)로 크게 완화**
   (avg spread 0.058)했으나 0 은 아니다. 추세(여러 run)로 해석하고 단일 run 절대값을 과신하지 않는다.
-- **샘플 편향**: 현재 58건(90개 symptom 중 typical_causes[0] 출처 + 등록 T-code 가 있는 것). 전수는 아니다.
+- **샘플 편향**: 현재 90건으로 symptom-index 전수. 다만 클라우드 전용 증상은 GUI T-code 가 빈약해 인접 등록 T-code 로 채점한다.
   → 확장은 [`../../data/eval/README.md`](../../data/eval/README.md).
 - **단일 정답 가정**: 실무 진단은 다중 원인이 흔하다. gold 는 *가장 흔한* 1차 원인만 본다.
   부분 일치(partial)로 다중 원인 답변을 일부 인정한다.
