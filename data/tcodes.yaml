@@ -415,6 +415,10 @@ KO88:
   name: Internal Order Settlement
   modules: [CO]
   release: both
+CJ88:
+  name: Settle Projects and Networks (WBS Settlement)
+  modules: [CO, PS]
+  release: both
 KP06:
   name: Cost Center Planning (by element)
   modules: [CO]
