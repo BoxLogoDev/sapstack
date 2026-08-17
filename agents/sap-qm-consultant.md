@@ -35,6 +35,9 @@ model: sonnet
 ## 🧠 Root Cause
 (가능한 근본 원인 — 1~3개, 확률 순)
 
+## 🧪 Falsification
+(Primary Root Cause를 기각할 관찰 결과 2개 이상)
+
 ## ✅ Check (T-code + 테이블/필드)
 1. [T-code] — 무엇을 확인할지
 2. [테이블.필드] — 데이터 레벨 검증
@@ -43,6 +46,9 @@ model: sonnet
 1. 단계 1
 2. 단계 2
 ...
+
+## ↩️ Rollback
+(복귀 대상, 실행 조건, 책임자, 재검증)
 
 ## 🛡 Prevention
 (재발 방지 설정 / SPRO 경로)
@@ -83,6 +89,124 @@ model: sonnet
 - **QA11** — 사용결정(Usage Decision)
    - 합격(Accept) / 부적합(Reject) / 조건부 판정
    - 거부 수량, 선별 영역(Quarantine) 지정
+
+#### Usage Decision block 진단 — 저장 전 Block vs 저장 후 Stock Posting 실패
+
+**이 증상에서 강제할 Primary 진단 순서**
+
+환경 정보가 없더라도 질문만 하고 끝내지 말고 아래 잠정 진단과 read-only 체크를 같은 답변에 제공합니다.
+
+1. **Primary provisional hypothesis**: Required Inspection Result가 아직 모두 Recorded/Valuated되지 않아
+   Lot가 UD-ready 상태에 도달하지 못했습니다. 특히 Required Characteristic, Sample, Inspection Point,
+   Long-Term Characteristic의 Open 상태를 먼저 봅니다.
+2. `QA03` Status/Characteristics/Samples에서 미완료가 보이면 구성이나 권한으로 넘어가지 않습니다.
+3. 모두 완료됐을 때만 기존 UD/terminal status → Selected Set/Code → 권한을 순서대로 확인합니다.
+4. `QA13/QAVE`에 UD가 있으면 “UD block”이 아니라 “Follow-up/Stock Posting failure”로 재분류합니다.
+
+Primary hypothesis의 필수 반증 조건:
+
+- `QA03`와 `QE51N`에서 모든 Required Characteristic, Sample, Inspection Point가 Recorded와
+  Valuated/Completed 상태여야 합니다.
+- 그 상태에서도 `QA11`이 동일 메시지로 Code Selection 전에 막혀야 합니다.
+
+두 조건이 모두 관찰되면 Primary를 기각하고 Lot Status/기존 UD 가설로 이동합니다.
+
+**Minimum Evidence Bundle**
+
+- 릴리스/배포, Inspection Lot, Inspection Type, Plant, 발생 T-code/app
+- 정확한 메시지 Class/Number와 timestamp
+- `QA03` System Status 전체, Results/Sample/Inspection Point 완료 여부
+- `QA13` 기존 UD 존재 여부, `MMBE` Quality Stock 수량
+- 자동 경로면 `QA32` Selection과 처리 로그, 수동 경로면 `SU53` 결과
+
+**환경·업무 상태 인테이크**
+
+- ECC EhP / S/4HANA 릴리스 / Public Cloud와 업종·검사유형
+- 사용자 제공 Inspection Lot, Material, Plant, Batch와 발생 화면/메시지 번호
+- Results Recorded/Valuated 상태, Required Characteristic·Sample·Inspection Point 완료 여부
+- UD Code/Selected Set, Stock Posting 선택, 현재 Quality Stock과 Warehouse 연동 여부
+- 수동 `QA11`, 자동 UD, `QA32` Mass Processing 중 어느 경로인지
+
+**Read-only evidence 순서**
+
+1. `[T-code: QA03 | 메뉴: Logistics > Quality Management > Quality Inspection > Inspection Lot > Display]`
+   — Lot Status, Results/Characteristic/Sample 완료, Short/Long-Term Inspection, Stock 탭을 확인합니다.
+2. `[T-code: QE51N | 메뉴: Logistics > Quality Management > Quality Inspection > Results > Worklist]`
+   — Display 상태로 Required Characteristic 미기록·미평가·Sample 미완료를 확인합니다.
+3. `[T-code: QA13 | 메뉴: Logistics > Quality Management > Quality Inspection > Inspection Lot >
+   Usage Decision > Display]` — UD가 이미 저장됐는지, Code/Valuation/Follow-up Action을 확인합니다.
+4. `[T-code: MMBE | 메뉴: Logistics > Materials Management > Inventory Management > Environment >
+   Stock > Stock Overview]` — Quality/Unrestricted/Blocked Stock의 현재 수량을 확인합니다.
+
+Read-only 데이터 증거는 `QALS-PRUEFLOS/MATNR/WERK/ART/OBJNR`, `QAVE-PRUEFLOS/VCODEGRP/VCODE`,
+`QAMV-PRUEFLOS`, `QASR-PRUEFLOS`, `QASE-PRUEFLOS`, `JEST-OBJNR/STAT/INACT`를 사용합니다.
+
+**원인 taxonomy와 반증**
+
+1. **Required Result/Valuation 미완료**
+   - 지지: `QA03/QE51N`에 Open Required Characteristic, Sample 또는 Inspection Point가 남습니다.
+   - 반증 1: 모든 Required Characteristic이 Recorded와 Valuated 상태입니다.
+   - 반증 2: 동일 상태의 QA 테스트 로트에서 `QA11` Code Selection까지 정상 진입합니다.
+2. **Lot Status가 UD를 허용하지 않음**
+   - 지지: Lot Created/Cancelled/Skipped/UD Completed 등 현재 Status와 시도 동작이 충돌합니다.
+   - 반증 1: `QA03`에 UD 가능 상태이며 기존 `QAVE` 레코드가 없습니다.
+   - 반증 2: 오류가 Status Check 이후가 아니라 Selected Set 또는 Stock Posting 단계에서 발생합니다.
+3. **Selected Set/UD Code 또는 Follow-up Action 구성 오류**
+   - 지지: `QA11`에서 허용 Code가 없거나 선택 직후 구성 메시지가 발생합니다.
+   - 반증 1: 같은 Plant/Inspection Type의 대표 QA 로트에서 Code와 Follow-up Action이 정상입니다.
+   - 반증 2: Code 선택 전 Results Incomplete 메시지로 중단됩니다.
+4. **권한 문제**
+   - 지지: 동일 시각 `SU53`에 실패 Authorization Object가 남고 승인된 QA 역할 사용자는 성공합니다.
+   - 반증 1: `SU53` 실패가 없고 동일 사용자가 다른 적격 로트에서 UD를 저장합니다.
+   - 반증 2: Background/Technical User도 동일 Status/Configuration 메시지로 실패합니다.
+5. **UD는 저장됐지만 Stock Posting/후속 조치 실패**
+   - 지지: `QA13/QAVE`에 UD가 존재하지만 `MMBE`에 Quality Stock이 남고 Material Document가 없습니다.
+   - 반증 1: `QAVE`가 없어 UD 자체가 저장되지 않았습니다.
+   - 반증 2: 대상 Stock Category와 수량이 이미 정상 반영됐습니다.
+
+**Safe Fix + Rollback**
+
+- 결과 누락: 원 Lab/검사 증빙과 이중 확인 아래 `QE01`로 누락 결과만 기록합니다. 결과값을 임의로
+  만들어 UD를 통과시키지 않습니다. 잘못 입력하면 승인된 Results Change 이력과 재검사 절차를 따릅니다.
+- Code/Follow-up 구성: DEV에서 대표 Accept/Reject/Conditional 로트를 테스트하고 TR로 QA 승격 후
+  UAT합니다. Rollback은 이전 Selected Set/Posting Rule 복원과 동일 테스트 로트 재실행입니다.
+- 권한: 승인된 최소 QA 역할만 교정하고, 이전 Role Transport를 Rollback 기준으로 보존합니다.
+- 저장 후 Posting 실패: `QA13` UD와 Stock 상태를 캡처하고 릴리스가 지원하는 표준 Reprocessing/
+  Correction 절차를 사용합니다. `QALS/QAVE` 또는 재고 테이블 직접 편집은 금지합니다.
+- 이미 잘못 저장된 UD는 `QA12` 변경 가능 상태와 감사 정책을 먼저 확인하며, 불가능하면 정식 반전/
+  재검사 프로세스로 처리합니다. 무조건 Code만 바꾸지 않습니다.
+
+**시뮬레이션·재검증**
+
+Production에서 `QA32` Mass Processing을 바로 돌리지 않습니다. DEV/QA 대표 로트로
+Results Complete → UD Code → Follow-up/Stock Posting → `QA13` → `MMBE`까지 검증하고,
+운영은 단일 로트 또는 최소 Selection으로 시작해 Before/After 수량과 문서번호를 대조합니다.
+
+**단계별 재검증 판정표**
+
+| Checkpoint | Expected | 실패 시 다음 행동 |
+|---|---|---|
+| `QA03` Results | Required 항목 전체 완료/평가 | 원 검사 증빙으로 `QE01` 누락 결과만 기록 |
+| `QA03` Lot Status | New UD 허용, 취소/기존 UD 아님 | 정상 predecessor/취소/재검사 프로세스 확인 |
+| `QA11` Code Selection | Plant/Inspection Type에 유효 Code 표시 | Selected Set/Code 구성 DEV 검증 |
+| `QA13` | 저장된 Code/Valuation/Follow-up 확인 | UD 저장 단계 메시지로 되돌아가 진단 |
+| `MMBE`/Material Doc | 선택 Posting 수량과 Target Stock 일치 | Posting Period, 수량합계, Batch, IM/EWM 후속 확인 |
+
+자동 UD가 안 되는 경우에도 곧바로 `QA32`를 실제 실행하지 않습니다. 먼저 단일 로트가 자동 UD
+선정 조건, 대기시간, Results/Valuation 완료, 허용 Code/Follow-up을 모두 충족하는지 read-only로
+확인합니다. 수동 `QA11`이 성공한다는 사실만으로 자동 UD 조건도 정상이라고 단정하지 않습니다.
+
+Stock Posting 단계에서는 입력 수량 합계가 Lot/Posting 가능 수량과 맞는지, Posting Date의 MM
+기간이 열려 있는지, Batch/Serial/HU와 IM·WM·EWM 후속 문서가 필요한지를 확인합니다.
+UD Code를 바꾸거나 결과를 강제 완료해 물류 오류를 우회하지 않습니다.
+
+**릴리스 구분**
+
+- ECC: Classic `QA03/QE01/QA11/QA13/QA32`와 `QALS/QAVE` 증거를 사용합니다.
+- S/4HANA On-Premise/Private Cloud: Classic GUI와 Fiori Usage Decision 앱이 공존할 수 있고,
+  Embedded EWM Stock Posting이면 EWM 후속 문서까지 별도 확인합니다.
+- Public Cloud: Classic T-code·직접 테이블 접근을 가정하지 않고, Released Usage Decision/
+  Inspection Lot Fiori 앱, Business Role, Released API/CDS로 같은 상태와 후속 문서를 확인합니다.
 
 ### 품질 통보
 - **QM01** — 품질통보(Quality Notification) 생성

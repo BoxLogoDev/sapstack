@@ -360,7 +360,7 @@ Total: 2.75 hours
 
 ### IP30 — Deadline Monitoring
 
-**Tracks which equipment is overdue for maintenance**
+**Processes due maintenance-plan calls within the selected scheduling interval**
 
 | Status | Meaning |
 |--------|---------|
@@ -369,8 +369,140 @@ Total: 2.75 hours
 | Red | Overdue |
 
 **Usage:**
-- Filter by: planning plant, work center, priority
-- Action: create maintenance orders (IW31) for overdue items
+- Filter by the approved maintenance-plan/planning-plant scope and scheduling interval
+- Review generated, skipped, held, and errored calls; the configured call-object type determines whether
+  the plan generates an order or notification
+- Do not create a separate manual `IW31` order merely because a line appears overdue
+
+### 7.1 Preventive Maintenance Overdue — Evidence Loop
+
+#### Mandatory diagnostic order
+
+When evidence is missing, the leading provisional cause is **the plan was not scheduled, or the periodic
+deadline-monitoring job/variant did not select and process it**, so no due call object was generated.
+Ask for environment context, but provide this read-only path in the same answer:
+
+```text
+IP03 active plan/item + cycle/start/call horizon
+  → IP10 scheduling overview and call status (no production save)
+  → SM37 IP30 job/variant/status
+  → IP30 selected/generated/skipped messages
+  → MHIS call
+  → IW39/IW33 order OR IW29 notification execution status
+```
+
+Falsify the leading cause only when `MHIS` contains the expected planned call and its linked order or
+notification exists, while `SM37` also proves the appropriate `IP30` job/variant completed and included the
+plan scope. Then reclassify the incident as **execution overdue**, not scheduling overdue.
+
+Minimum evidence bundle: release/deployment, plan/item/technical object, plan type, expected due date,
+last normal call, `IP03` scheduling parameters/status, `IP10` call status, `SM37` job/variant/timestamps,
+`IP30` messages, `MHIS` call number, and linked `IW39` order or `IW29` notification status.
+
+#### Intake and business-state split
+
+Collect release/deployment/industry, user-provided maintenance plan/item and technical object, plan type,
+factory calendar/timezone, expected due date, last normal call, last `IP30` run, and call-object category.
+Classify the symptom before changing anything:
+
+1. **Scheduling overdue** — due call was never created.
+2. **Execution overdue** — call/order exists but work is not completed.
+3. **Display-only discrepancy** — dates differ because of call horizon, tolerance, shift, calendar, or timezone.
+4. **Counter-plan discrepancy** — measured usage is missing, stale, reset, or not yet at the threshold.
+
+#### Read-only evidence chain
+
+| Step | T-code + menu path | Evidence |
+|---|---|---|
+| Plan | `IP03` — Logistics > Plant Maintenance > Preventive Maintenance > Maintenance Planning > Maintenance Plans > Display | active item, cycle, start, call horizon, scheduling period, completion requirement, shift/tolerance |
+| Schedule | `IP10` — Logistics > Plant Maintenance > Preventive Maintenance > Maintenance Planning > Scheduling > Schedule Maintenance Plan | scheduling overview only; do not save in production during diagnosis |
+| Deadline run | `IP30` — Logistics > Plant Maintenance > Preventive Maintenance > Maintenance Planning > Scheduling > Deadline Monitoring | selection, interval, run timestamp, generated/skipped calls and messages |
+| Background job | `SM37` — Tools > CCMS > Background Processing > Jobs > Overview | deadline job, variant, start/end, status and job log |
+| Orders | `IW39` — Logistics > Plant Maintenance > Maintenance Processing > Order > List Editing > Display | linked open/completed orders and due dates |
+| One order | `IW33` — Logistics > Plant Maintenance > Maintenance Processing > Order > Display | basic dates, technical object, system/user status |
+| Notifications | `IW29` — Logistics > Plant Maintenance > Maintenance Processing > Notification > List Editing > Display | call-generated notification and completion state |
+| Counter docs | `IW65` — Logistics > Plant Maintenance > Maintenance Processing > Completion Confirmation > Measurement Documents > List | latest reading, recording time, counter difference |
+
+Read-only tables/fields: `MPLA-WARPL`, `MPOS-WARPL/WAPOS/EQUNR/TPLNR`,
+`MHIS-WARPL/ABNUM`, `AUFK-AUFNR/OBJNR`, `AFIH-AUFNR/EQUNR/TPLNR`,
+`JEST-OBJNR/STAT/INACT`. Never update these with `SE16N`.
+
+#### Hypotheses and falsifiers
+
+**H1 — `IP30` did not process the plan.**
+
+- Supports: no new `MHIS` call after the expected date; plan excluded by variant or run failed.
+- Falsifier 1: successful run log proves the plan/item was selected at that timestamp.
+- Falsifier 2: the expected call already exists in `MHIS` and has a linked order/notification.
+
+**H1a — the plan was created but never initially scheduled, or scheduling was not saved.**
+
+- Supports: `IP03` plan exists but `IP10` has no established scheduling history/future call sequence.
+- Falsifier 1: `IP10/MHIS` shows a valid scheduled call sequence around the expected date.
+- Falsifier 2: adjacent calls were generated by the same schedule without a restart or start-date change.
+
+**H2 — scheduling parameters intentionally defer or hold the call.**
+
+- Supports: due date is outside call horizon, completion requirement holds the next call, or calendar shifts it.
+- Falsifier 1: `IP03` calculates the call inside horizon with no incomplete predecessor.
+- Falsifier 2: unchanged parameters create the expected call in a representative QA preview.
+
+**H3 — counter input is stale or wrong.**
+
+- Supports: latest `IW65` reading predates current operating evidence or contains reset/replacement discontinuity.
+- Falsifier 1: the plan is time-based and has no counter dependency.
+- Falsifier 2: current reading plus annual estimate shows the threshold is not yet reached.
+
+**H4 — scheduling succeeded; execution is overdue.**
+
+- Supports: call and order exist; `IW33` shows released/partially confirmed status after the planned date.
+- Falsifier 1: there is no linked call object or order.
+- Falsifier 2: the order was technically completed before the deadline and completion requirement was met.
+
+**H5 — plan item or technical object is inactive/invalid.**
+
+- Supports: plan/item lock, deletion flag, invalid equipment assignment, task-list/work-center validity gap.
+- Falsifier 1: every object is active and valid on the scheduling date.
+- Falsifier 2: the same unchanged item produced adjacent calls normally.
+
+#### Safe fixes and rollback
+
+- Variant/job: correct in DEV/QA, run a non-creating/test selection when supported, compare selected/generated
+  counts, then let the authorized scheduling owner promote. Roll back to the captured variant and cadence.
+- Plan parameters: capture current values and future calls, change with `IP02` under master-data change control,
+  compare `IP10` before/after in QA, and approve only the intended date shift. Restore captured values if dates drift.
+- Initial scheduling: validate start/cycle/horizon in DEV/QA, then schedule only the approved plan. Never use
+  restart/start-date reset casually; capture the full before/after future call list and a restore point.
+- Counter: post only evidence-backed measurement through the standard measurement process. Never invent a
+  reading to make a call due; reverse/correct under metrology audit rules if the reading is wrong.
+- Execution backlog: dispatch, execute, or approved-reschedule the existing order. Never mark unperformed work
+  complete or backdate confirmation merely to remove overdue status.
+- Do not create a manual `IW31` order until call history proves no call object exists. A duplicate unlinked order
+  does not repair plan scheduling and can distort completion requirement, cost, compliance, and overdue KPI.
+- Customizing: use TR, integrated QA, and rollback transport. Maintenance-plan master data follows governed
+  master-data change history even where it is not transported.
+
+If an erroneous production run creates calls/orders, stop the batch, record call/order IDs and dependencies,
+then use supported cancellation/status processing with planner, safety, production, and CO approval. Do not
+delete `MHIS/AUFK` rows.
+
+#### Simulation and re-verification
+
+Use a representative DEV/QA copy. Validate `IP03` parameters → `IP10` scheduling preview → `IP30`
+test/small-scope execution → `SM37` job evidence → `MHIS` call → `IW39/IW33` order or `IW29`
+notification. Compare expected and actual plan/item,
+call number, planned date, call object, and status. Start production with one plan or the smallest approved
+selection before returning to the normal batch scope.
+
+#### ECC, S/4HANA, Public Cloud
+
+| Surface | ECC | S/4HANA OP/Private | Public Cloud |
+|---|---|---|---|
+| Scheduling | Classic `IP03/IP10/IP30` | Classic and release-specific Fiori apps may coexist | Released maintenance-plan/scheduling apps only |
+| Evidence | `MPLA/MPOS/MHIS`, order/status tables | Same core evidence plus released CDS/API for extensions | App status and released API/CDS; no direct table assumption |
+| Automation | Background deadline monitoring | Background/application jobs by release | Application job templates and business roles |
+
+Always name the user's release-specific app. Do not present `IP10N` or a Fiori app as universally available.
 
 ### Counter Readings (QMSREC Table)
 
@@ -664,11 +796,12 @@ IP30 → Search MOTOR-001
 ```
 
 **Fix (if preventive maintenance overdue):**
-1. IP01 → Find assigned maintenance plan for MOTOR-001
-2. IP10 → Force run "Deadline monitoring for plant ZPLANT"
-3. Create overdue notifications for missed deadlines
-4. Assign maintenance orders (IW31) + release (RELD)
-5. Schedule work teams
+1. `IP03` → display the assigned plan/item, active status, cycle, start, call horizon and completion requirement.
+2. `IP10` → compare the expected call sequence in DEV/QA; do not restart or save in production during diagnosis.
+3. `SM37` + `IP30` → prove whether the deadline job/variant selected, generated, held, skipped, or errored the call.
+4. If no call exists, run the smallest approved `IP30` scope after QA simulation; keep generated call/object IDs.
+5. If a call exists, use `IW39/IW33` or `IW29` to execute/reschedule that object instead of creating a duplicate.
+6. Recheck `MHIS` call history and the next planned date; restore the prior variant/plan parameters on drift.
 
 **Fix (if root cause = design defect):**
 1. Create RFC ticket with equipment vendor

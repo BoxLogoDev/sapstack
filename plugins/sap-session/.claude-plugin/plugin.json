@@ -1,49 +1,22 @@
 {
-  "id": "sap-session",
-  "name": "SAP Evidence Loop Session",
-  "version": "0.1.0",
-  "description": "Turn-aware advisory sessions for SAP operations — hypothesis/verify loops without requiring live SAP access. Orchestrates existing sap-* plugins.",
-  "author": "BoxLogoDev",
-  "license": "MIT",
-  "homepage": "https://github.com/BoxLogoDev/sapstack",
-  "keywords": [
-    "evidence-loop",
-    "session",
-    "hypothesis",
-    "verify",
-    "rollback",
-    "operator-workflow",
-    "cross-module",
-    "orchestration",
-    "human-in-the-loop"
-  ],
-  "compatibility": {
-    "ecc": true,
-    "s4hana": true,
-    "btp": true,
-    "cloud_public": true
-  },
-  "stage": "experimental",
   "introduced_in": "v1.5.0",
-  "depends_on": [
-    "sap-fi",
-    "sap-co",
-    "sap-mm",
-    "sap-sd",
-    "sap-tr",
-    "sap-basis",
-    "sap-abap"
-  ],
   "reuses_agents": [
     "sap-fi-consultant",
     "sap-co-consultant",
     "sap-mm-consultant",
     "sap-sd-consultant",
     "sap-pp-consultant",
+    "sap-pm-consultant",
+    "sap-qm-consultant",
+    "sap-ewm-consultant",
+    "sap-hcm-consultant",
+    "sap-tr-consultant",
+    "sap-cloud-consultant",
     "sap-abap-developer",
     "sap-basis-consultant",
     "sap-s4-migration-advisor",
-    "sap-integration-advisor"
+    "sap-integration-advisor",
+    "sap-tutor"
   ],
   "schemas": [
     "schemas/evidence-bundle.schema.yaml",

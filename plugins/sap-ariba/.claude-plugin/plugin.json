@@ -1,0 +1,12 @@
+{
+  "depends_on": [
+    "sap-mm",
+    "sap-fi",
+    "sap-integration-cloud",
+    "sap-btp"
+  ],
+  "reuses_agents": [
+    "sap-mm-consultant",
+    "sap-fi-consultant"
+  ]
+}

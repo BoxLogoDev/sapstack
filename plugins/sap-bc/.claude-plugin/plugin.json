@@ -1,0 +1,6 @@
+{
+  "depends_on": [
+    "sap-basis"
+  ],
+  "reuses_agents": []
+}

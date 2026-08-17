@@ -274,6 +274,186 @@ adapter/network boundary. If CPI received and parsed it, reject partner-profile 
 **Rollback**: restore the prior partner-profile/port configuration through the approved backend TR.
 For replay, stop at the pre-approved message set and reconcile document keys after each batch.
 
+#### 6.3.1 Define what "stuck" means
+
+Do not use “IDoc adapter stuck” as a root cause. Classify the observed boundary first:
+
+| Observed state | Meaning to test | Next read-only boundary |
+|---|---|---|
+| No IDoc in backend | Application/output never created it, or selection window is wrong | Application log and source document/output status |
+| Outbound status `30` persists | Ready for dispatch; output mode/job scheduling may be involved | `WE20`, then scheduled dispatch job in `SM37` |
+| Outbound status `02` | Error passing data to port | Status long text, `WE20`, `WE21`, destination/endpoint evidence |
+| Outbound status `03` | Passed to port; not proof of target business posting | CPI MPL at matching time/correlation |
+| CPI MPL exists but starts/fails at adapter | Endpoint, identity, envelope, or adapter parsing boundary | MPL causal error and deployed adapter configuration |
+| CPI MPL passes adapter and fails later | Not an IDoc transport stuck; diagnose failed iFlow step | Mapping/schema/receiver playbook |
+| Inbound status `64` persists | Ready for application processing in ABAP | Partner/process-code/application scheduling boundary |
+| Inbound status `51` | Application document not posted | Status long text and application log; not primarily CPI transport |
+| Inbound status `53` | Application document posted | Reconcile the business object, not the adapter |
+
+Status interpretation is direction-specific. Always ask whether the operator is looking at an
+outbound IDoc in the source or an inbound IDoc in the target.
+
+#### 6.3.2 IDoc-specific environment intake
+
+Collect without requesting segment values:
+
+- ECC EhP or S/4HANA release year and deployment model.
+- Direct ABAP-to-CPI route or PI/PO coexistence hop.
+- Direction relative to ABAP and CPI.
+- Message type, basic type, extension name, sender/receiver partner type, logical partner hash.
+- Port type/name hash, output mode, immediate versus collected dispatch behavior.
+- One affected IDoc number hash and one recent successful IDoc number hash.
+- Full status sequence with timestamp/timezone and sanitized status long text.
+- CPI package, iFlow, deployed version, adapter role, MPL Message ID if one exists.
+- Change timeline for `WE20`, `WE21`, certificate/security material, endpoint, and iFlow transport.
+- Whether the receiver posts business data and how duplicate documents are prevented.
+
+#### 6.3.3 Read-only evidence ladder
+
+1. `WE05` — menu `SAP Easy Access > Tools > ALE > Administration > Services > IDoc Lists`;
+   establish affected count, direction, message/basic type, status distribution, and time window.
+2. `WE02` — menu `SAP Easy Access > Tools > ALE > Administration > Services > IDoc Display`;
+   inspect one affected and one successful control/status history. Do not copy segment values.
+3. `WE20` — display partner/message-type parameters, process code or outbound parameters,
+   receiver port, output mode, and change alignment.
+4. `WE21` — display the referenced port and destination/endpoint relationship.
+5. `SM37` — menu `SAP Easy Access > Tools > Administration > Monitor > Job Selection`;
+   display the relevant scheduled dispatch/application job and job log only when status indicates
+   a scheduling boundary. A green job alone does not prove it selected the affected IDoc.
+6. CPI MPL — menu `Integration Suite > Monitor > Integrations and APIs > Monitor Message Processing`;
+   match timestamp/correlation and decide whether the adapter received the message.
+7. If PI/PO is a real hop, use `SXMB_MONI`; do not add PI/PO merely because it existed historically.
+
+For technical field-level evidence, describe names and sanitized values only:
+
+```text
+EDIDC.STATUS  — current IDoc status
+EDIDC.MESTYP  — message type
+EDIDC.IDOCTP  — basic type
+EDIDC.CIMTYP  — extension
+EDIDC.RCVPRT / RCVPRN — receiver partner type / redacted partner
+EDIDS.STATUS with log date/time — chronological status history
+IDoc data-record table — segment structure is sensitive; do not export raw values
+```
+
+#### 6.3.4 General cause taxonomy with two or more falsifiers
+
+**H1 — The source application did not create the IDoc**
+
+Supporting evidence: no matching IDoc in `WE05`, while the business/output trigger was expected.
+
+Falsify H1 when both applicable checks show otherwise:
+
+- A matching IDoc exists with the expected message type and creation time.
+- The same source document produced an outbound status sequence.
+- CPI MPL already contains the same sanitized business correlation.
+
+**H2 — Collected dispatch or background scheduling is holding ready IDocs**
+
+Supporting evidence: status `30` grows, output mode is collected, and the selecting job did not
+process the affected time/partner/message range.
+
+Falsify H2 when:
+
+- The affected IDoc already moved past the ready-for-dispatch boundary.
+- The dispatch job selected the exact affected range and status still changed to a port error.
+- A direct/immediate test IDoc is equally stuck before scheduling becomes relevant.
+
+**H3 — Partner profile or port routing is inconsistent**
+
+Supporting evidence: `WE20` references an unintended/missing port or the message-type parameters do
+not match the intended route, especially after an aligned change.
+
+Falsify H3 when:
+
+- The same partner, message type, and port successfully dispatch messages after the incident began.
+- The affected IDoc is already present in CPI MPL, proving that route reached the tenant.
+- Displayed partner/port configuration and the approved baseline are identical.
+
+**H4 — Endpoint, trust, or communication identity prevents delivery**
+
+Supporting evidence: status long text and CPI/connector evidence agree on connection, handshake,
+authentication, or authorization failure at the same timestamp.
+
+Falsify H4 when:
+
+- CPI MPL receives and parses the affected IDoc envelope.
+- A synthetic canary through the same endpoint, identity alias, and route succeeds in the incident window.
+- The first failure occurs in a downstream mapping or receiver step after adapter acceptance.
+
+**H5 — Basic type, extension, or envelope metadata is incompatible**
+
+Supporting evidence: the adapter rejects parsing/metadata and the affected basic type/extension
+differs from the deployed contract.
+
+Falsify H5 when:
+
+- A recent message with the same message/basic/extension combination passes the same deployed adapter.
+- MPL proves parsing completed and the first failure is a downstream step.
+- The deployed schema/metadata version matches the source and a structural contract test succeeds.
+
+**H6 — CPI runtime backlog, retry, or resource pressure delays accepted messages**
+
+Supporting evidence: MPL exists, many messages remain processing/retrying, and queue/duration growth
+began at the same time without a source dispatch gap.
+
+Falsify H6 when:
+
+- No MPL exists because the message never reached CPI.
+- Comparable messages have normal wait/duration and there is no growing processing/retry set.
+- A single canary fails deterministically at the same mapping/endpoint step rather than waiting.
+
+**H7 — The target ABAP application rejected an inbound IDoc**
+
+Supporting evidence: CPI completed delivery but the target inbound IDoc has status `51` and an
+application-specific status message/log.
+
+Falsify H7 when:
+
+- No inbound IDoc exists in the target and CPI did not complete the receiver step.
+- The inbound IDoc has status `53` and the expected business key is present.
+- The first error occurs in source dispatch or CPI before target delivery.
+
+#### 6.3.5 Safe fix and rollback pairs
+
+| Confirmed cause | Safe fix after lower-environment test | Rollback |
+|---|---|---|
+| Dispatch schedule/output mode | Correct selection/schedule through change control; verify one synthetic IDoc | Restore previous output mode/job schedule and stop new dispatch |
+| Partner/port mismatch | Correct `WE20`/`WE21` through an approved backend TR | Import/restore prior partner and port configuration |
+| Certificate/identity | Add and canary-test a new alias before switching | Repoint to preserved previous alias; revoke new credential later |
+| Metadata incompatibility | Version the adapter schema/mapping and test same basic type/extension | Redeploy previous iFlow version and restore prior metadata artifact |
+| CPI backlog/resource pattern | Remove confirmed bottleneck and release a bounded canary | Restore prior concurrency/flow version and pause replay |
+| Target status `51` application error | Functional owner corrects master/config/business data in approved path | Revert configuration through TR or reverse only via supported business process |
+
+Never use production `WE19` as a harmless simulation. `WE19` menu path is
+`SAP Easy Access > Tools > ALE > ALE Development > IDoc > Test Tool`; use synthetic data in an
+isolated lower environment with a non-posting or controlled receiver. `BD87` is allowed only after
+the cause is fixed and the exact business replay set is approved.
+
+#### 6.3.6 Revalidation and reconciliation
+
+1. Create one synthetic lower-environment canary with the same message/basic/extension structure.
+2. Prove the source status transition reaches the intended dispatch boundary.
+3. Prove exactly one CPI MPL exists and record the deployed version and completion state.
+4. Prove exactly one target IDoc/business object result, including expected application status.
+5. Reconcile `source created = source dispatched = CPI accepted = CPI completed = target accepted`
+   for the canary, with explicit rejected/duplicate counts.
+6. In production, process one approved IDoc first, verify target and duplicate controls, then expand
+   in bounded batches with a stop condition.
+7. Confirm no residual ready/error/retry backlog for the affected partner/message/time window.
+
+#### 6.3.7 Release and deployment split for IDoc
+
+- **ECC 6.0**: backend ALE/IDoc status and `WE02`/`WE05`/`WE20`/`WE21` are relevant; Gateway or
+  PI/PO presence must be confirmed, not assumed.
+- **S/4HANA On-Premise/RISE**: classic IDoc remains possible, but prefer the released integration
+  artifact chosen by the solution design. Use the same backend evidence only if IDoc is the actual route.
+- **S/4HANA Cloud Public Edition**: do not promise classic backend T-code access. Verify whether the
+  scoped communication scenario exposes IDoc or a released API/event, and use cloud communication
+  arrangement/application monitoring.
+- **PI/PO coexistence**: `SXMB_MONI` is an extra boundary only when the message really traverses the
+  Integration Engine. CPI MPL cannot substitute for a missing PI/PO status, and vice versa.
+
 ### 6.4 OData or HTTP API
 
 1. In MPL, classify the receiver response and capture only sanitized headers.
@@ -431,18 +611,152 @@ transport. Stop the canary if error rate, duplicates, or receiver load exceed ag
    governance and transport procedure applicable to the landscape.
 6. Reconcile initial/delta row counts and business totals with a read-only sample.
 
+### 10.1.1 Define the failed replication boundary
+
+Do not call every lag or count mismatch a Replication Flow failure. Classify it:
+
+| Boundary | Read-only evidence | What it proves |
+|---|---|---|
+| Flow validation/start | Flow name/version, run ID, mode, selected objects | Whether the intended artifact actually ran |
+| Connection | Validate result, connection type, identity alias, last success | Reachability/authentication at connection surface |
+| Agent/tunnel | DP Agent or Cloud Connector status and aligned logs | Whether an on-prem path is available |
+| Source capture | Initial snapshot/checkpoint or ODP/SLT subscription state | Whether source changes became available |
+| Source read | Rows read and source-side error category | Whether the flow consumed source data |
+| Transform/mapping | Rejected columns/types/keys and step log | Whether schema/logic rejected data |
+| Target write | Rows written/rejected, storage/quota/lock evidence | Whether target accepted the batch |
+| Semantic reconciliation | Key counts, create/update/delete behavior, business totals | Whether “completed” is also correct |
+
+### 10.1.2 Datasphere-specific environment intake
+
+- Datasphere tenant/region, Space, Replication Flow name/version, connection alias, target object.
+- ECC EhP, S/4HANA release/deployment, BW/HANA/non-SAP source, and industry/data classification.
+- Connection technology actually used: ABAP/ODP, SLT, DP Agent, Cloud Connector, or another connector.
+- Initial load, delta, or restart/recovery; first failed run and last successful run with timezone.
+- Run ID/status/duration, rows read/written/rejected, sanitized first causal error.
+- Source object/extractor/CDS version and recent field/type/key changes.
+- Source checkpoint/subscription/high-water mark and target watermark/count snapshot.
+- Space storage/quota state, concurrent flows, maintenance/batch window, and SLA.
+- Whether deletes, key changes, filters, and late-arriving records must propagate.
+- PII/residency classification; request no production row values.
+
+### 10.1.3 Read-only evidence sequence
+
+1. Replication Flow run: T-code not applicable; menu
+   `Datasphere > Data Integration Monitor > Replication Flows > <Run>`; capture run ID, version,
+   source/target object, load type, first causal error, and row counters.
+2. Connection: T-code not applicable; menu `Datasphere > Space Management > Connections`;
+   display connection type/alias and approved Validate/preview result without credentials.
+3. Agent/tunnel only if used: inspect DP Agent status/log or
+   `Cloud Connector Admin UI > Cloud To On-Premise`; a green agent/tunnel does not prove source access.
+4. ODP only if used: `ODQMON` and its registered menu path; display subscriber/request/backlog and
+   last activity. Do not reset or delete a subscription during diagnosis.
+5. SLT only if used: `LTRC` for configuration/replication state and `LTRS` for display of relevant
+   advanced settings. Do not change logging table or reload state as a diagnostic shortcut.
+6. Target: display storage/capacity, object state, write/reject counters, keys, and last successful
+   partition/checkpoint in Datasphere.
+7. Reconcile source snapshot/high-water mark against target watermark and business totals using
+   counts and hashes, not PII values.
+
 ### 10.2 Common hypotheses
 
-- **Delta queue backlog** — supported by growing subscriber backlog in `ODQMON`; falsified when
-  queue is current and Datasphere did not request/consume the delta.
-- **Source schema drift** — supported by a source field/type change aligned with failure start;
-  falsified when source metadata and target mapping versions match.
-- **Flow schedule collision** — supported by repeated delay at the same source batch window;
-  falsified when lag persists outside that window.
-- **Federation push-down bottleneck** — supported when remote query execution dominates;
-  falsified when local/materialized execution is equally slow.
-- **Filter/join loss** — supported by stage-by-stage count divergence; falsified when counts and
-  keys reconcile before target consumption.
+#### H1 — Connection, DP Agent, or Cloud Connector path failure
+
+Supporting evidence: connection validation and run log fail at reachability/handshake before source
+read, aligned with agent/tunnel/path evidence.
+
+Falsify H1 when:
+
+- The same connection successfully previews/reads the affected source object during the incident.
+- Another flow using the same connection and path completes in the same window.
+- The failed run already reports nonzero source rows read, proving the source boundary was crossed.
+
+#### H2 — Source authorization or expired credential
+
+Supporting evidence: the first causal error is authorization/authentication and the affected object
+requires a privilege not held by the configured technical identity.
+
+Falsify H2 when:
+
+- The same configured identity reads metadata and data for the affected object.
+- There is no auth error and failure occurs after rows are read at transform/target write.
+- A recent successful run after credential rotation used the same alias and scope.
+
+#### H3 — ODP subscription or delta queue backlog
+
+Applicable only when ODP is the actual source mechanism. Supporting evidence: the relevant subscriber
+in `ODQMON` shows growing backlog/no consumption aligned with Datasphere lag.
+
+Falsify H3 when:
+
+- The flow is an initial load or does not use ODP.
+- The relevant ODP subscriber is current with no growing backlog.
+- Datasphere consumed the delta and failed later at transform or target write.
+
+#### H4 — SLT capture/replication state failure
+
+Applicable only when SLT is in the route. Supporting evidence: `LTRC` shows affected table/configuration
+not replicating or capture/transfer errors aligned with the failed run.
+
+Falsify H4 when:
+
+- The connection does not use SLT.
+- `LTRC` shows current replication and source change counts reach the downstream boundary.
+- The failure happens before SLT configuration is invoked or after target write begins.
+
+#### H5 — Source schema, key, or metadata drift
+
+Supporting evidence: source field/type/key changed at failure start and the run rejects metadata,
+mapping, or target compatibility.
+
+Falsify H5 when:
+
+- Source and deployed flow metadata versions, types, and keys are unchanged and compatible.
+- The same changed schema completes in another run using the same flow version.
+- The first failure is connection/authentication before metadata is read.
+
+#### H6 — Target storage, quota, constraint, or write failure
+
+Supporting evidence: source rows are read but target rejects writes, aligned with target capacity,
+object state, key, or write error.
+
+Falsify H6 when:
+
+- The failed run never reads source rows or reaches the target step.
+- A bounded isolated write to the same target succeeds and capacity/object state is healthy.
+- Rows written equal rows read and the discrepancy appears only in downstream semantic filters.
+
+#### H7 — Flow schedule collision, concurrency, or transient service condition
+
+Supporting evidence: repeated overlap/lock/queue wait occurs in the same batch window and clears when
+the competing run ends, without schema/auth errors.
+
+Falsify H7 when:
+
+- Failure persists during an isolated non-overlap window.
+- Run history shows no overlap, lock, queue growth, or transient service error.
+- The same object fails deterministically on one field/key regardless of schedule.
+
+#### H8 — Filter, delete handling, key semantics, or transformation causes count mismatch
+
+Supporting evidence: the run completes but stage counts diverge exactly at a configured filter,
+join, key resolution, delete, or transformation boundary.
+
+Falsify H8 when:
+
+- Source-read and target-write key sets already diverge before transformation.
+- The relevant filter/delete/key logic is absent and raw counts still mismatch.
+- Controlled create/update/delete records reconcile end to end under the same logic.
+
+#### H9 — Federation push-down performance, not replication correctness
+
+Supporting evidence: Replication Flow completes and target counts reconcile, but remote/federated
+query execution dominates consumer latency.
+
+Falsify H9 when:
+
+- The Replication Flow itself fails before completion.
+- Materialized/local access is equally slow with the same query plan constraints.
+- Consumer latency is normal while source capture/delta backlog is growing.
 
 ### 10.3 Safe fix and rollback
 
@@ -452,6 +766,51 @@ transport. Stop the canary if error rate, duplicates, or receiver load exceed ag
   point, expected volume, and duplicate strategy.
 - Exclude or mask PII columns before cross-region replication; do not rely only on downstream hiding.
 - Roll back to the prior flow/model and reconcile target partitions if the changed flow diverges.
+
+#### 10.3.1 Fix/rollback pairs by confirmed boundary
+
+| Confirmed cause | Safe fix | Rollback |
+|---|---|---|
+| Connection/agent path | Correct the minimum endpoint/path/agent issue and validate in lower Space | Restore prior connection/path/agent config and stop the test run |
+| Credential/authorization | Add minimum required scope or rotate via a new alias | Repoint to preserved old alias; remove new grant after evidence capture |
+| ODP backlog/subscription | Correct consumer/schedule after preserving subscriber checkpoint | Restore prior schedule/config; do not delete/reinitialize subscription blindly |
+| SLT state/config | Apply the confirmed SLT correction under approved change control | Restore prior `LTRC`/`LTRS` configuration and preserved replication state |
+| Schema drift | Version/refresh metadata and mapping in lower Space | Redeploy previous flow/model version and quarantine incompatible output |
+| Target capacity/write | Free/allocate approved capacity or correct target key/type | Restore prior target/model; isolate changed partition/table |
+| Schedule/concurrency | Move or serialize the confirmed conflicting window | Restore prior schedule and pause the new run |
+| Transform/filter semantics | Correct versioned logic with count/key tests | Restore prior flow version and reconcile affected target slice |
+
+If a proposed fix requires delta reset, initial-load restart, target truncate, or subscription deletion,
+stop. Document recovery point, expected volume, duplicate/delete semantics, target backup/snapshot,
+business downtime, and a tested recovery procedure before seeking approval.
+
+### 10.4 Revalidation contract
+
+Use an isolated lower Space/object and synthetic or approved non-sensitive source records:
+
+1. Validate the exact connection and source object.
+2. Complete a bounded initial load and record source-read/target-write/rejected counts.
+3. Create one record, update one non-key value, and delete one record when delete propagation is in scope.
+4. Verify the source checkpoint/subscriber advances once without gap or duplicate.
+5. Verify target keys, values, delete behavior, watermark, and business totals.
+6. Run once in the expected production batch window to expose schedule/concurrency effects.
+7. Confirm DP Agent/Cloud Connector and ODP/SLT monitors are current only when those components apply.
+8. Promote through approved content/configuration transport and business UAT.
+9. In production, run a bounded canary object/partition, reconcile, then expand with a stop threshold.
+10. Confirm no residual failed/retrying runs and measure lag against the agreed SLA.
+
+### 10.5 Release and deployment split for replication
+
+- **ECC 6.0**: extractor/ODP availability depends on EhP, add-ons, and enabled source object. Ask for
+  the actual connection/extraction mechanism; do not assume S/4 CDS extraction exists.
+- **S/4HANA On-Premise/RISE**: ODP/CDS, SLT, ABAP/HANA connections may be available, but the released
+  extraction object and delta capability are release-specific. Use `ODQMON` only for ODP and `LTRC`
+  only for SLT.
+- **S/4HANA Cloud Public Edition**: do not assume customer access to `ODQMON`, `LTRC`, source tables,
+  or classic extractors. Use released extraction/API scope, communication arrangement, and cloud-side
+  monitoring for the contracted scenario.
+- **Non-SAP/HANA/BW source**: do not force ABAP monitors onto the route. Use the actual connector,
+  DP Agent/connection logs, source-native read evidence, and Datasphere run counters.
 
 ## 11. ECC vs S/4HANA and deployment split
 

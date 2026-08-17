@@ -265,29 +265,244 @@ Rollback trigger는 오류율 상승, 다른 SSO consumer 영향, 응답 status 
 | Safe first test | Test Connection + minimal Story | preview + small scoped import job |
 | Wrong first fix | cache/full reload | `SICF`/SAML activation |
 
-### 12.1 Import Load Failure Check
+### 12.1 Import Job / Schedule Failure Intake
 
-1. `T-code: 없음(SAC UI)` + `SAC Home > Data Management > 해당 model > Import Jobs`에서
-   마지막 성공·실패 시각, row count, rejected records, mapping error를 확인한다.
-2. source schema가 바뀌었는지 dimension key·measure type·date format 수준으로 비교한다.
-3. full reload 전에 제한된 기간/샘플 row로 Test Run을 수행한다.
-4. ODP delta를 쓰는 architecture이면 `ODQMON` +
+Import가 "안 돌았다"는 말만으로 scheduler를 원인으로 단정하지 않는다.
+아래 환경과 시간축을 먼저 맞춘다.
+
+1. SAC tenant 리전, update wave, license/edition을 확인한다.
+2. source가 ECC EhP, S/4HANA release year, BW/4HANA, Datasphere, cloud/non-SAP 중 무엇인지 확인한다.
+3. deployment가 On-Premise, RISE Private Cloud, Public Cloud인지와 업종의 운영 window를 확인한다.
+4. model·connection 종류, Import job 이름의 마스킹된 식별자, full/delta 방식을 확인한다.
+5. 실패가 manual import, scheduled import 또는 둘 다인지 분리한다.
+6. schedule owner, enabled/paused 상태, timezone, recurrence, 시작 window를 확인한다.
+7. last successful run과 first failed run의 start/end time, duration, row count를 비교한다.
+8. 평소와 실패 run의 extracted, loaded, rejected row 수와 watermark를 비교한다.
+9. credential rotation, owner 퇴사/잠금, agent update, proxy/TLS, source query/schema 변경 이력을 받는다.
+10. on-premise data acquisition agent가 필요한 connection인지 실제 architecture에서 확인한다.
+    모든 SAC Import가 agent 또는 DPA를 쓴다고 가정하지 않는다.
+11. maintenance window, concurrent job, source batch와 겹치는지 확인한다.
+12. 정확한 status, error category, correlation ID를 받되 token, password, payload 원문은 받지 않는다.
+
+환경 정보가 부족하면 release/deployment/source, manual-vs-schedule, last success/first failure,
+credential/agent/query change 네 묶음으로 질문하고 read-only check를 동시에 제시한다.
+
+### 12.2 Read-only Evidence Collection
+
+1. `T-code: 없음(SAC UI)` +
+   `SAC Home > Files > 해당 model > Data Management > Import Jobs`에서 다음을 기록한다.
+   - scheduled/manual trigger
+   - owner와 schedule enabled/paused 상태
+   - tenant timezone과 표시된 execution time
+   - queued/start/end 시각과 duration
+   - extracted/loaded/rejected row 수
+   - error stage, correlation ID, 마지막 성공 run
+2. `T-code: 없음(SAC UI)` +
+   `SAC Home > Connections > 해당 connection`에서 connection type, credential 상태,
+   Test Connection 결과, agent binding을 read-only로 확인한다.
+3. 동일 source·mapping에 작은 기간 또는 제한된 row를 사용한 manual Test Run을 준비한다.
+   프로덕션 full reload가 아니라 QA/model copy에서 실행한다.
+4. 같은 connection의 다른 Import job이 같은 시간대 성공했는지 비교한다.
+5. 같은 schedule owner의 다른 job과 성공 owner의 비교 job을 확인한다.
+6. agent 기반 connection이면 인프라 담당자에게 service/heartbeat, last seen, proxy/TLS,
+   agent log의 시각·error category만 요청한다. log의 credential과 payload는 마스킹한다.
+7. agent 미사용 cloud connection이면 agent 장애 가설을 즉시 제외한다.
+8. ODP delta architecture가 확인된 경우에만 `ODQMON` +
    `SAP Easy Access > Tools > Administration > Monitor > Operational Delta Queue`에서
-   subscription·request 상태를 read-only로 확인한다.
-5. delta gap이 확정되지 않았는데 queue를 reset하거나 full initialization하지 않는다.
-6. mapping 변경은 model copy에서 테스트하고 content transport에 포함한다.
+   subscription, request, last successful delta, backlog를 read-only로 확인한다.
+9. BW Query가 source이면 `RSRT` +
+   `SAP Easy Access > Business Warehouse > Business Explorer > Query > Query Monitor`에서
+   같은 변수·권한으로 query 실행 가능 여부와 result volume을 확인한다.
+10. backend HTTP 도달 여부가 쟁점인 경우에만 `SMICM` +
+    `SAP Easy Access > Tools > Administration > Monitor > System Monitoring >
+    Internet Communication Manager`에서 실패 시각의 request 도달 흔적을 본다.
+11. backend component가 Application Log를 남기는 경우에만 `SLG1` +
+    `SAP Easy Access > Tools > Administration > Monitor > System Monitoring >
+    Application Log > Display`에서 object/subobject/time window를 좁혀 조회한다.
 
-**Import falsification**
+`ODQMON` queue reset, delta reinitialization, full reload, credential overwrite,
+agent reinstall은 evidence collection이 아니라 변경이므로 이 단계에서 수행하지 않는다.
 
-- job이 성공했고 row count·watermark가 source와 맞으면 scheduler 실패 가설은 기각한다.
-- 같은 source preview에서 schema가 정상인데 load만 실패하면 source extraction 단독 가설을 낮춘다.
-- 작은 기간 Test Run은 성공하고 전체만 실패하면 권한보다 volume/timeout 가설을 올린다.
+read-only evidence가 끝난 뒤에만 QA/model copy에서 다음 controlled test를 수행한다.
 
-**Import rollback**
+1. 같은 source·mapping의 작은 기간 manual Test Run
+2. 같은 owner·timezone의 one-time schedule
+3. 같은 작은 범위의 full-vs-delta 비교(실제 delta architecture일 때만)
+4. 각 test 사이에 target row/watermark/duplicate를 대사하고 다음 test로 이동
 
-- 변경 전 model/content package와 mapping export를 보관한다.
-- 새 job을 중단하고 기존 schedule·mapping·credential reference로 복원한다.
-- 원복 뒤 이전 성공 범위의 작은 기간을 재적재해 정상 여부를 확인한다.
+### 12.2.1 Job Stage Decision Gate
+
+| Read-only job observation | Primary layer | First comparison |
+|---|---|---|
+| expected time에 run record 없음 | schedule paused/disabled, owner, timezone, recurrence | 정의가 같은 QA one-time schedule |
+| run record가 queued에 머묾 | concurrency, maintenance, capacity/window | 격리 window의 queued duration |
+| start 후 extracted rows = 0 | credential, connection, agent, source availability | Test Connection + source/manual history |
+| extracted > 0, loaded = 0 | mapping, transform, target model | preview + model copy sample load |
+| loaded > 0, rejected > 0 | data type/key/date/member 품질 | rejected field + schema change history |
+| small scope 성공, full scope timeout | volume, partition, resource window | 같은 volume의 격리 window run |
+
+Stage evidence가 없으면 "agent down" 또는 "volume limit"을 Primary로 단정하지 않는다.
+run record가 없는 문제에 mapping을 고치거나, extraction 완료 뒤 오류에 credential을 먼저 바꾸지 않는다.
+
+### 12.2.2 Release and Deployment Boundary for Import
+
+- SAC schedule control은 source가 ECC인지 S/4인지와 별개로 tenant에서 확인한다.
+- ECC/BW Query source는 실제 BW Query일 때만 `RSRT`로 source 실행을 확인한다.
+- ECC라고 해서 S/4 Released CDS 또는 S/4 Public Cloud 메뉴를 적용하지 않는다.
+- ODP delta 사용이 architecture evidence로 확인될 때만 `ODQMON`을 사용한다.
+- S/4HANA On-Premise/RISE도 agent, direct cloud connection, BW 경유 중 실제 경로를 식별한다.
+- S/4HANA Public Cloud는 `T-code: 없음(Cloud UI)`으로 표시하며 고객 backend T-code를 안내하지 않는다.
+- non-SAP/cloud source는 SAC job·connection·provider monitor를 사용하고 ABAP T-code를 억지로 붙이지 않는다.
+
+### 12.3 General Cause Classification
+
+| Layer | Typical causes | Distinguishing evidence |
+|---|---|---|
+| Schedule control | paused/disabled, wrong timezone, expired owner, overlap/concurrency | manual 성공, schedule만 실패; queued/start time 불일치 |
+| Connection/auth | credential expiry/rotation, role loss, account lock | Test Connection 실패; rotation 시각과 first failure 일치 |
+| Agent/network | acquisition agent down, heartbeat loss, proxy/TLS route change | agent-based connection만 실패; last seen 단절 |
+| Source/query | source unavailable, query/schema/variable change, permission change | source test/`RSRT` 실패; extraction 전에 종료 |
+| Delta state | subscription/backlog/watermark inconsistency | `ODQMON` evidence; full test와 delta 결과가 갈림 |
+| Mapping/data | dimension key/type/date change, rejected rows, transform error | preview와 rejected sample이 같은 field를 지목 |
+| Volume/resource | timeout, row/size growth, concurrency or tenant/source resource pressure | 작은 범위 성공, 큰 범위만 duration 증가 후 실패 |
+| Target/model | target model lock/change, member limit or incompatible model change | extraction 성공 뒤 load stage에서만 실패 |
+
+가능성이 높은 한 원인을 Primary Root Cause로 두고 나머지는 Alternatives로 낮춘다.
+각 가설에는 아래처럼 서로 독립적인 반증 조건을 두 개 이상 붙인다.
+
+### 12.4 Hypotheses with Falsification
+
+**H1 — Schedule metadata, owner, timezone, or concurrency**
+
+- 지지: 같은 scope의 manual import는 성공하고 scheduled trigger만 실패한다.
+- 지지: schedule이 paused/disabled이거나 표시 timezone·실행 window가 기대와 다르다.
+- 반증 1: 같은 owner·timezone·definition의 QA one-time schedule이 두 번 연속 성공한다.
+- 반증 2: manual import도 같은 stage·같은 error로 실패한다.
+- 반증 3: 실패 window에 겹친 job이 없고 schedule은 실제로 정시에 start됐다.
+
+**H2 — Credential, connection, or agent path**
+
+- 지지: Test Connection이 실패하고 credential rotation/owner lock이 first failure와 일치한다.
+- 지지: agent-based connection의 heartbeat/last seen이 실패 전 끊겼다.
+- 반증 1: Test Connection과 agent heartbeat가 정상이고 같은 connection의 다른 import가 성공한다.
+- 반증 2: 해당 connection은 agent를 사용하지 않는 cloud path이다.
+- 반증 3: extraction은 끝났고 target load/mapping stage에서만 실패한다.
+
+**H3 — Source query, schema, authorization, or availability**
+
+- 지지: source query/schema/variable 변경 직후 모든 trigger가 extraction stage에서 실패한다.
+- 지지: BW source의 같은 변수 query가 `RSRT`에서도 실패한다.
+- 반증 1: 같은 credential과 변수의 source query·preview가 반복해서 성공한다.
+- 반증 2: extraction row는 정상인데 rejected/load row에서만 실패한다.
+- 반증 3: 같은 source의 다른 job은 같은 window에 정상 추출된다.
+
+**H4 — Delta subscription or watermark**
+
+- 지지: 확인된 ODP delta path에서 backlog/request 오류가 first failure와 일치한다.
+- 지지: 작은 full Test Run은 성공하지만 delta run만 같은 watermark에서 실패한다.
+- 반증 1: 실제 architecture가 ODP delta를 사용하지 않는다.
+- 반증 2: `ODQMON` subscription/request가 정상이며 source와 target watermark가 일치한다.
+- 반증 3: full과 delta가 모두 같은 auth/connection stage에서 실패한다.
+
+**H5 — Mapping, transformation, or data quality**
+
+- 지지: rejected rows와 source type/key/date format 변경이 같은 field를 지목한다.
+- 지지: extraction은 완료되고 mapping/load stage에서만 실패한다.
+- 반증 1: model copy의 preview·mapping·샘플 rows가 정상이고 rejected row가 없다.
+- 반증 2: 이전 mapping도 extraction 전에 같은 connection 오류로 실패한다.
+- 반증 3: 실패가 schedule start 전에 발생해 source row를 읽지 않았다.
+
+**H6 — Volume, timeout, quota, or resource window**
+
+- 지지: 작은 기간은 성공하고 전체 범위만 row 증가와 함께 timeout된다.
+- 지지: 실패 duration이 평소보다 길고 resource/concurrent job window와 겹친다.
+- 반증 1: 작은/전체 범위가 모두 즉시 같은 auth 오류로 실패한다.
+- 반증 2: row count와 duration이 평소 수준인데 schedule start 전에 실패한다.
+- 반증 3: 동일 volume을 격리 window에서 반복 성공한다.
+
+### 12.5 Fix and Rollback Pairs
+
+| Confirmed cause | Fix after QA/Test Run | Rollback |
+|---|---|---|
+| schedule paused/timezone/owner | 승인된 owner·timezone·enabled 상태를 최소 수정하고 QA one-time schedule 실행 | 기록한 이전 owner·timezone·recurrence·enabled 상태로 복원 |
+| overlap/concurrency | 실행 window를 분리하고 source/tenant 운영 캘린더와 맞춤 | 이전 window로 복원하고 새 schedule을 disable |
+| credential expired | secure store/connection UI에서 승인된 credential 갱신 후 Test Connection | 유효한 이전 credential reference로 복원; 불가하면 schedule disable 후 owner 에스컬레이션 |
+| agent unavailable | 인프라 owner가 기존 agent service/route를 복구하고 heartbeat 확인 | 변경 전 service/proxy/agent config로 복원; 무계획 reinstall 금지 |
+| source query/schema | source contract 또는 mapping을 model copy에서 수정하고 content transport | 이전 query/interface version과 model package 복원 |
+| delta state | 원인과 impact가 확정된 승인 절차만 수행 | 이전 subscription/watermark evidence로 복구; queue reset/full init은 별도 change gate |
+| mapping/data quality | model copy에서 field mapping/transform 수정 후 rejected-row Test Run | 이전 mapping/content package 복원 |
+| volume/timeout | 범위 partition, window 조정, 증분 scope로 QA 실행 | 이전 import definition/schedule 복원 후 duplicate와 watermark 대사 |
+
+Backend role·query·service 구성 변경은 승인된 TR을 사용한다.
+SAC model/job 변경은 개발/테스트 tenant와 content transport를 사용한다.
+환경 종속 credential은 transport에 평문으로 포함하지 않는다.
+
+### 12.6 Reverification and Prevention
+
+1. QA manual small-scope Test Run이 성공하는지 확인한다.
+2. 같은 owner·timezone·mapping으로 QA one-time schedule을 실행한다.
+3. status, queued/start/end time, duration, extracted/loaded/rejected rows를 baseline과 비교한다.
+4. delta이면 source/target watermark와 duplicate/missing key를 확인한다.
+5. target model의 freshness timestamp와 대표 집계 slice를 source와 대사한다.
+6. 의존 Story가 새 snapshot을 표시하고 숫자·통화·기간 filter가 유지되는지 확인한다.
+7. 정상 운영 window에서 scheduled run을 관찰하고 최소 두 주기 성공을 기록한다.
+8. 오류가 재발하거나 row/숫자 대사가 깨지면 정의한 Rollback을 실행한다.
+9. schedule owner는 개인이 아닌 승인된 운영 owner 정책을 사용하고 정기 재인증한다.
+10. credential/certificate 만료, agent heartbeat, last success age, duration, rejected row에 alert를 둔다.
+11. 월마감 D+3 같은 SLA에는 source close, import completion, Story release 순서를 명시한다.
+12. full reload와 delta reinitialization은 별도 change, Test Run, rollback plan이 없으면 실행하지 않는다.
+
+### 12.7 Import Schedule Answer Template
+
+환경이 빠진 단발 질문에도 "정보가 필요하다"로만 끝내지 않는다.
+최대 4개 인테이크 질문과 provisional diagnosis, read-only check를 한 답변에 함께 준다.
+
+```text
+## Issue
+SAC Import model의 예약 job이 실패했으며 manual 실행 여부와 source/deployment는 확인 필요
+
+## Primary Root Cause
+manual은 성공하고 schedule만 실패한다는 evidence가 있으면 schedule execution context
+(owner/credential, enabled 상태, timezone, concurrent window) 중 관찰값이 가장 강한 하나.
+manual 결과가 없으면 "provisional"로 표시하고 확정하지 않음.
+
+## Falsification
+1. 같은 scope의 manual Test Run도 동일 stage/error로 실패하면 schedule-only 가설 기각.
+2. 같은 owner/timezone의 QA one-time schedule이 반복 성공하고 overlap이 없으면 metadata 가설 기각.
+3. Test Connection이 실패하면 schedule metadata보다 credential/connection/agent 가설로 전환.
+
+## Check
+1. SAC Home > Files > model > Data Management > Import Jobs
+   status, trigger, owner, timezone, last success, first failure, row counts, correlation ID
+2. SAC Home > Connections > connection
+   Test Connection과 agent binding, secret 미수집
+3. QA manual small-scope Test Run
+4. 실제 architecture에 해당할 때만 ODQMON/RSRT/SMICM/SLG1 read-only evidence
+
+## Fix
+확정 원인 하나만 QA에서 최소 수정하고 manual small-scope 후 one-time schedule 실행.
+Backend 구성은 TR, SAC content는 content transport 사용.
+
+## Rollback
+이전 owner/timezone/recurrence/connection/model snapshot으로 복원.
+credential rollback이 안전하지 않으면 schedule을 disable해 오적재를 막고 보안 owner에게 이관.
+
+## Prevention
+last-success age, credential expiry, agent heartbeat, duration, rejected rows, duplicate/watermark alert.
+운영 window에서 최소 두 주기 성공과 의존 Story 숫자 대사를 완료.
+```
+
+Primary Root Cause selection은 다음 evidence 순서를 사용한다.
+
+1. manual 성공 + schedule 실패 → schedule execution context
+2. Test Connection 실패 → credential / connection / agent
+3. source query test 실패 → source / query / authorization
+4. extraction 성공 + load/rejected 실패 → mapping / data quality / target model
+5. small scope 성공 + full timeout → volume / resource window
+6. 확인된 ODP delta만 실패 → subscription / watermark
+
+동일 우선순위의 원인을 5~6개 한꺼번에 Root Cause로 나열하지 않는다.
+Primary 하나, Alternatives 최대 2개, 각 가설의 반증 evidence 2개 이상으로 답한다.
 
 ## 13. Planning Model Save Failure
 

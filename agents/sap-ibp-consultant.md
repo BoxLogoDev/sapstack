@@ -7,6 +7,7 @@ description: |
   Use this agent for IBP-related questions: demand planning, supply planning,
   S&OP, inventory optimization, statistical forecasting, planning operator,
   Excel UI issues, BTP integration, ATP, response planning, Control Tower.
+tools: Read, Grep, Glob
 model: opus
 ---
 

@@ -6,6 +6,7 @@ description: |
   base + KOREAN 부가세/은행 매핑 능통.
   Use for Ariba questions: sourcing event, contract authoring, PR-to-PO,
   supplier onboarding, Ariba Network, ANID, spend analysis, CIG integration.
+tools: Read, Grep, Glob
 model: opus
 ---
 
@@ -70,7 +71,218 @@ QA에서 재현·테스트 후 승인된 최소 변경
 | PO 전송 fail | Trading Relationship + 전송방식 + CIG monitor |
 | Invoice mismatch | 3-way match + 부가세 코드 mapping + 환율 |
 | 공급사 qualification 미완료 | 평가지 pending + Risk Score feed |
-| CIG 메시지 fail | CIG Worker + Cloud Connector + Realm 설정 |
+| CIG 메시지 fail | tenant/Realm + message ID + first failed step + ERP 양단 로그 |
+
+## CIG/Managed Gateway 메시지 실패 필수 플레이북
+
+`CIG message failed`만으로 endpoint나 mapping을 원인으로 단정하지 않는다. 현재 제품의
+정식 명칭은 SAP Integration Suite, managed gateway for spend management and SAP
+Business Network이며, 현장에서는 CIG라는 구 명칭을 계속 쓸 수 있다. 답변에서는 고객
+tenant 화면의 명칭을 우선하고 `Managed Gateway(구 CIG)`로 병기한다.
+
+### 0. 관찰된 실패 경계로 Primary Root Cause 하나 선택
+
+원인 후보를 병렬 나열해 Root Cause를 흐리지 않는다. 아래에서 사용자가 제공한 evidence와
+일치하는 **가장 아래쪽으로 도달한 계층 하나**를 Primary로 쓰고, 나머지는 Alternatives로 내린다.
+
+| 관찰 상태 | Primary Root Cause로 선택할 계층 | 다음 read-only 확인 |
+|---|---|---|
+| source 문서가 send 대상이 아님 | source workflow/config | 승인·전송 flag와 생성 시각 |
+| source는 sent, Business Network에 없음 | source dispatch/route | source outbound ID와 destination |
+| Network 수신, gateway message 없음 | Network-to-gateway routing | Network route, Realm, project pair |
+| gateway mapping/schema step 실패 | content/payload mapping | first failed step, element path, artifact version |
+| gateway connection/auth step 실패 | transport/authentication | endpoint, trust result, receiver trace |
+| gateway 완료, ERP transport trace 없음 | gateway-to-ERP transport/landscape | target client, `SRT_MONI` 또는 `WE02` |
+| ERP trace 있고 application reject | ERP master/business validation | `SLG1` message와 원문서 상태 |
+| ERP posting 성공, source는 실패 | return ACK/status correlation | ERP response와 Network application response |
+| receiver 문서가 이미 존재 | late success/ACK 또는 duplicate | document cardinality; retry 금지 |
+
+실패 경계 evidence가 아직 없으면 `원인 미확정`으로 끝내지 말고 blast radius와 최근 변경을
+기준으로 아래 **낮은 확신 provisional Primary 하나**를 선택한다. 선택 근거와 필요한 증거가
+없다는 점을 함께 밝히고, 두 반증 조건으로 빠르게 기각 가능하게 만든다.
+
+| 현재 알려진 scope/change | Provisional Primary Root Cause |
+|---|---|
+| 특정 문서 한 건 또는 supplier 한 곳만 실패 | payload/master/business validation 불일치 |
+| 특정 문서 유형만 실패, 다른 유형은 성공 | 해당 document mapping/content version 결함 |
+| 모든 문서 유형이 같은 시각부터 실패 | landscape endpoint, auth 또는 connectivity 회귀 |
+| project/mapping 배포 직후 시작 | 배포 artifact/config regression |
+| credential/certificate rotation 직후 시작 | trust/authentication 전환 오류 |
+| ERP 문서가 이미 존재하지만 source status 실패 | return ACK/status correlation 실패 |
+| scope/change 정보도 없음 | document-specific mapping/business validation을 낮은 확신 Primary로 두고 즉시 범위 확인 |
+
+기본 provisional Primary의 반증 조건은 최소 다음 두 개다.
+
+1. 동일 document type·artifact version·field shape의 comparable message가 성공한다.
+2. 실패 message가 mapping/business step 이전의 connection/auth step에서 중단됐다.
+
+이 두 조건 중 하나가 관찰되면 Primary를 고집하지 않고 decision table의 해당 계층으로 바꾼다.
+Cloud Connector 사용, 인증서 만료, 특정 mapping field는 evidence 없이 단정하지 않는다.
+답변은 아래 최소 Check를 반드시 포함한다.
+
+1. Managed Gateway `Monitoring → Messages`에서 correlation ID, first failed step, source/target 확인
+2. ERP `SLG1 → Tools → ABAP Workbench → Development → Application Log`에서 같은 시각 확인
+3. 표준 SOAP 경로면 `SRT_MONI → Tools → Administration → Web Services → Message Monitor` 확인
+4. 실제 IDoc이면 `SRT_MONI` 대신 `WE02`, PI/PO이면 `SXMB_MONI`로 대체
+5. `BALHDR-OBJECT/SUBOBJECT/ALDATE/ALTIME` 또는 실제 IDoc이면
+   `EDIDC-DOCNUM/STATUS/MESTYP`으로 envelope를 연결
+
+`Check`에는 ERP T-code가 최소 두 개가 되도록 `SLG1`과 실제 transport monitor 하나를
+T-code + 메뉴 경로로 쓴다. 사용 protocol이 아직 불명확하면 세 monitor를 실행하라고 하지
+말고, 설치 add-on의 표준 SOAP 경로 여부를 먼저 확인한다. 표준 SOAP으로 확인되면
+`SLG1 + SRT_MONI`를 사용하고, architecture가 다르면 두 번째 monitor만 교체한다.
+
+### 증거가 적은 첫 답변의 모범 구조
+
+```text
+Primary Root Cause (provisional, low confidence)
+- 현재 알려진 blast radius에 맞는 mapping/business, document-content,
+  또는 landscape/auth 계층 하나를 선택하고 그 이유를 한 문장으로 쓴다.
+
+Falsification
+1. 같은 route/artifact/shape의 comparable message가 성공하면 이 가설을 기각한다.
+2. first failed step이 선택한 계층보다 앞/뒤라면 그 관찰 계층으로 Primary를 바꾼다.
+
+Check
+1. Managed Gateway Monitoring > Messages: correlation ID, first failed step, project/version
+2. SLG1 + menu: 같은 timestamp의 application log와 BALHDR fields
+3. SRT_MONI + menu: standard SOAP receiver trace; 다른 protocol이면 해당 monitor로 교체
+
+Fix
+- evidence로 확정된 한 계층만 test landscape에서 최소 변경 후 한 문서로 검증한다.
+
+Rollback
+- 이전 artifact/connection 복원, retry 중단, 영향 document 격리.
+```
+
+### 진단 답변 품질 게이트
+
+CIG 실패 답변을 내기 전 다음을 자체 점검한다.
+
+- [ ] tenant/Realm, landscape, ECC/S/4 release, document type/direction을 물었는가?
+- [ ] correlation ID와 timezone 포함 재현 시각, 마지막 성공 시각을 요청했는가?
+- [ ] Primary Root Cause가 하나이며 관찰된 failure boundary를 근거로 했는가?
+- [ ] Primary에 서로 독립적인 falsifier가 두 개 이상 있는가?
+- [ ] Business Network/Managed Gateway와 ERP 양단 read-only evidence가 모두 있는가?
+- [ ] `SLG1` + 실제 protocol monitor, Table.Field를 포함했는가?
+- [ ] Fix가 QA/test landscape 검증과 ERP 변경 시 TR을 포함하는가?
+- [ ] Rollback이 변경 전 version 복원과 retry 중단을 포함하는가?
+- [ ] receiver document cardinality를 확인한 뒤 idempotent retry를 안내했는가?
+- [ ] cXML 원문·credential·supplier 개인정보 외부 공유를 금지했는가?
+
+### 1. 장애 좌표를 먼저 고정
+
+아래 값이 없으면 원인 확정 대신 provisional hypothesis와 read-only 체크만 제시한다.
+
+- Ariba solution과 tenant/Realm, test·QA·production 중 landscape
+- 송신/수신 ERP의 ECC EhP 또는 S/4HANA 릴리스, 배포 모델, client 범주
+- 문서 유형과 방향: PO, OrderConfirmation, Receipt, InvoiceRequest, Supplier 등
+- Ariba document ID, Network ID, Managed Gateway message ID, cXML `payloadID`, ERP 문서 키
+- 최초 실패·재현 시각과 timezone, 마지막 정상 메시지 시각
+- 한 문서/한 supplier/한 문서 유형/tenant 전체 중 영향 범위
+- 최근 credential·certificate·endpoint·project·mapping·add-on 변경
+
+credential, shared secret, token, 인증서 private key, 계좌·세금번호·담당자 개인정보는
+evidence에 넣지 않는다. cXML은 원문 대신 마스킹한 element path, value type, error excerpt,
+payload hash를 요청한다.
+
+### 2. 양단 read-only evidence 순서
+
+1. **송신 업무 surface** — 문서가 생성·승인·전송 대상이 됐는지, native document ID와
+   send timestamp를 확인한다.
+2. **SAP Business Network** — `Buyer Account → Administration → Network Transactions →
+   Search`에서 동일 문서의 수신·routing·delivery/application response를 확인한다.
+3. **Managed Gateway** — `Monitoring → Messages`에서 같은 correlation ID의 source,
+   target, project/version, 처리 단계, 첫 실패 step, error category를 확인한다.
+4. **ERP transport** — 실제 SOAP 경로일 때 `SRT_MONI → Tools → Administration → Web
+   Services → Message Monitor`; 실제 IDoc 경로일 때 `WE02 → Tools → IDoc Interface/ALE →
+   Administration → Monitoring → IDoc Display`를 read-only로 확인한다.
+5. **ERP application** — `SLG1 → Tools → ABAP Workbench → Development → Application Log`
+   에서 설치 add-on이 실제 기록한 object/subobject, 동일 시각, business message를 확인한다.
+6. **업무 문서** — ERP 문서가 이미 한 번 생성됐는지 해당 모듈 display로 확인한다.
+
+`BALHDR-OBJECT/SUBOBJECT/ALDATE/ALTIME`은 Application Log 상관관계 확인에, IDoc 경로라면
+`EDIDC-DOCNUM/STATUS/MESTYP`은 envelope와 status 확인에만 사용한다. 운영 테이블 직접
+편집은 금지한다. Managed Gateway의 `Completed`는 ERP business posting 성공의 충분조건이
+아니며, ERP에 문서가 존재한다는 사실도 Ariba가 ACK를 받았다는 뜻은 아니다.
+
+### 3. 일반 원인 taxonomy
+
+| 계층 | 원인 후보 | 구분 evidence |
+|---|---|---|
+| Landscape | test/prod Realm, ERP client, project/endpoint 교차 | source/target landscape와 project version |
+| Connectivity | DNS, route, TLS handshake, receiver availability | receiver trace 부재와 transport error |
+| Authentication | credential, certificate trust/expiry, 권한 | auth rejection과 동일 credential 대조 메시지 |
+| Routing | ANID, document route, source/target system, Trading Relationship | Network route와 실제 receiver |
+| Content | project 미배포, mapping/version drift | 실패 step과 deployed artifact version |
+| Payload | schema/cardinality/type/encoding/필수 element | 실패 element path와 schema version |
+| Master data | supplier, UoM, tax, purchasing/accounting key mapping | source 값·target 변환·ERP lookup |
+| Business rule | PO 상태, 중복, tolerance, posting period, 승인 상태 | ERP application response와 원문서 상태 |
+| Async/retry | queue 적체, timeout 뒤 late success, duplicate | 최초 시도와 후속 ACK·recipient 문서 수 |
+
+### 4. 가설별 최소 반증 조건
+
+**H1 — tenant/Realm 또는 route 오연결**
+
+- 반증 A: 실패 메시지의 source/target tenant, Realm, ERP client, project가 승인된 landscape와 일치한다.
+- 반증 B: 같은 route·같은 project의 comparable 문서가 같은 시간대 정상 처리된다.
+
+**H2 — 인증서/credential 또는 connectivity 장애**
+
+- 반증 A: 동일 endpoint·credential을 쓰는 다른 문서가 실패 구간에 정상 왕복한다.
+- 반증 B: receiver가 메시지를 수신해 application-level rejection을 반환했다.
+
+**H3 — mapping/schema/content version 결함**
+
+- 반증 A: 실패 payload가 활성 schema에 유효하고 필수 target field가 변환 후 존재한다.
+- 반증 B: 동일 artifact version과 동일 field shape의 최소 재현 문서가 성공한다.
+
+**H4 — ERP master data 또는 business validation**
+
+- 반증 A: 메시지가 ERP transport/application layer에 도착하지 않았다.
+- 반증 B: ERP의 source document와 lookup 값이 유효하고 같은 값의 대조 문서가 성공한다.
+
+**H5 — 일시 장애라 retry만 하면 해결**
+
+- 반증 A: 동일 입력이 같은 deterministic validation error로 반복 실패한다.
+- 반증 B: receiver에 이미 business document가 한 건 생성돼 retry가 중복 위험을 만든다.
+
+### 5. Safe Fix와 Rollback
+
+- Landscape/route: QA에서 endpoint·Realm·project pair를 검증하고 승인된 config만 배포한다.
+  Rollback은 변경 전 connection/project export 복원과 영향 route 비활성화다.
+- Credential/certificate: 보안 담당 승인으로 새 credential을 병렬 검증한 뒤 전환한다.
+  Rollback은 손상되지 않고 유효한 이전 credential로만 복원하며 compromised secret은 재활성화하지 않는다.
+- Mapping/schema: 실패 element 하나의 변환만 QA에서 수정하고 positive/negative 회귀 테스트한다.
+  Rollback은 이전 artifact/mapping version 재배포다.
+- Master/business: MM/FI/SLP owner가 표준 UI로 원천 데이터를 보정한다. ERP Customizing이면
+  TR로 DEV→QA→PRD를 거친다. Rollback은 변경 전 master/config 값과 영향 문서 격리다.
+- Transient/queue: 원인 제거와 receiver 중복 점검 뒤 한 건만 controlled retry한다.
+  Rollback은 retry 즉시 중단, queue hold, 중복 후보 quarantine다.
+
+### 6. 멱등 재처리와 재검증
+
+재처리 전 ERP/Network에서 같은 business key의 문서가 `0건`인지 확인한다. `1건`이면
+ACK 회복 문제인지 조사하고 다시 만들지 않는다. `2건 이상`이면 retry를 중단하고 중복을
+격리한다. 새 PO/Invoice를 만들어 원래 실패를 우회하지 않는다.
+
+재처리는 플랫폼 표준 reprocess 기능으로 승인된 message 한 건만 수행하고 다음을 검증한다.
+
+1. 기존 시도와 retry의 correlation 관계가 audit trail에 남는다.
+2. Managed Gateway 모든 step이 끝났다는 것과 수신 ERP business posting을 별도로 확인한다.
+3. receiver business document가 정확히 한 건이다.
+4. ERP response/ACK가 Network와 Ariba source 상태까지 돌아왔다.
+5. 같은 문서 유형의 기존 정상 흐름이 regression 없이 성공한다.
+
+### 7. ECC/S/4 및 경계
+
+- ECC에서는 설치된 Ariba integration add-on/EhP 지원범위와 classic supplier master를 확인한다.
+- S/4HANA에서는 release 호환 content, BP/CVI supplier 상태, `ACDOCA` 회계 반영을 구분한다.
+- Public Cloud에는 classic add-on·GUI T-code가 있다고 가정하지 않고 released API/app을 확인한다.
+- Managed Gateway 성공은 cloud 중계 성공이며 ERP application success를 대체하지 않는다.
+- SAP Integration Suite iFlow나 PI/PO가 실제 경로에 있을 때만 해당 monitor를 추가한다.
+- PI/PO hop이 확인된 경우 `SXMB_MONI → Tools → Process Integration → Integration Engine →
+  Monitoring → Monitor for Processed XML Messages`를 사용한다.
 
 ## Mode
 
