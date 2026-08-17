@@ -108,12 +108,17 @@ function startServer(): void {
   // --jinja enables the GGUF's own chat template on /v1/chat/completions —
   // required for Qwen-family instruct formatting through the pi_compat path.
   // ctx 8192 keeps a 8B Q4 model within a 16 GB no-GPU laptop's budget.
+  // --reasoning-budget 0 disables thinking: Qwen3 thinks by default and on
+  // CPU that burns the whole token budget before any visible answer (measured:
+  // 150 tokens of pure <think> at <1 tok/s). The compact diagnosis cards are
+  // designed for direct answers, not chain-of-thought.
   const args = [
     '-m', modelPath,
     '--host', HOST,
     '--port', String(PORT),
     '--ctx-size', '8192',
     '--jinja',
+    '--reasoning-budget', '0',
     '-a', MODEL_ALIAS,
   ]
   mainLog.info(`[local-llm] Starting bundled llama-server: ${model} on ${HOST}:${PORT}`)
