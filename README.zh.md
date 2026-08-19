@@ -114,6 +114,9 @@ Clean Core · Key User Extensibility · 3-Tier Extension · Fit-to-Standard · C
 ### 💻 VS Code Extension (v2.4.0)
 会话管理侧栏 · YAML 校验 · Webview 渲染 · File Watcher
 
+### 🖥 Desktop
+仅限 Windows x64。安装包 `sapstack-Desktop-<版本>-Setup-x64.exe`（NSIS）及 Portable 变体。按用户安装（`%LOCALAPPDATA%\Programs\`），无需管理员权限。约 219MB（v2.4.0 实测）。捆绑 `llama-server`（llama.cpp）；将 GGUF 权重放入 `~/.sapstack/models/` 即可自动检测。隔离网：`SAPSTACK_AIRGAPPED=1` 或 `~/.sapstack/config.yaml` 中的 `air_gapped: true`。SAP 数据为粘贴方式 — 应用不直接连接 SAP 系统。安装：[docs/desktop-install.md](docs/desktop-install.md)
+
 ### 🛡 合规就绪 (v2.0+)
 K-SOX · SOC 2 · ISO 27001 · GDPR · 网络隔离部署 · PII 自动脱敏
 
@@ -142,6 +145,9 @@ sapstack-mcp --sessions-dir ~/.sapstack/sessions
 
 ### VS Code Extension
 在 VS Code Marketplace 搜索 "sapstack" → Install ·（或从 [GitHub Release](https://github.com/BoxLogoDev/sapstack/releases) 直接安装 `.vsix`）
+
+### Desktop (Windows x64)
+从 [GitHub Releases](https://github.com/BoxLogoDev/sapstack/releases) 下载 `sapstack-Desktop-<版本>-Setup-x64.exe`。Windows 必须安装 Git for Windows（Git Bash）。隔离网需通过 USB 一并带入离线安装包。详情：[docs/desktop-install.md](docs/desktop-install.md)
 
 ### Amazon Kiro IDE
 ```bash

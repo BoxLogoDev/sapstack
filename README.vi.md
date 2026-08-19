@@ -114,6 +114,9 @@ Clean Core · Key User Extensibility · 3-Tier Extension · Fit-to-Standard · C
 ### 💻 VS Code Extension (v2.4.0)
 Thanh bên quản lý session · Kiểm tra YAML · Render Webview · File Watcher
 
+### 🖥 Desktop
+Chỉ Windows x64. Bộ cài `sapstack-Desktop-<phiên bản>-Setup-x64.exe` (NSIS) và bản Portable. Cài per-user (`%LOCALAPPDATA%\Programs\`), không cần quyền quản trị. Khoảng 219MB (đo trên v2.4.0). Đi kèm engine `llama-server` (llama.cpp); đặt trọng số GGUF vào `~/.sapstack/models/` để ứng dụng tự nhận. Mạng cô lập: `SAPSTACK_AIRGAPPED=1` hoặc `air_gapped: true` trong `~/.sapstack/config.yaml`. Dữ liệu SAP theo cách dán — ứng dụng không kết nối trực tiếp hệ thống SAP. Cài đặt: [docs/desktop-install.md](docs/desktop-install.md)
+
 ### 🛡 Sẵn sàng tuân thủ (v2.0+)
 K-SOX · SOC 2 · ISO 27001 · GDPR · triển khai mạng cô lập · tự động che PII
 
@@ -142,6 +145,9 @@ sapstack-mcp --sessions-dir ~/.sapstack/sessions
 
 ### VS Code Extension
 Tìm "sapstack" trong VS Code Marketplace → Install ·(hoặc cài `.vsix` trực tiếp từ [GitHub Release](https://github.com/BoxLogoDev/sapstack/releases))
+
+### Desktop (Windows x64)
+Tải `sapstack-Desktop-<phiên bản>-Setup-x64.exe` từ [GitHub Releases](https://github.com/BoxLogoDev/sapstack/releases). Windows bắt buộc có Git for Windows (Git Bash). Mạng cô lập cần mang theo bộ cài offline bằng USB. Chi tiết: [docs/desktop-install.md](docs/desktop-install.md)
 
 ### Amazon Kiro IDE
 ```bash

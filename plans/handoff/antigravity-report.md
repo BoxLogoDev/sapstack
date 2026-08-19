@@ -84,3 +84,51 @@
    - `LocalModelStep.tsx`에서 로컬 Ollama 엔드포인트 연결 실패 시 `errorMessage`가 사용자에게 한국어로 친절하게 매핑되어 표시되는지, 아니면 raw 네트워크 에러(예: `fetch failed`, `ECONNREFUSED`)로 노출되는지는 백엔드 IPC 핸들러의 에러 포맷팅 구현에 의존하므로 정적 코드 리딩만으로는 완전히 단정하기 어렵습니다.
 2. **미서명 바이너리의 폐쇄망 엔터프라이즈 보안 정책 통과 여부**:
    - 현재 빌드가 미서명(Unsigned) 상태이므로, 일반 Windows 환경에서는 SmartScreen "추가 정보 → 실행"으로 우회 가능하지만 일부 금융/제조사 폐쇄망의 엄격한 Application Control(AppLocker, 그룹 정책) 환경에서는 미서명 바이너리 실행 자체가 차단될 가능성이 있습니다.
+
+---
+
+## Round 4 — 데스크톱 동적 QA 3건
+
+### 검증 1 — 로컬 endpoint 무검증 온보딩
+
+- **예측**: 미기동 서버도 검증 에러 없이 "완료"로 통과
+- **재현 절차**:
+  1. `tasklist | findstr -i "llama-server ollama"` 실행하여 로컬 LLM 서버 프로세스가 미구동 상태임을 확인.
+  2. sapstack Desktop 2.4.0 구동 후 온보딩 위저드(`ProviderSelectStep`) 진입.
+  3. AI Provider 목록 중 5번째 옵션인 `Local model` ("Run models locally with Ollama.") 선택.
+  4. `LocalModelStep` 화면에서 기본값(`Endpoint: http://localhost:11434`, `Model: qwen3-coder`) 상태 그대로 `Continue` 버튼 클릭.
+  5. 온보딩 완료 화면(`CompletionStep`: "You're all set!")에서 `Get Started` 버튼 클릭하여 메인 화면 진입.
+  6. 채팅 입력창에서 1턴 질의(`"F110 테스트 질의"`) 입력 후 `Send message` 버튼 클릭.
+- **관찰 결과**:
+  - `Continue` 클릭 시 로컬 엔드포인트에 대한 헬스체크/연결 검증 없이 즉시 온보딩 완료 화면(`CompletionStep`)으로 통과됨.
+  - 온보딩 완료 후 채팅 1턴 전송 시: 전송 클릭 즉시(1.0초 이내), 채팅창 상단에 붉은색 에러 박스로 `Error: piServerPath not configured. Cannot spawn Pi subprocess.` 문구가 발생하며 응답 생성이 즉시 중단됨.
+- **예측과 일치 여부**: **일치** (미기동 서버도 무검증 통과 확인).
+
+---
+
+### 검증 2 — Git Bash 게이트 Back 버튼
+
+- **예측**: 클릭해도 무반응
+- **재현 절차**:
+  1. 시스템 내 Git 설치 여부 확인 (`git --version` 실행 → `git version 2.50.0.windows.1`이 `C:\Program Files\Git\cmd\git.exe`에 정상 설치되어 있음).
+  2. Git Bash 경로가 정상 인식되는 환경이므로 경고 화면 트리거 조건이 성립하지 않음.
+- **관찰 결과**: **재현 불가 (Git 설치됨)**
+- **예측과 일치 여부**: 판정 보류 (지침에 따라 "재현 불가(Git 설치됨)"로 기록).
+
+---
+
+### 검증 3 — 골든패스 → 채팅 프리필 UX
+
+- **예측**: 새 세션으로 이동 후 입력창에 텍스트가 채워질 뿐 자동 전송은 되지 않음
+- **재현 절차**:
+  1. 홈 화면(세션 미선택 상태)의 Golden Path 폼(`id="sap-guided-request"`)에 증상 텍스트(`"F110 돌렸는데 한 벤더만 지급방법 오류가 뜨네요"`) 입력.
+  2. `진단 시작` 버튼 클릭.
+  3. 세션 이동 및 에디터/채팅 입력창의 상태 관찰.
+- **관찰 결과**:
+  - 새 세션(`route=allSessions/session/...`, 세션명: "SAP Evidence Loop")으로 정상 라우팅됨.
+  - 진단 프롬프트(Turn 1 INTAKE 지침, 사용자 증상, 환경 프로필, 매칭된 Symptom Index 3건, 가설/반증/Rollback 원칙이 포함된 전문)가 채팅 에디터 입력창(`contenteditable="true"` div)에 **자동으로 프리필(채워짐)만 되고 자동 전송(auto-send)되지 않은 채 대기 상태로 유지됨**.
+  - 하단 `Send message` 버튼이 활성화되어 사용자의 명시적 전송 입력을 대기함.
+- **예측과 일치 여부**: **일치**.
+- **운영자 관점 한 줄 평가**: **프리필 확인 후 수동 전송 방식이 우수함**
+  - **근거**: SAP 운영 환경에서는 자동 분류된 Symptom Index나 환경 메타데이터(Release, Client, Industry 등)가 실제 현장 이슈와 미세하게 다를 수 있으므로, AI 모델에 질의가 전송되기 전에 운영자가 진단 컨텍스트와 추가 증상 세부사항(특정 회사코드/전표번호/오류 메시지 등)을 사전에 검토·보완할 수 있는 기회를 제공하는 것이 오진단 방지 및 SAP 안전 운영 원칙(Universal Rule #1)에 부합함.
+

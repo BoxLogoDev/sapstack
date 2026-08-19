@@ -114,6 +114,9 @@ Clean Core · Key User Extensibility · 3-Tier Extension · Fit-to-Standard · C
 ### 💻 VS Code Extension (v2.4.0)
 セッション管理サイドバー · YAML 検証 · Webview レンダリング · File Watcher
 
+### 🖥 Desktop
+Windows x64 専用。インストーラ `sapstack-Desktop-<バージョン>-Setup-x64.exe`（NSIS）と Portable 版。ユーザー単位インストール（`%LOCALAPPDATA%\Programs\`）、管理者権限不要。約 219MB（v2.4.0 実測）。`llama-server`（llama.cpp）を同梱。GGUF 重みは `~/.sapstack/models/` に置けば自動検出。閉鎖網は `SAPSTACK_AIRGAPPED=1` または `~/.sapstack/config.yaml` の `air_gapped: true`。SAP データは貼り付け方式 — アプリは SAP システムに直接接続しない。インストール: [docs/desktop-install.md](docs/desktop-install.md)
+
 ### 🛡 コンプライアンス対応 (v2.0+)
 K-SOX · SOC 2 · ISO 27001 · GDPR · 分離ネットワーク展開 · PII 自動マスキング
 
@@ -142,6 +145,9 @@ sapstack-mcp --sessions-dir ~/.sapstack/sessions
 
 ### VS Code Extension
 VS Code Marketplace で "sapstack" を検索 → Install ·（または [GitHub Release](https://github.com/BoxLogoDev/sapstack/releases) の `.vsix` を直接インストール）
+
+### Desktop (Windows x64)
+[GitHub Releases](https://github.com/BoxLogoDev/sapstack/releases) から `sapstack-Desktop-<バージョン>-Setup-x64.exe` を入手してインストールする。Windows では Git for Windows（Git Bash）が必須。閉鎖網ではオフラインインストーラを USB で併せて搬入する。詳細: [docs/desktop-install.md](docs/desktop-install.md)
 
 ### Amazon Kiro IDE
 ```bash

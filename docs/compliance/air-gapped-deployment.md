@@ -30,6 +30,7 @@
   1. 인터넷 없음 → npm registry 접근 불가
   2. 외부 서비스 차단 → Claude API 호출 불가 (MCP 서버는 로컬)
   3. 파일 전송만 가능 → USB, 암호화된 외장 HDD, 보안 파일 서버 (내부)
+  4. 데스크톱 앱(Windows x64)은 USB로 Setup/Portable + GGUF + Git for Windows 오프라인 설치본을 함께 반입
 ```
 
 ---
@@ -251,8 +252,10 @@ MCP 서버 동작:
           "result": "success"}
 
 클로드(Claude) 호출:
-  ❌ 현재: 인터넷 없으면 클라우드 LLM 호출 없음
-  → 온디바이스 로컬 모델 지원 예정 (v2.5). 실제 동작 서술은 확정 후 이 자리를 채운다.
+  ❌ MCP/npm 경로: 인터넷 없으면 클라우드 LLM 호출 없음
+  ✓ Desktop (Windows x64): 설치파일에 `llama-server`(llama.cpp)가 번들됨.
+    GGUF를 `~/.sapstack/models/`에 USB 반입하면 자동 감지. 온보딩에서 Local Model
+    선택 시 클라우드 API 키 없이 완주 가능.
 ```
 
 ---
@@ -596,7 +599,7 @@ sapstack 응답:
 ## FAQ: 망분리 환경
 
 **Q: 인터넷이 없으면 Claude AI 기능은?**
-A: 온디바이스 로컬 모델 지원 예정 (v2.5). 지금은 클라우드 Claude 호출 없음. 실제 동작(로컬 모델 vs 규칙 기반)은 확정 후 이 FAQ를 갱신한다.
+A: MCP/npm 경로는 클라우드 Claude를 호출하지 못한다. Desktop(Windows x64)은 `llama-server`가 번들되어 있고, GGUF를 `~/.sapstack/models/`에 넣으면 클라우드 API 키 없이 로컬 추론이 가능하다. 설치·플래그: [docs/desktop-install.md](../desktop-install.md)
 
 **Q: 업그레이드가 분기마다 와야 하는가?**
 A: 아니오. 필요할 때만 업그레이드. sapstack v2.4.0은 안정적이므로 연간 1-2회 정도.
@@ -612,6 +615,34 @@ A: Audit trail JSONL를 주기적으로 백업 (별도 암호화 HDD). 복구 �
 
 ---
 
-**Last Updated**: 2026-08-16  
-**Version**: 1.1  
+---
+
+## Desktop (Windows x64): 폐쇄망 반입
+
+MCP+npm 번들과 별도로, 데스크톱 앱을 USB로 반입할 수 있다. 설치 세부는 [docs/desktop-install.md](../desktop-install.md).
+
+### 반입물
+
+| 항목 | 내용 |
+|------|------|
+| 앱 | `sapstack-Desktop-<버전>-Setup-x64.exe` (NSIS) 또는 Portable 변형 |
+| 설치 위치 | `%LOCALAPPDATA%\Programs\` (per-user, 관리자 권한 불필요) |
+| 크기 | 약 219MB (v2.4.0 실측). Claude 네이티브 바이너리·Bun 런타임 포함 |
+| Git Bash | Windows는 Git for Windows(Git Bash) 필수. 오프라인 설치본을 USB로 함께 반입 |
+| 모델 | 가중치는 번들되지 않음. GGUF를 `~/.sapstack/models/`에 넣으면 자동 감지. 여러 개면 파일명 알파벳순 첫 번째 |
+| 권장 모델팩 | Qwen3 4B Q4_K_M (약 2.4GB). 8B Q4_K_M (약 4.7GB)은 장비 성능에 따라 선택 |
+
+### 폐쇄망 차단 플래그
+
+아래 중 하나면 Sentry 크래시 리포팅과 GitHub Releases 업데이트 폴링이 **시작 자체가 차단**된다. 폐쇄망에서 업데이트 폴링은 무의미하다.
+
+- 환경변수 `SAPSTACK_AIRGAPPED=1`
+- `~/.sapstack/config.yaml`에 `air_gapped: true`
+
+로컬 엔진은 루프백 `127.0.0.1:11435` 전용(외부 노출 없음). 포트는 `SAPSTACK_LOCAL_LLM_PORT`로 바꾼다. 모델 id는 파일명과 무관하게 `sapstack-local` 고정.
+
+온보딩에서 Local Model을 선택하면 클라우드 API 키 없이 완주한다. SAP 데이터는 복붙 기반 — 앱이 SAP 시스템에 직접 접속하지 않는다.
+
+**Last Updated**: 2026-08-18  
+**Version**: 1.2  
 **Applicable**: sapstack v2.4.0+, Korean financial/government/defense enterprises
