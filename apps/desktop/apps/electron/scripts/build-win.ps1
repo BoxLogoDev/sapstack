@@ -1,4 +1,4 @@
-# Build script for Windows NSIS installer
+﻿# Build script for Windows NSIS installer
 # Usage: powershell -ExecutionPolicy Bypass -File scripts/build-win.ps1
 #
 # -KeepRunningProcesses: skip the step-0 kill of node/npm/electron processes.
@@ -237,7 +237,16 @@ $SdkBinPkg = "claude-agent-sdk-win32-x64"
 $SdkBinSource = "$RootDir\node_modules\@anthropic-ai\$SdkBinPkg"
 if (-not (Test-Path $SdkBinSource)) {
     Write-Host "Cross-arch build: $SdkBinPkg not in node_modules — fetching from npm..."
-    $SdkVersion = (node -p "require('$RootDir/package.json'.replace(/\\/g, '/')).dependencies['@anthropic-ai/claude-agent-sdk']").Trim('"')
+    # PowerShell 로 읽는다 — `node -p "…/\\/g…"` 는 큰따옴표 안의 정규식과 괄호를
+    # PowerShell 파서가 자기 문법으로 해석해 "Unexpected token ')'" 로 스크립트 전체가
+    # 파싱 단계에서 죽는다(v2.4.1 릴리스 빌드 실패 원인). 외부 프로세스도 불필요하다.
+    $RootPkg = Get-Content -Raw -LiteralPath (Join-Path $RootDir 'package.json') | ConvertFrom-Json
+    $SdkVersion = $RootPkg.dependencies.'@anthropic-ai/claude-agent-sdk'
+    if (-not $SdkVersion) {
+        Write-Host "ERROR: package.json 에 @anthropic-ai/claude-agent-sdk 의존성이 없다" -ForegroundColor Red
+        exit 1
+    }
+    $SdkVersion = $SdkVersion.TrimStart('^', '~')
     $PkgTmp = New-Item -ItemType Directory -Path ([System.IO.Path]::Combine($env:TEMP, [System.Guid]::NewGuid().ToString()))
     try {
         Push-Location $PkgTmp
