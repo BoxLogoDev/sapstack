@@ -21,11 +21,14 @@ files:
   - "!dist/renderer/src/**"
   - "!**/*.map"
   - package.json
-  # Include bundled MCP servers (bridge + session) for Codex sessions
-  - resources/bridge-mcp-server/**/*
-  - resources/session-mcp-server/**/*
-  # Include Pi agent server subprocess for Pi SDK sessions
-  - resources/pi-agent-server/**/*
+  # 서브프로세스 서버(bridge/session MCP, Pi agent)는 소스 `resources/` 가 아니라
+  # `dist/resources/` 에 있다 — scripts/electron-build-resources.ts 가 정적 자산과
+  # packages/<name>/dist 를 거기로 모은다. 위 `dist/**/*` 가 이미 포함하므로
+  # 여기서 소스 경로를 다시 나열하지 않는다.
+  #
+  # 과거에 `resources/pi-agent-server/**` 를 나열했으나 그 경로는 존재한 적이 없어
+  # 아무것도 포함되지 않았고, 설치본에서 로컬 모델 채팅이
+  # `piServerPath not configured` 로 죽었다 (2026-08-19 실사용 재현).
   # Note: Bundled assets (docs, themes, permissions, tool-icons) are in resources/
   # and copied to dist/resources/ by build:copy. They're included via dist/**/* above.
   # Include network interceptor for API error capture and MCP schema injection
