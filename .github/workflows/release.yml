@@ -139,16 +139,6 @@ jobs:
         # publish 가 NPM_TOKEN 미설정으로 fail 해도 tarball 은 보존됨
         run: cd mcp && npm pack
 
-      - name: Publish MCP to npm
-        run: |
-          if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "NPM_TOKEN is not configured; publish skipped after successful build, test, and pack."
-          else
-            cd mcp && npm publish --access public
-          fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Install VS Code Extension dependencies
         run: cd extension && npm ci --workspaces=false
 
@@ -180,3 +170,21 @@ jobs:
             extension/*.vsix
             desktop-dist/*.exe
             desktop-dist/latest*.yml
+
+      # 이 스텝은 의도적으로 'Create GitHub Release' 뒤에 있다.
+      # npm 은 우리가 통제하지 못하는 외부 의존이고(토큰 만료·2FA·레지스트리 장애),
+      # 앞에 두면 그 실패 하나가 데스크톱 설치파일과 latest.yml 배포까지 막는다.
+      # 실제로 v2.4.1 이 토큰 만료(E404)로 여기서 세 번째로 멈췄다.
+      #
+      # continue-on-error 는 쓰지 않는다 — 그러면 run 이 초록으로 보고돼 미발행을 놓친다.
+      # 마지막에 두면 릴리스는 나가고 실패는 빨간불로 남는다.
+      # 발행 여부의 ground truth 는 항상 `npm view @boxlogodev/sapstack-mcp version`.
+      - name: Publish MCP to npm
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "NPM_TOKEN is not configured; publish skipped after successful build, test, and pack."
+          else
+            cd mcp && npm publish --access public
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
