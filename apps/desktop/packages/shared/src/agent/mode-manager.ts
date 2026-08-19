@@ -1628,8 +1628,12 @@ export function extractBashWriteTarget(command: string): string | null {
 
   // Pattern 2: shell -c/-lc with inner redirect (Codex pattern, unquoted paths)
   // Match: /bin/zsh -lc "... > /path/to/file ..." or bash -c '... > /path ...'
+  //
+  // 경로에 백슬래시를 허용해야 Windows 경로(`C:\Users\...\plans`)가 잘리지 않는다.
+  // 전부 제외하면 `C:` 만 추출돼 plans 폴더 판정이 실패했다(2026-08-19 CI 실패 원인).
+  // 이스케이프된 따옴표(`\"`)에서만 멈추도록 negative lookahead 로 좁힌다.
   const shellExecMatch = command.match(
-    /(?:\/bin\/)?(?:zsh|bash|sh)\s+(?:-\w+\s+)*["'].*?>\s*([^\s'"\\]+)/
+    /(?:\/bin\/)?(?:zsh|bash|sh)\s+(?:-\w+\s+)*["'].*?>\s*((?:\\(?!["'])|[^\s'"\\])+)/
   );
   if (shellExecMatch?.[1] && shellExecMatch[1] !== '/dev/null') {
     return shellExecMatch[1];
