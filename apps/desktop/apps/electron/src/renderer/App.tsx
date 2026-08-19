@@ -694,10 +694,17 @@ export default function App() {
 
   // Onboarding hook — onConfigSaved fires immediately when billing is saved,
   // ensuring connection state updates before the wizard closes.
+  // onDismiss 가 없으면 Git Bash 게이트의 Back 버튼이 아무 일도 하지 않는
+  // 막다른 길이 된다 (폐쇄망 Windows 는 다운로드 링크도 못 쓴다). Back 은
+  // "Setup later" 와 동일하게 설정을 미루고 앱으로 진입한다.
   const onboarding = useOnboarding({
     onComplete: handleOnboardingComplete,
     onConfigSaved: refreshLlmConnections,
     initialSetupNeeds: setupNeeds || undefined,
+    onDismiss: () => {
+      window.electronAPI.deferSetup().catch(() => {})
+      handleOnboardingComplete()
+    },
   })
 
   // Reauth login handler - placeholder (reauth is not currently used)

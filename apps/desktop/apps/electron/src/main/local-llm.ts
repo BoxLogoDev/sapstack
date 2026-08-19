@@ -25,6 +25,7 @@ import { existsSync, mkdirSync, readdirSync } from 'fs'
 import { homedir } from 'os'
 import { join } from 'path'
 import { app, ipcMain } from 'electron'
+import { resolveBackendRuntimePaths } from '@sapstack-desktop/shared/agent/backend/internal/runtime-resolver'
 import { mainLog } from './logger'
 
 const PORT = Number(process.env.SAPSTACK_LOCAL_LLM_PORT) || 11435
@@ -41,11 +42,33 @@ export interface LocalLlmStatus {
   modelsDir: string
   /** Server process is running. */
   running: boolean
+  /**
+   * Server answered /health — the model finished loading. `running` alone is
+   * spawn success; a multi-GB GGUF takes tens of seconds of CPU load time
+   * during which the server responds 503.
+   */
+  ready: boolean
   /** OpenAI-compatible endpoint when running. */
   endpoint: string | null
   /** Model id to use against the endpoint. */
   modelId: string
   lastError: string | null
+  /**
+   * Pi chat runtime bundle (pi-agent-server) resolved on disk. Local-model
+   * chat is proxied through a Pi subprocess; when this is null the first chat
+   * dies with "piServerPath not configured. Cannot spawn Pi subprocess." —
+   * surface it here so onboarding can refuse completion instead.
+   */
+  piServerPath: string | null
+  /** Operator-facing reason when piServerPath is null. */
+  piServerError: string | null
+}
+
+export interface LocalLlmProbeResult {
+  ok: boolean
+  /** Model ids served by the endpoint (when the /v1/models body is parseable). */
+  models: string[]
+  error: string | null
 }
 
 let child: ChildProcess | null = null
@@ -84,17 +107,90 @@ function isRunning(): boolean {
   return child !== null && child.exitCode === null && !child.killed
 }
 
-export function getLocalLlmStatus(): LocalLlmStatus {
+async function probeReady(): Promise<boolean> {
+  if (!isRunning()) return false
+  try {
+    const res = await fetch(`http://${HOST}:${PORT}/health`, { signal: AbortSignal.timeout(1500) })
+    return res.ok
+  } catch {
+    return false
+  }
+}
+
+// Resolver walks the filesystem (and may shell out for runtime discovery);
+// paths cannot change within a process lifetime, so resolve once.
+let piServerPathCache: string | null | undefined
+
+function piServerPath(): string | null {
+  if (piServerPathCache === undefined) {
+    try {
+      piServerPathCache = resolveBackendRuntimePaths({
+        appRootPath: app.isPackaged ? app.getAppPath() : process.cwd(),
+        resourcesPath: process.resourcesPath,
+        isPackaged: app.isPackaged,
+      }).piServerPath ?? null
+    } catch (err) {
+      mainLog.error(`[local-llm] pi-agent-server resolution failed: ${err instanceof Error ? err.message : String(err)}`)
+      piServerPathCache = null
+    }
+  }
+  return piServerPathCache
+}
+
+export async function getLocalLlmStatus(): Promise<LocalLlmStatus> {
   const server = serverBinaryPath()
   const model = findModelFile()
+  const piServer = piServerPath()
   return {
     serverBundled: server !== null,
     modelFile: model,
     modelsDir: modelsDir(),
     running: isRunning(),
+    ready: await probeReady(),
     endpoint: isRunning() ? `http://${HOST}:${PORT}` : null,
     modelId: MODEL_ALIAS,
     lastError,
+    piServerPath: piServer,
+    piServerError: piServer ? null
+      : 'Pi chat runtime (pi-agent-server) is missing from this installation — local model chat cannot start. Reinstall sapstack Desktop; if this build shipped without it, report the installer issue.',
+  }
+}
+
+/**
+ * Probe an arbitrary OpenAI-compatible endpoint (bundled llama-server, Ollama,
+ * or any LAN inference host) with a fast GET /v1/models. Gives onboarding a
+ * verdict + clear reason *before* completion, instead of the first chat dying.
+ */
+async function probeEndpoint(rawUrl: unknown): Promise<LocalLlmProbeResult> {
+  const fail = (error: string): LocalLlmProbeResult => ({ ok: false, models: [], error })
+  if (typeof rawUrl !== 'string' || !rawUrl.trim()) return fail('Endpoint URL is required')
+  let base: URL
+  try {
+    base = new URL(rawUrl.trim())
+  } catch {
+    return fail(`Invalid endpoint URL: ${String(rawUrl).trim()}`)
+  }
+  if (base.protocol !== 'http:' && base.protocol !== 'https:') {
+    return fail(`Endpoint must be an http(s) URL, got "${base.protocol}//"`)
+  }
+  // llama-server, Ollama and every OpenAI-compatible host serve GET /v1/models.
+  const url = new URL('v1/models', base.href.endsWith('/') ? base.href : `${base.href}/`)
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(3000) })
+    if (!res.ok) {
+      return fail(`Server at ${base.origin} answered HTTP ${res.status} for /v1/models — something is listening there, but it does not look like an OpenAI-compatible LLM endpoint`)
+    }
+    const body = (await res.json().catch(() => null)) as { data?: Array<{ id?: unknown }> } | null
+    const models = Array.isArray(body?.data)
+      ? body.data.map(m => String(m?.id ?? '')).filter(Boolean)
+      : []
+    return { ok: true, models, error: null }
+  } catch (err) {
+    if ((err as Error)?.name === 'TimeoutError') {
+      return fail(`No response from ${base.origin} within 3s — the server may still be loading a model, or the endpoint is wrong`)
+    }
+    const code = (err as { cause?: { code?: string } })?.cause?.code
+    return fail(`Cannot reach ${base.origin}${code ? ` (${code})` : ''} — no LLM server is listening there. Start Ollama, or drop a GGUF model pack into ${modelsDir()} for the bundled engine, then try again.`)
   }
 }
 
@@ -167,6 +263,7 @@ export function initLocalLlm(): void {
   }
 
   ipcMain.handle('sapstack:localLlm:status', () => getLocalLlmStatus())
+  ipcMain.handle('sapstack:localLlm:probe', (_event, endpoint: unknown) => probeEndpoint(endpoint))
 
   startServer()
   app.on('before-quit', () => stopLocalLlm())

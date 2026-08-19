@@ -478,6 +478,7 @@ contextBridge.exposeInMainWorld('sapstack', {
   },
   localLlm: {
     status: () => ipcRenderer.invoke('sapstack:localLlm:status'),
+    probe: (endpoint: string) => ipcRenderer.invoke('sapstack:localLlm:probe', endpoint),
   },
   security: {
     scrub: (text: string) => ipcRenderer.invoke('sapstack:security:scrub', text),

@@ -124,17 +124,25 @@ async function saveEnvironmentProfile(input: Record<string, unknown>): Promise<R
   if (!String(input.industry || '').trim()) throw new Error('Industry is required')
   if (!languages.has(String(input.language || 'ko'))) throw new Error('A supported language is required')
 
+  // 선택 키는 기존 profile 을 베이스로 보존한다. SapEnvironmentStep 은 4개 필수
+  // 필드만 보내므로, profile 을 처음부터 재작성하면 수동으로 켠 air_gapped 나
+  // country_iso/client 가 환경 재설정 한 번에 소실된다. input 에 명시된 값이 우선.
+  const existing = ((await readEnvironmentProfile().catch(() => null)) ?? {}) as Record<string, unknown>
+  const countryIso = input.country_iso ?? existing.country_iso
+  const client = input.client ?? existing.client
+  const airGapped = input.air_gapped ?? existing.air_gapped
+
   const profile = {
     profile_version: 1,
     release: input.release,
     deployment: input.deployment,
     industry: String(input.industry).trim(),
     language: input.language || 'ko',
-    ...(input.country_iso ? { country_iso: String(input.country_iso).toLowerCase() } : {}),
-    ...(input.client ? { client: String(input.client) } : {}),
+    ...(countryIso ? { country_iso: String(countryIso).toLowerCase() } : {}),
+    ...(client ? { client: String(client) } : {}),
     // 폐쇄망 모드. main/airgap.ts 가 부팅 시 이 키를 동기로 읽어 크래시 리포팅과
     // 업데이트 폴링을 끈다. 적용하려면 재시작이 필요하다.
-    ...(input.air_gapped === true ? { air_gapped: true } : {}),
+    ...(airGapped === true ? { air_gapped: true } : {}),
   }
   const target = environmentProfilePath()
   await mkdir(dirname(target), { recursive: true })

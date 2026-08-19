@@ -1117,9 +1117,17 @@ declare global {
           modelFile: string | null
           modelsDir: string
           running: boolean
+          ready: boolean
           endpoint: string | null
           modelId: string
           lastError: string | null
+          piServerPath: string | null
+          piServerError: string | null
+        }>
+        probe(endpoint: string): Promise<{
+          ok: boolean
+          models: string[]
+          error: string | null
         }>
       }
       security: { scrub(text: string): Promise<unknown> }

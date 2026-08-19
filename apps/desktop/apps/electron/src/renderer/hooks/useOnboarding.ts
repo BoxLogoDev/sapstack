@@ -705,6 +705,43 @@ export function useOnboarding({
     setState(s => ({ ...s, credentialStatus: 'validating', errorMessage: undefined }))
 
     try {
+      // Fast pre-check (3s): is an OpenAI-compatible server listening there at
+      // all? Catches the "Ollama not running" case with a clear reason instead
+      // of waiting out the full subprocess test's 45s timeout. Bridge-less
+      // contexts (playground) skip straight to the full test.
+      const probe = await window.sapstack?.localLlm.probe(data.baseUrl).catch(() => null)
+      if (probe && !probe.ok) {
+        setState(s => ({
+          ...s,
+          credentialStatus: 'error',
+          errorMessage: probe.error || 'Cannot reach the local endpoint',
+        }))
+        return
+      }
+
+      // Full validation on the same code path as real chat (spawns the Pi
+      // subprocess) — this also surfaces a missing pi-agent-server bundle
+      // ("piServerPath not configured") here instead of on the first chat.
+      // piAuthProvider mirrors what resolveSetupTestConnectionHint derives for
+      // an openai-completions custom endpoint; validateSetupTestInput rejects
+      // pi + baseUrl without it.
+      const testResult = await window.electronAPI.testLlmConnectionSetup({
+        provider: 'pi',
+        apiKey: '',
+        baseUrl: data.baseUrl,
+        model: data.model,
+        piAuthProvider: 'openai',
+        customEndpoint: { api: 'openai-completions' },
+      })
+      if (!testResult.success) {
+        setState(s => ({
+          ...s,
+          credentialStatus: 'error',
+          errorMessage: testResult.error || 'Connection test failed',
+        }))
+        return
+      }
+
       // apiSetupMethod was set to 'anthropic_api_key' when entering local-model step
       const saved = await handleSaveConfig(undefined, {
         baseUrl: data.baseUrl,
