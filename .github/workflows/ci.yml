@@ -162,6 +162,14 @@ jobs:
         run: npm ci --workspaces=false
       - working-directory: apps/desktop
         run: bun install --frozen-lockfile --ignore-scripts
+      # --ignore-scripts 는 electron 의 postinstall(바이너리 다운로드)까지 건너뛴다.
+      # 그러면 `electron-log/main` 이 로드 시점에 electron 을 require 하다
+      # "Electron failed to install correctly" 로 죽고, 그 모듈을 import 하는
+      # 테스트 파일이 통째로 실패한다. 테스트는 Electron 을 실행하지 않고
+      # 경로만 필요로 하므로 postinstall 만 따로 돌린다.
+      - name: Install Electron binary (postinstall skipped above)
+        working-directory: apps/desktop
+        run: node node_modules/electron/install.js
       - working-directory: apps/desktop
         run: bun run typecheck:shared
       - working-directory: apps/desktop
