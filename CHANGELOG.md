@@ -13,6 +13,35 @@ scripts/generate-release-notes.sh 가 태그 버전과 같은 헤딩을 찾아 �
 
 ## [Unreleased]
 
+## [2.4.1] - 2026-08-19
+
+**테마: 설치본에서만 드러나던 결함 수리 + 데스크톱 표면 마감**
+
+### Fixed
+
+- **로컬 모델 채팅이 설치본에서 항상 죽던 것** — `piServerPath not configured.
+Cannot spawn Pi subprocess.` 근본 원인은 `packages/pi-agent-server/dist` 를
+  `dist/resources/pi-agent-server` 로 옮기는 빌드 단계가 아예 없었던 것이다.
+  `electron-builder.yml` 은 존재한 적 없는 소스 경로를 나열했고 glob 이 0건을
+  조용히 매치했다. 개발 모드는 다른 경로 해석을 써서 늘 동작했기 때문에
+  설치본에서만 드러났다. 이제 빌드가 복사하고, 산출물이 없으면 빌드가 실패한다
+- **로컬 LLM 온보딩이 미기동 서버를 "완료"로 통과시키던 것** — probe IPC
+  (`sapstack:localLlm:probe`)와 저장 전 2단계 검증 추가. `piServerPath` 미구성도
+  온보딩 시점에 잡는다
+- **safe 모드에서 Windows 경로의 plans 폴더 쓰기가 거부되던 것** — 셸 리다이렉트
+  경로 추출 정규식이 백슬래시를 전부 제외해 `C:\Users\...` 가 `C:` 로 잘렸다.
+  이 결함으로 데스크톱 CI 가 2026-08-16 이후 20회 연속 실패하고 있었다
+
+### Changed
+
+- **앱 UI 다국어가 실제로 동작한다** — ko/vi 로케일 신설(각 1,721키, en parity).
+  SAP UI 4파일의 한국어 하드코딩을 i18n 키로 이전해 en 을 골라도 홈이 한국어로
+  뜨던 문제를 해소
+- **T-code 데이터 정합** — 백로그 101건 전수 검증(실존 56건 등록, 오탐 31·확인필요
+  14는 사유 주석과 함께 allowlist 유지)
+- 문서 정본을 `AGENTS.md` 로 통합. `CLAUDE.md`·`.windsurfrules` 는 라우팅 포인터로 축소
+- 플러그인·에이전트 표를 소스에서 재생성 (15→24, 9→20)
+
 **테마: 네 번째 표면 — 데스크톱 앱을 배포 가능한 제품으로**
 
 지금까지 sapstack 은 Claude Code 플러그인 · MCP 서버 · VS Code 확장 세 표면이었다.
