@@ -6,6 +6,19 @@
 > Claude Code·Windsurf 등 **모든 AI 에이전트**가 이 파일을 읽습니다.
 > Universal Rules, 응답 포맷, 라우팅 규칙은 여기에만 존재하며,
 > `CLAUDE.md`·`.windsurfrules` 등 도구별 파일은 해당 도구 라우팅만 담습니다.
+
+## 이 순서로 읽는다
+
+| #   | 무엇                                    | 어디                                            |
+| --- | --------------------------------------- | ----------------------------------------------- |
+| 1   | **Rules** — 반드시 지킬 것              | 이 파일 + `DESIGN.md`(시각)                     |
+| 2   | **State** — 지금 어디까지 왔나          | `STATE.md` ← 작업 시작 전 필수                  |
+| 3   | **Decisions** — 이 판단이 아직 유효한가 | `decisions/active/` (뒤집힌 것은 `superseded/`) |
+| 4   | **Knowledge** — 필요할 때만             | `plans/` · `aidlc-docs/` · `docs/`              |
+
+규칙이 바뀌면 이 파일, 상태가 바뀌면 `STATE.md`, 판단이 바뀌면 `decisions/`.
+**한 사실은 한 곳에만 산다.** 상위 규약: `~/.claude/workflows/project-memory.md`
+
 > Claude Code 사용자는 이 파일과 `plugins/*/skills/*/SKILL.md`를 읽습니다.
 
 ## 이 저장소는 무엇인가?
