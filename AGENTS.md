@@ -1,6 +1,6 @@
 # AGENTS.md — sapstack (v2.4.0)
 
-<!-- sapstack-stats: version=2.4.0 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
+<!-- sapstack-stats: version=2.4.1 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
 
 > 이 파일은 **sapstack의 프로젝트 운영 계약 정본**입니다. Codex CLI·Kiro·
 > Claude Code·Windsurf 등 **모든 AI 에이전트**가 이 파일을 읽습니다.

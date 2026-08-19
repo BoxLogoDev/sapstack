@@ -1,7 +1,7 @@
 {
   "$schema": "./schemas/asset-manifest.schema.json",
   "formatVersion": 1,
-  "productVersion": "2.4.0",
+  "productVersion": "2.4.1",
   "generatedAt": "2026-07-28T00:00:00.000Z",
   "counts": {
     "plugins": 24,
