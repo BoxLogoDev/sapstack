@@ -17,6 +17,11 @@
 *.yml text eol=lf
 *.json text eol=lf
 
+# 확장자가 없어 위 규칙에 걸리지 않는 호환 레이어 파일.
+# build-multi-ai.sh 의 sync block 을 담고 있어, CRLF 로 체크아웃되면
+# awk 가  을 떨어뜨린 LF 출력을 내놓아 전 라인이 drift 로 잡힌다.
+.windsurfrules text eol=lf
+
 # 바이너리 — 줄바꿈 변환 대상이 아니다.
 *.png binary
 *.jpg binary
