@@ -42,7 +42,9 @@ const REPO = resolve(__dirname, '..', '..');
 const GOLD_PATH = resolve(REPO, 'data/eval/gold-set.yaml');
 const REPORT_PATH = resolve(REPO, 'docs/eval/REPORT.md');
 const AGENTS_DIR = resolve(REPO, 'agents');
-const UNIVERSAL_RULES = readFileSync(resolve(REPO, 'CLAUDE.md'), 'utf8');
+// Universal Rules 의 정본은 AGENTS.md 다. CLAUDE.md 는 Claude/gstack 라우팅만 담는
+// 얇은 포인터라 여기서 읽으면 규칙이 통째로 비어 채점이 무의미해진다.
+const UNIVERSAL_RULES = readFileSync(resolve(REPO, 'AGENTS.md'), 'utf8');
 
 const MODULE_AGENT = {
   FI: 'sap-fi-consultant', CO: 'sap-co-consultant', TR: 'sap-tr-consultant',

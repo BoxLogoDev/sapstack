@@ -14,7 +14,9 @@ await mkdir(assetsDir, { recursive: true });
 for (const directory of ["plugins", "agents", "commands", "data", "schemas"]) {
   await cp(path.join(repositoryRoot, directory), path.join(assetsDir, directory), { recursive: true });
 }
-for (const filename of ["asset-manifest.json", "CLAUDE.md"]) {
+// AGENTS.md 가 Universal Rules 정본이다(CLAUDE.md 는 Claude/gstack 라우팅만 담는
+// 얇은 포인터). `sapstack://rules/universal` 리소스가 이 파일을 서빙한다.
+for (const filename of ["asset-manifest.json", "AGENTS.md"]) {
   await cp(path.join(repositoryRoot, filename), path.join(assetsDir, filename));
 }
 
