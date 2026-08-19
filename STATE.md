@@ -1,6 +1,6 @@
 # STATE — sapstack
 
-> 갱신: 2026-08-19 · 브랜치 `feat/desktop-release-and-knowledge` · PR #44 · **v2.4.1 릴리스 준비 중**
+> 갱신: 2026-08-19 · `main` @ `7c4aef9` · **v2.4.1 태그 푸시 완료, 릴리스 빌드 중**
 > 규약: `~/.claude/workflows/project-memory.md`. 규칙은 `AGENTS.md`, 판단 이력은 `decisions/`.
 
 ## 지금 어디까지 왔나
@@ -19,6 +19,12 @@ v2.4.0 이 npm 에 라이브인 상태에서, 데스크톱(Electron) 쪽 미완�
 
 지시서도 정리했다: `AGENTS.md` 가 정본이 되고 `CLAUDE.md`·`.windsurfrules` 는 포인터로 축소.
 그 여파로 규칙을 코드로 읽던 3곳(eval 하니스·MCP 리소스·데스크톱 자산 복사)을 함께 정렬했다.
+
+**릴리스 파이프라인이 두 번 막혔다가 뚫렸다** (PR #45, #47). 둘 다 "로컬은 통과, CI 만 실패" 형태였다 —
+`build-win.ps1` 이 BOM 없는 UTF-8 이라 영어 로케일 러너에서만 파서가 깨졌고,
+`bun install --ignore-scripts` 가 `@vscode/ripgrep`·`electron` 의 바이너리 postinstall 을 건너뛰어
+설치 시점이 아니라 빌드 도중에 엉뚱한 메시지로 터졌다. 이 캐스케이드 전체는
+`~/.claude/.../memory/sapstack-release-cascade.md` 에 남겼다.
 
 ## 열린 것
 
