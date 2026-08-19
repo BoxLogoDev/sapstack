@@ -1,159 +1,44 @@
-# SAP Skills — Universal Plugin Repository
+# CLAUDE.md — sapstack
 
-## Purpose
+## Project operating contract
 
-Production-ready Claude Code skills covering all SAP modules.
-Applicable to any company on SAP ECC 6.0 or S/4HANA (on-premise, RISE, or Cloud Public Edition).
-No company-specific hardcoding. Skills must adapt dynamically to any company code structure,
-chart of accounts, fiscal year variant, and industry sector.
+Before changing this repository or answering any SAP question, read `AGENTS.md`.
+Universal Rules, the dual-mode response format (Quick Advisory / Evidence Loop),
+plugin and subagent routing, the compatibility matrix, multilingual behavior,
+and the reference map all live there. `ETHOS.md` holds the _why_ behind those
+rules, and `CONTRIBUTING.md` holds the contribution gates.
 
-> **Philosophy:** These rules enforce the sapstack Advisor Ethos — see [`ETHOS.md`](ETHOS.md)
-> for the *why* behind them (Ground-truth over plausibility, Evidence over confidence,
-> No hardcoding, ECC≠S/4, Field language, Operator decides).
+Keep this file limited to Claude Code / gstack routing so project instructions
+do not diverge across agents. Do not restate project facts here — point at
+`AGENTS.md` instead.
 
-## Universal Rules (Apply to ALL Skills)
+## Claude Code entry points
 
-1. NEVER hardcode company codes, G/L accounts, cost centers, or org units
-2. ALWAYS ask the user for environment context before answering:
-   - ECC 6.0 (which EhP?) or S/4HANA (which release year?)
-   - On-premise / Private Cloud (RISE) / Public Cloud?
-   - Industry sector?
-3. ALWAYS distinguish ECC vs S/4HANA behavior where they differ
-4. ALWAYS require a transport request for any configuration change
-5. NEVER recommend production changes without a simulation/test run first
-6. NEVER suggest SE16N data edits in production
-7. ALWAYS provide both T-code and menu path for every action
-8. USE FIELD LANGUAGE, not dictionary Korean. In Korean responses:
-   - Use 현장 외래어 as primary: "코스트 센터", "페이먼트 메소드", "트포", "미고"
-   - On first occurrence, annotate with (공식 번역, 필드 코드): "코스트 센터 (원가센터, KOSTL)"
-   - Accept conversational patterns: "돌렸는데", "뜨네요", "안 돼요", "박아주세요"
-   - Keep T-codes as-is (F110, MIGO, ST22 — never "F110 트랜잭션")
-   - Keep abbreviations as-is (PO, GR, TR — never expand to "구매발주" etc.)
-   - Use Korean business calendar markers (D-1, 월마감 D+3, 가결산, 확정결산)
-   - Full guide: plugins/sap-session/skills/sap-session/references/korean-field-language.md
-   - Synonym source: data/synonyms.yaml (58 terms + 10 abbreviations + 15 time expressions)
+- Knowledge source: `plugins/*/skills/*/SKILL.md` (Korean: `references/ko/`)
+- Slash commands: `commands/*.md`
+- Subagents: `agents/*.md`
+- Install as a marketplace plugin:
+  `/plugin marketplace add https://github.com/BoxLogoDev/sapstack`
 
-## Standard Response Format (Option B — Dual Mode)
+## Skill routing
 
-sapstack supports **two response modes**. The mode is chosen by the nature of
-the user's request, not by user flag.
+When the user's request matches an available skill, invoke it via the Skill
+tool. When in doubt, invoke the skill.
 
-### Mode 1 — Quick Advisory (default for simple queries)
+- Evidence Loop diagnosis session → `/sap-session-start`, then
+  `/sap-session-add-evidence` and `/sap-session-next-turn`
+- Module-specific workflows → the matching `commands/sap-*.md` slash command
+- Bugs/errors in this repository's own code → `/investigate`
+- Code review / diff check → `/review`
+- Ship / deploy / PR → `/ship` or `/land-and-deploy`
+- Save progress → `/context-save`; resume → `/context-restore`
 
-For direct questions that can be answered in one turn
-(e.g. "What does FB01 do?", "Which table holds GL line items?", "What is the
-difference between XK02 and BP?"), use the classic structure:
+## Quality gates before committing
 
-**Issue** → **Root Cause** → **Check (T-code + Table/Field)** → **Fix (Steps)** → **Prevention** → **SAP Note (if known)**
-
-For diagnostic one-turn answers, name one evidence-backed primary root cause first
-and put alternatives in a clearly lower-priority section. Include a falsification
-condition for the primary cause. The Check section must contain at least two
-relevant T-codes and one Table.Field when the underlying SAP surface provides
-them. If environment context is missing, ask for it but still provide a clearly
-labelled provisional diagnosis and read-only checks in the same turn.
-
-This mode is for **knowledge lookup** and **small clarifications**. It should
-not be used for active incident diagnosis.
-
-### Mode 2 — Evidence Loop (for multi-turn diagnosis)
-
-For incident diagnosis, cross-module change impact, period-end investigation,
-or any situation where the AI needs to verify hypotheses against evidence,
-switch to the turn-aware format defined by the `sap-session` plugin:
-
-**Turn 1 INTAKE** → **Turn 2 HYPOTHESIS + Follow-up Request** → **Turn 3 COLLECT (operator)** → **Turn 4 VERIFY + Fix + Rollback**
-
-Each hypothesis MUST include falsification criteria. Each confirmed fix MUST
-ship with a rollback plan. Session state is serialized to
-`.sapstack/sessions/{id}/state.yaml` for resume and audit.
-
-See `plugins/sap-session/skills/sap-session/SKILL.md` for full rules, and
-`schemas/` for the data contracts.
-
-### Mode Selection Rule
-
-| Signal | Use Mode |
-|---|---|
-| One-shot factual question | Quick Advisory |
-| "What does X mean / do?" | Quick Advisory |
-| "This is broken — help me diagnose" | Evidence Loop |
-| Cross-module config change review | Evidence Loop |
-| Period-end pre-check or post-review | Evidence Loop |
-| User explicitly invokes `/sap-session-*` | Evidence Loop |
-| Hypothesis uncertainty > 1 candidate | Evidence Loop |
-
-When in doubt, prefer Evidence Loop — it costs slightly more turns but avoids
-the "confident but wrong advice" failure mode that the old single-turn format
-was prone to.
-
-## Compatibility Matrix
-
-| Module          | ECC 6.0 | S/4HANA OP | RISE | Cloud PE     |
-|-----------------|---------|------------|------|--------------|
-| FI/CO           | ✓       | ✓          | ✓    | ✓            |
-| TR              | ✓       | ✓          | ✓    | △            |
-| MM/SD/PP        | ✓       | ✓          | ✓    | ✓            |
-| HCM on-prem     | ✓       | ✓ (H4S4)   | ✓    | ✗            |
-| SuccessFactors  | ✗       | ✓ (hybrid) | ✓    | ✓            |
-| ABAP classic    | ✓       | ✓          | ✓    | ✗ (RAP only) |
-| BASIS           | ✓       | ✓          | △    | ✗            |
-| BTP             | ✗       | ✓          | ✓    | ✓            |
-| PM              | ✓       | ✓          | ✓    | ✗            |
-| QM              | ✓       | ✓          | ✓    | ✓            |
-| WM (legacy)     | ✓       | ✗ (depr.)  | ✗    | ✗            |
-| EWM             | ✗       | ✓          | ✓    | ✓            |
-| Cloud PE        | ✗       | ✗          | ✗    | ✓ (native)   |
-
-## Multilingual Support (v1.7.0)
-
-sapstack supports 6 languages: ko, en, zh, ja, de, vi.
-- Detect user's language from config or conversation context
-- Respond in the detected language
-- Symptom matching works across all 6 languages
-- T-codes and SAP terms remain in English regardless of language
-
-## SAP Cloud PE Routing
-
-For S/4HANA Cloud Public Edition questions, route to `sap-cloud-consultant`.
-Key signals: "Cloud PE", "Public Cloud", "Clean Core", "Key User Extensibility",
-"Fit-to-Standard", "Cloud ALM", "Quarterly Release", "CSP".
-
-## SAP AI/Joule Reference
-
-For questions about SAP Joule, SAP AI, or sapstack's relationship with SAP's
-built-in AI, refer to `docs/sap-ai-integration.md`.
-
-## IMG Configuration References
-
-When a user's issue stems from IMG misconfiguration, route to:
-`plugins/sap-{module}/skills/sap-{module}/references/img/`
-
-Each IMG guide contains SPRO paths, step-by-step configuration,
-field values, ECC vs S/4 differences, and verification steps.
-
-## Best Practice References
-
-sapstack follows a 3-Tier Best Practice framework:
-- **Tier 1 Operational**: Daily/weekly operations (`references/best-practices/operational.md`)
-- **Tier 2 Period-End**: Month/quarter/year-end closing (`references/best-practices/period-end.md`)
-- **Tier 3 Governance**: Audit, compliance, K-SOX (`references/best-practices/governance.md`)
-
-Cross-module BP: `docs/best-practices/`
-
-## Enterprise Scenarios
-
-For multi-company code, SSC, intercompany, global rollout scenarios:
-`docs/enterprise/`
-
-## Industry-Specific Guidance
-
-For manufacturing, retail, financial services differences:
-`docs/industry/`
-Industry module matrix: `data/industry-matrix.yaml`
-
-## SAP Tutor Agent
-
-For beginner/new employee questions, route to `sap-tutor` agent.
-The tutor delegates complex questions to module-specific consultants
-and translates answers to beginner-friendly language.
+```bash
+./scripts/lint-frontmatter.sh
+./scripts/check-marketplace.sh
+./scripts/check-hardcoding.sh --strict
+./scripts/check-tcodes.sh
+npm run check:doc-stats
+```
