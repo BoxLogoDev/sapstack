@@ -1,4 +1,4 @@
-# AGENTS.md — sapstack (v1.5.0)
+# AGENTS.md — sapstack (v2.4.0)
 
 <!-- sapstack-stats: version=2.4.0 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
 
@@ -24,9 +24,10 @@
 ## 이 저장소는 무엇인가?
 
 **sapstack**은 SAP 운영 자문을 위한 통합 지식·에이전트·커맨드 플러그인
-모음입니다. **14개 SAP 모듈**(FI/CO/TR/MM/SD/PP/HCM/SFSF/ABAP/S4Migration/
-BTP/BASIS/BC/GTS) + **1개 메타 플러그인**(sap-session, Evidence Loop
-오케스트레이터)로 구성됩니다.
+모음입니다. **23개 SAP 모듈**(FI/CO/TR/MM/SD/PP/PM/QM/WM/EWM/HCM/SFSF/
+ABAP/S4Migration/BTP/BASIS/BC/GTS/Cloud/IBP/SAC/Ariba/Integration-Cloud)
++ **1개 메타 플러그인**(sap-session, Evidence Loop 오케스트레이터)로
+구성됩니다 (합계 24).
 
 - 지식 원본 형식: Claude Code plugin marketplace (`plugins/*/skills/*/SKILL.md`)
 - 이 파일: 모든 AI 에이전트가 공유하는 **운영 계약 정본**
@@ -202,52 +203,66 @@ sapstack/
 
 ---
 
-## 📦 15개 플러그인
+## 📦 24개 플러그인
 
 ### 💰 Core Financials
 
 | Plugin | 주제                       | 트리거 키워드                                              |
 | ------ | -------------------------- | ---------------------------------------------------------- |
-| sap-fi | Financial Accounting       | FB01, F110, MIRO, period close, AP, AR, GL, AA, tax, GR/IR |
-| sap-co | Controlling                | cost center, KSU5, KO88, CK11N, CO-PA, settlement          |
-| sap-tr | Treasury & Cash Management | FF7A, FF7B, liquidity, FLQDB, cash position                |
+| sap-fi | Financial Accounting       | FI, GL, AP, AR, AA, FB01, MIRO, F110, period close, GR/IR, AFAB |
+| sap-co | Controlling                | CO, cost center, KSU5, KSV5, KO88, CK11N, CO-PA, settlement |
+| sap-tr | Treasury and Cash Management | TR, treasury, FF7A, FF7B, liquidity, cash position, FLQDB, F110 |
 
 ### 📦 Logistics
 
-| Plugin | 주제                 | 트리거 키워드                                   |
-| ------ | -------------------- | ----------------------------------------------- |
-| sap-mm | Materials Management | MIGO, MIRO, ME21N, GR/IR, purchasing, inventory |
-| sap-sd | Sales & Distribution | VA01, VF01, billing, pricing, credit, delivery  |
-| sap-pp | Production Planning  | MRP, MD01, CO01, BOM, routing                   |
+| Plugin | 주제                         | 트리거 키워드                                   |
+| ------ | ---------------------------- | ----------------------------------------------- |
+| sap-mm | Materials Management         | MM, MIGO, MIRO, ME21N, GR/IR, purchasing, inventory, MR11 |
+| sap-sd | Sales and Distribution       | SD, VA01, VL01N, VF01, billing, pricing, credit, delivery |
+| sap-pp | Production Planning          | PP, MRP, MD01, CO01, BOM, routing, KANBAN       |
+| sap-pm | Plant Maintenance            | PM, 설비보전, equipment, 보전오더, 예방보전, MTBF, MTTR |
+| sap-qm | Quality Management           | QM, 품질관리, inspection lot, 검사로트, usage decision, 품질통보 |
+| sap-wm | Warehouse Management (ECC legacy) | WM, 창고관리, LS01N, LT01, LB01, transfer order, picking, putaway |
+| sap-ewm | Extended Warehouse Management | EWM, 확장창고관리, /SCWM, warehouse order, wave, packing, RF |
 
 ### 👥 HR & Talent
 
 | Plugin   | 주제           | 트리거 키워드                                   |
 | -------- | -------------- | ----------------------------------------------- |
-| sap-hcm  | HCM On-Premise | HCM, PA30, infotype, payroll, PC00, time        |
-| sap-sfsf | SuccessFactors | SuccessFactors, EC, ECP, Recruiting, RBP, OData |
+| sap-hcm  | HCM On-Premise | HCM, HR, PA30, infotype, payroll, PC00, PT60, H4S4, ESS, MSS |
+| sap-sfsf | SuccessFactors | SuccessFactors, SFSF, Employee Central, EC, ECP, Recruiting, RBP, OData |
 
 ### ⚙️ Technology
 
 | Plugin           | 주제                             | 트리거 키워드                                     |
 | ---------------- | -------------------------------- | ------------------------------------------------- |
 | sap-abap         | ABAP Development                 | ABAP, SE38, BAdI, CDS, RAP, ST22, clean core, ATC |
-| sap-s4-migration | ECC → S/4HANA Migration          | migration, brownfield, readiness, BP, SUM, ATC    |
-| sap-btp          | SAP Business Technology Platform | BTP, CAP, Fiori, OData, XSUAA                     |
-| sap-basis        | BASIS Administration (Global)    | BASIS, STMS, transport, PFCG, SM50, performance   |
+| sap-s4-migration | S/4HANA Migration                | S/4HANA migration, brownfield, greenfield, SUM, DMO, readiness check, BP migration, ATC |
+| sap-btp          | SAP Business Technology Platform | BTP, CAP, Fiori, OData, Integration Suite, XSUAA |
+| sap-basis        | BASIS Administration             | BASIS, STMS, transport, SM50, PFCG, SM21, performance |
+| sap-cloud        | S/4HANA Cloud Public Edition     | Cloud PE, Public Cloud, Clean Core, Key User Extensibility, Fit-to-Standard, Cloud ALM, CSP |
+
+### ☁️ Cloud / Integration
+
+| Plugin                  | 주제                              | 트리거 키워드                                   |
+| ----------------------- | --------------------------------- | ----------------------------------------------- |
+| sap-ibp                 | Integrated Business Planning      | IBP, demand planning, S&OP, supply planning, demand sensing, ATP |
+| sap-sac                 | SAP Analytics Cloud               | SAC, Analytics Cloud, SAC Story, Analytic Application, BW Bridge, SAC Planning |
+| sap-ariba               | SAP Ariba                         | Ariba, sourcing, RFx, e-auction, Ariba Network, ANID, guided buying |
+| sap-integration-cloud   | Integration Suite + Datasphere    | CPI, Integration Suite, iFlow, Datasphere, DWC, Cloud Connector, Event Mesh |
 
 ### 🇰🇷 Korea & Global
 
 | Plugin      | 주제                      | 트리거 키워드                                             |
 | ----------- | ------------------------- | --------------------------------------------------------- |
-| **sap-bc**  | **한국 BC 컨설턴트 특화** | BC, 베이시스, 한국, Solman, 전자세금계산서, 망분리, K-SOX |
-| **sap-gts** | **Global Trade Services** | GTS, 관세청, UNI-PASS, HS code, FTA, compliance           |
+| **sap-bc**  | **한국 BC 컨설턴트 특화** | BC, 베이시스, Solution Manager Korea, 전자세금계산서, 망분리, KISA, 공인인증서 |
+| **sap-gts** | **Global Trade Services** | GTS, 관세청, UNI-PASS, HS code, FTA, trade compliance     |
 
 ### 🔁 Meta — Evidence Loop (v1.5.0, experimental)
 
 | Plugin          | 주제                         | 역할                                              |
 | --------------- | ---------------------------- | ------------------------------------------------- |
-| **sap-session** | Evidence Loop 오케스트레이터 | 기존 14 플러그인·9 에이전트를 턴 인식 루프로 활용 |
+| **sap-session** | Evidence Loop 오케스트레이터 | 라이브 접근 없이 확인→수정→재확인 루프로 모듈·에이전트를 오케스트레이션 |
 
 ### ⚠️ sap-basis vs sap-bc
 
@@ -276,25 +291,36 @@ sapstack/
 
 ---
 
-## 🤖 9개 서브에이전트 (프롬프트 재활용)
+## 🤖 20개 서브에이전트 (프롬프트 재활용)
 
 `agents/*.md`의 프롬프트는 Claude subagent 포맷이지만, **프롬프트 본문은
 범용적**이라 다른 AI에게도 system prompt로 주입 가능합니다.
 
-| 에이전트                 | 한 줄 역할                             |
-| ------------------------ | -------------------------------------- |
-| sap-fi-consultant        | FI 이슈 체계적 진단                    |
-| sap-co-consultant        | CO 원가·배분·CO-PA                     |
-| sap-mm-consultant        | MM 전반 (구매·재고·GR/IR)              |
-| sap-sd-consultant        | Order-to-Cash                          |
-| sap-pp-consultant        | MRP·BOM·생산오더                       |
-| sap-abap-developer       | ABAP 코드 리뷰 (Clean Core, HANA, ATC) |
-| sap-s4-migration-advisor | 마이그레이션 경로 + Risk               |
-| sap-basis-consultant     | Basis 장애 증상 라우팅                 |
-| sap-integration-advisor  | 통합 아키텍처 (RFC/IDoc/OData/CPI)     |
+| 에이전트                          | 한 줄 역할 |
+| --------------------------------- | ---------- |
+| sap-fi-consultant                 | FI 이슈를 체계적으로 진단하고 해결 방안을 제시 |
+| sap-co-consultant                 | CO 이슈 체계적 진단 — 원가센터·이익센터·내부주문·CO-PA |
+| sap-tr-consultant                 | TR 자금관리 — 유동성 계획(FF7A/FF7B), 하우스뱅크, F110 |
+| sap-mm-consultant                 | MM 전반 — 구매·재고·GR/IR·송장검증 |
+| sap-sd-consultant                 | SD Order-to-Cash — 판매오더·출하·빌링·여신 |
+| sap-pp-consultant                 | PP — BOM·Routing·MRP·생산오더 |
+| sap-pm-consultant                 | PM 설비보전 — 보전통보·보전오더·예방보전 |
+| sap-qm-consultant                 | QM 품질관리 — 검사계획·검사로트·사용결정 |
+| sap-ewm-consultant                | EWM·WM — 창고오더·Wave·패킹·RF |
+| sap-hcm-consultant                | HCM — PA·OM·PY·TM, ESS/MSS |
+| sap-abap-developer                | ABAP 코드 리뷰 — Clean Core, ATC, CDS, RAP |
+| sap-s4-migration-advisor          | ECC → S/4HANA 마이그레이션 경로 + Risk |
+| sap-basis-consultant              | Basis 장애 증상 라우팅 — ST22, SM50, STMS |
+| sap-integration-advisor           | 통합 아키텍처 — RFC/IDoc/OData/CPI |
+| sap-cloud-consultant              | S/4HANA Cloud Public Edition — Clean Core, Fit-to-Standard |
+| sap-ibp-consultant                | IBP — Demand Sensing·S&OP·Supply·Inventory·Response·Control Tower |
+| sap-sac-consultant                | SAC — Story·Analytic App·Planning Model·Smart Predict |
+| sap-ariba-consultant              | Ariba — Sourcing·Contracts·Procurement·SLP·Network |
+| sap-integration-cloud-consultant  | Integration Suite (CPI) + Datasphere |
+| sap-tutor                         | SAP 신입사원 교육 튜터 — 모듈 지식·ABAP·IMG를 단계별로 설명 |
 
-Evidence Loop(`sap-session`)는 **새 에이전트를 추가하지 않고** 이 9개를
-hypothesis별로 병렬 소환합니다.
+Evidence Loop(`sap-session`)는 이 표의 에이전트를 hypothesis별로 병렬
+소환합니다.
 
 ### 특수 라우팅
 
@@ -308,7 +334,7 @@ hypothesis별로 병렬 소환합니다.
 
 ---
 
-## 🌐 다국어 지원 (Multilingual Support, v1.7.0)
+## 🌐 다국어 지원 (Multilingual Support, v1.7.0에 추가됨)
 
 sapstack은 **6개 언어**를 지원합니다: ko, en, zh, ja, de, vi.
 
@@ -391,15 +417,18 @@ Turn 4 VERIFY     → AI가 가설 확정/기각 + Fix/Rollback/Prevention
 운영 규칙 정본은 **이 파일(`AGENTS.md`)**, SAP 지식 원본은
 `plugins/*/skills/*/SKILL.md`이고, 도구별 파일은 얇은 라우팅 레이어입니다.
 
-| AI 도구             | 진입점                                                       | 지원 버전   |
-| ------------------- | ------------------------------------------------------------ | ----------- |
-| Claude Code         | `AGENTS.md` + `CLAUDE.md` + `plugins/*/skills/*/SKILL.md`    | v1.0.0+     |
-| OpenAI Codex CLI    | `AGENTS.md` (이 파일)                                        | v1.2.0+     |
-| GitHub Copilot      | `.github/copilot-instructions.md`                            | v1.3.0+     |
-| Cursor              | `.cursor/rules/sapstack.mdc`                                 | v1.2.0+     |
-| Continue.dev        | `.continue/config.yaml`                                      | v1.3.0+     |
-| Aider               | `CONVENTIONS.md`                                             | v1.3.0+     |
-| **Amazon Kiro IDE** | `AGENTS.md` + `.kiro/steering/*` + `.kiro/settings/mcp.json` | **v1.5.0+** |
+| AI 도구                   | 진입점                                                       | 지원 버전   |
+| ------------------------- | ------------------------------------------------------------ | ----------- |
+| Claude Code               | `AGENTS.md` + `CLAUDE.md` + `plugins/*/skills/*/SKILL.md`    | v1.0.0+     |
+| OpenAI Codex CLI          | `AGENTS.md` (이 파일)                                        | v1.2.0+     |
+| GitHub Copilot            | `.github/copilot-instructions.md`                            | v1.3.0+     |
+| Cursor                    | `.cursor/rules/sapstack.mdc`                                 | v1.2.0+     |
+| Continue.dev              | `.continue/config.yaml`                                      | v1.3.0+     |
+| Aider                     | `CONVENTIONS.md`                                             | v1.3.0+     |
+| **Amazon Kiro IDE**       | `AGENTS.md` + `.kiro/steering/*` + `.kiro/settings/mcp.json` | **v1.5.0+** |
+| Windsurf / Codeium        | `.windsurfrules`                                             | v2.2.0+     |
+| Sourcegraph Cody          | `.cody/rules.md`                                             | v2.2.0+     |
+| JetBrains AI Assistant    | `.idea/sapstack-prompt.md`                                   | v2.2.0+     |
 
 ### Kiro 사용 시
 
@@ -413,7 +442,7 @@ Evidence Loop 전체가 Kiro 안에서 작동합니다.
 
 ```bash
 git submodule add https://github.com/BoxLogoDev/sapstack sapstack
-cd sapstack && git checkout v1.5.0 && cd ..
+cd sapstack && git checkout v2.4.0 && cd ..
 
 codex "sapstack의 sap-fi-consultant 에이전트 프롬프트를 따라 다음 이슈를 \
   진단해줘: F110 돌렸는데 벤더 100234 하나만 No valid payment method 뜨네요. \
@@ -454,8 +483,10 @@ Codex는 `AGENTS.md`를 자동 로드하므로 별도 플래그 없이 이 가�
 ## 📚 관련 문서
 
 - `README.md` — 일반 사용자 가이드
-- `CLAUDE.md` — Claude Code 전용 라우팅 (프로젝트 규칙은 이 파일이 정본)
-- `.windsurfrules` — Windsurf 전용 라우팅
+- `CLAUDE.md` — Claude Code 전용 라우팅 (프로젝트 규칙은 `AGENTS.md`가 정본)
+- `.windsurfrules` — Windsurf / Codeium 전용 라우팅
+- `.cody/rules.md` — Sourcegraph Cody 전용 라우팅
+- `.idea/sapstack-prompt.md` — JetBrains AI Assistant 전용 라우팅
 - `CONTRIBUTING.md` — 기여 절차 (한국어)
 - `docs/architecture.md` — 3축 구조 설명
 - `docs/multi-ai-compatibility.md` — 다른 AI 도구에서 sapstack 쓰는 법 ⭐
