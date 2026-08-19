@@ -36,6 +36,25 @@ jobs:
         working-directory: apps/desktop
         run: bun install --frozen-lockfile --ignore-scripts
 
+      # --ignore-scripts 는 네이티브 바이너리를 받아오는 postinstall 까지 건너뛴다.
+      # build-win.ps1 이 ripgrep 바이너리를 설치파일에 복사하므로, 없으면
+      # "ERROR: @vscode/ripgrep not installed or postinstall did not run" 로 빌드가 멈춘다.
+      # electron 도 같은 이유로 필요하다(electron-log 가 로드 시점에 require 한다).
+      - name: Run trusted postinstalls skipped by --ignore-scripts
+        working-directory: apps/desktop
+        shell: bash
+        run: |
+          set -e
+          # bun pm trust 가 먹지 않는 경우(이미 trusted 목록에 있어 no-op 등)를 대비해
+          # 바이너리 존재를 확인하고, 없으면 패키지의 postinstall 을 직접 돌린다.
+          bun pm trust @vscode/ripgrep || true
+          if [ ! -f node_modules/@vscode/ripgrep/bin/rg.exe ]; then
+            echo "ripgrep binary still missing — running postinstall directly"
+            node node_modules/@vscode/ripgrep/lib/postinstall.js
+          fi
+          test -f node_modules/@vscode/ripgrep/bin/rg.exe
+          node node_modules/electron/install.js
+
       # build-win.ps1 이 Windows 빌드 전체를 담당한다: bun 바이너리 다운로드(SHA 검증) →
       # 루트 node_modules 에서 SDK 복사 + claude-agent-sdk-binary alias 생성 →
       # ripgrep/interceptor 복사 → electron 빌드 → electron-builder --win → 설치파일 검증.
