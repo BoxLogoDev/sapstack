@@ -116,6 +116,14 @@ export function useMessagingConnect({
 export interface MessagingSessionMenuItemProps extends UseMessagingConnectOptions {}
 
 export function MessagingSessionMenuItem(props: MessagingSessionMenuItemProps) {
+  // Gated here (not at the three call sites) so SessionMenu / SessionItem /
+  // CompactSessionMenu stay upstream-identical. The flag is constant for the
+  // app lifetime, so hook order below never changes between renders.
+  if (!window.electronAPI?.featureFlags?.messaging) return null
+  return <MessagingSessionMenuItemInner {...props} />
+}
+
+function MessagingSessionMenuItemInner(props: MessagingSessionMenuItemProps) {
   const { t } = useTranslation()
   const { MenuItem, Sub, SubTrigger, SubContent } = useMenuComponents()
   const handleConnectMessaging = useMessagingConnect(props)

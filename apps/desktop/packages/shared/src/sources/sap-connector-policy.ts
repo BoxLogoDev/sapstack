@@ -9,10 +9,16 @@ export interface SapConnectorPolicyDecision {
 
 const SOURCE_TOOL = /^mcp__([a-z0-9-]+)__(.+)$/
 const NON_PRODUCTION_ENVIRONMENTS = new Set<SapConnectorPolicy['environment']>(['development', 'quality', 'sandbox'])
+const SAP_SOURCE_IDENTITY = /(^|[-_\s])(sap|abap|adt|s4hana|s-4hana)([-_\s]|$)/i
+
+function isSapSource(sourceSlug: string, config?: Partial<FolderSourceConfig>): boolean {
+  return [sourceSlug, config?.slug, config?.id, config?.name, config?.provider]
+    .some(value => typeof value === 'string' && SAP_SOURCE_IDENTITY.test(value))
+}
 
 /**
  * Enforce an SAP connector's exact tool allowlist before normal permission-mode checks.
- * Sources without sapConnector metadata keep the existing permission behavior.
+ * SAP-labelled sources fail closed when their policy is missing or unreadable.
  */
 export function evaluateSapConnectorTool(workspaceRootPath: string, toolName: string): SapConnectorPolicyDecision | null {
   const match = SOURCE_TOOL.exec(toolName)
@@ -24,11 +30,19 @@ export function evaluateSapConnectorTool(workspaceRootPath: string, toolName: st
   try {
     config = JSON.parse(readFileSync(join(workspaceRootPath, 'sources', sourceSlug, 'config.json'), 'utf8')) as FolderSourceConfig
   } catch {
+    if (isSapSource(sourceSlug)) {
+      return { allowed: false, reason: `SAP connector "${sourceSlug}" policy could not be loaded.` }
+    }
     return null
   }
 
   const policy = config.sapConnector
-  if (!policy) return null
+  if (!policy) {
+    if (isSapSource(sourceSlug, config)) {
+      return { allowed: false, reason: `SAP connector "${sourceSlug}" is missing its required read-only policy.` }
+    }
+    return null
+  }
   if (
     policy.access !== 'read_only' ||
     !NON_PRODUCTION_ENVIRONMENTS.has(policy.environment) ||

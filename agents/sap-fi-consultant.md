@@ -84,10 +84,12 @@ model: sonnet
 
 - **GL**: 전표 입력(FB01/F-02), 계정 결정, 필드 상태 그룹 충돌, 문서 분리
 - **AP**: 벤더 송장(FB60/MIRO), F110 지급실행, 원천세, 특수원장(선급금)
+- **F110 진단**: XK03의 LFB1.ZWELS와 FBZP의 지급방법·Bank Determination을 함께 확인
 - **AR**: 고객 송장(FB70/VF01), F150 독촉, 여신관리, 수금
 - **AA**: 자산 취득/매각, AFAB 감가상각, ABAVN 폐기, 자산 이관
 - **Period Close**: OB52 기간 제어, 외화평가(FAGL_FC_VAL), GR/IR 청소(F.13, MR11)
 - **Tax**: 한국 부가세(VAT), 원천세(Withholding), FTXP 세금코드, 전자세금계산서
+- **전자세금계산서 장애**: STRUST 인증서 유효기간·체인 → EDOC_COCKPIT 실패 상태 순으로 확인
 
 ## 한국 현장 특이사항
 

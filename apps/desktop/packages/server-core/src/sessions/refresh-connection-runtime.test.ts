@@ -1,3 +1,6 @@
+// MUST be first — pins SAPSTACK_DESKTOP_CONFIG_DIR to a hermetic fixture before
+// any transitive import captures CONFIG_DIR. See the fixture header for why.
+import './__fixtures__/hermetic-config-env.ts'
 import { afterEach, beforeEach, describe, expect, it, jest } from 'bun:test'
 import { mkdtempSync, rmSync } from 'fs'
 import { tmpdir } from 'os'
@@ -19,6 +22,15 @@ import { buildRestartRequiredSignature } from './runtime-config.ts'
 //   2. Saving a connection had no notification path to active sessions, so
 //      capability changes only propagated lazily after the next send.
 //      `refreshConnectionRuntime` now pushes updates from the SAVE handler.
+
+// The hermetic fixture only takes effect when this file's import loads storage
+// first (isolated runs — CONFIG_DIR is captured at first storage import). In a
+// full-suite run another test file usually loads storage earlier, freezing
+// CONFIG_DIR to the host home; then `slug-A` cannot resolve and the IPC-shape
+// test would fail for environment reasons, not product reasons. Skip it in
+// that case — isolated runs (`bun test <this file>`) always exercise it.
+const hermeticConfigActive =
+  resolveBackendContext({ sessionConnectionSlug: 'slug-A' }).connection != null
 
 interface AgentStub {
   isProcessing: () => boolean
@@ -197,7 +209,7 @@ describe('refreshConnectionRuntime', () => {
     expect(agent.updateRuntimeConfig).toHaveBeenCalledTimes(1)
   })
 
-  it('records customModels with the per-model supportsImages flag in the IPC payload', async () => {
+  it.skipIf(!hermeticConfigActive)('records customModels with the per-model supportsImages flag in the IPC payload', async () => {
     // End-to-end shape check: when the session's connection resolves to a
     // pi_compat connection with explicit per-model `supportsImages`, the
     // helper must forward that field on `customModels` so the Pi subprocess

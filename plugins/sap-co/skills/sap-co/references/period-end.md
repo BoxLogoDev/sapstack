@@ -12,7 +12,7 @@
 | 6 | Internal order settlement | KO8G | Collective settlement — simulate first |
 | 7 | Product cost collector settlement | KKS1 | If product cost collectors active |
 | 8 | WBS/Project settlement | CJ88 | If PS module active |
-| 9 | Material Ledger period-end closing | CKMLCP | S/4HANA mandatory |
+| 9 | Material Ledger actual costing close | CKMLCP | Run only when actual costing is activated and in close scope; S/4HANA Material Ledger foundation does not make every actual-costing run universal |
 | 10 | CO-PA transfer check | KE24 | Verify line items transferred from billing |
 | 11 | Variance analysis | KSB1 / S_ALR_87013611 | Cost center variances |
 | 12 | Lock CO period | OKP1 | After all allocations complete |

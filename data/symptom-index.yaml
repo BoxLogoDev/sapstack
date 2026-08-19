@@ -1,4 +1,9 @@
 # data/symptom-index.yaml
+# 다국어 검수 상태 (2026-08-16, Grok draft):
+#   symptom_zh/ja/de/vi 전수 채움. 신규분은 Claude/Grok 초안 — 네이티브 검수 전.
+#   식별: 아래 "translation_review: pending-native" 및 docs/TRANSLATION-REVIEW.md
+#   배지 관행: <!-- Grok-authored draft (community review welcome) -->
+#
 # Symptom Index — 자연어 증상 ↔ SAP 모듈·T-code·초기 체크 매핑
 #
 # 목적:
@@ -22,12 +27,12 @@ schema_version: "1.0.0"
 generated: 2026-04-12
 source: sapstack authors
 license: MIT
+# translation_review: pending-native — zh/ja/de/vi 신규분은 Grok 초안. 네이티브 검수 전. docs/TRANSLATION-REVIEW.md
 
 symptoms:
   # ═══════════════════════════════════════════════
   # F110 — Payment Run (3건)
   # ═══════════════════════════════════════════════
-
   - id: sym-f110-no-payment-method
     symptom_ko: "F110 돌리는데 벤더 하나만 'No valid payment method' 뜨는 경우"
     symptom_ko_variants:
@@ -39,6 +44,7 @@ symptoms:
     symptom_de: "F110 schlägt fehl mit 'Keine gültige Zahlungsmethode für Lieferant gefunden'"
     symptom_zh: "F110运行时某供应商出现'未找到有效付款方式'错误"
     symptom_ja: "F110実行時に特定仕入先で「有効な支払方法が見つかりません」エラー"
+    symptom_vi: "F110 chạy nhưng một nhà cung cấp (Lieferant/Vendor) báo 'No valid payment method'"
     likely_modules: [FI, TR]
     first_check_tcodes: [F110, XK03, FBZP, SE16N]
     typical_causes:
@@ -101,6 +107,8 @@ symptoms:
     symptom_en: "F110 fails at Payment stage when creating DME file"
     symptom_zh: "F110 付款阶段未能创建DME文件"
     symptom_ja: "F110支払実行のDMEファイル生成段階で失敗"
+    symptom_de: "F110 erzeugt in der Payment-Stufe keine DME-Datei"
+    symptom_vi: "F110 thất bại ở bước Payment khi tạo tệp DME"
     likely_modules: [FI, TR, BC]
     first_check_tcodes: [F110, DMEE, OBPM1, OBPM4]
     typical_causes:
@@ -134,6 +142,7 @@ symptoms:
     symptom_de: "MIGO Warenannahme-Buchung schlägt fehl mit M7-Nachricht"
     symptom_zh: "MIGO入库时出现M7错误，无法过账"
     symptom_ja: "MIGO入庫計上時にM7エラーで過账失敗"
+    symptom_vi: "MIGO nhập kho (Goods Receipt) không ghi sổ được, báo lỗi M7"
     likely_modules: [MM, FI]
     first_check_tcodes: [MIGO, ME23N, OMJJ, OBYC]
     typical_causes:
@@ -340,6 +349,8 @@ symptoms:
     symptom_en: "ABAP runtime dump in production (ST22)"
     symptom_de: "ABAP-Laufzeitfehler im Produktivsystem (ST22)"
     symptom_ja: "本番環境でABAPランタイムダンプ発生 (ST22)"
+    symptom_zh: "生产系统出现ABAP运行时转储（ST22）"
+    symptom_vi: "Hệ thống production xuất hiện dump ABAP (ST22)"
     likely_modules: [ABAP, BASIS]
     first_check_tcodes: [ST22, SE24, SLG1, SM21]
     typical_causes:
@@ -787,6 +798,10 @@ symptoms:
       - "COGI 미 처리"
       - "자동 이동 오류"
     symptom_en: "COGI automatic goods movement error"
+    symptom_zh: "COGI出现自动货物移动（backflush）错误并持续堆积"
+    symptom_ja: "COGIに自動品目移動（バックフラッシュ）エラーが溜まる"
+    symptom_de: "COGI sammelt Fehler bei automatischer Warenbewegung (Backflush)"
+    symptom_vi: "COGI liên tục chất lỗi dịch chuyển hàng tự động (backflush)"
     likely_modules: [PP, MM]
     first_check_tcodes: [COGI, CO01, MIGO, OMJJ]
     typical_causes:
@@ -811,6 +826,10 @@ symptoms:
       - "에스오 상태 불완전"
       - "SO 저장 실패"
     symptom_en: "VA02 blocks order save with incomplete status"
+    symptom_zh: "VA02因不完整日志（incompletion log）无法保存销售订单"
+    symptom_ja: "VA02で不完全ログのため受注を保存できない"
+    symptom_de: "VA02 blockiert das Sichern wegen unvollständigem Beleg (Incompletion)"
+    symptom_vi: "VA02 chặn lưu đơn bán vì trạng thái incomplete"
     likely_modules: [SD]
     first_check_tcodes: [VA02, VA01, V.23, VBAK]
     typical_causes:
@@ -831,6 +850,10 @@ symptoms:
       - "가결정 조건 미포함"
       - "SO 조건 누락"
     symptom_en: "VA01 pricing error (conditions not applied)"
+    symptom_zh: "VA01定价失败，条件（condition）未应用"
+    symptom_ja: "VA01で価格決定エラー（条件が適用されない）"
+    symptom_de: "VA01 Preisfindungfehler — Konditionen werden nicht ermittelt"
+    symptom_vi: "VA01 lỗi định giá (condition không được áp dụng)"
     likely_modules: [SD]
     first_check_tcodes: [VA01, VK11, V/08, KONV]
     typical_causes:
@@ -851,6 +874,10 @@ symptoms:
       - "VF01 문서 발행 안 됨"
       - "출력 타입 미실행"
     symptom_en: "VF01 billing created but output document not issued"
+    symptom_zh: "VF01已创建开票但输出（Output）未发出"
+    symptom_ja: "VF01で請求書は作成されたが出力（Output）が出ない"
+    symptom_de: "VF01 Faktura erzeugt, aber Ausgabe (Output/Nachricht) wird nicht ausgegeben"
+    symptom_vi: "VF01 đã tạo billing nhưng Output không được phát hành"
     likely_modules: [SD, BC]
     first_check_tcodes: [VF01, VF03, NACE, OVA6]
     typical_causes:
@@ -871,6 +898,10 @@ symptoms:
       - "여신한도 초과 해제 못 함"
       - "크레딧 매니지먼트 잠금"
     symptom_en: "VKM1 credit block cannot be released"
+    symptom_zh: "VKM1信贷冻结（credit block）无法释放"
+    symptom_ja: "VKM1与信ブロックを解除できない"
+    symptom_de: "VKM1 Kreditsperre lässt sich nicht aufheben"
+    symptom_vi: "VKM1 không gỡ được credit block"
     likely_modules: [SD, FI]
     first_check_tcodes: [VKM1, FD32, UKM_CASE, FD10N]
     typical_causes:
@@ -891,6 +922,10 @@ symptoms:
       - "D/N 여러 개 생성"
       - "배송 지시 나뉨"
     symptom_en: "VL01N delivery unexpectedly split into multiple documents"
+    symptom_zh: "VL01N交货单被意外拆分成多张凭证"
+    symptom_ja: "VL01N出荷が予期せず複数伝票に分割される"
+    symptom_de: "VL01N Lieferung wird unerwartet in mehrere Belege gesplittet"
+    symptom_vi: "VL01N delivery bị tách thành nhiều chứng từ ngoài ý muốn"
     likely_modules: [SD]
     first_check_tcodes: [VL01N, VA03, LIKP, LIPS]
     typical_causes:
@@ -915,6 +950,10 @@ symptoms:
       - "임금 타입 거부"
       - "PC00 wage type 에러"
     symptom_en: "PC00_M99 payroll run error (wage type rejected)"
+    symptom_zh: "PC00_M99工资核算运行出错（工资项被拒绝）"
+    symptom_ja: "PC00_M99給与計算でエラー（賃金タイプが拒否される）"
+    symptom_de: "PC00_M99 Abrechnung bricht ab (Lohnart abgelehnt)"
+    symptom_vi: "PC00_M99 chạy payroll lỗi (wage type bị từ chối)"
     likely_modules: [HCM]
     first_check_tcodes: [PC00_M99, PT01, PT50, MOLGA]
     typical_causes:
@@ -935,6 +974,10 @@ symptoms:
       - "시간 할당량 불일치"
       - "퀘타 평가 에러"
     symptom_en: "PT60 time evaluation shows remaining leave quota mismatch"
+    symptom_zh: "PT60时间评估显示剩余休假配额与实际不符"
+    symptom_ja: "PT60勤怠評価の残年次（quota）が実数と一致しない"
+    symptom_de: "PT60 Zeitauswertung zeigt abweichendes Resturlaubs-Kontingent (Quota)"
+    symptom_vi: "PT60 đánh giá thời gian: số ngày phép còn lại không khớp"
     likely_modules: [HCM]
     first_check_tcodes: [PT60, PT65, PTEQ, PIQAP]
     typical_causes:
@@ -955,6 +998,10 @@ symptoms:
       - "O/U 배정 다름"
       - "조직 단위 불일치"
     symptom_en: "PA30 IT0001 organizational assignment mismatch"
+    symptom_zh: "PA30 IT0001组织分配与当前组织不一致"
+    symptom_ja: "PA30 IT0001の組織割当が現行組織と一致しない"
+    symptom_de: "PA30 IT0001 Organisationszuordnung stimmt nicht mit der aktuellen Organisation"
+    symptom_vi: "PA30 IT0001 phân công tổ chức không khớp tổ chức hiện tại"
     likely_modules: [HCM]
     first_check_tcodes: [PA30, PA01, PA20, SECU]
     typical_causes:
@@ -975,6 +1022,10 @@ symptoms:
       - "사회보험 신고 금액"
       - "4대보험 차이"
     symptom_en: "Four social insurances (Korea) notification amount mismatch"
+    symptom_zh: "韩国四险申报金额与工资核算不一致"
+    symptom_ja: "韓国4大保険の申告額と給与計算が一致しない"
+    symptom_de: "Korea: Meldebetrag der vier Sozialversicherungen weicht von der Abrechnung ab"
+    symptom_vi: "Số tiền kê khai 4 bảo hiểm xã hội Hàn Quốc không khớp payroll"
     likely_modules: [HCM]
     first_check_tcodes: [PA01, PC00_M99, MOLGA, PT01]
     typical_causes:
@@ -999,6 +1050,10 @@ symptoms:
       - "KO88 PM"
       - "작업지시서 정산 실패"
     symptom_en: "KO88 PM order settlement fails"
+    symptom_zh: "KO88设备维护订单（PM order）结算失败"
+    symptom_ja: "KO88保全指図（PM order）の決済に失敗する"
+    symptom_de: "KO88 Abrechnung des Instandhaltungsauftrags (PM) schlägt fehl"
+    symptom_vi: "KO88 quyết toán lệnh bảo trì (PM order) thất bại"
     likely_modules: [PM, CO]
     first_check_tcodes: [KO88, IW52, COBL, AUFK]
     typical_causes:
@@ -1019,6 +1074,10 @@ symptoms:
       - "긴급 정비 요청"
       - "브레이크다운 노티피케이션"
     symptom_en: "IW21 equipment breakdown notification processing"
+    symptom_zh: "IW21紧急故障通知未自动生成维护订单"
+    symptom_ja: "IW21緊急故障通知から保全指図が自動生成されない"
+    symptom_de: "IW21 Störmeldung erzeugt keinen Instandhaltungsauftrag"
+    symptom_vi: "IW21 thông báo hỏng khẩn không tạo lệnh bảo trì"
     likely_modules: [PM]
     first_check_tcodes: [IW21, IW23, QMEL, IE02]
     typical_causes:
@@ -1039,6 +1098,10 @@ symptoms:
       - "예방정비 스케줄"
       - "PM 기한"
     symptom_en: "IP30 preventive maintenance schedule overdue"
+    symptom_zh: "IP30预防性维护计划已逾期仍持续告警"
+    symptom_ja: "IP30予防保全の期限超過通知が出続ける"
+    symptom_de: "IP30 vorbeugende Instandhaltung ist überfällig"
+    symptom_vi: "IP30 bảo trì phòng ngừa quá hạn vẫn báo"
     likely_modules: [PM]
     first_check_tcodes: [IP30, IP01, IP10, IVPLAN]
     typical_causes:
@@ -1059,6 +1122,10 @@ symptoms:
       - "장비 생명주기"
       - "Equipment Status Lock"
     symptom_en: "IE02 equipment status change fails"
+    symptom_zh: "IE02无法更改设备状态（Equipment Status）"
+    symptom_ja: "IE02で設備ステータスを変更できない"
+    symptom_de: "IE02 Equipment-Status lässt sich nicht ändern"
+    symptom_vi: "IE02 không đổi được trạng thái thiết bị (Equipment Status)"
     likely_modules: [PM]
     first_check_tcodes: [IE02, IE01, EQKTXHDR, EQKTXDATA]
     typical_causes:
@@ -1079,6 +1146,10 @@ symptoms:
       - "계량기 역전"
       - "메터 판독 불가"
     symptom_en: "IW65 counter reading error (negative/reversal)"
+    symptom_zh: "IW65计数器读数错误（负数或回退）"
+    symptom_ja: "IW65カウンタ読取が異常（マイナス/逆転）"
+    symptom_de: "IW65 Zählerstand fehlerhaft (negativ/rückläufig)"
+    symptom_vi: "IW65 lỗi số đếm (âm hoặc đảo chiều)"
     likely_modules: [PM]
     first_check_tcodes: [IW65, IW64, EQUI, EQCT]
     typical_causes:
@@ -1099,6 +1170,10 @@ symptoms:
       - "부외 서비스 입력"
       - "Service Entry Sheet Error"
     symptom_en: "ML81N service entry sheet error"
+    symptom_zh: "ML81N服务确认单（Service Entry Sheet）报错"
+    symptom_ja: "ML81Nサービス入力シートでエラー"
+    symptom_de: "ML81N Fehler im Serviceerfassungsblatt (Service Entry Sheet)"
+    symptom_vi: "ML81N lỗi phiếu ghi nhận dịch vụ (Service Entry Sheet)"
     likely_modules: [PM, MM]
     first_check_tcodes: [ML81N, ML81, ML85, SEREC]
     typical_causes:
@@ -1123,6 +1198,10 @@ symptoms:
       - "검사 로트 못 풀어요"
       - "IL 릴리즈 안 됨"
     symptom_en: "QA03 inspection lot stuck in REL status"
+    symptom_zh: "QA03检验批停在REL状态无法进入下一步"
+    symptom_ja: "QA03検査ロットがRELのまま次工程に進まない"
+    symptom_de: "QA03 Prüflos bleibt im Status REL stehen"
+    symptom_vi: "QA03 inspection lot kẹt trạng thái REL"
     likely_modules: [QM]
     first_check_tcodes: [QA03, QA01, QALS, QAMR]
     typical_causes:
@@ -1143,6 +1222,10 @@ symptoms:
       - "UD 후 스탁 미전환"
       - "Usage Decision 재고 처리"
     symptom_en: "QA11 usage decision fails to convert stock"
+    symptom_zh: "QA11使用决策后库存未转换（仍隔离）"
+    symptom_ja: "QA11使用決定後に在庫が振り替わらない"
+    symptom_de: "QA11 Verwendungsentscheid wandelt Bestand nicht um"
+    symptom_vi: "QA11 usage decision xong nhưng tồn kho không chuyển"
     likely_modules: [QM, MM]
     first_check_tcodes: [QA11, QA01, QALS, QAMR]
     typical_causes:
@@ -1163,6 +1246,10 @@ symptoms:
       - "부적합 통보 멈춤"
       - "Quality Notification 블로킹"
     symptom_en: "QM01 quality notification workflow interruption"
+    symptom_zh: "QM01质量通知工作流中断"
+    symptom_ja: "QM01品質通知のワークフローが止まる"
+    symptom_de: "QM01 Workflow der Qualitätsmeldung unterbrochen"
+    symptom_vi: "QM01 workflow thông báo chất lượng bị gián đoạn"
     likely_modules: [QM]
     first_check_tcodes: [QM01, QM02, QM03, SWWL]
     typical_causes:
@@ -1183,6 +1270,10 @@ symptoms:
       - "IP 자동 할당"
       - "Inspection Plan 미포함"
     symptom_en: "QA01 inspection plan not automatically assigned"
+    symptom_zh: "QA01未自动分配检验计划"
+    symptom_ja: "QA01に検査計画が自動割当されない"
+    symptom_de: "QA01 Prüfplan wird nicht automatisch zugeordnet"
+    symptom_vi: "QA01 không gán tự động inspection plan"
     likely_modules: [QM, MM]
     first_check_tcodes: [QA01, QA06, QPLA, QA08]
     typical_causes:
@@ -1203,6 +1294,10 @@ symptoms:
       - "시험성적서 생성 실패"
       - "Certificate of Analysis 오류"
     symptom_en: "QC21 Certificate of Analysis generation fails"
+    symptom_zh: "QC21分析证书（CoA）生成失败"
+    symptom_ja: "QC21成績書（CoA）の生成に失敗する"
+    symptom_de: "QC21 Erstellung des Prüfzeugnisses (CoA) schlägt fehl"
+    symptom_vi: "QC21 không tạo được Certificate of Analysis (CoA)"
     likely_modules: [QM]
     first_check_tcodes: [QC21, QC22, QCMA, QCALC]
     typical_causes:
@@ -1227,6 +1322,10 @@ symptoms:
       - "이관오더 컨펌 못 함"
       - "TO Confirmation 블로킹"
     symptom_en: "LT06 Transfer Order confirmation error"
+    symptom_zh: "LT06转储单（Transfer Order）确认失败"
+    symptom_ja: "LT06転送オーダ（TO）の確認ができない"
+    symptom_de: "LT06 Transportauftrag (TO) lässt sich nicht quittieren"
+    symptom_vi: "LT06 không confirm được Transfer Order"
     likely_modules: [WM, MM]
     first_check_tcodes: [LT06, LT01, LTAK, LTAP]
     typical_causes:
@@ -1247,6 +1346,10 @@ symptoms:
       - "EWM 웨이브 처리"
       - "/SCWM/WAVE 블로킹"
     symptom_en: "/SCWM/WAVE wave release fails"
+    symptom_zh: "/SCWM/WAVE波次释放失败"
+    symptom_ja: "/SCWM/WAVEのウェーブリリースに失敗する"
+    symptom_de: "/SCWM/WAVE Wave-Freigabe schlägt fehl"
+    symptom_vi: "/SCWM/WAVE giải phóng wave thất bại"
     likely_modules: [EWM]
     first_check_tcodes: ["/SCWM/WAVE", "/SCWM/MON", "/SCWM/WHSE", "/SCWM/BOD"]
     typical_causes:
@@ -1267,6 +1370,10 @@ symptoms:
       - "EWM 빈 할당"
       - "저장 위치 불일치"
     symptom_en: "EWM putaway strategy results in incorrect bin assignment"
+    symptom_zh: "EWM上架策略导致仓位（bin）分配错误"
+    symptom_ja: "EWM入庫戦略で誤ったビンが割り当てられる"
+    symptom_de: "EWM Einlagerstrategie weist den falschen Lagerplatz (Bin) zu"
+    symptom_vi: "Chiến lược putaway EWM gán sai bin"
     likely_modules: [EWM]
     first_check_tcodes: ["/SCWM/CONFIG", "/SCWM/ZONE", "/SCWM/PUTAWAY", "/SCWM/MON"]
     typical_causes:
@@ -1287,6 +1394,10 @@ symptoms:
       - "바코드 매핑 오류"
       - "리더 스캔 다름"
     symptom_en: "EWM RF scan mismatch (barcode vs material)"
+    symptom_zh: "EWM RF扫描不一致（条码与物料不匹配）"
+    symptom_ja: "EWM RFスキャン不一致（バーコードと品目）"
+    symptom_de: "EWM RF-Scan weicht ab (Barcode vs. Material)"
+    symptom_vi: "EWM RF scan không khớp (barcode ↔ material)"
     likely_modules: [EWM]
     first_check_tcodes: ["/SCWM/RF", "/SCWM/BARCODE", "/SCWM/LABEL", "/SCWM/MON"]
     typical_causes:
@@ -1307,6 +1418,10 @@ symptoms:
       - "창고 재고 불일치"
       - "Stock Discrepancy"
     symptom_en: "EWM-ERP stock discrepancy"
+    symptom_zh: "EWM与ERP库存数量不一致"
+    symptom_ja: "EWMとERPの在庫が一致しない"
+    symptom_de: "Bestandsabweichung zwischen EWM und ERP"
+    symptom_vi: "Tồn kho EWM và ERP không khớp"
     likely_modules: [EWM, MM]
     first_check_tcodes: ["/SCWM/MON", "/SCWM/CNT", "MMBE", "/SCWM/REPL"]
     typical_causes:
@@ -1331,6 +1446,10 @@ symptoms:
       - "은행 대사"
       - "Bank Statement Reconciliation"
     symptom_en: "FF_5 bank statement balance mismatch"
+    symptom_zh: "FF_5银行对账单余额与SAP不一致"
+    symptom_ja: "FF_5銀行取引明細の残高がSAPと一致しない"
+    symptom_de: "FF_5 Kontostand des Kontoauszugs weicht von SAP ab"
+    symptom_vi: "FF_5 số dư sao kê ngân hàng không khớp SAP"
     likely_modules: [TR, FI]
     first_check_tcodes: [FF_5, FF.5, FF_6, FBRA]
     typical_causes:
@@ -1351,6 +1470,10 @@ symptoms:
       - "Liquidity Forecast"
       - "현금흐름 예측"
     symptom_en: "FF7B liquidity forecast calculation error"
+    symptom_zh: "FF7B流动性预测计算结果异常"
+    symptom_ja: "FF7B流動性予測の計算結果が異常"
+    symptom_de: "FF7B Liquiditätsvorschau berechnet fehlerhaft"
+    symptom_vi: "FF7B dự báo thanh khoản tính sai"
     likely_modules: [TR]
     first_check_tcodes: [FF7B, FF.7, FLFX, FLERRF]
     typical_causes:
@@ -1371,6 +1494,10 @@ symptoms:
       - "DMEE 에러"
       - "지급 형식"
     symptom_en: "DMEE payment file format error"
+    symptom_zh: "DMEE付款文件格式错误"
+    symptom_ja: "DMEE支払ファイルのフォーマットが不正"
+    symptom_de: "DMEE-Zahlungsdatei hat ein falsches Format"
+    symptom_vi: "DMEE định dạng tệp thanh toán sai"
     likely_modules: [TR, FI]
     first_check_tcodes: [DMEE, F110, OBPM1, OBPM4]
     typical_causes:
@@ -1395,6 +1522,10 @@ symptoms:
       - "원격 함수 호출 지연"
       - "SM58 실패"
     symptom_en: "RFC call timeout (SM58)"
+    symptom_zh: "RFC调用超时（SM58）"
+    symptom_ja: "RFC呼出しがタイムアウトする（SM58）"
+    symptom_de: "RFC-Aufruf Zeitüberschreitung (SM58)"
+    symptom_vi: "RFC bị timeout (SM58)"
     likely_modules: [BASIS, BC]
     first_check_tcodes: [SM58, SM59, RZ10, RZ11]
     typical_causes:
@@ -1415,6 +1546,10 @@ symptoms:
       - "API 인증 실패"
       - "OData Gateway Error"
     symptom_en: "OData service authentication fails (403/401)"
+    symptom_zh: "OData服务认证失败（403/401）"
+    symptom_ja: "ODataサービス認証失敗（403/401）"
+    symptom_de: "OData-Service-Authentifizierung schlägt fehl (403/401)"
+    symptom_vi: "OData xác thực thất bại (403/401)"
     likely_modules: [BC, BASIS]
     first_check_tcodes: [SEGW, SICF, SU53, SM59]
     typical_causes:
@@ -1435,6 +1570,10 @@ symptoms:
       - "CPI 처리"
       - "Integration Flow Failed"
     symptom_en: "CPI iFlow processing fails"
+    symptom_zh: "CPI iFlow处理失败"
+    symptom_ja: "CPI iFlowの処理に失敗する"
+    symptom_de: "CPI-iFlow-Verarbeitung schlägt fehl"
+    symptom_vi: "CPI iFlow xử lý thất bại"
     likely_modules: [BC, BTP]
     first_check_tcodes: ["/iwcb/moni", "/iwcb/mon_cpi", "/iwcb/launch", "SM59"]
     typical_causes:
@@ -1459,6 +1598,10 @@ symptoms:
       - "사회보험료 계산"
       - "보험 정산 불일치"
     symptom_en: "Korean four social insurances settlement amount error"
+    symptom_zh: "韩国四险结算金额误差（健康保险计算基准）"
+    symptom_ja: "韓国4大保険の精算金額がずれる"
+    symptom_de: "Korea: Abweichung bei der Abrechnung der vier Sozialversicherungen"
+    symptom_vi: "Lệch số quyết toán 4 bảo hiểm xã hội Hàn Quốc"
     likely_modules: [HCM, FI]
     first_check_tcodes: [PC00_M99, PT01, MOLGA, PA01]
     typical_causes:
@@ -1479,6 +1622,10 @@ symptoms:
       - "통관 오류"
       - "UNI-PASS Error"
     symptom_en: "Korea UNI-PASS export declaration rejection"
+    symptom_zh: "韩国UNI-PASS出口申报被退回"
+    symptom_ja: "韓国UNI-PASSの輸出申告が差し戻される"
+    symptom_de: "Korea UNI-PASS Exportanmeldung wird abgelehnt"
+    symptom_vi: "Tờ khai xuất khẩu UNI-PASS (Hàn Quốc) bị từ chối"
     likely_modules: [SD, FI, BC]
     first_check_tcodes: [SM59, STRUST, SLG1, VF01]
     typical_causes:
@@ -1499,6 +1646,10 @@ symptoms:
       - "전자통관"
       - "Strategic Material Export Control"
     symptom_en: "Korea strategic material export license linkage error"
+    symptom_zh: "韩国战略物资出口许可联动错误"
+    symptom_ja: "韓国戦略物資の輸出許可連携エラー"
+    symptom_de: "Korea: Fehler bei der Verknüpfung der Ausfuhrgenehmigung für strategische Güter"
+    symptom_vi: "Lỗi liên kết giấy phép xuất khẩu hàng chiến lược (Hàn Quốc)"
     likely_modules: [SD, FI, BC]
     first_check_tcodes: [SM59, STRUST, VF01, EDOC_COCKPIT]
     typical_causes:
@@ -1522,6 +1673,10 @@ symptoms:
       - "포캐스트 모델 실행했는데 결과 없음"
       - "수요계획 예측 안 잡혀요"
     symptom_en: "IBP statistical forecast run produces no output"
+    symptom_zh: "IBP统计预测运行后无结果（Forecast为空）"
+    symptom_ja: "IBP統計予測を実行しても結果が出ない（Forecastが空）"
+    symptom_de: "IBP statistische Prognose liefert keine Ergebnisse (Forecast leer)"
+    symptom_vi: "IBP chạy forecast thống kê nhưng không có kết quả"
     likely_modules: [IBP]
     first_check_tcodes: []
     typical_causes:
@@ -1547,6 +1702,10 @@ symptoms:
       - "엑셀 플래닝 뷰 멈춤"
       - "IBP 엑셀 refresh 오래 걸림"
     symptom_en: "IBP Excel Add-In Planning View is extremely slow to refresh"
+    symptom_zh: "IBP Excel加载项刷新Planning View极慢"
+    symptom_ja: "IBP ExcelアドインのPlanning View更新が極端に遅い"
+    symptom_de: "IBP Excel-Add-In aktualisiert die Planning View extrem langsam"
+    symptom_vi: "IBP Excel Add-In refresh Planning View rất chậm"
     likely_modules: [IBP]
     first_check_tcodes: []
     typical_causes:
@@ -1570,6 +1729,10 @@ symptoms:
       - "IBP CPI 메시지 에러"
       - "S/4에서 IBP로 데이터 안 넘어감"
     symptom_en: "IBP ↔ S/4 CPI integration fails with message mapping error"
+    symptom_zh: "IBP与S/4的CPI集成失败（消息映射错误）"
+    symptom_ja: "IBP↔S/4のCPI連携が失敗する（メッセージマッピング誤り）"
+    symptom_de: "IBP↔S/4 CPI-Integration schlägt fehl (Message Mapping)"
+    symptom_vi: "Tích hợp CPI IBP↔S/4 thất bại (lỗi message mapping)"
     likely_modules: [IBP, IC]
     first_check_tcodes: [SXMB_MONI, SRT_MONI]
     typical_causes:
@@ -1593,6 +1756,10 @@ symptoms:
       - "IBP 수요계획이 S/4 PP로 안 넘어옴"
       - "PIR 릴리스 후 MD63에 데이터 없음"
     symptom_en: "PIR released from IBP does not appear in S/4 MRP"
+    symptom_zh: "从IBP下达的PIR未出现在S/4 MRP（MD04）"
+    symptom_ja: "IBPからリリースしたPIRがS/4 MRP（MD04）に出ない"
+    symptom_de: "Aus IBP freigegebene PIR erscheint nicht im S/4-MRP (MD04)"
+    symptom_vi: "PIR release từ IBP không xuất hiện trên S/4 MRP (MD04)"
     likely_modules: [IBP, PP]
     first_check_tcodes: [MD63, MD05, MDBT, MD04]
     typical_causes:
@@ -1617,6 +1784,10 @@ symptoms:
       - "공급계획 수량 이상함"
       - "Supply heuristic vs optimizer 결과 차이"
     symptom_en: "IBP Supply heuristic produces unexpected planning results"
+    symptom_zh: "IBP供应启发式结果与预期不符"
+    symptom_ja: "IBP Supplyヒューリスティックの結果が想定と異なる"
+    symptom_de: "IBP Supply-Heuristik liefert unerwartete Planungsergebnisse"
+    symptom_vi: "IBP Supply heuristic ra kết quả không như kỳ vọng"
     likely_modules: [IBP]
     first_check_tcodes: []
     typical_causes:
@@ -1645,6 +1816,10 @@ symptoms:
       - "라이브 커넥션 끊김"
       - "SAC에서 S/4 데이터 로드 실패"
     symptom_en: "SAC Story fails to refresh — Live Connection error"
+    symptom_zh: "SAC Story刷新失败 — Live Connection错误"
+    symptom_ja: "SAC Storyの更新失敗 — Live Connectionエラー"
+    symptom_de: "SAC Story aktualisiert nicht — Live-Connection-Fehler"
+    symptom_vi: "SAC Story không refresh — lỗi Live Connection"
     likely_modules: [SAC, IC]
     first_check_tcodes: [SICF, SAML2]
     typical_causes:
@@ -1669,6 +1844,10 @@ symptoms:
       - "SAC 데이터 임포트 스케줄 에러"
       - "예약 새로고침 실패"
     symptom_en: "SAC Import Connection scheduled refresh keeps failing"
+    symptom_zh: "SAC Import Connection计划刷新反复失败"
+    symptom_ja: "SAC Import Connectionのスケジュール更新が繰り返し失敗する"
+    symptom_de: "Geplante Aktualisierung der SAC Import Connection schlägt wiederholt fehl"
+    symptom_vi: "Lịch refresh SAC Import Connection cứ thất bại"
     likely_modules: [SAC, IC]
     first_check_tcodes: [RSA1, RSRT]
     typical_causes:
@@ -1692,6 +1871,10 @@ symptoms:
       - "Predictive scenario 결과 신뢰 안 됨"
       - "SAC 예측 모델 품질 낮음"
     symptom_en: "SAC Smart Predict scenario produces low-accuracy predictions"
+    symptom_zh: "SAC Smart Predict预测准确度过低"
+    symptom_ja: "SAC Smart Predictの予測精度が低すぎる"
+    symptom_de: "SAC Smart Predict liefert zu ungenaue Prognosen"
+    symptom_vi: "SAC Smart Predict độ chính xác quá thấp"
     likely_modules: [SAC]
     first_check_tcodes: []
     typical_causes:
@@ -1715,6 +1898,10 @@ symptoms:
       - "SAC 플래닝 입력 안 됨"
       - "버전 잠금으로 셀 수정 불가"
     symptom_en: "SAC Planning model data entry is locked (version locked)"
+    symptom_zh: "SAC Planning模型数据输入被锁定（version locked）"
+    symptom_ja: "SAC Planningモデルへの入力がロックされている（version locked）"
+    symptom_de: "SAC-Planning-Modell ist für die Dateneingabe gesperrt (version locked)"
+    symptom_vi: "SAC Planning bị khóa nhập liệu (version locked)"
     likely_modules: [SAC]
     first_check_tcodes: []
     typical_causes:
@@ -1738,6 +1925,10 @@ symptoms:
       - "SAC 대시보드 느림"
       - "스토리 위젯 렌더 지연"
     symptom_en: "SAC Story / dashboard loads very slowly"
+    symptom_zh: "SAC Story/仪表盘加载非常慢"
+    symptom_ja: "SAC Story/ダッシュボードの読込が非常に遅い"
+    symptom_de: "SAC Story / Dashboard lädt sehr langsam"
+    symptom_vi: "SAC Story / dashboard tải rất chậm"
     likely_modules: [SAC]
     first_check_tcodes: [RSRT]
     typical_causes:
@@ -1765,6 +1956,10 @@ symptoms:
       - "공급사 입찰 초대 못 받음"
       - "RFx 발송했는데 공급사 안 보임"
     symptom_en: "Supplier did not receive the Ariba RFx invitation"
+    symptom_zh: "供应商未收到Ariba RFx邀请"
+    symptom_ja: "仕入先がAriba RFxを受け取っていない"
+    symptom_de: "Lieferant hat die Ariba-RFx-Einladung nicht erhalten"
+    symptom_vi: "Nhà cung cấp không nhận được lời mời Ariba RFx"
     likely_modules: [Ariba]
     first_check_tcodes: []
     typical_causes:
@@ -1788,6 +1983,10 @@ symptoms:
       - "구매요청 승인 안 됨"
       - "PR approver 안 넘어감"
     symptom_en: "Ariba purchase requisition stuck in approval"
+    symptom_zh: "Ariba采购申请停在审批环节"
+    symptom_ja: "Aribaの購買依頼が承認で止まる"
+    symptom_de: "Ariba-Bestellanforderung bleibt in der Genehmigung stecken"
+    symptom_vi: "Ariba PR kẹt ở bước phê duyệt"
     likely_modules: [Ariba]
     first_check_tcodes: []
     typical_causes:
@@ -1811,6 +2010,10 @@ symptoms:
       - "PO 공급사 미수신"
       - "발주서 Network 전송 실패"
     symptom_en: "Ariba PO is not transmitted to the supplier"
+    symptom_zh: "Ariba采购订单未传输给供应商"
+    symptom_ja: "Ariba発注が仕入先に送信されない"
+    symptom_de: "Ariba-Bestellung wird nicht an den Lieferanten übertragen"
+    symptom_vi: "Ariba PO không gửi tới nhà cung cấp"
     likely_modules: [Ariba, IC]
     first_check_tcodes: [SLG1, ME2N]
     typical_causes:
@@ -1835,6 +2038,10 @@ symptoms:
       - "송장 매칭 불일치"
       - "Invoice exception 발생"
     symptom_en: "Ariba invoice fails 3-way match (PO-GR-Invoice)"
+    symptom_zh: "Ariba发票三单匹配失败（PO-GR-Invoice）"
+    symptom_ja: "Ariba請求書の3者照合（PO-GR-Invoice）が失敗する"
+    symptom_de: "Ariba-Rechnung scheitert am 3-way match (PO-GR-Invoice)"
+    symptom_vi: "Ariba invoice lệch 3 chiều (PO-GR-Invoice)"
     likely_modules: [Ariba, MM, FI]
     first_check_tcodes: [MIRO, ME2N]
     typical_causes:
@@ -1859,6 +2066,10 @@ symptoms:
       - "CIG 메시지 에러"
       - "Ariba 통합 worker 끊김"
     symptom_en: "Ariba ↔ S/4 CIG integration messages fail"
+    symptom_zh: "Ariba与S/4的CIG集成消息失败"
+    symptom_ja: "Ariba↔S/4 CIG連携メッセージが失敗する"
+    symptom_de: "Ariba↔S/4 CIG-Integrationsnachrichten schlagen fehl"
+    symptom_vi: "Tin nhắn tích hợp Ariba↔S/4 CIG thất bại"
     likely_modules: [Ariba, IC]
     first_check_tcodes: [SLG1, SXMB_MONI]
     typical_causes:
@@ -1888,6 +2099,10 @@ symptoms:
       - "iFlow 매핑 실패"
       - "CPI 메시지 retry 무한반복"
     symptom_en: "CPI iFlow messages keep failing (mapping/adapter error)"
+    symptom_zh: "CPI iFlow消息持续失败（映射/适配器错误）"
+    symptom_ja: "CPI iFlowメッセージが失敗し続ける（マッピング/アダプタ）"
+    symptom_de: "CPI-iFlow-Nachrichten schlagen weiter fehl (Mapping/Adapter)"
+    symptom_vi: "CPI iFlow message cứ fail (mapping/adapter)"
     likely_modules: [IC]
     first_check_tcodes: [SXMB_MONI, SRT_MONI]
     typical_causes:
@@ -1913,6 +2128,10 @@ symptoms:
       - "SLT 리플리케이션 멈춤"
       - "delta queue 적체"
     symptom_en: "Datasphere Replication Flow fails or lags (SLT/delta queue)"
+    symptom_zh: "Datasphere Replication Flow失败或延迟（SLT/增量队列）"
+    symptom_ja: "Datasphere Replication Flowが失敗/遅延する（SLT/差分キュー）"
+    symptom_de: "Datasphere Replication Flow schlägt fehl oder verzögert (SLT/Delta-Queue)"
+    symptom_vi: "Datasphere Replication Flow fail hoặc trễ (SLT/delta queue)"
     likely_modules: [IC, SAC]
     first_check_tcodes: [LTRC, LTRS, ODQMON]
     typical_causes:
@@ -1937,6 +2156,10 @@ symptoms:
       - "클라우드 커넥터 다운"
       - "BTP에서 온프레 시스템 접근 불가"
     symptom_en: "Cloud Connector is down — on-premise connectivity broken"
+    symptom_zh: "Cloud Connector中断，本地连接不可用"
+    symptom_ja: "Cloud Connectorが切断されオンプレ連携ができない"
+    symptom_de: "Cloud Connector ist down — On-Premise-Anbindung unterbrochen"
+    symptom_vi: "Cloud Connector đứt — mất kết nối on-premise"
     likely_modules: [IC]
     first_check_tcodes: [SICF, SM59]
     typical_causes:
@@ -1962,6 +2185,10 @@ symptoms:
       - "SOAP 서비스 인증 실패"
       - "토큰 만료 연동 끊김"
     symptom_en: "OData/SOAP service auth expired — integration returns 401"
+    symptom_zh: "OData/SOAP服务认证过期，集成返回401"
+    symptom_ja: "OData/SOAP認証の期限切れで連携が401になる"
+    symptom_de: "OData/SOAP-Authentifizierung abgelaufen — Integration liefert 401"
+    symptom_vi: "OData/SOAP hết hạn xác thực — tích hợp trả 401"
     likely_modules: [IC]
     first_check_tcodes: [SOAMANAGER, SICF, SAML2]
     typical_causes:
@@ -1987,6 +2214,10 @@ symptoms:
       - "IDoc 메시지 적체"
       - "WE20 파트너 프로파일 에러"
     symptom_en: "CPI IDoc adapter messages stuck / piling up"
+    symptom_zh: "CPI IDoc适配器消息堆积未处理"
+    symptom_ja: "CPI IDocアダプタのメッセージが処理されず滞留する"
+    symptom_de: "CPI-IDoc-Adapter-Nachrichten stauen sich / werden nicht verarbeitet"
+    symptom_vi: "CPI IDoc adapter message bị kẹt / xếp hàng"
     likely_modules: [IC]
     first_check_tcodes: [WE20, WE21, IDX1, IDX2]
     typical_causes:
@@ -2015,6 +2246,10 @@ symptoms:
       - "BTP 앱 403 Forbidden"
       - "role collection 매핑 안 됨"
     symptom_en: "BTP app access denied — XSUAA role-collection not assigned"
+    symptom_zh: "BTP应用拒绝访问 — 未分配XSUAA role-collection"
+    symptom_ja: "BTPアプリが権限不足 — XSUAA role-collection未割当"
+    symptom_de: "BTP-App verweigert Zugriff — XSUAA-Role-Collection nicht zugeordnet"
+    symptom_vi: "BTP từ chối truy cập — chưa gán XSUAA role-collection"
     likely_modules: [BTP]
     first_check_tcodes: []
     typical_causes:
@@ -2038,6 +2273,10 @@ symptoms:
       - "Destination service 연결 실패"
       - "BTP에서 S/4 호출 안 됨"
     symptom_en: "BTP Destination service call to backend fails"
+    symptom_zh: "BTP Destination调用后端失败"
+    symptom_ja: "BTP Destinationからバックエンド呼出しに失敗する"
+    symptom_de: "BTP Destination-Aufruf zum Backend schlägt fehl"
+    symptom_vi: "BTP Destination gọi backend thất bại"
     likely_modules: [BTP, IC]
     first_check_tcodes: [SICF, SM59]
     typical_causes:
@@ -2061,6 +2300,10 @@ symptoms:
       - "CAP 배포 에러"
       - "mtar deploy 실패"
     symptom_en: "BTP CAP application deployment fails (cf push / mta deploy)"
+    symptom_zh: "BTP CAP应用部署失败（cf push / mta deploy）"
+    symptom_ja: "BTP CAPアプリのデプロイに失敗する（cf push / mta deploy）"
+    symptom_de: "BTP-CAP-Deployment schlägt fehl (cf push / mta deploy)"
+    symptom_vi: "Deploy ứng dụng BTP CAP thất bại (cf push / mta deploy)"
     likely_modules: [BTP]
     first_check_tcodes: []
     typical_causes:
@@ -2084,6 +2327,10 @@ symptoms:
       - "Launchpad 타일 없음"
       - "Fiori 앱 안 뜸"
     symptom_en: "BTP Fiori Launchpad shows no tiles (blank)"
+    symptom_zh: "BTP Fiori Launchpad无磁贴（空白）"
+    symptom_ja: "BTP Fiori Launchpadにタイルが出ない（空白）"
+    symptom_de: "BTP Fiori Launchpad zeigt keine Kacheln (leer)"
+    symptom_vi: "BTP Fiori Launchpad không có tile (trống)"
     likely_modules: [BTP]
     first_check_tcodes: []
     typical_causes:
@@ -2107,6 +2354,10 @@ symptoms:
       - "AMDP 메소드 덤프"
       - "CDS view 활성화 실패"
     symptom_en: "AMDP/CDS runtime error (HANA push-down failure)"
+    symptom_zh: "AMDP/CDS运行时错误（HANA下推失败）"
+    symptom_ja: "AMDP/CDS実行時エラー（HANAプッシュダウン失敗）"
+    symptom_de: "AMDP/CDS-Laufzeitfehler (HANA-Push-down fehlgeschlagen)"
+    symptom_vi: "Lỗi runtime AMDP/CDS (HANA push-down thất bại)"
     likely_modules: [ABAP]
     first_check_tcodes: [ST22, SE11, ST05]
     typical_causes:
@@ -2130,6 +2381,10 @@ symptoms:
       - "웨이브 릴리스 실패"
       - "Warehouse task 미생성"
     symptom_en: "EWM Wave not released / warehouse tasks not created"
+    symptom_zh: "EWM波次未释放或未创建仓库任务"
+    symptom_ja: "EWMウェーブがリリースされず倉庫タスクが作成されない"
+    symptom_de: "EWM-Wave nicht freigegeben / keine Warehouse Tasks erzeugt"
+    symptom_vi: "EWM Wave chưa release / không tạo warehouse task"
     likely_modules: [EWM]
     first_check_tcodes: [SLG1]
     typical_causes:
@@ -2153,6 +2408,10 @@ symptoms:
       - "TO 생성 실패"
       - "LT03 전기 안 됨"
     symptom_en: "WM Transfer Order creation/confirmation fails (legacy WM)"
+    symptom_zh: "传统WM转储单创建/确认失败"
+    symptom_ja: "レガシーWMで転送オーダの作成/確認ができない"
+    symptom_de: "Legacy-WM: Transportauftrag lässt sich nicht anlegen/quittieren"
+    symptom_vi: "WM legacy: không tạo/confirm Transfer Order"
     likely_modules: [WM, MM]
     first_check_tcodes: [LT03, LT12, LS24]
     typical_causes:
@@ -2176,6 +2435,10 @@ symptoms:
       - "IM-WM 재고 차이"
       - "LB10 인터페이스 미처리"
     symptom_en: "IM stock and WM stock mismatch (interface inconsistency)"
+    symptom_zh: "IM库存与WM库存不一致（接口差异）"
+    symptom_ja: "IM在庫とWM在庫が一致しない（インタフェース不整合）"
+    symptom_de: "IM-Bestand und WM-Bestand weichen ab (Schnittstelleninkonsistenz)"
+    symptom_vi: "Tồn IM và WM không khớp (lệch interface)"
     likely_modules: [WM, MM]
     first_check_tcodes: [LB10, LS24, LX23]
     typical_causes:

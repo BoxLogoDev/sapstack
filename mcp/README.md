@@ -1,6 +1,6 @@
 # sapstack MCP Server v2.4.0
 
-<!-- sapstack-stats: version=2.4.0 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
+<!-- sapstack-stats: version=2.4.1 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
 
 Production-ready **Model Context Protocol** server implementing the complete **Evidence Loop** session management for SAP diagnostics.
 

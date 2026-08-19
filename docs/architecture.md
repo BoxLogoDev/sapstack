@@ -1,9 +1,9 @@
 # sapstack 아키텍처
 
-<!-- sapstack-stats: version=2.4.0 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
+<!-- sapstack-stats: version=2.4.1 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
 
-> 버전: v1.4.0
-> 최종 업데이트: 2026-04-11
+> 버전: v2.4.0
+> 최종 업데이트: 2026-08-16
 
 sapstack은 단순한 "지식 문서 번들"이 아니라 **SAP 운영 자문 파이프라인**입니다. 이 문서는 sapstack이 어떤 구성 요소로 이뤄져 있고 각 요소가 어떻게 상호작용하는지 설명합니다.
 
@@ -21,9 +21,9 @@ sapstack은 세 가지 축으로 구성됩니다:
 │  ① Active Advisors        ② Context            │
 │     (위임 가능한 컨설턴트)     Persistence       │
 │  ─────────────────        ──────────────       │
-│  • 14 SKILL.md            • .sapstack/         │
-│  • 9 agents/*.md            config.yaml        │
-│  • 10 commands/*.md       • 환경 프로필 자동     │
+│  • 24 SKILL.md            • .sapstack/         │
+│  • 20 agents/*.md           config.yaml        │
+│  • 22 commands/*.md       • 환경 프로필 자동     │
 │                             로드                │
 │           ▲                      ▲             │
 │           └───────┬──────────────┘             │
@@ -76,7 +76,7 @@ sapstack은 세 가지 축으로 구성됩니다:
 
 ### ③ Quality Gates (품질 보증)
 
-**목적**: 12+1개 모듈을 유지보수 가능한 품질로 관리.
+**목적**: 24개 플러그인 · 20개 에이전트 · 22개 커맨드를 유지보수 가능한 품질로 관리.
 
 | 스크립트 | 검증 항목 |
 |---------|----------|
@@ -113,7 +113,7 @@ sapstack/
 │   ├── architecture.md
 │   ├── environment-profile.md
 │   └── roadmap.md
-├── plugins/                      # 13개 SAP 모듈 (sap-bc 신규 v1.1)
+├── plugins/                      # 24개 플러그인 (asset-manifest.json 기준)
 │   ├── sap-fi/
 │   ├── sap-co/
 │   ├── sap-tr/
@@ -256,5 +256,5 @@ v1.2.0 이후 로드맵은 [`roadmap.md`](./roadmap.md) 참조.
 - SAP Note 정적 resolver (키워드 → Note 번호)
 - T-code validator (모든 SKILL의 T-code가 실제 SAP 영역에서 유효한지)
 - OData/REST client helper (BTP 연동)
-- 추가 서브에이전트 (sap-basis-consultant, sap-mm-consultant 등)
+- 추가 서브에이전트 (현재 20개 — `asset-manifest.json` 기준)
 - CI에 `check-hardcoding --strict` 활성화

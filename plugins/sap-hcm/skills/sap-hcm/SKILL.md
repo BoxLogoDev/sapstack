@@ -138,6 +138,78 @@ Key T-codes:
 - **Payroll periods**: T549Q → period parameters per payroll area
 - **Retro accounting**: triggered automatically when backdated IT0008/IT0014/IT0015 changes
 
+### Payroll Calculation Failure — Evidence-First Diagnostic Path
+
+Do not jump from a generic "payroll error" to a schema change. First identify the
+failed stage, reproduce it in simulation, and collect the first error in the log.
+
+#### Minimum intake
+
+- ECC EhP or H4S4 release and deployment; distinguish classic HCM from Employee
+  Central Payroll and an EC-to-ECP replication incident.
+- Country payroll, payroll area, regular versus off-cycle, for-period and in-period.
+- Exact message class/number, first failing payroll-log node, first failure time,
+  last successful run, and whether all employees or a masked subset are affected.
+- Recent transport, schema/PCR/wage-type, master-data, or time-close change.
+
+Never request names, national IDs, bank details, or raw salary values. Mask employee
+numbers and retain only the smallest diagnostic sample.
+
+#### Read-only triage sequence
+
+1. **`PC00_M99`** — menu path: `Human Resources > Payroll > International > Payroll`.
+   Select the applicable country driver and reproduce the same payroll area and
+   periods in **Simulation**. Never retry a productive run as the first diagnostic step.
+2. In the payroll log, capture the first error node and its surrounding schema
+   function, PCR, and wage-type context. A later summary error is not root cause.
+3. **Payroll Control Record** — menu path: `Human Resources > Payroll > <Country> >
+   Tools > Control Record`. Compare payroll area, current period, and Released/Correction/Exit state
+   with the run selection. Do not change status or clear a lock during evidence collection.
+4. **`PA20`** — menu path: `Human Resources > Personnel Management > Administration >
+   HR Master Data > Display`. At the failing date, compare IT0000/0001/0007/0008 and
+   relevant IT0014/0015 and IT2001/2002 validity with a masked normal peer.
+5. If calculation completed and only FI/CO posting failed, split it into a posting
+   incident. Inspect the posting-run log and symbolic-account/account-assignment chain;
+   do not rewrite payroll calculation results or clusters.
+
+#### Ranked hypotheses and falsification evidence
+
+| Hypothesis | Supporting evidence | Falsified when both are true |
+|---|---|---|
+| Control record or selected period mismatch | Control-record period/state differs from the run, or productive run conflicts with Correction/Exit state | Control period/state equals the run selection; another employee in the same run calculates normally |
+| Master/time validity gap or overlap | A required infotype does not cover the error date and the log stops at that date | Required validity is continuous with no overlap; a normal peer has the same required record structure |
+| Schema/PCR/wage-type customizing path | First log failure names that rule path and the affected cohort starts after one transport | No relevant transport difference exists; an employee with the same inputs and rule path succeeds |
+| Retro-accounting boundary | Earliest retro date excludes the effective change, or the error starts at a for-/in-period boundary | No backdated change exists; current-period-only simulation fails at the same first node |
+| Authorization, lock, or posting-stage failure | Calculation completed but authorization/lock or posting log fails | Simulation fails inside payroll calculation; no posting run was reached |
+
+Each live diagnosis must state at least two observations that would falsify its leading
+hypothesis. If the evidence does not distinguish the hypotheses, issue a read-only
+follow-up request instead of proposing a configuration change.
+
+#### Fix, rollback, and verification contract
+
+- Correct master/time validity only from an approved source document and preserve the
+  prior dates/values for rollback. Re-run one masked employee in simulation before the
+  affected population.
+- Change schema/PCR/wage-type customizing only in DEV with a Transport Request and QA
+  regression cohort. Rollback is the prior transported version plus re-simulation of
+  both affected and normal cohorts.
+- Change the control record only with the payroll process owner's approval. Record its
+  previous state and period as rollback data. Never improvise a reversal after Exit or
+  FI posting; design the standard reversal/reposting flow separately.
+- Verify the same failing sample, the affected population, and a normal control group.
+  Compare employee count, error count, totals, retro results, and the first log node
+  with the last successful run before any productive execution.
+
+#### Product boundary
+
+- ECC HCM and H4S4 retain the classic control-record, schema/PCR, and infotype axes,
+  but confirm release-specific support and whether the entry point is GUI or Fiori.
+- Employee Central Payroll incidents may originate in EC-to-ECP replication. Prove that
+  replication completed before treating the symptom as a classic payroll calculation error.
+- In managed or public-cloud environments, use the exposed payroll apps and monitors
+  when classic GUI transactions are unavailable.
+
 ### Common Errors
 
 | Error | Root Cause | Fix |

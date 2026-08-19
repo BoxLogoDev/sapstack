@@ -2,8 +2,9 @@
  * Auto-update module using electron-updater
  *
  * Handles checking for updates, downloading, and installing via the standard
- * electron-updater library. Updates are served from https://boxlogodev.github.io/sapstack/electron/latest
- * using the generic provider (YAML manifests + binaries on R2/S3).
+ * electron-updater library. Updates are served from GitHub Releases
+ * (BoxLogoDev/sapstack). The feed URL is baked into app-update.yml at build time
+ * from the `publish` block in electron-builder.yml, not hardcoded here.
  *
  * Platform behavior:
  * - macOS: Downloads zip, extracts and swaps app bundle atomically
@@ -20,6 +21,7 @@ import { platform } from 'os'
 import * as path from 'path'
 import * as fs from 'fs'
 import { mainLog, autoUpdateLog } from './logger'
+import { isAirGapped } from './airgap'
 import { getAppVersion } from '@sapstack-desktop/shared/version'
 import {
   getDismissedUpdateVersion,
@@ -327,6 +329,14 @@ function checkForExistingDownload(): { exists: boolean; version?: string } {
  * @param options.autoDownload - If false, only checks without downloading (for manual "Check Now")
  */
 export async function checkForUpdates(options: CheckOptions = {}): Promise<UpdateInfo> {
+  // 기동 시 폴링은 index.ts 가 이미 막지만, 설정 화면의 수동 "업데이트 확인"도
+  // 여기로 들어온다. 폐쇄망 모드에서는 외부 요청이 존재한다는 사실 자체가 보안
+  // 심사 탈락 사유이므로 진입점에서 일괄 차단한다.
+  if (isAirGapped()) {
+    mainLog.info('[auto-update] Skipping update check — air-gapped mode')
+    updateInfo = { ...updateInfo, available: false, error: 'Update checks are disabled in air-gapped mode' }
+    return updateInfo
+  }
   const { autoDownload = true } = options
 
   // Temporarily override autoDownload for this check if needed

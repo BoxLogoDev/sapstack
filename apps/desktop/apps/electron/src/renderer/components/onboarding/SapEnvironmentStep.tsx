@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ServerCog } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { StepFormLayout, ContinueButton } from './primitives'
@@ -18,6 +19,7 @@ const selectClassName = 'flex h-9 w-full rounded-md border border-foreground/15 
  * Deliberately excludes company code, account and organisation defaults.
  */
 export function SapEnvironmentStep({ initialError, onComplete }: SapEnvironmentStepProps) {
+  const { t } = useTranslation()
   const [release, setRelease] = useState<SapEnvironmentProfile['release'] | ''>('')
   const [deployment, setDeployment] = useState<SapEnvironmentProfile['deployment'] | ''>('')
   const [industry, setIndustry] = useState('')
@@ -40,7 +42,7 @@ export function SapEnvironmentStep({ initialError, onComplete }: SapEnvironmentS
       })
       onComplete(profile)
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'SAP 환경 프로필을 저장하지 못했습니다.')
+      setError(cause instanceof Error ? cause.message : t('onboarding.sapEnvironment.saveFailed'))
     } finally {
       setSaving(false)
     }
@@ -49,60 +51,60 @@ export function SapEnvironmentStep({ initialError, onComplete }: SapEnvironmentS
   return (
     <StepFormLayout
       icon={<ServerCog />}
-      title="SAP 환경을 먼저 설정해 주세요"
-      description="sapstack은 Release와 배포 모델에 따라 다른 절차를 안내합니다. 회사코드·계정·조직값은 자동으로 만들지 않습니다."
+      title={t('onboarding.sapEnvironment.title')}
+      description={t('onboarding.sapEnvironment.description')}
       actions={
-        <ContinueButton disabled={!isValid} loading={saving} loadingText="저장 중…" onClick={save} className="w-full">
-          환경 저장 후 계속
+        <ContinueButton disabled={!isValid} loading={saving} loadingText={t('onboarding.sapEnvironment.saving')} onClick={save} className="w-full">
+          {t('onboarding.sapEnvironment.continue')}
         </ContinueButton>
       }
     >
       <div className="space-y-4">
         <div className={fieldClassName}>
-          <label className={labelClassName} htmlFor="sap-release">SAP Release</label>
+          <label className={labelClassName} htmlFor="sap-release">{t('onboarding.sapEnvironment.release')}</label>
           <select id="sap-release" className={selectClassName} value={release} onChange={(event) => setRelease(event.target.value as SapEnvironmentProfile['release'] | '')}>
-            <option value="">Release 선택</option>
-            <option value="ECC6_EhP7">ECC 6.0 EhP7</option>
-            <option value="ECC6_EhP8">ECC 6.0 EhP8</option>
-            <option value="S4_2020">S/4HANA 2020</option>
-            <option value="S4_2021">S/4HANA 2021</option>
-            <option value="S4_2022">S/4HANA 2022</option>
-            <option value="S4_2023">S/4HANA 2023</option>
-            <option value="S4_2024">S/4HANA 2024</option>
-            <option value="RISE">RISE with SAP</option>
-            <option value="PublicCloud">S/4HANA Public Cloud</option>
+            <option value="">{t('onboarding.sapEnvironment.releasePlaceholder')}</option>
+            <option value="ECC6_EhP7">{t('onboarding.sapEnvironment.releaseEccEhp7')}</option>
+            <option value="ECC6_EhP8">{t('onboarding.sapEnvironment.releaseEccEhp8')}</option>
+            <option value="S4_2020">{t('onboarding.sapEnvironment.releaseS4_2020')}</option>
+            <option value="S4_2021">{t('onboarding.sapEnvironment.releaseS4_2021')}</option>
+            <option value="S4_2022">{t('onboarding.sapEnvironment.releaseS4_2022')}</option>
+            <option value="S4_2023">{t('onboarding.sapEnvironment.releaseS4_2023')}</option>
+            <option value="S4_2024">{t('onboarding.sapEnvironment.releaseS4_2024')}</option>
+            <option value="RISE">{t('onboarding.sapEnvironment.releaseRise')}</option>
+            <option value="PublicCloud">{t('onboarding.sapEnvironment.releasePublicCloud')}</option>
           </select>
         </div>
 
         <div className={fieldClassName}>
-          <label className={labelClassName} htmlFor="sap-deployment">배포 모델</label>
+          <label className={labelClassName} htmlFor="sap-deployment">{t('onboarding.sapEnvironment.deployment')}</label>
           <select id="sap-deployment" className={selectClassName} value={deployment} onChange={(event) => setDeployment(event.target.value as SapEnvironmentProfile['deployment'] | '')}>
-            <option value="">배포 모델 선택</option>
-            <option value="on_premise">On-Premise</option>
-            <option value="private_cloud">RISE / Private Cloud</option>
-            <option value="public_cloud">Public Cloud</option>
+            <option value="">{t('onboarding.sapEnvironment.deploymentPlaceholder')}</option>
+            <option value="on_premise">{t('onboarding.sapEnvironment.deploymentOnPremise')}</option>
+            <option value="private_cloud">{t('onboarding.sapEnvironment.deploymentPrivateCloud')}</option>
+            <option value="public_cloud">{t('onboarding.sapEnvironment.deploymentPublicCloud')}</option>
           </select>
         </div>
 
         <div className={fieldClassName}>
-          <label className={labelClassName} htmlFor="sap-industry">업종</label>
+          <label className={labelClassName} htmlFor="sap-industry">{t('onboarding.sapEnvironment.industry')}</label>
           <Input
             id="sap-industry"
             value={industry}
             onChange={(event) => setIndustry(event.target.value)}
-            placeholder="예: 제조, 유통, 금융"
+            placeholder={t('onboarding.sapEnvironment.industryPlaceholder')}
             autoComplete="organization-title"
           />
         </div>
 
         <div className={fieldClassName}>
-          <label className={labelClassName} htmlFor="sap-language">응답 언어</label>
+          <label className={labelClassName} htmlFor="sap-language">{t('onboarding.sapEnvironment.responseLanguage')}</label>
           <select id="sap-language" className={selectClassName} value={language} onChange={(event) => setLanguage(event.target.value as SapEnvironmentProfile['language'])}>
-            <option value="ko">한국어</option>
-            <option value="en">English</option>
-            <option value="de">Deutsch</option>
-            <option value="ja">日本語</option>
-            <option value="zh">中文</option>
+            <option value="ko">{t('onboarding.sapEnvironment.languageKo')}</option>
+            <option value="en">{t('onboarding.sapEnvironment.languageEn')}</option>
+            <option value="de">{t('onboarding.sapEnvironment.languageDe')}</option>
+            <option value="ja">{t('onboarding.sapEnvironment.languageJa')}</option>
+            <option value="zh">{t('onboarding.sapEnvironment.languageZh')}</option>
           </select>
         </div>
 

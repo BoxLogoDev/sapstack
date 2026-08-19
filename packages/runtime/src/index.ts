@@ -4,10 +4,12 @@ import { CatalogService } from "./catalog.js";
 import { KnowledgeService } from "./knowledge.js";
 import { FileSessionStore, SessionService, type SessionStore } from "./sessions.js";
 import { SecurityService } from "./security.js";
+import { LearningService } from "./learning.js";
 
 export * from "./assets.js";
 export * from "./catalog.js";
 export * from "./knowledge.js";
+export * from "./learning.js";
 export * from "./sessions.js";
 export * from "./security.js";
 export * from "./support.js";
@@ -23,6 +25,7 @@ export class SapstackRuntime {
   readonly assets: AssetProvider;
   readonly catalog: CatalogService;
   readonly knowledge: KnowledgeService;
+  readonly learning: LearningService;
   readonly sessions: SessionService;
   readonly security: SecurityService;
 
@@ -31,6 +34,7 @@ export class SapstackRuntime {
     this.security = security;
     this.catalog = new CatalogService(assets);
     this.knowledge = new KnowledgeService(assets, this.catalog);
+    this.learning = new LearningService(assets, store);
     this.sessions = new SessionService(assets, store, security);
   }
 

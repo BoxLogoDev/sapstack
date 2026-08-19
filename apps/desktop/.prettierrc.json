@@ -1,0 +1,4 @@
+{
+  "_comment": "requirePragma 는 이 디렉토리 전체에서 prettier 를 사실상 끈다. apps/desktop 은 upstream(craft-agents-oss) 파생이라 자체 스타일(영역별로 세미콜론 유무까지 다름)을 쓰는데, 루트의 auto-prettier 훅이 기본 스타일로 재포맷하면 upstream diff 가 폭발한다. .prettierignore 는 prettier 가 cwd 에서만 찾아 훅의 실행 위치에 따라 무시되지만, 설정 파일은 대상 파일에서 상향 탐색되므로 이 킬스위치는 항상 적용된다. @prettier pragma 주석이 있는 파일만 포맷된다(현재 0개).",
+  "requirePragma": true
+}

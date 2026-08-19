@@ -415,6 +415,10 @@ KO88:
   name: Internal Order Settlement
   modules: [CO]
   release: both
+CJ88:
+  name: Settle Projects and Networks (WBS Settlement)
+  modules: [CO, PS]
+  release: both
 KP06:
   name: Cost Center Planning (by element)
   modules: [CO]
@@ -612,6 +616,10 @@ VK12:
   name: Change Condition Record
   modules: [SD]
   release: both
+V/06:
+  name: Maintain Pricing Condition Types
+  modules: [SD]
+  release: both
 VOFM:
   name: Maintain Formulas and Routines
   modules: [SD]
@@ -651,6 +659,10 @@ CR01:
 CR02:
   name: Change Work Center
   modules: [PM, PP]
+  release: both
+CM01:
+  name: Capacity Planning — Work Center Load
+  modules: [PP]
   release: both
 CO01:
   name: Create Production Order
@@ -1319,7 +1331,7 @@ IW39:
   modules: [PM]
   release: both
 IW65:
-  name: Measurement Document List
+  name: Display Activities (PM Notification List)
   modules: [PM]
   release: both
 IP01:
@@ -1876,6 +1888,10 @@ KEPM:
   name: CO-PA Planning (Profitability Analysis planning framework)
   modules: [CO]
   release: both
+KEI1:
+  name: Maintain CO-PA Assignment to Value Fields
+  modules: [CO]
+  release: both
 NACE:
   name: Output Condition Records / Message Determination (output management)
   modules: [SD, MM]
@@ -1888,3 +1904,276 @@ CM25:
   name: Capacity Planning Table (graphical)
   modules: [PP]
   release: both
+
+# gold-set 58→90 — symptom-index first_check 에 있으나 미등록이던 실존 T-code
+SM58:
+  name: Transactional RFC (tRFC) Error Log
+  modules: [BASIS, BC]
+  release: both
+ST03N:
+  name: Workload and Performance Statistics
+  modules: [BASIS, BC]
+  release: both
+OKP1:
+  name: Maintain CO Period Lock
+  modules: [CO]
+  release: both
+CS13:
+  name: BOM Explosion (where-used / multi-level)
+  modules: [PP, MM]
+  release: both
+DMEE:
+  name: Data Medium Exchange Engine (payment file format tree)
+  modules: [FI, TR]
+  release: both
+OBPM1:
+  name: Payment Medium Workbench — Payment Methods / Format
+  modules: [FI, TR]
+  release: both
+VA03:
+  name: Display Sales Order
+  modules: [SD]
+  release: both
+ML81N:
+  name: Service Entry Sheet
+  modules: [MM, PM]
+  release: both
+OB29:
+  name: Fiscal Year Variant
+  modules: [FI]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# v2.5.0 backfill — round4 전수 검증에서 실존으로 확정한 T-code
+# (scripts/check-tcodes.sh v2.5.0 allowlist 에서 이동)
+# ──────────────────────────────────────────────────────────────
+AL08:
+  name: Users Logged On (all application servers)
+  modules: [BASIS, BC]
+  release: both
+AL11:
+  name: SAP Directories
+  modules: [BASIS, BC]
+  release: both
+SE18:
+  name: BAdI Builder (Definition / Enhancement Spot)
+  modules: [ABAP]
+  release: both
+SE19:
+  name: BAdI Builder (Implementation)
+  modules: [ABAP]
+  release: both
+SE30:
+  name: ABAP Runtime Analysis (legacy)
+  modules: [ABAP]
+  release: both
+  note: Successor is SAT
+AO90:
+  name: Asset G/L Account Determination
+  modules: [FI]
+  release: both
+AS01:
+  name: Create Asset Master
+  modules: [FI]
+  release: both
+AS91:
+  name: Create Legacy Asset (with historical values)
+  modules: [FI]
+  release: both
+F.19:
+  name: Analyze GR/IR Clearing Accounts / Intercompany Reconciliation
+  modules: [FI]
+  release: both
+F-90:
+  name: Asset Acquisition with Vendor
+  modules: [FI]
+  release: both
+FK05:
+  name: Block / Unblock Vendor (company code)
+  modules: [FI]
+  release: both
+FLBPD1:
+  name: Convert Vendor to Business Partner (CVI)
+  modules: [FI]
+  release: both
+  note: Required before ECC→S/4 conversion when CVI is in scope
+FLBPD3:
+  name: Convert Customer to Business Partner (CVI)
+  modules: [FI]
+  release: both
+  note: Required before ECC→S/4 conversion when CVI is in scope
+OB59:
+  name: Define Foreign Currency Valuation Methods
+  modules: [FI]
+  release: both
+OBY6:
+  name: Company Code Global Parameters
+  modules: [FI]
+  release: both
+CM21:
+  name: Capacity Leveling (interactive / work center)
+  modules: [PP]
+  release: both
+CM50:
+  name: Capacity Evaluation (variable)
+  modules: [PP]
+  release: both
+CO03:
+  name: Display Production Order
+  modules: [PP]
+  release: both
+CO13:
+  name: Cancel Confirmation of Production Order
+  modules: [PP]
+  release: both
+CS11:
+  name: BOM Explosion (multi-level)
+  modules: [PP, MM]
+  release: both
+CS14:
+  name: BOM Comparison
+  modules: [PP]
+  release: both
+CS15:
+  name: Where-Used List for Material
+  modules: [PP, MM]
+  release: both
+KB11N:
+  name: Enter Manual Repostings of Primary Costs
+  modules: [CO]
+  release: both
+KB15N:
+  name: Enter Manual Activity Allocation
+  modules: [CO]
+  release: both
+KB31N:
+  name: Enter Statistical Key Figures
+  modules: [CO]
+  release: both
+KB65:
+  name: Indirect Activity Allocation
+  modules: [CO]
+  release: both
+KE24:
+  name: CO-PA Actual Line Items
+  modules: [CO]
+  release: both
+KE5T:
+  name: PCA Compare Ledgers (base vs comparison)
+  modules: [CO]
+  release: both
+KO22:
+  name: Change Original Budget (Internal Order)
+  modules: [CO]
+  release: both
+KO26:
+  name: Change Return (Internal Order Budget)
+  modules: [CO]
+  release: both
+KO8G:
+  name: Collective Settlement of Internal Orders
+  modules: [CO]
+  release: both
+KSU1:
+  name: Create Actual Assessment Cycle
+  modules: [CO]
+  release: both
+KSV1:
+  name: Create Actual Distribution Cycle
+  modules: [CO]
+  release: both
+OKO7:
+  name: Maintain Settlement Profile
+  modules: [CO]
+  release: both
+TM01:
+  name: Create Money Market Transaction (Fixed-Term Deposit)
+  modules: [TR]
+  release: both
+OVZ9:
+  name: Availability Check Control (scope of check)
+  modules: [SD]
+  release: both
+VF06:
+  name: Batch Billing (collective billing run)
+  modules: [SD]
+  release: both
+VF44:
+  name: Revenue Recognition (classic)
+  modules: [SD]
+  release: ecc_only
+  note: "S/4: replaced by IFRS 15 POB approach"
+VL03N:
+  name: Display Outbound Delivery
+  modules: [SD]
+  release: both
+MIR7:
+  name: Park Incoming Invoice
+  modules: [MM]
+  release: both
+MR02:
+  name: Process Blocked Invoices
+  modules: [MM]
+  release: both
+PA03:
+  name: Payroll Control Record
+  modules: [HCM]
+  release: both
+PC00:
+  name: Payroll Area Menu
+  modules: [HCM]
+  release: both
+PC00_M01_CALC:
+  name: Payroll Driver (Germany)
+  modules: [HCM]
+  release: both
+PC00_M08_CALC:
+  name: Payroll Driver (Great Britain)
+  modules: [HCM]
+  release: both
+PC00_M10_CALC:
+  name: Payroll Driver (USA)
+  modules: [HCM]
+  release: both
+PC00_M12_CALC:
+  name: Payroll Driver (Australia)
+  modules: [HCM]
+  release: both
+PC00_M23_CALC:
+  name: Payroll Driver (Japan)
+  modules: [HCM]
+  release: both
+PC00_M26_CALC:
+  name: Payroll Driver (Korea)
+  modules: [HCM]
+  release: both
+IE10:
+  name: Equipment Usage Period
+  modules: [PM]
+  release: both
+IW24:
+  name: Create PM Notification
+  modules: [PM]
+  release: both
+IA06:
+  name: Change General Task List
+  modules: [PM]
+  release: both
+QM10:
+  name: Change List of Quality Notifications
+  modules: [QM]
+  release: both
+LS01:
+  name: Create Warehouse Master Record (classic)
+  modules: [WM]
+  release: ecc_only
+  note: Enjoy successor is LS01N
+LB03:
+  name: Display Transfer Requirement
+  modules: [WM]
+  release: ecc_only
+LI01:
+  name: Create System Inventory Record (classic)
+  modules: [WM]
+  release: ecc_only
+  note: Enjoy successor is LI01N

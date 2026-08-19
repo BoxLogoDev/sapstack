@@ -4,9 +4,24 @@
 # Usage: pwsh -File powershell-parser.ps1 -Command "Get-Process | Select-Object Name"
 
 param(
-    [Parameter(Mandatory=$true)]
+    # Optional: the caller (powershell-validator.ts) passes the command via the
+    # SAPSTACK_PS_PARSE_COMMAND environment variable instead of argv. Windows
+    # argv quoting between the Node/Bun spawn layer and powershell.exe consumes
+    # backslashes ('C:\Users\test' arrived as 'C:Users<TAB>est'), which broke
+    # every Windows-path extraction. Environment variables have no escaping
+    # layer, so they round-trip losslessly. The argv parameter remains as a
+    # fallback for manual invocation.
+    [Parameter(Mandatory=$false)]
     [string]$Command
 )
+
+if ($env:SAPSTACK_PS_PARSE_COMMAND) {
+    $Command = $env:SAPSTACK_PS_PARSE_COMMAND
+}
+if (-not $Command) {
+    Write-Error 'No command provided (argv -Command or SAPSTACK_PS_PARSE_COMMAND).'
+    exit 1
+}
 
 $ErrorActionPreference = 'Stop'
 

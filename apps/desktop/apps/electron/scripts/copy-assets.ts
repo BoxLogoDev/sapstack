@@ -27,7 +27,8 @@ mkdirSync(sapstackAssetsDest, { recursive: true });
 for (const directory of ['plugins', 'agents', 'commands', 'data', 'schemas']) {
   cpSync(join(repositoryRoot, directory), join(sapstackAssetsDest, directory), { recursive: true });
 }
-for (const filename of ['asset-manifest.json', 'CLAUDE.md']) {
+// AGENTS.md 가 Universal Rules 정본 (CLAUDE.md 는 Claude/gstack 라우팅 포인터)
+for (const filename of ['asset-manifest.json', 'AGENTS.md']) {
   copyFileSync(join(repositoryRoot, filename), join(sapstackAssetsDest, filename));
 }
 console.log('✓ Copied canonical sapstack assets → dist/resources/sapstack/');

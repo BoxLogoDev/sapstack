@@ -1,0 +1,18 @@
+{
+  "depends_on": [
+    "sap-basis",
+    "sap-bc",
+    "sap-abap",
+    "sap-btp",
+    "sap-integration-cloud",
+    "sap-fi",
+    "sap-co",
+    "sap-session"
+  ],
+  "reuses_agents": [
+    "sap-basis-consultant",
+    "sap-abap-developer",
+    "sap-fi-consultant",
+    "sap-co-consultant"
+  ]
+}

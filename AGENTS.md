@@ -1,26 +1,45 @@
-# AGENTS.md — sapstack (v1.5.0)
+# AGENTS.md — sapstack (v2.4.0)
 
-<!-- sapstack-stats: version=2.4.0 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
+<!-- sapstack-stats: version=2.4.1 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
 
-> 이 파일은 **AGENTS.md 표준을 지원하는 모든 AI 에이전트**(OpenAI Codex CLI,
-> **Amazon Kiro IDE**, 그 외)에게 sapstack의 사용 규칙을 전달합니다.
-> Claude Code 사용자는 `plugins/*/skills/*/SKILL.md`와 `CLAUDE.md`를 직접
-> 읽으며, 이 파일은 동일한 지식을 다른 AI에게 전달하는 호환 레이어입니다.
+> 이 파일은 **sapstack의 프로젝트 운영 계약 정본**입니다. Codex CLI·Kiro·
+> Claude Code·Windsurf 등 **모든 AI 에이전트**가 이 파일을 읽습니다.
+> Universal Rules, 응답 포맷, 라우팅 규칙은 여기에만 존재하며,
+> `CLAUDE.md`·`.windsurfrules` 등 도구별 파일은 해당 도구 라우팅만 담습니다.
+
+## 이 순서로 읽는다
+
+| #   | 무엇                                    | 어디                                            |
+| --- | --------------------------------------- | ----------------------------------------------- |
+| 1   | **Rules** — 반드시 지킬 것              | 이 파일 + `DESIGN.md`(시각)                     |
+| 2   | **State** — 지금 어디까지 왔나          | `STATE.md` ← 작업 시작 전 필수                  |
+| 3   | **Decisions** — 이 판단이 아직 유효한가 | `decisions/active/` (뒤집힌 것은 `superseded/`) |
+| 4   | **Knowledge** — 필요할 때만             | `plans/` · `aidlc-docs/` · `docs/`              |
+
+규칙이 바뀌면 이 파일, 상태가 바뀌면 `STATE.md`, 판단이 바뀌면 `decisions/`.
+**한 사실은 한 곳에만 산다.** 상위 규약: `~/.claude/workflows/project-memory.md`
+
+> Claude Code 사용자는 이 파일과 `plugins/*/skills/*/SKILL.md`를 읽습니다.
 
 ## 이 저장소는 무엇인가?
 
 **sapstack**은 SAP 운영 자문을 위한 통합 지식·에이전트·커맨드 플러그인
-모음입니다. **14개 SAP 모듈**(FI/CO/TR/MM/SD/PP/HCM/SFSF/ABAP/S4Migration/
-BTP/BASIS/BC/GTS) + **1개 메타 플러그인**(sap-session, Evidence Loop
-오케스트레이터)로 구성됩니다.
+모음입니다. **23개 SAP 모듈**(FI/CO/TR/MM/SD/PP/PM/QM/WM/EWM/HCM/SFSF/
+ABAP/S4Migration/BTP/BASIS/BC/GTS/Cloud/IBP/SAC/Ariba/Integration-Cloud)
++ **1개 메타 플러그인**(sap-session, Evidence Loop 오케스트레이터)로
+구성됩니다 (합계 24).
 
-- 원본 형식: Claude Code plugin marketplace (`plugins/*/skills/*/SKILL.md`)
-- 이 파일: Codex·Kiro·기타 AI 호환용 변환 레이어
+- 지식 원본 형식: Claude Code plugin marketplace (`plugins/*/skills/*/SKILL.md`)
+- 이 파일: 모든 AI 에이전트가 공유하는 **운영 계약 정본**
 - 저장소: https://github.com/BoxLogoDev/sapstack
 
 ---
 
 ## 🎯 Universal Rules (모든 SAP 답변에 적용)
+
+> **철학**: 이 규칙들은 sapstack Advisor Ethos를 강제합니다. 규칙의 *이유*는
+> [`ETHOS.md`](ETHOS.md) 참조 — Ground-truth over plausibility, Evidence over
+> confidence, No hardcoding, ECC≠S/4, Field language, Operator decides.
 
 아래 규칙은 **절대 위반 금지**입니다:
 
@@ -38,8 +57,9 @@ BTP/BASIS/BC/GTS) + **1개 메타 플러그인**(sap-session, Evidence Loop
 6. **Never recommend SE16N** data edits in production.
 7. **Always provide T-code + menu path** for every action.
 8. **Use field language, not dictionary Korean** — 한국어 응답은 현장체 우선:
+   - 현장 외래어를 1순위로: "코스트 센터", "페이먼트 메소드", "트포", "미고"
    - 외래어(공식 번역, 필드코드) 이중 병기: "코스트 센터 (원가센터, KOSTL)"
-   - 발화체 수용: "돌렸는데", "뜨네요", "박아주세요", "튕겨요"
+   - 발화체 수용: "돌렸는데", "뜨네요", "안 돼요", "박아주세요", "튕겨요"
    - T-code·약어 원형 유지 (`F110`, `PO`, `GR` — 풀어 쓰지 말 것)
    - 업무 시점은 `D-1`, `월마감 D+3`, `가결산` 같은 업계 표준 표기
    - 상세: `plugins/sap-session/skills/sap-session/references/korean-field-language.md`
@@ -77,6 +97,19 @@ AI가 자동 선택합니다.
 (data/sap-notes.yaml에 있는 경우만)
 ```
 
+**Quick Advisory 품질 기준**:
+
+- 진단성 단발 답변은 **증거 기반 primary root cause 하나를 먼저** 지목하고,
+  대안은 우선순위가 명확히 낮은 별도 섹션에 둔다.
+- primary cause에는 **falsification 조건**을 반드시 붙인다.
+- Check 섹션은 SAP 화면이 제공하는 한 **T-code 2개 이상 + Table.Field 1개
+  이상**을 포함한다.
+- 환경 컨텍스트가 없으면 물어보되, **같은 턴 안에서** "잠정(provisional)"
+  이라고 명시한 진단과 read-only 확인 절차를 함께 제공한다.
+
+이 모드는 **지식 조회**와 **간단한 확인**용입니다. 실제 인시던트 진단에는
+쓰지 마세요.
+
 ### Mode 2 — Evidence Loop (진단 루프)
 
 인시던트 진단, 크로스 모듈 변경 영향, 마감 검증 등 **가설 검증이 필요한**
@@ -90,6 +123,7 @@ Turn 4 VERIFY   → 가설 확정/기각 + Fix Plan + 필수 Rollback Plan
 ```
 
 **핵심 규칙**:
+
 - 모든 가설은 **falsification 조건**을 반드시 포함 (Popper)
 - 확정 가설에는 **Fix와 Rollback이 페어**로 제시돼야 함
 - 세션 상태는 `.sapstack/sessions/{id}/state.yaml`에 직렬화되어 재개 가능
@@ -98,14 +132,14 @@ Turn 4 VERIFY   → 가설 확정/기각 + Fix Plan + 필수 Rollback Plan
 
 ### Mode 선택 규칙
 
-| 신호 | Mode |
-|---|---|
+| 신호                         | Mode           |
+| ---------------------------- | -------------- |
 | 단일 팩트 질문 ("~가 뭐야?") | Quick Advisory |
-| "이게 안 돼요" 진단 요청 | Evidence Loop |
-| 크로스 모듈 변경 영향 리뷰 | Evidence Loop |
-| 월/분기/연 마감 사전 체크 | Evidence Loop |
-| `/sap-session-*` 명시 호출 | Evidence Loop |
-| 2개 이상 가설 후보 | Evidence Loop |
+| "이게 안 돼요" 진단 요청     | Evidence Loop  |
+| 크로스 모듈 변경 영향 리뷰   | Evidence Loop  |
+| 월/분기/연 마감 사전 체크    | Evidence Loop  |
+| `/sap-session-*` 명시 호출   | Evidence Loop  |
+| 2개 이상 가설 후보           | Evidence Loop  |
 
 애매하면 **Evidence Loop**를 기본 선택 — 단발 조언의 과신 실수를 피함.
 
@@ -169,74 +203,181 @@ sapstack/
 
 ---
 
-## 📦 15개 플러그인
+## 📦 24개 플러그인
 
 ### 💰 Core Financials
-| Plugin | 주제 | 트리거 키워드 |
-|--------|------|-------------|
-| sap-fi | Financial Accounting | FB01, F110, MIRO, period close, AP, AR, GL, AA, tax, GR/IR |
-| sap-co | Controlling | cost center, KSU5, KO88, CK11N, CO-PA, settlement |
-| sap-tr | Treasury & Cash Management | FF7A, FF7B, liquidity, FLQDB, cash position |
+
+| Plugin | 주제                       | 트리거 키워드                                              |
+| ------ | -------------------------- | ---------------------------------------------------------- |
+| sap-fi | Financial Accounting       | FI, GL, AP, AR, AA, FB01, MIRO, F110, period close, GR/IR, AFAB |
+| sap-co | Controlling                | CO, cost center, KSU5, KSV5, KO88, CK11N, CO-PA, settlement |
+| sap-tr | Treasury and Cash Management | TR, treasury, FF7A, FF7B, liquidity, cash position, FLQDB, F110 |
 
 ### 📦 Logistics
-| Plugin | 주제 | 트리거 키워드 |
-|--------|------|-------------|
-| sap-mm | Materials Management | MIGO, MIRO, ME21N, GR/IR, purchasing, inventory |
-| sap-sd | Sales & Distribution | VA01, VF01, billing, pricing, credit, delivery |
-| sap-pp | Production Planning | MRP, MD01, CO01, BOM, routing |
+
+| Plugin | 주제                         | 트리거 키워드                                   |
+| ------ | ---------------------------- | ----------------------------------------------- |
+| sap-mm | Materials Management         | MM, MIGO, MIRO, ME21N, GR/IR, purchasing, inventory, MR11 |
+| sap-sd | Sales and Distribution       | SD, VA01, VL01N, VF01, billing, pricing, credit, delivery |
+| sap-pp | Production Planning          | PP, MRP, MD01, CO01, BOM, routing, KANBAN       |
+| sap-pm | Plant Maintenance            | PM, 설비보전, equipment, 보전오더, 예방보전, MTBF, MTTR |
+| sap-qm | Quality Management           | QM, 품질관리, inspection lot, 검사로트, usage decision, 품질통보 |
+| sap-wm | Warehouse Management (ECC legacy) | WM, 창고관리, LS01N, LT01, LB01, transfer order, picking, putaway |
+| sap-ewm | Extended Warehouse Management | EWM, 확장창고관리, /SCWM, warehouse order, wave, packing, RF |
 
 ### 👥 HR & Talent
-| Plugin | 주제 | 트리거 키워드 |
-|--------|------|-------------|
-| sap-hcm | HCM On-Premise | HCM, PA30, infotype, payroll, PC00, time |
-| sap-sfsf | SuccessFactors | SuccessFactors, EC, ECP, Recruiting, RBP, OData |
+
+| Plugin   | 주제           | 트리거 키워드                                   |
+| -------- | -------------- | ----------------------------------------------- |
+| sap-hcm  | HCM On-Premise | HCM, HR, PA30, infotype, payroll, PC00, PT60, H4S4, ESS, MSS |
+| sap-sfsf | SuccessFactors | SuccessFactors, SFSF, Employee Central, EC, ECP, Recruiting, RBP, OData |
 
 ### ⚙️ Technology
-| Plugin | 주제 | 트리거 키워드 |
-|--------|------|-------------|
-| sap-abap | ABAP Development | ABAP, SE38, BAdI, CDS, RAP, ST22, clean core, ATC |
-| sap-s4-migration | ECC → S/4HANA Migration | migration, brownfield, readiness, BP, SUM, ATC |
-| sap-btp | SAP Business Technology Platform | BTP, CAP, Fiori, OData, XSUAA |
-| sap-basis | BASIS Administration (Global) | BASIS, STMS, transport, PFCG, SM50, performance |
+
+| Plugin           | 주제                             | 트리거 키워드                                     |
+| ---------------- | -------------------------------- | ------------------------------------------------- |
+| sap-abap         | ABAP Development                 | ABAP, SE38, BAdI, CDS, RAP, ST22, clean core, ATC |
+| sap-s4-migration | S/4HANA Migration                | S/4HANA migration, brownfield, greenfield, SUM, DMO, readiness check, BP migration, ATC |
+| sap-btp          | SAP Business Technology Platform | BTP, CAP, Fiori, OData, Integration Suite, XSUAA |
+| sap-basis        | BASIS Administration             | BASIS, STMS, transport, SM50, PFCG, SM21, performance |
+| sap-cloud        | S/4HANA Cloud Public Edition     | Cloud PE, Public Cloud, Clean Core, Key User Extensibility, Fit-to-Standard, Cloud ALM, CSP |
+
+### ☁️ Cloud / Integration
+
+| Plugin                  | 주제                              | 트리거 키워드                                   |
+| ----------------------- | --------------------------------- | ----------------------------------------------- |
+| sap-ibp                 | Integrated Business Planning      | IBP, demand planning, S&OP, supply planning, demand sensing, ATP |
+| sap-sac                 | SAP Analytics Cloud               | SAC, Analytics Cloud, SAC Story, Analytic Application, BW Bridge, SAC Planning |
+| sap-ariba               | SAP Ariba                         | Ariba, sourcing, RFx, e-auction, Ariba Network, ANID, guided buying |
+| sap-integration-cloud   | Integration Suite + Datasphere    | CPI, Integration Suite, iFlow, Datasphere, DWC, Cloud Connector, Event Mesh |
 
 ### 🇰🇷 Korea & Global
-| Plugin | 주제 | 트리거 키워드 |
-|--------|------|-------------|
-| **sap-bc** | **한국 BC 컨설턴트 특화** | BC, 베이시스, 한국, Solman, 전자세금계산서, 망분리, K-SOX |
-| **sap-gts** | **Global Trade Services** | GTS, 관세청, UNI-PASS, HS code, FTA, compliance |
+
+| Plugin      | 주제                      | 트리거 키워드                                             |
+| ----------- | ------------------------- | --------------------------------------------------------- |
+| **sap-bc**  | **한국 BC 컨설턴트 특화** | BC, 베이시스, Solution Manager Korea, 전자세금계산서, 망분리, KISA, 공인인증서 |
+| **sap-gts** | **Global Trade Services** | GTS, 관세청, UNI-PASS, HS code, FTA, trade compliance     |
 
 ### 🔁 Meta — Evidence Loop (v1.5.0, experimental)
-| Plugin | 주제 | 역할 |
-|--------|------|------|
-| **sap-session** | Evidence Loop 오케스트레이터 | 기존 14 플러그인·9 에이전트를 턴 인식 루프로 활용 |
+
+| Plugin          | 주제                         | 역할                                              |
+| --------------- | ---------------------------- | ------------------------------------------------- |
+| **sap-session** | Evidence Loop 오케스트레이터 | 라이브 접근 없이 확인→수정→재확인 루프로 모듈·에이전트를 오케스트레이션 |
 
 ### ⚠️ sap-basis vs sap-bc
+
 - **본질**: 둘 다 SAP Basis(시스템 관리·Transport·권한·성능)
 - **분리 이유**: 한국 현장 특화 이슈(한글·망분리·전자세금계산서·K-SOX·공인인증서)는 별도 유지
 - **한국 업계 용어**: "BC 컨설턴트" = "Basis Consultant"
 - **선택 기준**: 한국어/localization → `sap-bc`, 글로벌 영문 → `sap-basis`
 
+### 📊 Compatibility Matrix (모듈 × 배포 모델)
+
+| Module         | ECC 6.0 | S/4HANA OP | RISE | Cloud PE     |
+| -------------- | ------- | ---------- | ---- | ------------ |
+| FI/CO          | ✓       | ✓          | ✓    | ✓            |
+| TR             | ✓       | ✓          | ✓    | △            |
+| MM/SD/PP       | ✓       | ✓          | ✓    | ✓            |
+| HCM on-prem    | ✓       | ✓ (H4S4)   | ✓    | ✗            |
+| SuccessFactors | ✗       | ✓ (hybrid) | ✓    | ✓            |
+| ABAP classic   | ✓       | ✓          | ✓    | ✗ (RAP only) |
+| BASIS          | ✓       | ✓          | △    | ✗            |
+| BTP            | ✗       | ✓          | ✓    | ✓            |
+| PM             | ✓       | ✓          | ✓    | ✗            |
+| QM             | ✓       | ✓          | ✓    | ✓            |
+| WM (legacy)    | ✓       | ✗ (depr.)  | ✗    | ✗            |
+| EWM            | ✗       | ✓          | ✓    | ✓            |
+| Cloud PE       | ✗       | ✗          | ✗    | ✓ (native)   |
+
 ---
 
-## 🤖 9개 서브에이전트 (프롬프트 재활용)
+## 🤖 20개 서브에이전트 (프롬프트 재활용)
 
 `agents/*.md`의 프롬프트는 Claude subagent 포맷이지만, **프롬프트 본문은
 범용적**이라 다른 AI에게도 system prompt로 주입 가능합니다.
 
-| 에이전트 | 한 줄 역할 |
-|---------|----------|
-| sap-fi-consultant | FI 이슈 체계적 진단 |
-| sap-co-consultant | CO 원가·배분·CO-PA |
-| sap-mm-consultant | MM 전반 (구매·재고·GR/IR) |
-| sap-sd-consultant | Order-to-Cash |
-| sap-pp-consultant | MRP·BOM·생산오더 |
-| sap-abap-developer | ABAP 코드 리뷰 (Clean Core, HANA, ATC) |
-| sap-s4-migration-advisor | 마이그레이션 경로 + Risk |
-| sap-basis-consultant | Basis 장애 증상 라우팅 |
-| sap-integration-advisor | 통합 아키텍처 (RFC/IDoc/OData/CPI) |
+| 에이전트                          | 한 줄 역할 |
+| --------------------------------- | ---------- |
+| sap-fi-consultant                 | FI 이슈를 체계적으로 진단하고 해결 방안을 제시 |
+| sap-co-consultant                 | CO 이슈 체계적 진단 — 원가센터·이익센터·내부주문·CO-PA |
+| sap-tr-consultant                 | TR 자금관리 — 유동성 계획(FF7A/FF7B), 하우스뱅크, F110 |
+| sap-mm-consultant                 | MM 전반 — 구매·재고·GR/IR·송장검증 |
+| sap-sd-consultant                 | SD Order-to-Cash — 판매오더·출하·빌링·여신 |
+| sap-pp-consultant                 | PP — BOM·Routing·MRP·생산오더 |
+| sap-pm-consultant                 | PM 설비보전 — 보전통보·보전오더·예방보전 |
+| sap-qm-consultant                 | QM 품질관리 — 검사계획·검사로트·사용결정 |
+| sap-ewm-consultant                | EWM·WM — 창고오더·Wave·패킹·RF |
+| sap-hcm-consultant                | HCM — PA·OM·PY·TM, ESS/MSS |
+| sap-abap-developer                | ABAP 코드 리뷰 — Clean Core, ATC, CDS, RAP |
+| sap-s4-migration-advisor          | ECC → S/4HANA 마이그레이션 경로 + Risk |
+| sap-basis-consultant              | Basis 장애 증상 라우팅 — ST22, SM50, STMS |
+| sap-integration-advisor           | 통합 아키텍처 — RFC/IDoc/OData/CPI |
+| sap-cloud-consultant              | S/4HANA Cloud Public Edition — Clean Core, Fit-to-Standard |
+| sap-ibp-consultant                | IBP — Demand Sensing·S&OP·Supply·Inventory·Response·Control Tower |
+| sap-sac-consultant                | SAC — Story·Analytic App·Planning Model·Smart Predict |
+| sap-ariba-consultant              | Ariba — Sourcing·Contracts·Procurement·SLP·Network |
+| sap-integration-cloud-consultant  | Integration Suite (CPI) + Datasphere |
+| sap-tutor                         | SAP 신입사원 교육 튜터 — 모듈 지식·ABAP·IMG를 단계별로 설명 |
 
-Evidence Loop(`sap-session`)는 **새 에이전트를 추가하지 않고** 이 9개를
-hypothesis별로 병렬 소환합니다.
+Evidence Loop(`sap-session`)는 이 표의 에이전트를 hypothesis별로 병렬
+소환합니다.
+
+### 특수 라우팅
+
+- **SAP Cloud PE** — S/4HANA Cloud Public Edition 질문은 `sap-cloud-consultant`
+  로 라우팅. 신호 키워드: "Cloud PE", "Public Cloud", "Clean Core",
+  "Key User Extensibility", "Fit-to-Standard", "Cloud ALM",
+  "Quarterly Release", "CSP".
+- **SAP Tutor** — 초보자·신입 질문은 `sap-tutor` 에이전트로 라우팅. 튜터는
+  복잡한 질문을 모듈별 컨설턴트에게 위임하고, 답변을 초보자 눈높이로
+  번역합니다.
+
+---
+
+## 🌐 다국어 지원 (Multilingual Support, v1.7.0에 추가됨)
+
+sapstack은 **6개 언어**를 지원합니다: ko, en, zh, ja, de, vi.
+
+- 사용자 언어는 config 또는 대화 컨텍스트에서 감지
+- 감지된 언어로 응답
+- 증상 매칭(symptom matching)은 6개 언어 전부에서 동작
+- **T-code와 SAP 용어는 언어와 무관하게 영문 유지**
+
+---
+
+## 🗺 참조 맵 (Reference Map)
+
+### IMG Configuration References
+
+사용자 이슈가 IMG 오설정에서 비롯된 경우 다음으로 라우팅:
+`plugins/sap-{module}/skills/sap-{module}/references/img/`
+
+각 IMG 가이드는 SPRO 경로, 단계별 configuration, 필드 값,
+ECC vs S/4 차이, 검증 절차를 담고 있습니다.
+
+### Best Practice References
+
+sapstack은 3-Tier Best Practice 프레임워크를 따릅니다:
+
+- **Tier 1 Operational** — 일·주 단위 운영 (`references/best-practices/operational.md`)
+- **Tier 2 Period-End** — 월/분기/연 마감 (`references/best-practices/period-end.md`)
+- **Tier 3 Governance** — 감사·컴플라이언스·K-SOX (`references/best-practices/governance.md`)
+
+크로스 모듈 BP: `docs/best-practices/`
+
+### Enterprise Scenarios
+
+다중 회사코드, SSC, intercompany, 글로벌 롤아웃 시나리오: `docs/enterprise/`
+
+### Industry-Specific Guidance
+
+제조·유통·금융업 차이: `docs/industry/`
+산업별 모듈 매트릭스: `data/industry-matrix.yaml`
+
+### SAP AI / Joule
+
+SAP Joule, SAP AI, 그리고 sapstack과 SAP 내장 AI의 관계에 대한 질문은
+`docs/sap-ai-integration.md` 참조.
 
 ---
 
@@ -246,6 +387,7 @@ hypothesis별로 병렬 소환합니다.
 Human-in-the-loop 비동기 루프 — 운영자가 실행기 역할.
 
 ### 4턴 구조
+
 ```
 Turn 1 INTAKE     → 운영자/엔드유저가 초기 Evidence Bundle 업로드
 Turn 2 HYPOTHESIS → AI가 2-4개 가설 (반증 조건 필수) + Follow-up Request
@@ -254,6 +396,7 @@ Turn 4 VERIFY     → AI가 가설 확정/기각 + Fix/Rollback/Prevention
 ```
 
 ### Session-specific Rules
+
 - **Falsifiability**: 모든 가설은 `falsification_evidence`가 2개 이상
 - **Rollback-or-no-Fix**: 확정 Fix는 반드시 Rollback Plan과 페어
 - **Read-only bias**: Follow-up Request는 언제나 read-only 기본
@@ -261,6 +404,7 @@ Turn 4 VERIFY     → AI가 가설 확정/기각 + Fix/Rollback/Prevention
 - **Three Surfaces**: CLI(A) / VS Code(B, v1.6) / Web(C)이 세션 ID로 연결
 
 ### 관련 파일
+
 - `plugins/sap-session/skills/sap-session/SKILL.md` — 전체 규약
 - `plugins/sap-session/skills/sap-session/references/turn-formats.md` — 턴별 입출력
 - `schemas/session-state.schema.yaml` — 세션 직렬화 계약
@@ -270,20 +414,24 @@ Turn 4 VERIFY     → AI가 가설 확정/기각 + Fix/Rollback/Prevention
 
 ## 🧭 Multi-AI 호환성
 
-sapstack은 **7개 AI 코딩 도구**와 호환됩니다. 원본은 `plugins/*/skills/*/
-SKILL.md`이고, 나머지는 얇은 호환 레이어입니다.
+운영 규칙 정본은 **이 파일(`AGENTS.md`)**, SAP 지식 원본은
+`plugins/*/skills/*/SKILL.md`이고, 도구별 파일은 얇은 라우팅 레이어입니다.
 
-| AI 도구 | 진입점 | 지원 버전 |
-|---|---|---|
-| Claude Code | `plugins/*/skills/*/SKILL.md` | v1.0.0+ |
-| OpenAI Codex CLI | `AGENTS.md` (이 파일) | v1.2.0+ |
-| GitHub Copilot | `.github/copilot-instructions.md` | v1.3.0+ |
-| Cursor | `.cursor/rules/sapstack.mdc` | v1.2.0+ |
-| Continue.dev | `.continue/config.yaml` | v1.3.0+ |
-| Aider | `CONVENTIONS.md` | v1.3.0+ |
-| **Amazon Kiro IDE** | `AGENTS.md` + `.kiro/steering/*` + `.kiro/settings/mcp.json` | **v1.5.0+** |
+| AI 도구                   | 진입점                                                       | 지원 버전   |
+| ------------------------- | ------------------------------------------------------------ | ----------- |
+| Claude Code               | `AGENTS.md` + `CLAUDE.md` + `plugins/*/skills/*/SKILL.md`    | v1.0.0+     |
+| OpenAI Codex CLI          | `AGENTS.md` (이 파일)                                        | v1.2.0+     |
+| GitHub Copilot            | `.github/copilot-instructions.md`                            | v1.3.0+     |
+| Cursor                    | `.cursor/rules/sapstack.mdc`                                 | v1.2.0+     |
+| Continue.dev              | `.continue/config.yaml`                                      | v1.3.0+     |
+| Aider                     | `CONVENTIONS.md`                                             | v1.3.0+     |
+| **Amazon Kiro IDE**       | `AGENTS.md` + `.kiro/steering/*` + `.kiro/settings/mcp.json` | **v1.5.0+** |
+| Windsurf / Codeium        | `.windsurfrules`                                             | v2.2.0+     |
+| Sourcegraph Cody          | `.cody/rules.md`                                             | v2.2.0+     |
+| JetBrains AI Assistant    | `.idea/sapstack-prompt.md`                                   | v2.2.0+     |
 
 ### Kiro 사용 시
+
 Kiro는 **AGENTS.md를 자동으로 steering에 주입**하므로, 이 파일을 두는 것만
 으로도 기본 통합이 작동합니다. 추가로 4개 steering 파일과 MCP 서버를 설정하면
 Evidence Loop 전체가 Kiro 안에서 작동합니다.
@@ -291,9 +439,10 @@ Evidence Loop 전체가 Kiro 안에서 작동합니다.
 자세한 설치: `docs/kiro-quickstart.md`, `docs/kiro-integration.md`
 
 ### Codex CLI 사용 예시
+
 ```bash
 git submodule add https://github.com/BoxLogoDev/sapstack sapstack
-cd sapstack && git checkout v1.5.0 && cd ..
+cd sapstack && git checkout v2.4.0 && cd ..
 
 codex "sapstack의 sap-fi-consultant 에이전트 프롬프트를 따라 다음 이슈를 \
   진단해줘: F110 돌렸는데 벤더 100234 하나만 No valid payment method 뜨네요. \
@@ -334,7 +483,10 @@ Codex는 `AGENTS.md`를 자동 로드하므로 별도 플래그 없이 이 가�
 ## 📚 관련 문서
 
 - `README.md` — 일반 사용자 가이드
-- `CLAUDE.md` — Claude Code용 Universal Rules (Dual Mode 포함)
+- `CLAUDE.md` — Claude Code 전용 라우팅 (프로젝트 규칙은 `AGENTS.md`가 정본)
+- `.windsurfrules` — Windsurf / Codeium 전용 라우팅
+- `.cody/rules.md` — Sourcegraph Cody 전용 라우팅
+- `.idea/sapstack-prompt.md` — JetBrains AI Assistant 전용 라우팅
 - `CONTRIBUTING.md` — 기여 절차 (한국어)
 - `docs/architecture.md` — 3축 구조 설명
 - `docs/multi-ai-compatibility.md` — 다른 AI 도구에서 sapstack 쓰는 법 ⭐

@@ -1,0 +1,13 @@
+{
+  "depends_on": [
+    "sap-sd",
+    "sap-pp",
+    "sap-integration-cloud",
+    "sap-btp"
+  ],
+  "reuses_agents": [
+    "sap-sd-consultant",
+    "sap-pp-consultant",
+    "sap-integration-cloud-consultant"
+  ]
+}

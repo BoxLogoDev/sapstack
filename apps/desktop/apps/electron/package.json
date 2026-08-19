@@ -1,6 +1,6 @@
 {
   "name": "@sapstack-desktop/electron",
-  "version": "3.0.0-beta.0",
+  "version": "2.4.1",
   "description": "Electron desktop app for sapstack Desktop",
   "main": "dist/main.cjs",
   "private": true,

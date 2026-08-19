@@ -23,6 +23,7 @@ import { RoutedClient } from '../transport/routed-client'
 import { buildClientApi } from '../transport/build-api'
 import { CHANNEL_MAP } from '../transport/channel-map'
 import { createCallbackServer } from '@sapstack-desktop/shared/auth/callback-server'
+import { FEATURE_FLAGS } from '@sapstack-desktop/shared/feature-flags'
 import { CHATGPT_OAUTH_CONFIG } from '@sapstack-desktop/shared/auth/chatgpt-oauth-config'
 import {
   CLIENT_OPEN_EXTERNAL,
@@ -430,6 +431,14 @@ client.onConnectionStateChanged((state) => {
   downloadUrl: process.env.SAPSTACK_DESKTOP_VCREDIST_URL,
 })
 
+// Feature flags — evaluated once in preload (same process.env as main; the
+// renderer cannot read env). Constant for the app lifetime, so a plain object
+// is enough — same pattern as getSystemWarnings above. The browser tool is
+// NOT here: it has its own product axis (getBrowserToolEnabled → settings RPC).
+;(api as ElectronAPI).featureFlags = {
+  messaging: FEATURE_FLAGS.messaging,
+}
+
 // i18n: sync language changes to main process (for native menus/dialogs)
 ;(api as ElectronAPI).changeLanguage = (lang: string) => ipcRenderer.invoke('i18n:changeLanguage', lang)
 
@@ -467,8 +476,15 @@ contextBridge.exposeInMainWorld('sapstack', {
     get: (sessionId: string) => ipcRenderer.invoke('sapstack:sessions:get', sessionId),
     list: (filter?: unknown) => ipcRenderer.invoke('sapstack:sessions:list', filter || {}),
   },
+  localLlm: {
+    status: () => ipcRenderer.invoke('sapstack:localLlm:status'),
+    probe: (endpoint: string) => ipcRenderer.invoke('sapstack:localLlm:probe', endpoint),
+  },
   security: {
     scrub: (text: string) => ipcRenderer.invoke('sapstack:security:scrub', text),
+  },
+  learning: {
+    inspect: () => ipcRenderer.invoke('sapstack:learning:inspect'),
   },
   environment: {
     get: () => ipcRenderer.invoke('sapstack:environment:get'),

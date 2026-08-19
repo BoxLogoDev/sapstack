@@ -34,21 +34,37 @@ CHECKED=0
 for skill_file in $(find plugins -name SKILL.md -type f 2>/dev/null); do
   CHECKED=$((CHECKED + 1))
 
-  # 프론트매터 제외 본문
-  body=$(awk 'BEGIN{fm=0} /^---$/{fm=!fm; next} !fm{print}' "$skill_file")
+  # 프론트매터 제외 본문.
+  # 두 가지를 고쳤다.
+  #  1) \r? — CRLF 체크아웃(Windows)에서 /^---$/ 가 매치되지 않아 프론트매터가
+  #     제거되지 않고, 로컬과 CI 의 검사 결과가 달라졌다.
+  #  2) 첫 줄 기준 — 기존 토글 방식은 본문의 마크다운 구분선(---)까지 프론트매터
+  #     경계로 세어, 구분선이 많은 SKILL.md 는 본문 일부가 검사에서 빠졌다.
+  #     프론트매터는 파일 맨 앞 첫 블록 하나뿐이다.
+  body=$(awk '
+    BEGIN { fm = 0 }
+    NR == 1 && /^---\r?$/ { fm = 1; next }
+    fm && /^---\r?$/      { fm = 0; next }
+    !fm                   { print }
+  ' "$skill_file")
 
   has_ecc=0
   has_s4=0
 
+  # herestring 을 쓴다. `echo "$body" | grep -q` 는 grep 이 첫 매치에서 즉시
+  # 종료하면서 echo 가 SIGPIPE(141) 로 죽고, 15행의 `set -o pipefail` 이 그
+  # 141 을 파이프라인 exit code 로 삼는다. 그러면 키워드를 찾았는데도 조건이
+  # 거짓이 된다. body 가 클수록 잘 터지는 경합이라, 실제로 SKILL.md 를 보강해
+  # 파일이 길어지자 CI 에서만 재현됐다.
   for kw in "${ECC_KEYWORDS[@]}"; do
-    if echo "$body" | grep -Eq "$kw"; then
+    if grep -Eq "$kw" <<< "$body"; then
       has_ecc=1
       break
     fi
   done
 
   for kw in "${S4_KEYWORDS[@]}"; do
-    if echo "$body" | grep -Eq "$kw"; then
+    if grep -Eq "$kw" <<< "$body"; then
       has_s4=1
       break
     fi

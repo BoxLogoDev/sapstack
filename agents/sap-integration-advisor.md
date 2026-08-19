@@ -82,6 +82,8 @@ model: sonnet
 - **V4**: RAP 기반, S/4HANA 권장
 - **SMICM**: ICM HTTP 서비스 확인
 - **SICF**: Service Activation
+- **SM59**: BTP Destination이 호출하는 on-premise RFC/HTTP destination 연결 테스트
+- BTP Destination fail은 Destination URL/인증 타입을 먼저 확인하고, backend의 SICF 서비스 활성과 SM59 연결을 read-only로 교차 확인
 
 ### SOAP / REST
 - **SOAMANAGER**: Web Service Configuration

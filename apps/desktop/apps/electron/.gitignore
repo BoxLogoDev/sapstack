@@ -9,3 +9,6 @@ resources/bin/darwin-arm64/
 resources/bin/darwin-x64/
 resources/bin/win32-x64/
 resources/bin/linux-x64/
+
+# Bundled local LLM engine — downloaded by build-win.ps1 (pinned release), never committed
+resources/llama/

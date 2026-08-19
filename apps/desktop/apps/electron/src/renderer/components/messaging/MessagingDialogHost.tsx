@@ -20,6 +20,13 @@ import { PairingCodeDialog } from './PairingCodeDialog'
 import { WhatsAppConnectDialog } from './WhatsAppConnectDialog'
 
 export function MessagingDialogHost() {
+  // Feature-flag gate: constant for the app lifetime, so the inner component's
+  // hook order never changes between renders.
+  if (!window.electronAPI?.featureFlags?.messaging) return null
+  return <MessagingDialogHostInner />
+}
+
+function MessagingDialogHostInner() {
   const [state, setState] = useAtom(messagingDialogAtom)
   const { t } = useTranslation()
 

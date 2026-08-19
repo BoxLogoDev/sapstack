@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.modelcontextprotocol.io/server/v1",
   "name": "sapstack",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "SAP operations advisory and Evidence Loop — 23 tools, 12 prompts, 9 resources/templates",
   "author": "BoxLogoDev",
   "license": "MIT",
@@ -263,6 +263,9 @@
         "type": "object",
         "properties": {
           "symptom": {
+            "type": "string"
+          },
+          "matched_symptom_index_entry": {
             "type": "string"
           },
           "reporter_role": {

@@ -69,7 +69,9 @@ done
 REGISTERED=$(jq -r '.plugins[].path' "$MARKETPLACE" | sort)
 ACTUAL=$(find plugins -maxdepth 1 -mindepth 1 -type d | sort)
 for dir in $ACTUAL; do
-  if ! echo "$REGISTERED" | grep -Fxq "$dir"; then
+  # herestring — 파이프 + grep -q + pipefail 조합은 SIGPIPE 로 거짓 양성을 낸다
+  # (check-tcodes.sh 173행 주석 참조).
+  if ! grep -Fxq "$dir" <<< "$REGISTERED"; then
     echo "⚠️  $dir — marketplace.json에 미등록"
   fi
 done

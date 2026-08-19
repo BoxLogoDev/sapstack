@@ -16,17 +16,46 @@
  * - prompts: korean-field-language, img-config-walk, best-practice-review, evidence-loop-turn2, evidence-loop-turn4
  */
 
-import { describe, it, expect, beforeAll } from "@jest/globals";
+import { before, describe, it } from "node:test";
+import assert from "node:assert/strict";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import * as yaml from "js-yaml";
+import { PROMPT_REGISTRY } from "../registry.js";
 
 // ─────────────────────────────────────────────────────────────
 // Test utilities
 // ─────────────────────────────────────────────────────────────
 
-const WORKSPACE_ROOT = process.env.SAPSTACK_WORKSPACE || process.cwd();
-const SAPSTACK_ROOT = process.env.SAPSTACK_ROOT || path.join(WORKSPACE_ROOT, "sapstack");
+// 이 파일은 jest 로 작성됐다가 러너가 node:test 로 바뀌면서 실행 대상에서 빠져 있었다.
+// node:test 에는 expect 가 없으므로, 실제로 쓰는 matcher 6종만 assert 로 매핑한다.
+function expect(actual: any) {
+  return {
+    toBe: (expected: unknown) => assert.strictEqual(actual, expected),
+    toEqual: (expected: unknown) => assert.deepStrictEqual(actual, expected),
+    toContain: (expected: unknown) =>
+      assert.ok(
+        actual?.includes(expected),
+        `expected ${JSON.stringify(actual)} to contain ${JSON.stringify(expected)}`,
+      ),
+    toBeDefined: () => assert.notStrictEqual(actual, undefined),
+    toBeTruthy: () => assert.ok(actual),
+    toBeGreaterThan: (expected: number) =>
+      assert.ok(actual > expected, `expected ${actual} > ${expected}`),
+    toMatch: (expected: RegExp | string) =>
+      assert.match(
+        String(actual),
+        expected instanceof RegExp ? expected : new RegExp(expected),
+      ),
+  };
+}
+
+// mcp/tests/ 기준 두 단계 위가 저장소 루트 (contract.test.ts 와 동일 패턴).
+// 기존 값은 process.cwd()/sapstack 이라 mcp 에서 실행하면 데이터를 찾지 못했다.
+const SAPSTACK_ROOT =
+  process.env.SAPSTACK_ROOT ||
+  path.resolve(fileURLToPath(new URL("../../", import.meta.url)));
 const DATA_DIR = path.join(SAPSTACK_ROOT, "data");
 
 async function readYamlFile<T>(filePath: string): Promise<T> {
@@ -45,14 +74,18 @@ describe("Expanded MCP Tools — v1.7.0", () => {
   let synonyms: any;
   let industryMatrix: any;
 
-  beforeAll(async () => {
+  before(async () => {
     // Load test data
     try {
       tcodes = await readYamlFile(path.join(DATA_DIR, "tcodes.yaml"));
       notes = await readYamlFile(path.join(DATA_DIR, "sap-notes.yaml"));
-      periodEnd = await readYamlFile(path.join(DATA_DIR, "period-end-sequence.yaml"));
+      periodEnd = await readYamlFile(
+        path.join(DATA_DIR, "period-end-sequence.yaml"),
+      );
       synonyms = await readYamlFile(path.join(DATA_DIR, "synonyms.yaml"));
-      industryMatrix = await readYamlFile(path.join(DATA_DIR, "industry-matrix.yaml"));
+      industryMatrix = await readYamlFile(
+        path.join(DATA_DIR, "industry-matrix.yaml"),
+      );
     } catch (err) {
       console.error("Failed to load test data:", err);
       throw err;
@@ -65,24 +98,22 @@ describe("Expanded MCP Tools — v1.7.0", () => {
 
   describe("list_tcodes_by_module", () => {
     it("should return T-codes for FI module", async () => {
-      const fiTcodes = Object.entries(tcodes)
-        .filter(([key, val]: any) => {
-          if (key.startsWith("_") || typeof val !== "object") return false;
-          const modules = val.modules || [];
-          return Array.isArray(modules) && modules.includes("FI");
-        });
+      const fiTcodes = Object.entries(tcodes).filter(([key, val]: any) => {
+        if (key.startsWith("_") || typeof val !== "object") return false;
+        const modules = val.modules || [];
+        return Array.isArray(modules) && modules.includes("FI");
+      });
 
       expect(fiTcodes.length).toBeGreaterThan(0);
       console.log(`✓ Found ${fiTcodes.length} FI T-codes`);
     });
 
     it("should return T-codes for MM module", async () => {
-      const mmTcodes = Object.entries(tcodes)
-        .filter(([key, val]: any) => {
-          if (key.startsWith("_") || typeof val !== "object") return false;
-          const modules = val.modules || [];
-          return Array.isArray(modules) && modules.includes("MM");
-        });
+      const mmTcodes = Object.entries(tcodes).filter(([key, val]: any) => {
+        if (key.startsWith("_") || typeof val !== "object") return false;
+        const modules = val.modules || [];
+        return Array.isArray(modules) && modules.includes("MM");
+      });
 
       expect(mmTcodes.length).toBeGreaterThan(0);
       console.log(`✓ Found ${mmTcodes.length} MM T-codes`);
@@ -122,7 +153,9 @@ describe("Expanded MCP Tools — v1.7.0", () => {
 
       expect(criticalModules).toContain("PP");
       expect(criticalModules).toContain("MM");
-      console.log(`✓ Critical modules for manufacturing: ${criticalModules.join(", ")}`);
+      console.log(
+        `✓ Critical modules for manufacturing: ${criticalModules.join(", ")}`,
+      );
     });
 
     it("should have agent assignments for each module", async () => {
@@ -164,7 +197,10 @@ describe("Expanded MCP Tools — v1.7.0", () => {
     });
 
     it("should respect dependency order", async () => {
-      const allSteps = [...(periodEnd.monthly_close || []), ...(periodEnd.quarterly_close || [])];
+      const allSteps = [
+        ...(periodEnd.monthly_close || []),
+        ...(periodEnd.quarterly_close || []),
+      ];
       const stepMap = new Map(allSteps.map((s: any) => [s.id, s]));
 
       // Check that dependent steps come after their dependencies
@@ -173,7 +209,9 @@ describe("Expanded MCP Tools — v1.7.0", () => {
           for (const depId of step.depends_on) {
             const depStep = stepMap.get(depId);
             expect(depStep).toBeDefined();
-            console.log(`✓ Dependency verified: ${step.id} depends on ${depId}`);
+            console.log(
+              `✓ Dependency verified: ${step.id} depends on ${depId}`,
+            );
           }
         }
       }
@@ -191,20 +229,28 @@ describe("Expanded MCP Tools — v1.7.0", () => {
       expect(Array.isArray(terms)).toBe(true);
       expect(terms.length).toBeGreaterThan(0);
 
-      const costCenterTerm = terms.find((t: any) => t.canonical === "cost_center");
+      const costCenterTerm = terms.find(
+        (t: any) => t.canonical === "cost_center",
+      );
       expect(costCenterTerm).toBeDefined();
       expect(costCenterTerm.ko.primary).toBe("코스트 센터");
-      console.log(`✓ Cost center term found with variants: ${costCenterTerm.ko.variants.join(", ")}`);
+      console.log(
+        `✓ Cost center term found with variants: ${costCenterTerm.ko.variants.join(", ")}`,
+      );
     });
 
     it("should map variant forms to canonical", async () => {
       const terms = synonyms.terms;
-      const generalLedger = terms.find((t: any) => t.canonical === "general_ledger");
+      const generalLedger = terms.find(
+        (t: any) => t.canonical === "general_ledger",
+      );
 
       expect(generalLedger).toBeDefined();
       expect(generalLedger.ko.variants).toContain("GL");
       expect(generalLedger.en).toBe("General Ledger");
-      console.log(`✓ General ledger variants: ${generalLedger.ko.variants.join(", ")}`);
+      console.log(
+        `✓ General ledger variants: ${generalLedger.ko.variants.join(", ")}`,
+      );
     });
 
     it("should include related T-codes for each term", async () => {
@@ -240,7 +286,10 @@ describe("Expanded MCP Tools — v1.7.0", () => {
       const noteList = notes.notes;
       const fiNotes = noteList.filter((n: any) => {
         const modules = n.modules || [];
-        return Array.isArray(modules) && (modules.includes("FI") || modules.includes("ALL"));
+        return (
+          Array.isArray(modules) &&
+          (modules.includes("FI") || modules.includes("ALL"))
+        );
       });
 
       expect(fiNotes.length).toBeGreaterThan(0);
@@ -287,7 +336,9 @@ describe("Expanded MCP Tools — v1.7.0", () => {
         expect(tier).toBeTruthy();
       }
 
-      console.log(`✓ 3-Tier framework: Operational (daily/weekly), Period-End (month/quarter/year), Governance (audit/compliance)`);
+      console.log(
+        `✓ 3-Tier framework: Operational (daily/weekly), Period-End (month/quarter/year), Governance (audit/compliance)`,
+      );
     });
   });
 
@@ -306,7 +357,9 @@ describe("Expanded MCP Tools — v1.7.0", () => {
 
       expect(vendorRules.required_fields).toContain("LIFNR");
       expect(vendorRules.required_fields).toContain("NAME1");
-      console.log(`✓ Vendor master data rules: ${vendorRules.required_fields.join(", ")}`);
+      console.log(
+        `✓ Vendor master data rules: ${vendorRules.required_fields.join(", ")}`,
+      );
     });
 
     it("should return required fields for customer master data", async () => {
@@ -319,7 +372,9 @@ describe("Expanded MCP Tools — v1.7.0", () => {
 
       expect(customerRules.required_fields).toContain("KUNNR");
       expect(customerRules.required_fields).toContain("NAME1");
-      console.log(`✓ Customer master data rules: ${customerRules.required_fields.join(", ")}`);
+      console.log(
+        `✓ Customer master data rules: ${customerRules.required_fields.join(", ")}`,
+      );
     });
 
     it("should return required fields for material master data", async () => {
@@ -331,7 +386,9 @@ describe("Expanded MCP Tools — v1.7.0", () => {
       };
 
       expect(materialRules.required_fields).toContain("MATNR");
-      console.log(`✓ Material master data rules: ${materialRules.required_fields.join(", ")}`);
+      console.log(
+        `✓ Material master data rules: ${materialRules.required_fields.join(", ")}`,
+      );
     });
   });
 
@@ -350,12 +407,13 @@ Generate 2-4 plausible root causes that would explain the observed symptoms.`;
     });
 
     it("should have Turn 4 verdict generation template", () => {
-      const template = `You are an SAP incident resolution specialist.
-Review all collected evidence against the proposed hypotheses.`;
-
-      expect(template).toContain("verdict");
-      expect(template).toContain("fix plan");
-      console.log("✓ Turn 4 verdict prompt template defined");
+      // 로컬 문자열을 만들어 그 문자열을 자기가 검사하던 자기충족 테스트였다.
+      // 검사어("verdict", "fix plan")가 문자열에 없어 통과 자체가 불가능했다.
+      // 실제 레지스트리 등록 여부를 검증하도록 바꾼다.
+      const names = PROMPT_REGISTRY.map((p) => p.name);
+      expect(names).toContain("sap-session-turn4-verify");
+      expect(names).toContain("evidence-loop-turn4"); // 하위호환 별칭
+      console.log("✓ Turn 4 verdict prompt registered");
     });
 
     it("should have Korean field language translation template", () => {

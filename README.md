@@ -1,4 +1,4 @@
-<!-- sapstack-stats: version=2.4.0 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
+<!-- sapstack-stats: version=2.4.1 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
 <div align="center">
 
 # 🏛 sapstack
@@ -115,6 +115,9 @@ Clean Core · Key User Extensibility · 3-Tier Extension · Fit-to-Standard · C
 ### 💻 VS Code Extension (v2.4.0)
 세션 관리 사이드바 · YAML 검증 · Webview 렌더링 · File Watcher
 
+### 🖥 Desktop
+Windows x64 전용. 설치파일 `sapstack-Desktop-<버전>-Setup-x64.exe` (NSIS)와 Portable 변형. per-user 설치(`%LOCALAPPDATA%\Programs\`), 관리자 권한 불필요. 크기 약 219MB (v2.4.0 실측). 로컬 추론 엔진 `llama-server`(llama.cpp)가 번들되며, 모델 가중치(GGUF)는 `~/.sapstack/models/`에 넣으면 자동 감지한다. 폐쇄망은 `SAPSTACK_AIRGAPPED=1` 또는 `~/.sapstack/config.yaml`의 `air_gapped: true`. SAP 데이터는 복붙 기반 — 앱이 SAP 시스템에 직접 접속하지 않는다. 설치: [docs/desktop-install.md](docs/desktop-install.md)
+
 ### 🛡 컴플라이언스 준비 (v2.0+)
 K-SOX · SOC 2 · ISO 27001 · GDPR · 망분리 배포 · PII 자동 마스킹
 
@@ -143,6 +146,9 @@ sapstack-mcp --sessions-dir ~/.sapstack/sessions
 
 ### VS Code Extension
 VS Code Marketplace에서 "sapstack" 검색 → Install · (또는 [GitHub Release](https://github.com/BoxLogoDev/sapstack/releases)의 `.vsix` 직접 설치)
+
+### Desktop (Windows x64)
+[GitHub Releases](https://github.com/BoxLogoDev/sapstack/releases)에서 `sapstack-Desktop-<버전>-Setup-x64.exe`를 받아 설치한다. Windows는 Git for Windows(Git Bash)가 필수이며, 폐쇄망에서는 오프라인 설치본을 USB로 함께 반입해야 한다. 자세히: [docs/desktop-install.md](docs/desktop-install.md)
 
 ### Amazon Kiro IDE
 ```bash

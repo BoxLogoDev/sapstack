@@ -1,0 +1,10 @@
+{
+  "depends_on": [
+    "sap-sd",
+    "sap-mm",
+    "sap-fi"
+  ],
+  "reuses_agents": [
+    "sap-integration-advisor"
+  ]
+}

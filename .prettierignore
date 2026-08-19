@@ -1,0 +1,15 @@
+# apps/desktop 은 craft-ai-agents/craft-agents-oss (Apache-2.0) 파생이고
+# 자체 eslint 체계(apps/desktop/apps/electron/eslint.config.mjs)와
+# 자체 코드 스타일(세미콜론 없음, 작은따옴표)을 쓴다.
+#
+# 루트에 prettier 설정이 없어 포맷터가 기본값(세미콜론·큰따옴표)으로 재포맷하면
+# upstream 스타일과 어긋나 동기화 diff 가 폭발한다. 실제로 주석 3줄을 고쳤을 때
+# index.ts 가 1,690줄 diff 로 부풀었다.
+#
+# upstream 코드는 upstream 규칙으로 관리한다.
+apps/desktop/
+
+# 생성물
+**/dist/
+**/release/
+**/node_modules/

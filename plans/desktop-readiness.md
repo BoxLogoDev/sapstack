@@ -1,0 +1,211 @@
+# 온전한 데스크톱 앱이 되기 위해 필요한 것
+
+> 조사 기준: 2026-08-16, sapstack v2.4.0, `apps/desktop` (craft-agents-oss v0.11.2 파생)
+> 이 문서는 **확인한 사실**과 **미확인 항목**을 구분해 적는다. 추측은 추측이라고 표시한다.
+
+---
+
+## 요약 — 생각보다 많이 되어 있다
+
+조사 전 예상과 실제가 달랐던 지점이 셋이다.
+
+| 예상                                      | 실제                                                                                                            |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Craft 브랜딩이 사용자 화면에 남아 있을 것 | **이미 정리됨.** 로고는 sapstack "S" 심볼, 메뉴 문자열도 "Quit sapstack Desktop". 내부 식별자 이름만 잔존(무해) |
+| SAP 온보딩이 없을 것                      | **`SapEnvironmentStep.tsx` 이미 존재.** 온보딩에 SAP 환경 설정 단계가 들어가 있음                               |
+| 자동 업데이트가 없을 것                   | **`auto-update.ts` 구현 완료.** electron-updater로 `boxlogodev.github.io/sapstack/electron/latest` 를 바라봄    |
+
+남은 것은 **"만들기"보다 "연결하기"와 "덜어내기"** 에 가깝다.
+
+---
+
+## P0 — 이게 없으면 배포 자체가 불가능
+
+### 1. 코드 서명 (Windows EV 인증서)
+
+| 항목   | 상태                                                                                         |
+| ------ | -------------------------------------------------------------------------------------------- |
+| 현재   | 서명 없음. `electron-builder.yml` 의 mac notarize 블록도 주석 처리                           |
+| 준비됨 | 릴리스 워크플로가 `WINDOWS_CSC_LINK` / `WINDOWS_CSC_KEY_PASSWORD` secret 을 읽도록 배선 완료 |
+| 필요   | **EV 인증서 발급 (리드타임 1~2주)**                                                          |
+
+서명이 없으면 SmartScreen 경고가 뜨고, 폐쇄망 고객의 보안 심사를 통과할 수 없다. **이것이 일정의 크리티컬 패스다.**
+
+### 2. 자동 업데이트 배포 경로 — 코드는 있는데 파일이 안 올라간다
+
+`apps/electron/src/main/auto-update.ts` 가 electron-updater 로 이 URL 을 폴링한다.
+
+```
+https://boxlogodev.github.io/sapstack/electron/latest
+```
+
+그런데 릴리스 워크플로(방금 추가한 `desktop-windows` job)는 **GitHub Release 에 첨부만 하고 저 경로에 올리지 않는다.** 즉 설치는 되지만 업데이트는 영원히 오지 않는다.
+
+필요한 것: 릴리스 시 `latest.yml` + 설치 파일을 GitHub Pages(`gh-pages` 브랜치 또는 `docs/electron/latest`)에 게시하는 단계. electron-builder 가 생성하는 `latest.yml` 이 매니페스트다.
+
+> ⚠️ 폐쇄망 고객에게는 이 경로가 무의미하다. 자동 업데이트를 **끌 수 있어야** 한다(아래 4번).
+
+### 3. 설치 후 실제 동작 검증 — 아직 한 번도 안 해봤다
+
+| 항목               | 상태                                                                                       |
+| ------------------ | ------------------------------------------------------------------------------------------ |
+| 빌드 스크립트      | `build-win.ps1` 8단계 완비 (bun 다운로드 → SDK alias → electron 빌드 → nsis 패키징 → 검증) |
+| CI 연결            | 방금 완료                                                                                  |
+| **실제 설치·실행** | **미확인**                                                                                 |
+
+최소 확인 항목: 설치 → 첫 실행 → 온보딩 완주 → SAP 환경 저장 → 진단 1건 완료 → 재시작 후 세션 유지.
+
+NSIS 가 `perMachine: false` (per-user 설치)인 이유가 코드에 적혀 있다 — Bun 서브프로세스가 Program Files 에 쓰지 못하기 때문. 이 제약이 고객사 IT 정책(사용자별 설치 금지)과 충돌할 수 있다. **확인 필요.**
+
+---
+
+## P1 — 상용 제품으로 팔려면 필요
+
+### 4. 폐쇄망 모드 (제품의 존재 이유)
+
+현재 앱은 폐쇄망을 **가정하지 않는다**. 외부로 나가는 경로가 최소 셋이다.
+
+| 경로                     | 현재                                                                                                                 | 필요                                                                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **Sentry 크래시 리포팅** | `@sentry/electron` 이 앱 시작 시 init. `dsn: process.env.SENTRY_ELECTRON_INGEST_URL` 이 없으면 비활성 (빌드 시 주입) | 폐쇄망 빌드에서는 **주입하지 않음**을 보장 + 설정에서 명시적으로 끌 수 있어야 함. 스택트레이스에 SAP 데이터가 실릴 위험 |
+| **자동 업데이트 폴링**   | 시작 시 GitHub Pages 폴링                                                                                            | 오프라인 모드 스위치 필요                                                                                               |
+| **LLM API 호출**         | 기본이 클라우드                                                                                                      | 로컬 모델 강제 모드                                                                                                     |
+
+> ✅ 다행인 점: Sentry DSN 이 **하드코딩돼 있지 않다.** craft 쪽으로 크래시가 새지 않는다.
+
+**필요한 것: "Air-gapped 모드" 토글 하나.** 켜면 Sentry·업데이트 폴링·클라우드 LLM 이 전부 차단되고, 그 사실이 UI 에 표시된다. 보안 심사 제출용 근거가 된다.
+
+### 5. 제품 범위 정리 — SAP 와 무관한 기능 덜어내기
+
+craft-agents-oss 파생이라 SAP 운영과 관계없는 기능이 딸려 왔다.
+
+| 기능                                  | 패키지/위치                                         | 판단                                                                                |
+| ------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| WhatsApp 게이트웨이                   | `packages/messaging-whatsapp-worker` (Baileys 번들) | **제거 검토.** SAP 운영 도구에 메신저 봇은 불필요하고, 보안 심사에서 설명 부담이 큼 |
+| Telegram 게이트웨이                   | `packages/messaging-gateway`                        | 〃                                                                                  |
+| 브라우저 툴                           | `browser_tool` (session-tools)                      | 판단 필요 — SAP Note 조회에 쓸 수 있으나 폐쇄망에선 무용                            |
+| 문서 툴 (pdf/xlsx/docx/pptx/img/ical) | `resources/scripts/*` + uv 바이너리 번들            | **유지 권장.** 운영자가 붙여넣는 증거가 엑셀·PDF 인 경우가 많음                     |
+| 마케팅/온라인 문서 앱                 | `apps/marketing`, `apps/online-docs`                | **제거.** 제품과 무관                                                               |
+| Playground (UI 데모)                  | `renderer/playground/*`                             | 개발용. 프로덕션 번들에서 제외되는지 **확인 필요**                                  |
+
+제거는 설치 파일 크기와 보안 심사 표면을 동시에 줄인다. 현재 설치 파일에 이미 claude 네이티브 바이너리(~210MB) + Bun 런타임 + uv 가 들어간다.
+
+> ✅ **확인함.** messaging 은 코드만 있는 게 아니라 UI 에 깊이 박혀 있다.
+> `components/messaging/{WhatsApp,Telegram,Lark}ConnectDialog.tsx` 는 물론
+> `TopBar` · `SessionMenu` · `SessionItem` · `CompactSessionMenu` · `AppShell`,
+> 그리고 **온보딩 `WelcomeStep`** 까지 걸쳐 있다. 통째로 들어내면 수정 범위가
+> 넓고 upstream 동기화도 깨진다. 제거는 비용 대비 이득이 낮다.
+>
+> **더 싼 길이 있다.** `packages/shared/src/feature-flags.ts` 에 이미 플래그
+> 체계가 있다 — `isDeveloperFeedbackEnabled` / `isCraftAgentsCliEnabled` /
+> `isEmbeddedServerEnabled` 가 모두 `SAPSTACK_DESKTOP_FEATURE_*` 환경변수 +
+> 기본값 패턴을 쓴다. 여기에 `isMessagingEnabled()` 를 기본 false 로 추가하고
+> 노출 지점을 감싸면 된다. 다만 렌더러에서는 `getEnv` 가 undefined 를 반환해
+> 항상 기본값을 타므로, 플래그를 렌더러까지 넘길 경로가 필요한지 먼저 확인해야 한다.
+>
+> `apps/marketing` 과 `apps/online-docs` 는 `electron:build` 체인에 없어
+> **설치파일에 애초에 들어가지 않는다.** 제거 우선순위가 낮다.
+>
+> 이건 제품 결정이라 결론을 내지 않고 선택지만 둔다 — 제거 / 플래그로 숨김 / 유지.
+
+### 6. 라이선스 표시 (BSL 전환 + Apache-2.0 고지)
+
+| 항목                    | 상태                                                                                                  |
+| ----------------------- | ----------------------------------------------------------------------------------------------------- |
+| `apps/desktop` 라이선스 | **Apache-2.0** (craft-agents-oss 파생). `NOTICE`·`UPSTREAM.md` 에 provenance 기록됨                   |
+| 제품 방향               | 데스크톱만 BSL 전환 예정                                                                              |
+| 필요                    | 앱 내 "About / 라이선스" 화면에 **양쪽 고지 병기**. Apache-2.0 은 파생물 배포 시 고지 의무가 따라온다 |
+
+BSL 파라미터도 정해야 한다 — Change Date(통상 4년), Change License(통상 Apache-2.0), Additional Use Grant.
+
+### 7. 테스트 신뢰성 — 71개가 실패 중
+
+```
+4827 pass · 1 skip · 71 fail · 2 errors  /  4899 tests, 370 files (625초)
+```
+
+관찰된 실패는 `deriveSelectionFlags('/')` 가 `folderName` 을 `undefined` 대신 `"/"` 로 반환하는 유형 — **Windows 경로 처리 차이로 보인다** (POSIX `basename('/')` 는 빈 문자열).
+
+> ✅ **판정 완료.** CI(ubuntu)에 관찰 모드로 넣어 양쪽 결과를 얻었다.
+
+| 환경         | pass  | skip | fail   | 소요  |
+| ------------ | ----- | ---- | ------ | ----- |
+| Windows 로컬 | 4,827 | 1    | **71** | 625초 |
+| ubuntu CI    | 4,853 | 12   | **32** | 132초 |
+
+**39건은 Windows 전용**으로 확정됐다(경로 처리 등). 남은 **32건은 양쪽에서 실패**한다.
+
+실패는 세 모듈에 집중된다 — `BrowserCDP`, `BrowserPaneManager`,
+`refreshConnectionRuntime`. 에러는 전부 평범한 assertion 실패
+(`toBe` 8, `toHaveLength` 5, `toHaveBeenCalled` 3, `toContain` 3 …)이고
+"Chrome 을 찾을 수 없음" 류의 환경 에러가 아니다.
+**즉 환경 의존이 아니라 실제 로직 불일치다.** 환경 탓으로 넘길 수 없다.
+
+다만 셋 다 브라우저 자동화 영역이고 SAP 진단 경로와 무관하다. upstream 이관
+과정에서 딸려온 것으로 보이나, **upstream 원본에서 같은 테스트가 통과하는지는
+확인하지 않았다** — 그것까지 봐야 "우리가 깨뜨린 것"인지 판별된다.
+
+판단: `continue-on-error` 를 유지하되 방치하지 않는다. 브라우저 기능을 제품에서
+어떻게 다룰지(제거 / 플래그로 숨김 / 유지)가 정해지면 함께 결론 낸다. 폐쇄망에서는
+브라우저 툴이 무용하므로 5번 항목과 같은 결정에 묶인다. 결정이 "숨김"이면 이
+32건은 비활성 기능의 테스트가 되므로 skip 처리가 정당해진다.
+
+---
+
+## P2 — 있으면 좋지만 1차 출시를 막지는 않음
+
+### 8. 제품 문서에서의 존재감
+
+데스크톱은 `README.md`, `CHANGELOG.md`, `docs/quickstart-5min.md` **어디에도 없다**. README 는 설치법 7개를 평행 나열하고 있어 "이 제품이 무엇인가"가 보이지 않는다.
+
+필요: 데스크톱을 1순위 진입점으로 올린 단일 서사. 폐쇄망 고객은 npm/플러그인이 아니라 **설치 파일**을 원한다.
+
+### 9. mac / linux 빌드
+
+`electron-builder.yml` 에 타겟이 정의돼 있다(mac dmg+zip arm64/x64, linux AppImage x64). CI 는 Windows 만 연결했다. mac 은 별도로 **공증(notarization)** 과 Apple Developer 계정이 필요하다.
+
+권장: 1차는 Windows 만. SAP 운영자 데스크톱은 대부분 Windows 다.
+
+### 10. 내부 식별자 정리
+
+`CraftAgentsSymbol`, `CraftAgentsLogo`, `CraftAppIcon`, `menu.quitCraftAgents` 같은 **이름**이 남아 있다. 사용자에게 보이는 문자열과 아트워크는 이미 sapstack 이므로 기능상 무해하다. 대규모 rename 은 upstream 동기화를 깨뜨리므로 **의도적으로 유지**하는 것이 맞다(코드 주석에 그 의도가 적혀 있다).
+
+### 11. 죽은 스크립트 참조 14개
+
+`apps/desktop/package.json` 이 존재하지 않는 스크립트 14개를 참조한다(`release.ts`, `oss-sync.ts`, `check-raw-sends.sh` 등). **릴리스 빌드 체인은 온전하다** — 전부 개발 편의 스크립트다. 다만 `bun run lint` 는 지금 즉시 실패한다.
+
+---
+
+## 이미 해결된 것 (2026-08-16 작업분)
+
+- ✅ 릴리스 워크플로에 `desktop-windows` job 추가 (build-win.ps1 경유, 서명 secret 배선, artifact → Release 첨부)
+- ✅ 버전 단일출처 통합 — 데스크톱 `3.0.0-beta.0` → `2.4.0`, `bump-version.sh` 대상 5→8개, `bun.lock` 갱신, `--frozen-lockfile` 통과 확인
+- ✅ `UPSTREAM.md` stale 문구 정리
+- ✅ **자동 업데이트 경로 수정** — publish provider 가 generic + GitHub Pages 였는데
+  Pages 는 파일당 100MB 제한이라 이 설치파일을 애초에 담을 수 없었다. 즉 코드는
+  있었지만 받을 파일이 존재할 수 없는 상태였다. GitHub Releases 로 바꾸고
+  `latest.yml` 을 함께 게시하도록 했다.
+- ✅ **Air-gapped 모드 구현** (`main/airgap.ts`) — `SAPSTACK_AIRGAPPED` 또는
+  `~/.sapstack/config.yaml` 의 `air_gapped: true` 로 Sentry 와 업데이트 폴링을
+  시작 자체를 막는다. Sentry init 보다 먼저 평가돼야 해서 동기 판정이다.
+- ✅ 데스크톱 테스트 4,899건을 CI 에 관찰 모드(`continue-on-error`)로 편입 —
+  ubuntu 결과를 확보해 71건 실패가 플랫폼 차이인지 판정하기 위함
+- ✅ 게이트 신뢰성 복구 — `echo | grep -q` + `pipefail` 이 SIGPIPE 로 오판하던
+  버그 8곳, 줄바꿈 혼재로 로컬과 CI 결과가 갈리던 문제(`.gitattributes`)
+
+---
+
+## 1차 출시(1~2개월) 관점 최소 집합
+
+| #   | 항목                                  | 담당            | 비고                                   |
+| --- | ------------------------------------- | --------------- | -------------------------------------- |
+| 1   | EV 인증서 발급                        | **사용자**      | 지금 신청. 리드타임이 일정을 결정      |
+| 2   | 자동 업데이트 게시 경로 연결          | Claude          | 릴리스 워크플로에 Pages 배포 추가      |
+| 3   | Air-gapped 모드 토글                  | Claude          | Sentry·업데이트·클라우드 LLM 일괄 차단 |
+| 4   | 설치 후 실제 동작 검증                | Claude + 사용자 | 온보딩~진단 1건 완주                   |
+| 5   | 테스트 71건 ubuntu 판정               | Claude          | continue-on-error 로 관찰              |
+| 6   | 비SAP 기능 노출 여부 확인 → 제거 판단 | Claude          | messaging/marketing 우선               |
+| 7   | 라이선스 화면 (BSL + Apache-2.0)      | Claude          | BSL 파라미터는 사용자 결정             |
+| 8   | README 에 데스크톱 1순위 배치         | Grok(docs 소유) |                                        |
+
+**mac/linux, 내부 rename, 죽은 스크립트 정리는 1차에서 뺀다.**

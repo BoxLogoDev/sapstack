@@ -1,5 +1,13 @@
 # Build script for Windows NSIS installer
 # Usage: powershell -ExecutionPolicy Bypass -File scripts/build-win.ps1
+#
+# -KeepRunningProcesses: skip the step-0 kill of node/npm/electron processes.
+#   That kill avoids EBUSY file locks on dedicated CI runners, but on a shared
+#   developer machine it takes down unrelated Node processes (other agent
+#   sessions, MCP servers, Electron apps). Pass this switch for local builds.
+param(
+    [switch]$KeepRunningProcesses
+)
 
 $ErrorActionPreference = "Stop"
 
@@ -55,17 +63,22 @@ try {
 }
 Write-Host ""
 
-# 0. Kill any lingering processes that might lock files
-Write-Host "Killing any lingering node/npm processes..."
-$processesToKill = @('node', 'npm', 'electron', 'electron-builder')
-foreach ($procName in $processesToKill) {
-    Get-Process -Name $procName -ErrorAction SilentlyContinue | ForEach-Object {
-        Write-Host "  Killing $($_.ProcessName) (PID: $($_.Id))..." -ForegroundColor Yellow
-        Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue
+# 0. Kill any lingering processes that might lock files (CI runners only —
+#    on shared developer machines this would take down unrelated Node work).
+if ($KeepRunningProcesses) {
+    Write-Host "Skipping process kill (-KeepRunningProcesses)..." -ForegroundColor Yellow
+} else {
+    Write-Host "Killing any lingering node/npm processes..."
+    $processesToKill = @('node', 'npm', 'electron', 'electron-builder')
+    foreach ($procName in $processesToKill) {
+        Get-Process -Name $procName -ErrorAction SilentlyContinue | ForEach-Object {
+            Write-Host "  Killing $($_.ProcessName) (PID: $($_.Id))..." -ForegroundColor Yellow
+            Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue
+        }
     }
+    # Give processes time to fully terminate
+    Start-Sleep -Seconds 2
 }
-# Give processes time to fully terminate
-Start-Sleep -Seconds 2
 
 # 1. Clean previous build artifacts (with retry for locked files)
 Write-Host "Cleaning previous builds..."
@@ -152,6 +165,56 @@ try {
     Start-Sleep -Seconds 3
 } finally {
     Remove-Item -Recurse -Force $TempDir -ErrorAction SilentlyContinue
+}
+
+# 3b. Download the bundled local LLM engine (llama.cpp llama-server, CPU build).
+# Air-gapped operators cannot install Ollama, so the app ships its own
+# OpenAI-compatible inference server (~18 MB). Model weights are NOT bundled —
+# operators import a GGUF model pack into ~/.sapstack/models (local-llm.ts).
+# Version + SHA256 pinned; llama.cpp publishes no checksum file, so the hash
+# was captured from the GitHub release-asset digest at pin time.
+$LlamaTag = "b10451"
+$LlamaAsset = "llama-$LlamaTag-bin-win-cpu-x64"
+$LlamaSha256 = "5017036e0746933f0d35b8225e3f9768eee0f4fd54154e1328274d0e88537e7d"
+$LlamaDest = "$ElectronDir\resources\llama"
+
+if ((Test-Path "$LlamaDest\llama-server.exe")) {
+    Write-Host "llama-server already present, skipping download." -ForegroundColor Green
+} else {
+    Write-Host "Downloading llama.cpp $LlamaTag (Windows x64 CPU)..."
+    $LlamaTemp = Join-Path $env:TEMP "llama-download-$(Get-Random)"
+    New-Item -ItemType Directory -Force -Path $LlamaTemp | Out-Null
+    try {
+        $LlamaZipUrl = "https://github.com/ggml-org/llama.cpp/releases/download/$LlamaTag/$LlamaAsset.zip"
+        Invoke-WebRequest -Uri $LlamaZipUrl -OutFile "$LlamaTemp\$LlamaAsset.zip"
+
+        Write-Host "Verifying llama.cpp checksum..."
+        $LlamaActual = (Get-FileHash "$LlamaTemp\$LlamaAsset.zip" -Algorithm SHA256).Hash.ToLower()
+        if ($LlamaActual -ne $LlamaSha256) {
+            throw "llama.cpp checksum verification failed! Expected: $LlamaSha256, Got: $LlamaActual"
+        }
+        Write-Host "Checksum verified successfully" -ForegroundColor Green
+
+        Expand-Archive -Path "$LlamaTemp\$LlamaAsset.zip" -DestinationPath "$LlamaTemp\extracted" -Force
+
+        # Asset layout varies between releases (flat vs nested) — locate the
+        # server binary and copy its whole directory (exe + required DLLs).
+        $ServerExe = Get-ChildItem -Path "$LlamaTemp\extracted" -Recurse -Filter "llama-server.exe" | Select-Object -First 1
+        if (-not $ServerExe) {
+            throw "llama-server.exe not found inside $LlamaAsset.zip"
+        }
+        New-Item -ItemType Directory -Force -Path $LlamaDest | Out-Null
+        $robocopyResult = robocopy $ServerExe.DirectoryName $LlamaDest /E /R:5 /W:3 /NP /NFL /NDL
+        if ($LASTEXITCODE -ge 8) {
+            throw "robocopy (llama) failed with exit code $LASTEXITCODE"
+        }
+        if (-not (Test-Path "$LlamaDest\llama-server.exe")) {
+            throw "llama-server.exe missing after copy to $LlamaDest"
+        }
+        Write-Host "llama-server staged at: $LlamaDest\llama-server.exe" -ForegroundColor Green
+    } finally {
+        Remove-Item -Recurse -Force $LlamaTemp -ErrorAction SilentlyContinue
+    }
 }
 
 # 4. Copy SDK from root node_modules (monorepo hoisting).

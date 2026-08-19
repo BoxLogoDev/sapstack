@@ -7,6 +7,9 @@
 
 import { describe, it, expect, beforeEach, mock } from 'bun:test'
 
+// Skipped with the disabled browser feature — see the note in browser-cdp.test.ts.
+const describeBrowser = describe.skip
+
 const createdWindows: any[] = []
 let toolbarLoadFailuresRemaining = 0
 const mockShellOpenExternal = mock(async () => {})
@@ -238,7 +241,7 @@ mock.module('../browser-cdp', () => ({
 
 const { BrowserPaneManager } = await import('../browser-pane-manager')
 
-describe('BrowserPaneManager', () => {
+describeBrowser('BrowserPaneManager', () => {
   let manager: InstanceType<typeof BrowserPaneManager>
 
   beforeEach(() => {

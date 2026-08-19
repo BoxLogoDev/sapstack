@@ -21,11 +21,14 @@ files:
   - "!dist/renderer/src/**"
   - "!**/*.map"
   - package.json
-  # Include bundled MCP servers (bridge + session) for Codex sessions
-  - resources/bridge-mcp-server/**/*
-  - resources/session-mcp-server/**/*
-  # Include Pi agent server subprocess for Pi SDK sessions
-  - resources/pi-agent-server/**/*
+  # 서브프로세스 서버(bridge/session MCP, Pi agent)는 소스 `resources/` 가 아니라
+  # `dist/resources/` 에 있다 — scripts/electron-build-resources.ts 가 정적 자산과
+  # packages/<name>/dist 를 거기로 모은다. 위 `dist/**/*` 가 이미 포함하므로
+  # 여기서 소스 경로를 다시 나열하지 않는다.
+  #
+  # 과거에 `resources/pi-agent-server/**` 를 나열했으나 그 경로는 존재한 적이 없어
+  # 아무것도 포함되지 않았고, 설치본에서 로컬 모델 채팅이
+  # `piServerPath not configured` 로 죽었다 (2026-08-19 실사용 재현).
   # Note: Bundled assets (docs, themes, permissions, tool-icons) are in resources/
   # and copied to dist/resources/ by build:copy. They're included via dist/**/* above.
   # Include network interceptor for API error capture and MCP schema injection
@@ -78,10 +81,14 @@ files:
 extraMetadata:
   main: dist/main.cjs
 
-# Auto-update: electron-updater fetches from this URL for update manifests (.yml files)
+# Auto-update: electron-updater 가 GitHub Releases 에서 latest.yml 과 설치파일을 받는다.
+# generic + GitHub Pages 였으나 Pages 는 파일당 100MB 제한이 있어 맞지 않는다
+# (설치파일에 claude 네이티브 바이너리 ~210MB 와 Bun 런타임이 들어간다).
+# Releases 는 파일당 2GB 까지 허용하고, 릴리스 워크플로가 이미 여기에 산출물을 올린다.
 publish:
-  provider: generic
-  url: https://boxlogodev.github.io/sapstack/electron/latest
+  provider: github
+  owner: BoxLogoDev
+  repo: sapstack
 
 # Disable ASAR to avoid decompression overhead and click delays
 asar: false
@@ -126,6 +133,14 @@ mac:
     # WhatsApp worker subprocess (self-contained; Baileys bundled in).
     - from: ../../packages/messaging-whatsapp-worker/dist/worker.cjs
       to: messaging-whatsapp-worker/worker.cjs
+    # upstream(craft-ai-agents/craft-agents-oss) 고지. Apache-2.0 은 파생물을
+    # 배포할 때 라이선스 사본과 NOTICE 를 함께 제공하도록 요구한다.
+    - from: ../../LICENSE
+      to: licenses/craft-agents-oss/LICENSE
+    - from: ../../NOTICE
+      to: licenses/craft-agents-oss/NOTICE
+    - from: ../../TRADEMARK.md
+      to: licenses/craft-agents-oss/TRADEMARK.md
   # Exclude binaries for other platforms
   files:
     - "!**/resources/bin/win32-*/**"
@@ -194,6 +209,21 @@ win:
     # WhatsApp worker subprocess (self-contained; Baileys bundled in).
     - from: ../../packages/messaging-whatsapp-worker/dist/worker.cjs
       to: messaging-whatsapp-worker/worker.cjs
+    # Bundled local LLM engine (llama.cpp llama-server, CPU build ~18 MB).
+    # Populated by build-win.ps1 (pinned release + SHA256). Model weights are
+    # NOT bundled — operators import a GGUF model pack into ~/.sapstack/models
+    # (see src/main/local-llm.ts). Air-gapped operators cannot download Ollama,
+    # so this is their only local-inference path.
+    - from: resources/llama
+      to: llama
+    # upstream(craft-ai-agents/craft-agents-oss) 고지. Apache-2.0 은 파생물을
+    # 배포할 때 라이선스 사본과 NOTICE 를 함께 제공하도록 요구한다.
+    - from: ../../LICENSE
+      to: licenses/craft-agents-oss/LICENSE
+    - from: ../../NOTICE
+      to: licenses/craft-agents-oss/NOTICE
+    - from: ../../TRADEMARK.md
+      to: licenses/craft-agents-oss/TRADEMARK.md
 
 nsis:
   oneClick: true
@@ -224,6 +254,14 @@ linux:
     # WhatsApp worker subprocess (self-contained; Baileys bundled in).
     - from: ../../packages/messaging-whatsapp-worker/dist/worker.cjs
       to: messaging-whatsapp-worker/worker.cjs
+    # upstream(craft-ai-agents/craft-agents-oss) 고지. Apache-2.0 은 파생물을
+    # 배포할 때 라이선스 사본과 NOTICE 를 함께 제공하도록 요구한다.
+    - from: ../../LICENSE
+      to: licenses/craft-agents-oss/LICENSE
+    - from: ../../NOTICE
+      to: licenses/craft-agents-oss/NOTICE
+    - from: ../../TRADEMARK.md
+      to: licenses/craft-agents-oss/TRADEMARK.md
   # Exclude binaries for other platforms
   files:
     - "!**/resources/bin/darwin-*/**"

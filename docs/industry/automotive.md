@@ -137,3 +137,67 @@
 - 자율주행 데이터 분석 (별도 BTP·SAC 활용)
 - Telematics (별도 IoT 솔루션)
 - 차량 정비소 운영 (CS 영역 또는 별도 DMS)
+
+---
+
+## 13. 모듈 활성화 매트릭스 (`data/industry-matrix.yaml` 과 동일)
+
+| 모듈 | importance | 라우팅 에이전트 | 노트 |
+|------|------------|-----------------|------|
+| PP | critical | sap-pp-consultant | REM, Run Schedule, VC |
+| SD | critical | sap-sd-consultant | VMS, Dealer |
+| MM | critical | sap-mm-consultant | JIT/JIS |
+| EWM | high | sap-ewm-consultant | Yard |
+| GTS | high | sap-sd-consultant (전용 GTS 에이전트 없음) | 수출·FTA |
+| QM | medium | sap-qm-consultant | 리콜·안전 — EHS 인접 |
+| PM | medium | sap-pm-consultant | 설비. Warranty 는 CS |
+| FI / CO | medium | sap-fi / sap-co | Variant Pricing |
+| WM | medium | sap-ewm-consultant | ECC 레거시 |
+| ABAP | high | sap-abap-developer | OEM EDI |
+| BTP | low | sap-integration-advisor | 자율주행은 Out of Scope |
+| HCM / TR | low | 해당 컨설턴트 | |
+
+이 표와 YAML 이 어긋나면 YAML 을 고친다 (단일 출처: matrix).
+
+## 14. ECC vs S/4
+
+| 주제 | ECC | S/4HANA |
+|------|-----|---------|
+| 창고 | 레거시 WM (LT01/LT06) | EWM / Stock Room. classic WM deprecated |
+| VC 모델링 | CU01 등 | **PMEVC** 권장 (본문 3.2) |
+| 고객/딜러 | XD/VD 계열 | **BP** |
+| JIT | JIT01/JIT03 등 | 동일 T-code + OEM EDI 가 CPI 로 이전되는 경우 많음 |
+
+## 15. 체크리스트
+
+### 구축
+- [ ] Configurable Material + Super BOM + Dependency 충돌 테스트
+- [ ] REM (MFBF) vs Discrete 선택 — 라인 단위인지 오더 단위인지
+- [ ] JIT 호출 채널(EDI) 실패 시 line stop 대응 런북
+- [ ] VMS VIN 추적 — 리콜 식별이 되는지
+
+### 운영
+- [ ] PMEVC Dependency 변경은 반드시 테스트 오더 VA01
+- [ ] MFBF 실적 vs 실물 차이 주간 대사
+- [ ] JITM 미수신 알림
+- [ ] GTS/수출 허가는 SD 빌링 전에
+
+### 거버넌스
+- [ ] 리콜 VIN 추출 권한 SoD
+- [ ] OEM 시퀀스 데이터 보존 기간 — 확인 필요
+- [ ] 본문의 SAP Note 번호(2389716, 2701145, 2401012)는 **인용 전 확인 필요**
+
+## 16. 자주 마주치는 이슈 (추가)
+
+### Dealer 가 VA01 VC 에서 옵션을 고르지 못함
+- 확인: Configuration Profile 이 해당 영업조직에 유효한지
+- T-code: VA01, PMEVC, CU01
+
+### Yard 입고가 OEM 시퀀스와 안 맞음
+- 확인: EWM HU / 입고 프로세스 vs JIT sequence
+- T-code: /SCWM/MON (S/4). ECC 면 레거시 WM
+
+---
+
+**Last Updated**: 2026-08-16  
+**Matrix**: `data/industry-matrix.yaml` automotive

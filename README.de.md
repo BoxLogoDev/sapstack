@@ -114,6 +114,9 @@ Clean Core · Key User Extensibility · 3-Tier Extension · Fit-to-Standard · C
 ### 💻 VS Code Extension (v2.4.0)
 Sitzungs-Seitenleiste · YAML-Validierung · Webview-Rendering · File Watcher
 
+### 🖥 Desktop
+Nur Windows x64. Installer `sapstack-Desktop-<Version>-Setup-x64.exe` (NSIS) plus Portable-Variante. Per-User-Installation (`%LOCALAPPDATA%\Programs\`), keine Administratorrechte. Etwa 219MB (gemessen an v2.4.0). Enthält die Engine `llama-server` (llama.cpp); GGUF-Gewichte in `~/.sapstack/models/` werden automatisch erkannt. Air-Gap: `SAPSTACK_AIRGAPPED=1` oder `air_gapped: true` in `~/.sapstack/config.yaml`. SAP-Daten per Einfügen — die App verbindet sich nicht mit SAP-Systemen. Installation: [docs/desktop-install.md](docs/desktop-install.md)
+
 ### 🛡 Konformitätsbereit (v2.0+)
 K-SOX · SOC 2 · ISO 27001 · GDPR · Air-Gap-Bereitstellung · automatische PII-Maskierung
 
@@ -142,6 +145,9 @@ sapstack-mcp --sessions-dir ~/.sapstack/sessions
 
 ### VS Code Extension
 Im VS Code Marketplace nach "sapstack" suchen → Install ·(oder die `.vsix` direkt aus einem [GitHub Release](https://github.com/BoxLogoDev/sapstack/releases) installieren)
+
+### Desktop (Windows x64)
+`sapstack-Desktop-<Version>-Setup-x64.exe` von [GitHub Releases](https://github.com/BoxLogoDev/sapstack/releases) herunterladen. Unter Windows ist Git for Windows (Git Bash) erforderlich. Im Air-Gap-Netz die Offline-Installer zusätzlich per USB mitbringen. Details: [docs/desktop-install.md](docs/desktop-install.md)
 
 ### Amazon Kiro IDE
 ```bash

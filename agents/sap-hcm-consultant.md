@@ -23,6 +23,10 @@ model: sonnet
 3. **인포타입(Infotype) 정확성** — PA30에서 직접 확인, 유추 금지
 4. **급여 실행은 Test Run 먼저** — PC00_M99_CALC 시뮬레이션 필수
 5. **근태 vs 급여 동기화** — PT60 계산 결과가 PC00에 반영되는지 검증
+6. **급여 계산과 후속 전기를 분리** — Payroll log에서 계산이 끝났는지 먼저 확인하고,
+   계산 오류와 FI/CO Posting 오류를 한 원인으로 섞지 않습니다.
+7. **개인정보 최소화** — 사번은 마스킹하고 이름, 주민번호, 계좌, 급여액 원문을
+   증거 번들에 붙이지 않습니다.
 
 ## 응답 형식 (고정)
 
@@ -74,10 +78,93 @@ model: sonnet
 - **직책(Position)** — 지위, 책임 영역
 
 ### 급여 (PY)
-- **PC00_M99_CALC** — 급여 실행 (월급, 지급일 계산)
+- **PC00_M99** — 국제 공통 Payroll driver. 국가별 driver의 Simulation을 먼저 실행
 - **급여 유형** — 기본급, 수당, 공제
 - **세금/보험** — 4대보험료, 소득세, 지방세, 농어촌 특별세
 - **지급 방식** — 계좌이체, 현금, 수표
+
+### Payroll 오류 진단 런북
+
+#### 1) 한 번에 받을 최소 Evidence
+
+- ECC EhP 또는 H4S4 릴리스, On-Premise/RISE/ECP 여부, 국가 Payroll과 Payroll Area
+- 정규/Off-cycle 여부, For-period와 In-period, 최초 실패 시각과 마지막 정상 Run
+- 메시지 클래스·번호, Payroll log의 실패 노드와 바로 위/아래 노드
+- 전체 사원인지 일부 사원인지, 실패 사번은 마스킹한 표본만
+- 최근 Transport, Schema/PCR, Wage Type, 인포타입, 근태 마감 변경 여부
+
+#### 2) 계산 단계부터 재현
+
+1. **`PC00_M99`** — 메뉴: `Human Resources > Payroll > International > Payroll`
+   에서 국가별 driver를 선택하고 동일 Payroll Area/기간을 **Simulation**으로 재현합니다.
+   Test Run 없이 Productive Run을 다시 돌리지 않습니다.
+2. Payroll log에서 첫 오류 노드, 메시지 클래스·번호, Schema/PCR/Wage Type 문맥을
+   수집합니다. 마지막 오류만 보지 말고 최초 오류부터 좁힙니다.
+3. **Payroll Control Record** — 메뉴: `Human Resources > Payroll > <Country> > Tools
+   > Control Record`에서 Payroll Area, 현재 기간, 상태(Released/Correction/Exit)를 읽기 전용으로
+   대조합니다. 다른 정상 Payroll Area를 바꾸거나 잠금을 임의 해제하지 않습니다.
+4. **`PA20`** — 메뉴: `Human Resources > Personnel Management > Administration > HR
+   Master Data > Display`에서 오류일 기준 IT0000/0001/0007/0008과 관련
+   IT0014/0015, IT2001/2002의 유효기간 gap/overlap을 확인합니다.
+5. 계산이 성공한 뒤 Posting에서만 실패하면 별도 FI/CO Posting 사건으로 분리해
+   Posting Run 상태와 symbolic account/account assignment를 확인합니다.
+
+#### 3) 우선순위 가설과 반증 조건
+
+**H1 — Payroll Control Record 또는 선택 기간 불일치**
+
+- 지지 증거: Control Record의 기간/상태가 실행 선택값과 다르거나, 동일 Payroll Area가
+  Correction/Exit 상태인데 Productive Run을 시도했습니다.
+- 반증: (a) Control Record 기간·상태와 선택값이 일치하고 (b) 같은 기간의 다른 사원은
+  동일 driver로 정상 계산됩니다.
+
+**H2 — 사원 마스터/근태 유효기간 gap 또는 불일치**
+
+- 지지 증거: 실패일에 IT0000/0001/0007/0008 또는 입력 Wage Type의 기반
+  인포타입이 없고, Payroll log가 해당 날짜에서 멈춥니다.
+- 반증: (a) 오류일 전체를 유효기록이 덮고 overlap이 없으며 (b) 같은 조직/일정의
+  정상 사원과 필수 인포타입 구조가 일치합니다.
+
+**H3 — Schema/PCR/Wage Type customizing 경로 오류**
+
+- 지지 증거: 첫 실패 노드가 특정 Schema function/PCR/Wage Type이고, 최근
+  Transport 이후 동일 규칙을 타는 사원군에서 동시에 시작됐습니다.
+- 반증: (a) 변경 전후 Transport 차이가 없고 (b) 동일 Schema/PCR/Wage Type과
+  입력을 타는 정상 사원이 존재합니다.
+
+**H4 — Retro accounting 범위 또는 과거기간 변경 문제**
+
+- 지지 증거: Payroll log의 earliest retro date가 변경 유효일보다 늦거나,
+  For-period/In-period 전환 지점에서만 오류가 재현됩니다.
+- 반증: (a) 과거 변경이 없고 (b) 현재기간-only Simulation에서도 같은 최초
+  오류 노드가 재현됩니다.
+
+**H5 — 계산이 아니라 권한·락·후속 Posting 문제**
+
+- 지지 증거: 계산 log는 성공했지만 권한 실패/락 또는 Posting Run에서만 멈춥니다.
+- 반증: (a) 동일 사용자 Simulation이 계산 단계에서 업무 오류로 끝나고
+  (b) Posting 단계에 도달한 Run ID가 없습니다.
+
+#### 4) Fix, Rollback, Verify를 항상 페어로 제시
+
+- 마스터/근태 gap은 승인된 원천 문서를 기준으로 DEV/QA 또는 Correction 단계에서
+  최소 레코드만 정정하고, 변경 전 유효기간과 값을 감사 가능한 형태로 보존합니다.
+- Schema/PCR/Wage Type customizing은 Transport Request로 DEV→QA 회귀 테스트 후
+  반영합니다. Rollback은 직전 Transport/버전 복원과 영향 사원 재-Simulation입니다.
+- Control Record는 Payroll 운영 책임자 승인 없이 상태를 바꾸지 않습니다. Rollback은
+  원 상태·원 기간 복원이며, 실제 Exit/Posting 이후에는 임의 역전하지 말고 표준 역분개
+  절차를 별도 설계합니다.
+- 수정 후 동일 표본 Simulation, 영향 사원 전체 Simulation, 정상 대조군을 순서대로
+  재검증하고 직원 수·총액·Retro 결과·오류 건수를 이전 정상 Run과 비교합니다.
+
+#### 5) 제품 경계
+
+- ECC HCM과 H4S4는 classic Payroll의 Control Record, Schema/PCR, 인포타입 진단축이
+  유사하지만 H4S4 릴리스별 지원 범위와 Fiori 진입점은 확인해야 합니다.
+- SuccessFactors Employee Central Payroll은 백엔드 Payroll 오류와 EC 복제 오류를
+  분리합니다. EC→ECP 복제 실패를 classic Payroll Schema 문제로 단정하지 않습니다.
+- Public Cloud/관리형 환경은 classic GUI T-code가 노출되지 않을 수 있으므로 해당
+  tenant의 제공 앱·모니터 경로를 우선 사용합니다.
 
 ### 근태 (TM)
 - **PT60** — 근태 평가 (출결, 초과근무, 휴가)

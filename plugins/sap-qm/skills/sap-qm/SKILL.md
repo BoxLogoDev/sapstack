@@ -356,6 +356,144 @@ QA32 Report:
 
 **생산 관점**: 월마감 전 일괄 처리로 미결 검사로트 정리
 
+### 4.5 Usage Decision Block — Evidence Loop
+
+#### Mandatory diagnostic order
+
+When no evidence is available, the leading provisional cause is **incomplete required results/valuation**,
+not configuration. Ask for environment context, but include the following read-only path in the same answer:
+
+```text
+QA03 lot status + required characteristic/sample/inspection-point state
+  → QE51N open Recorded/Valuated work
+  → QA13 existing UD / terminal state
+  → QA11 selected set and authorization boundary
+  → MMBE/MIGO post-UD stock and material document
+```
+
+Do not skip to code-set configuration while a required result is open. Falsify the leading cause only when
+both `QA03` and `QE51N` show every required characteristic, sample, inspection point, and applicable
+long-term characteristic as complete/valuated, yet `QA11` still stops before code selection with the same message.
+
+Minimum evidence bundle: release/deployment, lot/type/plant, exact message class and number, timestamp,
+full `QA03` status, open-result count, existing `QA13` decision, current `MMBE` quality-stock quantity,
+and manual versus automatic UD path.
+
+#### Intake and state boundary
+
+Collect release/deployment/industry, inspection type, user-provided inspection lot/material/plant/batch,
+exact message class/number, attempted surface (`QA11` or automatic/mass UD), current lot status,
+required characteristic/sample/inspection-point completion, selected set/code, stock-posting choice,
+and current quality stock.
+
+First classify the boundary:
+
+1. **Before UD save** — status, results, code, authorization, or lock prevents `QAVE` creation.
+2. **After UD save** — `QAVE` exists but follow-up action or stock posting failed.
+3. **Already completed/cancelled** — requested operation conflicts with terminal lot status.
+
+#### Read-only evidence chain
+
+| Step | T-code + menu path | Evidence |
+|---|---|---|
+| Lot | `QA03` — Logistics > Quality Management > Quality Inspection > Inspection Lot > Display | lot status, results, samples, inspection points, stock and existing UD status |
+| Results | `QE51N` — Logistics > Quality Management > Quality Inspection > Results > Worklist | display required characteristics, recorded/valuated state and open samples |
+| Existing UD | `QA13` — Logistics > Quality Management > Quality Inspection > Inspection Lot > Usage Decision > Display | code, valuation, follow-up action and posting outcome |
+| Stock | `MMBE` — Logistics > Materials Management > Inventory Management > Environment > Stock > Stock Overview | quality/unrestricted/blocked quantity by plant/storage/batch |
+| Material doc | `MIGO` — Logistics > Materials Management > Inventory Management > Goods Movement > Display | reference document and posting/reversal chain |
+
+Read-only tables/fields: `QALS-PRUEFLOS/MATNR/WERK/ART/OBJNR`,
+`QAVE-PRUEFLOS/VCODEGRP/VCODE`, `QAMV-PRUEFLOS`, `QASR-PRUEFLOS`,
+`QASE-PRUEFLOS`, `JEST-OBJNR/STAT/INACT`. Direct production edits are forbidden.
+
+#### Hypotheses and falsifiers
+
+**H1 — required results or valuations are incomplete.**
+
+- Supports: `QA03/QE51N` has open required characteristics, unvaluated results, samples, or inspection points.
+- Falsifier 1: every required characteristic/sample is recorded and valuated.
+- Falsifier 2: a representative QA lot with the same statuses reaches UD code selection normally.
+
+**H2 — lot status does not permit a new/change UD.**
+
+- Supports: created/cancelled/skipped/completed status conflicts with the attempted action.
+- Falsifier 1: `QA03` shows UD-ready status and `QA13` finds no prior UD.
+- Falsifier 2: failure occurs after valid code selection at follow-up/stock posting.
+
+**H3 — selected set, UD code, or follow-up action is invalid for context.**
+
+- Supports: no permitted code is offered, or a configuration message follows code selection.
+- Falsifier 1: the same plant/inspection type and code work on a representative QA lot.
+- Falsifier 2: the actual failure occurs before code selection because results are incomplete.
+
+**H4 — authorization is missing.**
+
+- Supports: immediate `[T-code: SU53 | menu: SAP GUI > System > Utilities > Display Authorization Check]`
+  shows the failed object and an approved QA role succeeds on the same eligible scenario.
+- Falsifier 1: no relevant failed check exists and the user can decide another eligible lot.
+- Falsifier 2: an authorized technical/QA user receives the same status/configuration error.
+
+**H5 — UD saved, but stock posting/follow-up failed.**
+
+- Supports: `QA13/QAVE` shows UD while `MMBE` still shows quality stock and no expected material document.
+- Falsifier 1: no `QAVE` record exists, so save itself failed.
+- Falsifier 2: target stock and material document already match the chosen posting quantity.
+
+#### Safe fixes and rollback
+
+- Missing results: enter only source-evidence-backed values through `QE01`; use dual review for regulated
+  results. Never fabricate/pass a result to unblock stock. Correct wrong results through the audited change/
+  reinvestigation process.
+- Status: complete the legitimate predecessor step or use the documented cancellation/reinspection flow.
+  Do not manipulate `QALS/JEST`.
+- Selected set/follow-up: change in DEV, attach TR, test Accept/Reject/Conditional plus reversal/error paths
+  in QA, then UAT. Roll back to the captured prior code/posting rule via controlled transport.
+- Authorization: grant the minimum approved QA role through security transport. Keep the prior role version
+  and verify segregation of duties after rollback.
+- Post-save failure: capture UD, stock, batch, posting choice, and any document/error ID; use the release-
+  supported reprocessing/correction procedure. If a wrong UD is changeable, `QA12` is used only with quality
+  approval and audit evidence; otherwise use the formal reversal/reinspection process.
+
+`QA32` is not a shortcut around an individual block. Never run a broad production selection until a single
+representative lot succeeds and the selection/output counts are approved.
+
+#### Simulation and re-verification
+
+In DEV/QA, execute result completion → UD code → follow-up/stock posting → `QA13` → `MMBE/MIGO`.
+Test at least an accepted, rejected, conditional, incomplete-result, and posting-error path. Record before/after
+lot status, `QAVE`, stock category/quantity, material document, user, and timestamp. Production starts with
+one lot or the smallest approved selection and stops on the first unexplained variance.
+
+Use this checkpoint matrix:
+
+| Boundary | Expected evidence | If false |
+|---|---|---|
+| Results | all required results recorded and valuated | enter only evidence-backed missing results in `QE01` |
+| Lot status | UD permitted; no terminal/cancelled state | complete the legitimate predecessor or formal reinspection path |
+| Code selection | valid plant/type selected set and code | test selected-set/follow-up configuration in DEV with TR |
+| UD save | `QA13/QAVE` contains intended code and valuation | diagnose the exact save/status/authorization message |
+| Stock follow-up | posting quantities balance; target stock/material doc exists | check period, batch/serial/HU and IM/WM/EWM follow-up |
+
+For automatic UD, separately verify automatic-selection eligibility, waiting time, result/valuation completion,
+code/follow-up assignment, and job log. A successful manual `QA11` decision does not prove automatic-UD
+selection is correct. Use `QA32` first with a single eligible QA lot or non-posting/test option when the release
+provides one; record selection and output counts before any broader run.
+
+If `QA13/QAVE` already exists, stop calling the incident “UD cannot be made.” Reclassify it as follow-up or
+stock-posting failure. Reconcile the posting-quantity total, MM posting period/date, batch/serial/HU controls,
+and IM versus embedded EWM document chain. Never change the UD code simply to bypass a logistics error.
+
+#### ECC, S/4HANA, Public Cloud
+
+| Surface | ECC | S/4HANA OP/Private | Public Cloud |
+|---|---|---|---|
+| UD | Classic `QA03/QA11/QA13/QA32` | Classic GUI and release-specific Fiori apps may coexist | Released inspection-lot/UD apps and roles only |
+| Persistence evidence | `QALS/QAVE/QAMV/QASR` | Same core evidence; released CDS/API preferred for extensions | App/API/CDS status, no direct table access assumption |
+| Stock follow-up | Inventory Management/WM integration | IM plus optional embedded EWM; verify EWM follow-up separately | Scope-item and released app dependent |
+
+Do not assume a classic T-code or automatic stock posting exists in Public Cloud. Verify the release, scope,
+business role, and configured follow-up action first.
+
 ---
 
 ## 5. Quality Notification (QM01/QM02/QM03)

@@ -50,7 +50,11 @@ check_file() {
 
   # 2. name 필드 (SKILL / agent만)
   if [[ "$kind" != "command" ]]; then
-    if ! echo "$fm" | grep -Eq '^name:[[:space:]]*[a-zA-Z0-9_-]+'; then
+    # 이하 검사는 herestring 을 쓴다. `echo "$fm" | grep -q` 는 grep 이 첫 매치에서
+    # 즉시 끝나며 echo 가 SIGPIPE(141) 로 죽고, pipefail 이 그 141 을 파이프라인
+    # 결과로 삼는다. 전부 부정 조건이라 "필드가 있는데 누락으로 보고"하는 거짓
+    # 양성이 된다. ^name: 처럼 앞줄에서 매치될수록 잘 터진다.
+    if ! grep -Eq '^name:[[:space:]]*[a-zA-Z0-9_-]+' <<< "$fm"; then
       echo "❌ [$kind] $file — name 필드 누락 또는 형식 오류"
       ERRORS=$((ERRORS + 1))
       return
@@ -70,7 +74,7 @@ check_file() {
   fi
 
   # 3. description 필드 + 길이 검사
-  if ! echo "$fm" | grep -Eq '^description:'; then
+  if ! grep -Eq '^description:' <<< "$fm"; then
     echo "❌ [$kind] $file — description 필드 누락"
     ERRORS=$((ERRORS + 1))
     return
@@ -95,13 +99,13 @@ check_file() {
 
   # 4. allowed-tools (skill) 또는 tools (agent)
   if [[ "$kind" == "skill" ]]; then
-    if ! echo "$fm" | grep -Eq '^allowed-tools:'; then
+    if ! grep -Eq '^allowed-tools:' <<< "$fm"; then
       echo "❌ [skill] $file — allowed-tools 필드 누락"
       ERRORS=$((ERRORS + 1))
       return
     fi
   elif [[ "$kind" == "agent" ]]; then
-    if ! echo "$fm" | grep -Eq '^tools:'; then
+    if ! grep -Eq '^tools:' <<< "$fm"; then
       echo "⚠️  [agent] $file — tools 필드 누락 (선택이지만 권장)"
     fi
   fi

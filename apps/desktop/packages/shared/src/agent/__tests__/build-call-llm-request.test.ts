@@ -87,14 +87,13 @@ describe('buildCallLlmRequest()', () => {
 
   // --- Attachments ---
 
-  it('processes text file attachments', async () => {
-    const result = await buildCallLlmRequest(
-      { prompt: 'Summarize', attachments: [join(TMP_DIR, 'test.ts')] },
-      { backendName: 'Test' }
-    );
-    expect(result.prompt).toContain('<file path="test.ts">');
-    expect(result.prompt).toContain('const x = 1;');
-    expect(result.prompt).toContain('Summarize');
+  it('blocks file attachments until outbound approval is configured', async () => {
+    await expect(
+      buildCallLlmRequest(
+        { prompt: 'Summarize', attachments: [join(TMP_DIR, 'test.ts')] },
+        { backendName: 'Test' }
+      )
+    ).rejects.toThrow('outbound-data approval policy');
   });
 
   it('rejects image attachments', async () => {
@@ -103,7 +102,7 @@ describe('buildCallLlmRequest()', () => {
         { prompt: 'test', attachments: [join(TMP_DIR, 'image.png')] },
         { backendName: 'Codex' }
       )
-    ).rejects.toThrow('Image attachments are not supported in Codex mode');
+    ).rejects.toThrow('outbound-data approval policy');
   });
 
   it('rejects missing file attachments', async () => {
@@ -112,7 +111,7 @@ describe('buildCallLlmRequest()', () => {
         { prompt: 'test', attachments: ['/nonexistent/file.ts'] },
         { backendName: 'Test' }
       )
-    ).rejects.toThrow('File not found');
+    ).rejects.toThrow('outbound-data approval policy');
   });
 
   // --- Schema injection ---

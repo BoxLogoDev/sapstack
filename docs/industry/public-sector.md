@@ -157,3 +157,57 @@
 - 세무 직접 처리 (PSCD 영역 별도)
 - 공공기관 인사평가 (외부 시스템 일반적)
 - 외교·국방 기밀 (외부 SAP 사용 불가)
+
+---
+
+## 12. 모듈 활성화 매트릭스 (`data/industry-matrix.yaml` 과 동일)
+
+| 모듈 | importance | 라우팅 | 노트 |
+|------|------------|--------|------|
+| FI | critical | sap-fi-consultant | FM 예산, PSCD |
+| MM | critical | sap-mm-consultant | 나라장터/KONEPS |
+| HCM | critical | sap-hcm-consultant | 공무원 |
+| BASIS | critical | sap-basis-consultant | 망분리, K-SOX, 감사 trail |
+| PM | high | sap-pm-consultant | 시설 |
+| ABAP | high | sap-abap-developer | G2B 연동 |
+| SD / PP / QM / WM / EWM / GTS | **none** | (없음) | 매트릭스와 동일 |
+| BTP | low | sap-integration-advisor | 클라우드 제한 |
+| CO / TR | medium / low | 해당 컨설턴트 | |
+
+## 13. ECC vs S/4
+
+| 주제 | ECC | S/4 |
+|------|-----|-----|
+| 예산(FM) | FMBB, AVC | 동일 개념. Fiori 앱은 릴리스 확인 필요 |
+| 조달 | ME21N / ME31K | 동일 + 공공 입찰은 외부 G2B |
+| 망분리 | 온프렘 전제 | RISE/Public Cloud 는 공공 보안성 검토. 단정 금지 |
+
+본문의 FMBB, FMAVCC, FMJ2, FPL9 등은 공공 FM/PSCD 표준으로 본문에만 둔다. `tcodes.yaml` 미등록이면 새 gold-set 에 넣지 않음.
+
+## 14. 체크리스트
+
+### 구축
+- [ ] AVC (FMAVCC) 임계 — 예산 초과 지출 차단이 목적인지 확인
+- [ ] 나라장터 인증서 갱신 런북 (망분리 USB 반입)
+- [ ] CDPOS 보존 연한. 본문 "7년"은 기존 서술 — **현행 기록물법 확인 필요**
+- [ ] sapstack audit-trail 권한 600/640. 777 금지
+
+### 운영
+- [ ] 연말 FMJ2 이전에 약정(earmarked) 미결 목록
+- [ ] KONEPS 점검 창 — 발주 중단 공지
+- [ ] 국정감사 시즌(통상 10월) 전 trail 추출 리허설
+
+### 거버넌스
+- [ ] 감사원 / 내부통제평가 일정은 기관마다 다름
+- [ ] 본문 Note 2701156 / 2401118 / 3010312 — **인용 전 확인 필요**
+- [ ] 기밀 등급 데이터는 sapstack 세션에 붙여넣지 말 것
+
+## 15. 망분리와 sapstack
+
+- sapstack 은 SAP 에 붙지 않는다. 예산 조회 결과를 운영자가 붙여넣는다.
+- 온디바이스 LLM 은 v2.5 예정 (`docs/compliance/air-gapped-deployment.md`).
+
+---
+
+**Last Updated**: 2026-08-16  
+**Matrix**: `data/industry-matrix.yaml` public_sector

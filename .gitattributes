@@ -1,0 +1,35 @@
+# 기본: 텍스트 파일은 저장소에 LF 로 저장한다.
+* text=auto
+
+# 아래 확장자는 작업트리에서도 LF 를 강제한다.
+#
+# core.autocrlf=true 인 Windows 개발 환경에서는 체크아웃 시 CRLF 로 변환되는데,
+# 셸 게이트가 쓰는 정규식(awk 의 /^---$/ 등)은 줄 끝의 \r 때문에 매치되지 않는다.
+# 그러면 같은 커밋을 로컬(CRLF)과 CI(LF)에서 검사한 결과가 달라진다.
+# 실제로 check-ecc-s4-split 이 로컬에서만 통과하고 CI 에서 실패한 적이 있다.
+# 게이트는 어디서 돌리든 같은 답을 내야 한다.
+#
+# .sh 는 특히 중요하다. CRLF 면 shebang 해석까지 깨질 수 있다.
+*.sh text eol=lf
+*.mjs text eol=lf
+*.md text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+
+# 확장자가 없어 위 규칙에 걸리지 않는 호환 레이어 파일.
+# build-multi-ai.sh 의 sync block 을 담고 있어, CRLF 로 체크아웃되면
+# awk 가  을 떨어뜨린 LF 출력을 내놓아 전 라인이 drift 로 잡힌다.
+.windsurfrules text eol=lf
+
+# 바이너리 — 줄바꿈 변환 대상이 아니다.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.icns binary
+*.tiff binary
+*.pdf binary
+*.vsix binary
+*.tgz binary

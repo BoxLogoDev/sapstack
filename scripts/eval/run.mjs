@@ -42,6 +42,9 @@ const REPO = resolve(__dirname, '..', '..');
 const GOLD_PATH = resolve(REPO, 'data/eval/gold-set.yaml');
 const REPORT_PATH = resolve(REPO, 'docs/eval/REPORT.md');
 const AGENTS_DIR = resolve(REPO, 'agents');
+// Universal Rules 의 정본은 AGENTS.md 다. CLAUDE.md 는 Claude/gstack 라우팅만 담는
+// 얇은 포인터라 여기서 읽으면 규칙이 통째로 비어 채점이 무의미해진다.
+const UNIVERSAL_RULES = readFileSync(resolve(REPO, 'AGENTS.md'), 'utf8');
 
 const MODULE_AGENT = {
   FI: 'sap-fi-consultant', CO: 'sap-co-consultant', TR: 'sap-tr-consultant',
@@ -52,22 +55,41 @@ const MODULE_AGENT = {
   IC: 'sap-integration-cloud-consultant',
   // 전용 에이전트 없는 모듈 → 가장 인접한 에이전트로 라우팅(eval 용)
   WM: 'sap-ewm-consultant',   // WM(레거시 창고) → EWM 컨설턴트가 창고 도메인 최근접
-  BTP: 'sap-cloud-consultant', // BTP → Cloud 컨설턴트(플랫폼/클라우드 영역)
+  BTP: 'sap-integration-advisor', // BTP destination/backend 진단은 integration advisor가 관련 T-code를 보유
 };
 
 const API_URL = 'https://api.anthropic.com/v1/messages';
 
 // Provider 선택: 유료 API 키가 있으면 api, 없으면 구독 claude CLI(추가 비용 0), 둘 다 없으면 none.
-// EVAL_PROVIDER 로 명시 가능 (api | claude-cli).
+// EVAL_PROVIDER 로 명시 가능 (api | claude-cli | local).
+//
+// local: 데스크톱에 내장된 llama-server(또는 임의 OpenAI 호환 로컬 서버)로
+// **답변만** 생성한다. judge 는 여전히 claude-cli/api 를 쓴다 — 채점자가
+// 답변자와 같은 약한 모델이면 측정 자체가 무의미해진다. 목적은 폐쇄망
+// Local 등급의 품질을 숫자로 증명하는 것 (docs/eval/latest-local.json).
 const HAS_API = !!process.env.ANTHROPIC_API_KEY;
 let HAS_CLI = false;
-// Windows 의 claude 는 셸 래퍼라 shell:true 로 탐지/호출 (Node 직접 spawn 불가)
-try { HAS_CLI = spawnSync('claude --version', { shell: true, encoding: 'utf8' }).status === 0; } catch { /* no cli */ }
+try {
+  HAS_CLI = spawnSync(process.platform === 'win32' ? 'where.exe' : 'which', ['claude'],
+    { encoding: 'utf8' }).status === 0;
+} catch { /* no cli */ }
 const PROVIDER = process.env.EVAL_PROVIDER || (HAS_API ? 'api' : (HAS_CLI ? 'claude-cli' : 'none'));
 
+// local 답변 백엔드 설정 (local-llm.ts 의 번들 서버 기본값과 일치)
+const LOCAL_URL = process.env.SAPSTACK_LOCAL_LLM_URL || 'http://127.0.0.1:11435/v1';
+const LOCAL_MODEL = process.env.EVAL_LOCAL_MODEL || 'sapstack-local';
+// local 의 judge 백엔드: api 키가 있으면 api, 아니면 구독 CLI. 둘 다 없으면 측정 불가.
+const JUDGE_PROVIDER = PROVIDER === 'local' ? (HAS_API ? 'api' : (HAS_CLI ? 'claude-cli' : 'none')) : PROVIDER;
+if (PROVIDER === 'local' && JUDGE_PROVIDER === 'none') {
+  console.error('EVAL_PROVIDER=local 은 judge 용 claude CLI 또는 ANTHROPIC_API_KEY 가 필요합니다.');
+  process.exit(1);
+}
+
 // 모델: API 는 정식 id, CLI 는 별칭(sonnet/opus/haiku).
-const MODEL = process.env.EVAL_MODEL || (PROVIDER === 'claude-cli' ? 'sonnet' : 'claude-sonnet-4-6');
-const JUDGE_MODEL = process.env.EVAL_JUDGE_MODEL || MODEL;
+const MODEL = PROVIDER === 'local' ? LOCAL_MODEL
+  : (process.env.EVAL_MODEL || (PROVIDER === 'claude-cli' ? 'sonnet' : 'claude-sonnet-4-6'));
+const JUDGE_MODEL = process.env.EVAL_JUDGE_MODEL
+  || (JUDGE_PROVIDER === 'claude-cli' ? 'sonnet' : 'claude-sonnet-4-6');
 
 function parseArgs(argv) {
   const a = { dryRun: false, case: null, module: null, all: false, limit: Infinity, jsonOut: null };
@@ -183,9 +205,42 @@ function callClaudeCLI(system, user, model) {
   }
 }
 
-// Provider 디스패처
+// 로컬 OpenAI 호환 서버 (llama-server /v1/chat/completions)
+async function callLocalLlm(system, user) {
+  const res = await fetch(`${LOCAL_URL}/chat/completions`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      model: LOCAL_MODEL,
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: user },
+      ],
+      // 카드 기반 직답 형식이라 512 로 충분 — CPU 추론에서 토큰 상한이 곧
+      // 벽시계 시간이다 (90건 전수의 소요를 절반으로 줄인다).
+      max_tokens: Number(process.env.EVAL_LOCAL_MAX_TOKENS) || 512,
+      temperature: 0.3,
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`local LLM ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  }
+  const data = await res.json();
+  const text = data.choices?.[0]?.message?.content;
+  if (!text) throw new Error('local LLM: 빈 응답');
+  return text;
+}
+
+// Provider 디스패처 — 답변 생성용
 async function complete(system, user, model) {
+  if (PROVIDER === 'local') return callLocalLlm(system, user);
   if (PROVIDER === 'claude-cli') return callClaudeCLI(system, user, model);
+  return callAnthropic(system, user, model);
+}
+
+// judge 디스패처 — local 모드에서도 항상 강한 모델을 쓴다.
+async function judgeComplete(system, user, model) {
+  if (JUDGE_PROVIDER === 'claude-cli') return callClaudeCLI(system, user, model);
   return callAnthropic(system, user, model);
 }
 
@@ -283,6 +338,41 @@ function dryRun(cases) {
   }
 }
 
+// local(8B CPU) 답변용 시스템 프롬프트.
+//
+// CLAUDE.md 전문 + 에이전트 본문(수천 토큰)은 8B 가 지시로 소화하지 못한다 —
+// 컨텍스트에는 들어가지만 추종력이 무너지고 CPU 속도에서 실용성을 잃는다.
+// data/local-llm/compact/{module}.md (증류된 진단 카드)가 있으면 그것을 쓰고,
+// 없으면 미니 헤더 + 에이전트 본문으로 폴백한다(폴백은 측정치가 과소평가될 수
+// 있음을 뜻하므로 로그로 표시).
+const LOCAL_HEADER = [
+  '당신은 SAP 운영 진단 어시스턴트다.',
+  '규칙: 회사코드·계정 같은 고정값 금지 / ECC 와 S/4HANA 를 구분 / T-code 는 원형으로 /',
+  '확신 없으면 "확인 필요"라고 말한다 / 운영 환경 SE16N 데이터 편집을 제안하지 않는다.',
+  '형식: 가능한 원인 1~2개(확률순) → 확인할 T-code → 조치 순서.',
+].join('\n');
+
+// gold-set 모듈명 → 컴팩트 카드 파일명 (전용 카드가 없는 모듈은 최근접 카드로)
+const COMPACT_FILE = {
+  IC: 'integration-cloud',
+  WM: 'ewm',
+  Ariba: 'ariba',
+};
+const warnedCompactMiss = new Set();
+
+function buildLocalSystem(module_, agentFile) {
+  const name = COMPACT_FILE[module_] || module_.toLowerCase();
+  const compact = resolve(REPO, 'data/local-llm/compact', `${name}.md`);
+  if (existsSync(compact)) {
+    return `${LOCAL_HEADER}\n\n${readFileSync(compact, 'utf8')}`;
+  }
+  if (!warnedCompactMiss.has(name)) {
+    warnedCompactMiss.add(name);
+    console.error(`ℹ 컴팩트 카드 없음: data/local-llm/compact/${name}.md — 에이전트 본문으로 폴백 (8B 에는 과부하일 수 있음)`);
+  }
+  return `${LOCAL_HEADER}\n\n${stripFrontmatter(readFileSync(agentFile, 'utf8'))}`;
+}
+
 async function liveRun(cases) {
   const results = [];
   for (const c of cases) {
@@ -293,22 +383,31 @@ async function liveRun(cases) {
       results.push({ id: c.id, module: c.module, error: 'agent-missing' });
       continue;
     }
-    const system = stripFrontmatter(readFileSync(agentFile, 'utf8'));
+    const system = PROVIDER === 'local'
+      ? buildLocalSystem(c.module, agentFile)
+      : `${UNIVERSAL_RULES}\n\n# Assigned SAP specialist\n\n${stripFrontmatter(readFileSync(agentFile, 'utf8'))}`;
     process.stderr.write(`▶ ${c.id} (${c.module}) … `);
     try {
       // 답변은 1회만 생성(비용↑). 분산의 주범인 judge 만 N회 호출 → 합의 집계.
-      const answer = await complete(system, c.prompt, MODEL);
+      const userPrompt = [
+        `SAP environment: ${JSON.stringify(c.env || {})}`,
+        'Use this supplied environment directly. Do not stop at an environment question.',
+        c.prompt,
+      ].join('\n');
+      const t0 = Date.now();
+      const answer = await complete(system, userPrompt, MODEL);
+      const answerMs = Date.now() - t0;
       const verdicts = [];
       for (let i = 0; i < JUDGE_VOTES; i++) {
         try {
           verdicts.push(safeParseJson(
-            await complete('You output only JSON.', judgePrompt(c, answer), JUDGE_MODEL)));
+            await judgeComplete('You output only JSON.', judgePrompt(c, answer), JUDGE_MODEL)));
         } catch (je) {
           if (verdicts.length === 0 && i === JUDGE_VOTES - 1) throw je; // 전부 실패 시에만 throw
         }
       }
       const v = aggregateVerdicts(verdicts);
-      results.push({ id: c.id, module: c.module, difficulty: c.difficulty, ...v });
+      results.push({ id: c.id, module: c.module, difficulty: c.difficulty, answer_ms: answerMs, ...v });
       process.stderr.write(
         `score=${v.score.toFixed(2)} (${v.root_cause_match}) [${v.judge_votes}표, spread ${v.score_spread}]\n`);
     } catch (e) {
@@ -335,6 +434,10 @@ function summarize(results) {
     ethos_violations_total: ethos,
     judge_votes: JUDGE_VOTES,
     avg_judge_spread: n ? +avg('score_spread').toFixed(3) : 0,
+    // local 실측에서 중요한 지표 — 16GB CPU 노트북에서 실용 속도가 나오는가.
+    ...(scored.some((r) => typeof r.answer_ms === 'number')
+      ? { avg_answer_seconds: +(avg('answer_ms') / 1000).toFixed(1) }
+      : {}),
   };
 }
 
@@ -390,12 +493,21 @@ async function main() {
   const summary = summarize(results);
   console.log('\n── 요약 ──');
   console.log(JSON.stringify(summary, null, 2));
-  writeReport(summary, results);
-  console.log(`\n📄 REPORT 갱신: docs/eval/REPORT.md`);
+  if (args.all && PROVIDER !== 'local') {
+    writeReport(summary, results);
+    console.log(`\n📄 REPORT 갱신: docs/eval/REPORT.md`);
+  } else if (PROVIDER === 'local') {
+    // local 등급 측정은 클라우드 baseline REPORT 를 오염시키지 않는다 —
+    // --json docs/eval/latest-local.json 으로 별도 고정한다.
+    console.log('\nℹ local 실행은 REPORT를 갱신하지 않습니다. --json docs/eval/latest-local.json 을 사용하세요.');
+  } else {
+    console.log('\nℹ 타깃 실행은 REPORT를 갱신하지 않습니다. 공식 전체 실행은 --all을 사용하세요.');
+  }
   if (args.jsonOut) {
     writeFileSync(args.jsonOut, JSON.stringify({ ...summary, generated_at: new Date().toISOString(), provider: PROVIDER, model: MODEL }, null, 2));
     console.log(`📄 요약 JSON: ${args.jsonOut}`);
   }
+  if (summary.cases_errored > 0) process.exitCode = 1;
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

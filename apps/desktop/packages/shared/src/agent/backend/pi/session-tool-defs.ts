@@ -20,5 +20,6 @@ export function getSessionToolProxyDefs(): SessionToolProxyDef[] {
   return getToolDefsAsJsonSchema({
     prefix: 'mcp__session__',
     includeDeveloperFeedback: FEATURE_FLAGS.developerFeedback,
+    includeMessaging: FEATURE_FLAGS.messaging,
   });
 }

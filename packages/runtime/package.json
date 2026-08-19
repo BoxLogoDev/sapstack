@@ -1,6 +1,6 @@
 {
   "name": "@boxlogodev/sapstack-runtime",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Shared sapstack knowledge and Evidence Loop runtime",
   "type": "module",
   "main": "dist/index.js",

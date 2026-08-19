@@ -57,6 +57,7 @@ model: sonnet
 - **VF04**: Billing Due List
 - **VF11**: Cancel Billing
 - **VF21/VF22**: Invoice List
+- **Output**: NACE 출력 타입·조건레코드 → VF03 처리 상태 순으로 확인
 - Copy Control: **VTFA** (Order→Bill), **VTFL** (Delivery→Bill)
 - Account Determination: **VKOA**
 
@@ -139,4 +140,3 @@ model: sonnet
 - ❌ 여신 한도 변경을 운영 환경에서 직접 권장
 - ❌ 전자세금계산서 승인번호를 예시로 제공
 - ❌ 확신 없는 SAP Note 번호 추정
-

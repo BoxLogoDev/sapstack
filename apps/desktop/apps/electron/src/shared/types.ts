@@ -387,6 +387,12 @@ export interface ElectronAPI {
   // System warnings (startup checks)
   getSystemWarnings(): Promise<{ vcredistMissing: boolean; downloadUrl?: string }>
 
+  // Feature flags — evaluated once in preload from env (constant for the app
+  // lifetime). Renderer gates upstream-inherited features that default off in
+  // SAP operations builds. (Browser tool is gated by its own settings axis —
+  // getBrowserToolEnabled — not here.)
+  featureFlags: { messaging: boolean }
+
   // Shell operations
   openUrl(url: string): Promise<void>
   openFile(path: string): Promise<void>
@@ -1105,7 +1111,34 @@ declare global {
         get(sessionId: string): Promise<unknown>
         list(filter?: unknown): Promise<unknown>
       }
+      localLlm: {
+        status(): Promise<{
+          serverBundled: boolean
+          modelFile: string | null
+          modelsDir: string
+          running: boolean
+          ready: boolean
+          endpoint: string | null
+          modelId: string
+          lastError: string | null
+          piServerPath: string | null
+          piServerError: string | null
+        }>
+        probe(endpoint: string): Promise<{
+          ok: boolean
+          models: string[]
+          error: string | null
+        }>
+      }
       security: { scrub(text: string): Promise<unknown> }
+      learning: {
+        inspect(): Promise<{
+          total_sessions: number
+          resolved_sessions: number
+          candidates: Array<{ candidate_id: string; kind: 'gold_set' | 'codify'; symptom_ref?: string; modules: string[] }>
+          privacy: { contains_free_text: false; contains_environment: false; auto_apply: false }
+        }>
+      }
       environment: {
         get(): Promise<SapEnvironmentProfile | null>
         save(profile: Omit<SapEnvironmentProfile, 'profile_version'>): Promise<SapEnvironmentProfile>

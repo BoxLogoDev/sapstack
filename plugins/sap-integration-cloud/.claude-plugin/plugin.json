@@ -1,0 +1,14 @@
+{
+  "depends_on": [
+    "sap-btp",
+    "sap-abap",
+    "sap-sfsf",
+    "sap-ariba",
+    "sap-sac"
+  ],
+  "reuses_agents": [
+    "sap-abap-developer",
+    "sap-ariba-consultant",
+    "sap-sac-consultant"
+  ]
+}

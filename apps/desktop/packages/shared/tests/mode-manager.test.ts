@@ -2059,7 +2059,12 @@ describe('PowerShell plans folder exception', () => {
   });
 
   describe('case-insensitive path matching on Windows', () => {
-    it('allows write when path case differs from plansFolderPath', () => {
+    // Case-insensitive containment is a Windows filesystem semantic — on Linux
+    // 'C:\Users\Test' and 'C:\Users\test' are genuinely different paths, so
+    // asserting allowed=true there tests behavior the platform doesn't have.
+    // (ubuntu CI runners ship pwsh, so the psAvailable guard alone doesn't
+    // keep this suite off Linux.)
+    it.skipIf(process.platform !== 'win32')('allows write when path case differs from plansFolderPath', () => {
       if (!psAvailable) return;
 
       // plansFolderPath uses lowercase 'test', command uses 'Test'

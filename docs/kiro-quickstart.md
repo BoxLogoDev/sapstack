@@ -1,6 +1,6 @@
 # sapstack × Kiro — 5분 Quick Start
 
-<!-- sapstack-stats: version=2.4.0 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
+<!-- sapstack-stats: version=2.4.1 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
 
 > Amazon **Kiro** IDE에서 sapstack을 써서 SAP 운영 진단·지식 검색·Evidence
 > Loop 세션을 돌리는 법. 라이브 SAP 연결은 일체 없습니다 — 모든 데이터는

@@ -89,8 +89,10 @@ function collectModules(state) {
     for (const r of v.resolutions || [])
       if (r.status === 'confirmed') confirmed.add(r.hypothesis_id);
   for (const h of state.hypotheses || [])
-    if (confirmed.has(h.hypothesis_id))
-      for (const m of h.likely_modules || []) mods.add(m);
+    if (confirmed.has(h.hypothesis_id)) {
+      const modules = Array.isArray(h.impacted_modules) && h.impacted_modules.length ? h.impacted_modules : h.likely_modules;
+      for (const m of modules || []) mods.add(m);
+    }
   return [...mods];
 }
 
@@ -151,7 +153,7 @@ function main() {
     : `# ✚ 신규 symptom 후보 — data/symptom-index.yaml symptoms[] 에 추가 검토`;
 
   console.log(header);
-  console.log(`# 출처 세션: ${state.session_id} (status=resolved, env=${JSON.stringify(state.sap_context || {})})`);
+  console.log(`# 출처 세션: ${state.session_id} (status=resolved)`);
   console.log('# ⚠ 사람 검수 필수: typical_causes 일반화·중복 확인, PII 잔존 점검 후 PR.');
   console.log('');
   console.log(yaml.dump({ symptoms: [candidate] }, { lineWidth: 100, noRefs: true }));

@@ -135,3 +135,58 @@
 - 진단 영상 (PACS·DICOM 별도)
 - 원격 진료 (Telemedicine 별도 플랫폼)
 - 의료 AI (별도 BTP/SAC 활용)
+
+---
+
+## 12. 모듈 활성화 매트릭스 (`data/industry-matrix.yaml` 과 동일)
+
+| 모듈 | importance | 라우팅 | 노트 |
+|------|------------|--------|------|
+| FI | critical | sap-fi-consultant | 보험·NHIS DRG |
+| MM | critical | sap-mm-consultant | 의약품 Lot/Serial |
+| HCM | critical | sap-hcm-consultant | 의료진 |
+| QM | high | sap-qm-consultant | Calibration |
+| PM | high | sap-pm-consultant | 의료기기 plan |
+| BASIS | high | sap-basis-consultant | PIPA / HIPAA-like |
+| EWM | medium | sap-ewm-consultant | 의약품 FEFO |
+| PP | **none** | (없음) | 매트릭스와 동일 |
+| GTS | **none** | (없음) | |
+| BTP | low | sap-integration-advisor | 의료 AI 는 Out of Scope |
+| SD / WM / TR / CO / ABAP | low~medium | 해당 컨설턴트 | NHIS EDI 는 ABAP |
+
+## 13. ECC vs S/4
+
+| 주제 | ECC | S/4 |
+|------|-----|-----|
+| 환자 마스터 | IS-H (NPTAB 등 — 본문 3절) | 동일 또는 후속 헬스케어 솔루션. 사이트 확인 필요 |
+| 재고 | MIGO + MSC* | 동일 + EWM FEFO |
+| 개인정보 | 역할·로그 | 동일 + ILM. 클라우드 PE 는 별도 |
+
+IS-H T-code (NPTAB, NIN1 등) 는 본문에만 있고 `data/tcodes.yaml` 미등록이면 gold-set/답변에 새로 박지 않는다.
+
+## 14. 체크리스트
+
+### 구축
+- [ ] 의약품 배치 + 임플란트 시리얼 필수
+- [ ] 환자 마스터 중복 병합 절차 + audit
+- [ ] NHIS EDI 는 실패 시 운영자가 로그를 붙이는 흐름 (sapstack 은 연결하지 않음)
+- [ ] PIPA 최소수집 — 세션 증거의 주민번호 마스킹
+
+### 운영
+- [ ] QA11 UD 후 격리 재고가 병동으로 나가지 않는지
+- [ ] PM 교정 일정 기한 초과 (IP30)
+- [ ] Recall 시 Lot → 투여 이력 식별. 추적이 안 되면 출고 중지
+
+### 거버넌스
+- [ ] HIPAA/PIPA 위반 신고 시한은 관할마다 다름. **확인 필요** (본문 "24시간"은 기존 서술 — 재검증 전)
+- [ ] 본문 Note 2010023 / 2701231 / 3010256 — **인용 전 확인 필요**
+
+## 15. 한국 의료 (보강)
+
+- DRG 7개 질병군 목록은 심평원 고시가 바뀐다. 목록을 여기에 고정하지 않음.
+- 처방·조제 KPIS 연동 실패는 Integration 재위임.
+
+---
+
+**Last Updated**: 2026-08-16  
+**Matrix**: `data/industry-matrix.yaml` healthcare

@@ -52,7 +52,7 @@ model: sonnet
 
 ### 재고 (Inventory)
 - **MIGO**: GR (101), GI (201), Transfer (301/311), Reversal (102/122)
-- **재고 현황**: MMBE, MB52, MB5B (전기간)
+- **재고 현황**: MMBE, MB52, MB5B (전기간); 차이는 MB51 자재문서 이력에서 102/122 역전표부터 확인
 - **Batch 관리**: MSC1N, MSC3N
 - **Special Stock**: E (판매오더), K (위탁), Q (프로젝트), O (외주)
 - **재고 실사**: MI01 (문서 생성) → MI04 (입력) → MI07 (포스팅)
@@ -144,4 +144,3 @@ model: sonnet
 - ❌ 회사코드·플랜트 고정값 가정
 - ❌ ECC MSEG/MKPF 기반 답변을 S/4HANA에 그대로 적용 (S/4는 MATDOC)
 - ❌ 확신 없는 SAP Note 번호 인용
-

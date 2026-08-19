@@ -1,8 +1,9 @@
 # sapstack × SAP AI Joule — 연동 전략 연구 문서
 
-> **버전**: v1.7.0-research  
+> **버전**: v2.4.0 (연구 문서, 로드맵 재정렬)  
 > **작성일**: 2026-04-12  
-> **상태**: 연구 문서 (프로토타입 없음)
+> **갱신**: 2026-08-16  
+> **상태**: 연구 문서 — Joule 연동 프로토타입은 아직 없음. sapstack 본편(Evidence Loop·MCP·eval)은 v2.4.0 에 존재.
 
 ---
 
@@ -57,7 +58,7 @@ sapstack = Active Advisor + Context Persistence + Quality Gates
 
 | 축 | 역할 | 핵심 산출물 |
 |----|------|-----------|
-| **Active Advisors** | 14 SKILL + 9 Subagent + 10 Command | 위임 가능한 SAP 컨설턴트 |
+| **Active Advisors** | 24 SKILL + 20 Subagent + 22 Command | 위임 가능한 SAP 컨설턴트 |
 | **Context Persistence** | `.sapstack/config.yaml` | 환경 프로필 (ECC/S4, 회사코드, 산업 등) |
 | **Quality Gates** | CI/lint/hardcoding check | 품질 보증 시스템 |
 
@@ -443,28 +444,36 @@ T로 설정해줄래?" (Joule 자동화)
 
 ## 7. 구현 로드맵
 
-### Phase 1 (v1.8 — 2026년 Q3)
-**연구 검증 및 프로토타입**
+현재 제품 버전은 **v2.4.0** 이다. 아래는 2026-04 초안의 v1.8/v2.0/v3.0 구간을
+현재 시점으로 재정렬한 것이다. Joule 연동 자체는 아직 연구 단계 — 체크박스를
+완료로 바꾸지 않는다.
 
-- [ ] BTP AI Core API 프로토타입 (50 IMG references 등재)
-- [ ] Embedding 모델 선택 (multilingual-e5-large)
-- [ ] Semantic search 성능 벤치마크 (Recall@5)
+### 이미 제품에 있는 것 (v1.5 ~ v2.4.0)
+
+- [x] Evidence Loop (INTAKE → HYPOTHESIS → COLLECT → VERIFY)
+- [x] MCP 서버 + 진단 품질 eval 하니스 (`data/eval/gold-set.yaml`)
+- [x] 6개 언어 응답 (ko/en/zh/ja/de/vi)
+- [x] 망분리 배포 가이드 (`docs/compliance/air-gapped-deployment.md`)
+- [x] 본 연구 문서 (Joule vs sapstack 포지셔닝)
+
+초안의 Phase 1(v1.8)·Phase 2(v2.0) 일정은 **이미 지난 버전 번호**다.
+해당 항목 중 미구현분은 아래로 이월한다.
+
+### Next (v2.5) — 온디바이스·망분리 LLM + 연구 검증
+
+- [ ] 온디바이스 로컬 모델 지원 (망분리에서 Claude API 대체). 실제 동작은 Phase 2 확정
+- [ ] BTP AI Core API 프로토타입 (IMG references 등재)
+- [ ] Embedding 모델 선택 및 semantic search 벤치마크 (Recall@5)
 - [ ] 한국 고객사 1곳 파일럿 (망분리 환경)
+- [ ] Joule System Prompt Injection 가이드 (연구 → 게시)
 
-### Phase 2 (v2.0 — 2026년 Q4)
-**Production RAG Integration**
+### Later (v3.0) — SAP Operations AI Layer
 
 - [ ] BTP AI Core RAG pipeline 정식 운영
-- [ ] Joule System Prompt Injection 가이드 게시
-- [ ] sapstack.io API 알파 출시
-- [ ] 대고객 1대1 세션 기반 데이터 수집
-
-### Phase 3 (v3.0 — 2027년 Q2)
-**SAP Operations AI Layer**
-
-- [ ] Joule에 native "sapstack" 스킬 등재
+- [ ] sapstack.io API 알파
+- [ ] Joule 에 native "sapstack" 스킬 등재
 - [ ] Event Mesh 자동 trigger (F110 실패 → Evidence Loop 자동 시작)
-- [ ] 자동 CONFIG 적용 (IMG guide → ABAP macro)
+- [ ] 자동 CONFIG 적용 (IMG guide → ABAP macro) — 운영자 승인 없이 쓰지 않음 (ETHOS ⑥)
 
 ---
 
@@ -502,20 +511,19 @@ T로 설정해줄래?" (Joule 자동화)
 
 ### 권장 다음 단계
 
-**v1.8 (2026년 Q3)**:
-- BTP AI Core와의 API 계약 검토 (SAP 파트너십)
+**v2.5 (다음 마이너)**:
+- 온디바이스 로컬 모델 경로를 망분리 가이드에 자리만 확보 (동작 서술은 확정 후)
+- BTP AI Core 와의 API 계약 검토 (SAP 파트너십)
 - 한국 고객사 1곳과 파일럿 NDA 체결
-- Evidence Loop 기반 SAP Notes 자동 추출 스크립트 개발
+- Joule System Prompt Injection 가이드 초안
 
-**v2.0 (2026년 Q4)**:
+**v3.0**:
 - Joule 개발팀과 Integration 공식 협의
-- System Prompt Injection 가이드 공개
-- "sapstack-powered Joule" 마케팅 캠페인
-
-**Long-term (v3.0)**:
-- SAP Marketplace에 공식 "sapstack" 스킬 등재
-- German/English translations 추가 (European expansion)
+- SAP Marketplace 에 공식 "sapstack" 스킬 등재
 - Industry-specific AI consulting (Manufacturing, Finance)
+
+> 초안에 있던 "German/English translations 추가"는 v2.4.0 시점에 이미 6개 언어
+> (ko/en/zh/ja/de/vi) 가 제품에 있다. 유럽 확장은 번역이 아니라 현지 운영 시나리오다.
 
 ---
 

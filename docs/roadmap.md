@@ -250,7 +250,7 @@
 **테마**: 지식 자산 심화 + 사용 학습 루프 + **진단 품질 측정**(gstack 갭 G4)
 
 - [x] **SAP Note/KBA 100+** — 112건 등록 완료 (v2.3.3)
-- [~] **진단 품질 eval 하니스 (G4)** — gold-set 21건 + LLM-judge 러너 + 무료 무결성 게이트.
+- [~] **진단 품질 eval 하니스 (G4)** — gold-set 58건 + LLM-judge 러너 + 무료 무결성 게이트.
   "112개 노트"를 "진단 정확도 X%"로. 로컬 전용(CI 비용 0). → [`eval/methodology.md`](eval/methodology.md)
 - [~] **Learning Loop** (opt-in·로컬, pure OSS) — codify(세션→symptom 후보) + aggregate(가설 정확도·모듈 분포 + gold-set 환류 후보) + decisions.jsonl(결정 메모리). → [`learning-loop.md`](learning-loop.md)
 - [ ] **다국어 네이티브 검수** — symptom-index 90/90 × 6개 언어, synonyms 80+ terms

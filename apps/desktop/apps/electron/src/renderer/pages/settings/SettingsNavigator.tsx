@@ -155,12 +155,17 @@ export default function SettingsNavigator({
   const { t } = useTranslation()
 
   const settingsItems: SettingsItem[] = useMemo(() =>
-    SETTINGS_ITEMS.map((item) => ({
-      id: item.id,
-      label: t(item.labelKey),
-      icon: SETTINGS_ICONS[item.id],
-      description: t(item.descriptionKey),
-    })),
+    SETTINGS_ITEMS
+      // Platform messaging is feature-flagged off by default in SAP operations
+      // builds — hide its settings entry. Deep links still resolve (constant
+      // flag, harmless), only navigator visibility is gated here.
+      .filter((item) => item.id !== 'messaging' || window.electronAPI.featureFlags?.messaging)
+      .map((item) => ({
+        id: item.id,
+        label: t(item.labelKey),
+        icon: SETTINGS_ICONS[item.id],
+        description: t(item.descriptionKey),
+      })),
     [t]
   )
 
