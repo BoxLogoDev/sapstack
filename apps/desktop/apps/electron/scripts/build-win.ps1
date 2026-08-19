@@ -500,7 +500,12 @@ while (-not $builderSuccess -and $builderRetry -lt $maxBuilderRetries) {
         Start-Sleep -Seconds 1
     }
 
-    npx electron-builder --win --x64 2>&1 | Tee-Object -Variable builderOutput
+    # --publish never: electron-builder.yml has publish=github, and on a tag push in CI
+    # electron-builder defaults to uploading artifacts itself, which needs GH_TOKEN.
+    # Release upload is the workflow's job (upload-artifact -> action-gh-release), so
+    # the builder must only build. latest.yml is still written -- PublishManager writes
+    # update info outside the isPublish branch.
+    npx electron-builder --win --x64 --publish never 2>&1 | Tee-Object -Variable builderOutput
 
     if ($LASTEXITCODE -eq 0) {
         $builderSuccess = $true
