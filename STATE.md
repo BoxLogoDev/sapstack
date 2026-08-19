@@ -1,6 +1,6 @@
 # STATE — sapstack
 
-> 갱신: 2026-08-19 · 브랜치 `feat/desktop-release-and-knowledge` · PR #44
+> 갱신: 2026-08-19 · 브랜치 `feat/desktop-release-and-knowledge` · PR #44 · **v2.4.1 릴리스 준비 중**
 > 규약: `~/.claude/workflows/project-memory.md`. 규칙은 `AGENTS.md`, 판단 이력은 `decisions/`.
 
 ## 지금 어디까지 왔나
@@ -28,10 +28,6 @@ v2.4.0 이 npm 에 라이브인 상태에서, 데스크톱(Electron) 쪽 미완�
 | **로컬 LLM 실기기 검증**                                      | 위 릴리스 후에만 의미 있다                                                                                                                                                  | 새 빌드 설치 → 모델팩을 `~/.sapstack/models/` 에 넣고 채팅 1턴                                                                                  |
 | GGUF 가중치 미번들                                            | 라이선스·용량 문제로 설치파일에 못 넣음                                                                                                                                     | 운영자가 USB 반입. 권장 모델팩 결정 필요                                                                                                        |
 | Qwen3 8B "권장" 판정 보류                                     | 개발 머신 실측 0.75 tok/s — 타깃 사양(16GB 노트북) 미실측                                                                                                                   | 실기기 측정 후 문서의 "장비에 따라 선택" 문구 확정                                                                                              |
-| 본문 통계 스테일                                              | AGENTS.md 본문이 "15 플러그인·9 에이전트"인데 실측 24·20·22                                                                                                                 | 플러그인 표를 소스에서 생성. **키워드 창작 금지**                                                                                               |
-| 버전 라벨 3중 불일치                                          | AGENTS.md `v1.5.0` / 다국어 섹션 `v1.7.0` / package.json `2.4.0`                                                                                                            | 일괄 정리                                                                                                                                       |
-| Multi-AI 호환표 누락                                          | `build-multi-ai.sh` 는 8개인데 표는 7개                                                                                                                                     | Windsurf·Cody 행 추가                                                                                                                           |
-| build-multi-ai drift 2건                                      | `.cody/rules.md`·`.idea/sapstack-prompt.md` 가 CRLF 라 전 라인 diff                                                                                                         | LF 로 재작성                                                                                                                                    |
 
 ## 다음 한 걸음
 
