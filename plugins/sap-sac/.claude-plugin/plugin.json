@@ -1,4 +1,7 @@
 {
+  "name": "sap-sac",
+  "version": "1.0.0",
+  "description": "Cloud BI, Story design, Analytic Applications, Planning models, Smart Predict, BW Bridge, Datasphere connectivity. Cloud-native analytics replacing on-prem BI.",
   "depends_on": [
     "sap-basis",
     "sap-bc",

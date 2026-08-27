@@ -1,4 +1,7 @@
 {
+  "name": "sap-mm",
+  "version": "1.0.0",
+  "description": "Procurement, inventory, GR/IR, invoice verification",
   "depends_on": [],
   "reuses_agents": []
 }

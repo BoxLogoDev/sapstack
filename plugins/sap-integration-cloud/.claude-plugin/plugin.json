@@ -1,4 +1,7 @@
 {
+  "name": "sap-integration-cloud",
+  "version": "1.0.0",
+  "description": "Cloud integration platform — CPI (Cloud Platform Integration) iFlows, API Management, Event Mesh, Open Connectors, Datasphere (data warehouse cloud). PO/PI successor.",
   "depends_on": [
     "sap-btp",
     "sap-abap",

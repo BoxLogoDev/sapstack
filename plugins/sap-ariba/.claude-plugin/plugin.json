@@ -1,4 +1,7 @@
 {
+  "name": "sap-ariba",
+  "version": "1.0.0",
+  "description": "Strategic sourcing, contracts, procurement, supplier lifecycle (SLP), spend analysis, Ariba Network. Cloud procurement integrated with S/4 via CIG.",
   "depends_on": [
     "sap-mm",
     "sap-fi",

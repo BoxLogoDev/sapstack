@@ -1,4 +1,7 @@
 {
+  "name": "sap-sfsf",
+  "version": "1.0.0",
+  "description": "Employee Central, ECP, Recruiting, LMS, Performance, People Analytics, SF integration",
   "depends_on": [],
   "reuses_agents": []
 }

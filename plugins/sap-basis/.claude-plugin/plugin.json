@@ -1,4 +1,7 @@
 {
+  "name": "sap-basis",
+  "version": "1.0.0",
+  "description": "System administration, transport management, performance, security",
   "depends_on": [],
   "reuses_agents": []
 }

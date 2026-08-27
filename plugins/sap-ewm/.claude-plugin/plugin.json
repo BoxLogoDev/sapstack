@@ -1,4 +1,7 @@
 {
+  "name": "sap-ewm",
+  "version": "1.0.0",
+  "description": "Warehouse process types, warehouse order, wave management, packing, RF framework, physical inventory, resource/labor management, yard management. Modern replacement for WM.",
   "depends_on": [],
   "reuses_agents": []
 }

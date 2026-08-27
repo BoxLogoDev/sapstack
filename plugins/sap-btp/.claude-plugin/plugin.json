@@ -1,4 +1,7 @@
 {
+  "name": "sap-btp",
+  "version": "1.0.0",
+  "description": "BTP extensions, CAP, Fiori Elements, OData, Integration Suite",
   "depends_on": [],
   "reuses_agents": []
 }

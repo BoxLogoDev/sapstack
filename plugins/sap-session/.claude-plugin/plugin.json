@@ -1,4 +1,7 @@
 {
+  "name": "sap-session",
+  "version": "0.1.0",
+  "description": "Turn-aware advisory sessions — hypothesis/verify loops without live SAP access. Orchestrates the other 14 plugins and 9 agents. Enables end-user web triage with operator escalation.",
   "introduced_in": "v1.5.0",
   "reuses_agents": [
     "sap-fi-consultant",

@@ -1,4 +1,7 @@
 {
+  "name": "sap-hcm",
+  "version": "1.0.0",
+  "description": "ECC HCM and H4S4 — PA, OM, Payroll, Time Management, FI posting",
   "depends_on": [],
   "reuses_agents": []
 }

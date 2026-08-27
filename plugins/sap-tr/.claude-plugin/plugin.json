@@ -1,4 +1,7 @@
 {
+  "name": "sap-tr",
+  "version": "1.0.0",
+  "description": "Liquidity planning, cash position, payment run, bank statement",
   "depends_on": [],
   "reuses_agents": []
 }

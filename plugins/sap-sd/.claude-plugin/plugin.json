@@ -1,4 +1,7 @@
 {
+  "name": "sap-sd",
+  "version": "1.0.0",
+  "description": "Order-to-cash, billing, credit management, pricing",
   "depends_on": [],
   "reuses_agents": []
 }
