@@ -8,6 +8,7 @@ import {
   SapstackRuntime,
   buildSupportBundle,
 } from '../../../../../../packages/runtime/src/index.js'
+import { getSapConnection, probeSapConnection, saveSapConnection } from './sap-connection'
 
 export const SAPSTACK_IPC = {
   catalog: 'sapstack:catalog',
@@ -28,6 +29,9 @@ export const SAPSTACK_IPC = {
   inspectLearning: 'sapstack:learning:inspect',
   getEnvironment: 'sapstack:environment:get',
   saveEnvironment: 'sapstack:environment:save',
+  getSapConnection: 'sapstack:connection:get',
+  saveSapConnection: 'sapstack:connection:save',
+  probeSapConnection: 'sapstack:connection:probe',
   exportSupportBundle: 'sapstack:support:export',
 } as const
 
@@ -75,6 +79,9 @@ export function registerSapstackRuntimeHandlers(): void {
   ipcMain.handle(SAPSTACK_IPC.inspectLearning, async () => (await getRuntime()).learning.inspect())
   ipcMain.handle(SAPSTACK_IPC.getEnvironment, async () => readEnvironmentProfile())
   ipcMain.handle(SAPSTACK_IPC.saveEnvironment, async (_event, profile) => saveEnvironmentProfile(profile))
+  ipcMain.handle(SAPSTACK_IPC.getSapConnection, async () => getSapConnection())
+  ipcMain.handle(SAPSTACK_IPC.saveSapConnection, async (_event, input) => saveSapConnection(input))
+  ipcMain.handle(SAPSTACK_IPC.probeSapConnection, async (_event, input) => probeSapConnection(input))
   ipcMain.handle(SAPSTACK_IPC.exportSupportBundle, async (event) => {
     const runtime = await getRuntime()
     const bundle = buildSupportBundle({
