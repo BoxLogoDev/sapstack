@@ -1,5 +1,5 @@
 # setup.ps1 — sapstack 5분 온보딩 (Windows PowerShell)
-# setup.sh 의 Windows 등가물. 동작 동일: 사전요건 → config 생성 → MCP(선택) → 첫 진단 안내.
+# setup.sh 의 Windows 등가물. 동작 동일: 사전요건 → config 생성 → SAP ADT 접속(선택) → MCP(선택) → 첫 진단 안내.
 #
 # 사용:
 #   ./setup.ps1            # 대화형 온보딩
@@ -29,7 +29,7 @@ Write-Host "========================================"
 
 # 1. 사전 요건
 Write-Host ""
-Write-Host "[1/4] 사전 요건 점검"
+Write-Host "[1/5] 사전 요건 점검"
 $node = Get-Command node -ErrorAction SilentlyContinue
 if ($node) {
   $major = [int]((node -p "process.versions.node.split('.')[0]"))
@@ -51,7 +51,7 @@ if ($Check) {
 
 # 2. config 생성
 Write-Host ""
-Write-Host "[2/4] 환경 프로필 생성 (.sapstack/config.yaml)"
+Write-Host "[2/5] 환경 프로필 생성 (.sapstack/config.yaml)"
 $skip = $false
 if (Test-Path $Config) {
   $ow = Read-Host "  이미 config.yaml 이 있습니다. 덮어쓸까요? (y/N)"
@@ -101,9 +101,86 @@ preferences:
   }
 }
 
-# 3. MCP (선택)
+# 3. SAP ADT 접속 (선택) — AI가 CBO 소스를 직접 읽는 연동 (읽기 전용)
 Write-Host ""
-Write-Host "[3/4] MCP 서버 (Evidence Loop / 세션 저장에 사용 — 선택)"
+Write-Host "[3/5] SAP 시스템 접속 (선택) — AI가 CBO 소스를 직접 읽는 ADT 연동 (읽기 전용)"
+$sap = Read-Host "  SAP ADT 접속을 설정할까요? (y/N)"
+if ($sap.ToLower() -eq "y") {
+# Desktop 앱(설정 > SAP 접속)과 vsp 브리지가 같은 파일을 읽는다 — 위치 통일
+  $SapstackHome = Join-Path $HOME ".sapstack"
+  $EnvFile = Join-Path $SapstackHome ".env"
+  $skipEnv = $false
+  if (Test-Path $EnvFile) {
+    $eo = Read-Host "  이미 ~/.sapstack/.env 가 있습니다. 덮어쓸까요? (y/N)"
+    if ($eo.ToLower() -ne "y") { Write-Host "  → 기존 .env 유지."; $skipEnv = $true }
+  }
+
+  if (-not $skipEnv) {
+    Write-Host "  ADT URL — SAP GUI: SMICM > Goto > Services 의 HTTP(S) 포트 (예: https://sapdev:44300)"
+    $SapUrl = Read-Host "  ADT URL"
+    $SapClient = Read-Host "  클라이언트 [100]"; if (-not $SapClient) { $SapClient = "100" }
+    $SapUser = Read-Host "  사용자명"
+    $sec = Read-Host "  비밀번호 (입력 숨김)" -AsSecureString
+    $SapPassword = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($sec))
+    $SapLang = Read-Host "  언어 (KO/EN) [KO]"; if (-not $SapLang) { $SapLang = "KO" }
+
+    New-Item -ItemType Directory -Force $SapstackHome | Out-Null
+    @"
+# sapstack SAP 접속 프로필 — setup.ps1 가 생성. Desktop 앱(설정 > SAP 접속)과 공유.
+# ⚠ 비밀번호 평문 저장 — 조회 전용 계정 사용 권장, 파일 공유 금지.
+SAP_URL=$SapUrl
+SAP_USER=$SapUser
+SAP_PASSWORD=$SapPassword
+SAP_CLIENT=$SapClient
+SAP_LANGUAGE=$SapLang
+SAP_INSECURE=true
+SAP_READ_ONLY=true
+"@ | Set-Content -Path $EnvFile -Encoding UTF8
+    Ok "생성됨: ~/.sapstack/.env"
+
+    # 접속 테스트 — ADT discovery 엔드포인트 (Windows 10+ 은 curl.exe 내장)
+    $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
+    if ($curl) {
+      $code = & curl.exe -k -s -o NUL -w "%{http_code}" --connect-timeout 8 `
+        -u "${SapUser}:${SapPassword}" "$SapUrl/sap/bc/adt/discovery?sap-client=$SapClient" 2>$null
+      switch ($code) {
+        "200" { Ok "ADT 접속 성공 (discovery 200)" }
+        "401" { Write-Host "  [ERR]  인증 실패 (401) — 계정/비밀번호/클라이언트 확인 후 .env 수정" }
+        "403" { Warn "권한 부족 (403) — 계정에 S_DEVELOP 조회(ACTVT 03) 권한 필요" }
+        "000" { Write-Host "  [ERR]  서버 연결 불가 — URL/포트/방화벽/DNS 확인 (IP 직접 입력도 가능)" }
+        default { Warn "예상외 응답 (HTTP $code) — SICF 에서 /sap/bc/adt 서비스 활성화 확인" }
+      }
+    } else {
+      Warn "curl.exe 없음 — 접속 테스트 건너뜀"
+    }
+  }
+
+  # vsp(ADT-MCP 브리지) 연동 — 있으면 런처 생성, 없으면 안내
+  $vspCmd = Get-Command vsp.exe -ErrorAction SilentlyContinue
+  $VspBin = if ($vspCmd) { $vspCmd.Source } else { Read-Host "  vsp.exe 경로 (없으면 Enter — 나중에 설치)" }
+  if ($VspBin -and (Test-Path $VspBin)) {
+    $Launcher = Join-Path $RepoRoot ".sapstack\vsp-mcp.cmd"
+    New-Item -ItemType Directory -Force (Join-Path $RepoRoot ".sapstack") | Out-Null
+    @"
+@echo off
+rem vsp MCP 런처 — setup.ps1 가 생성. %USERPROFILE%\.sapstack\.env 의 접속 프로필을 읽는다.
+cd /d "%USERPROFILE%\.sapstack"
+"$VspBin" --read-only --allowed-packages Z*
+"@ | Set-Content -Path $Launcher -Encoding ASCII
+    Ok "생성됨: .sapstack\vsp-mcp.cmd (읽기 전용, Z* 패키지 한정)"
+    Write-Host "  Claude Code 등록 (아래 한 줄 실행):"
+    Write-Host "    claude mcp add sap-adt --scope user -- cmd /c `"$Launcher`""
+  } else {
+    Write-Host "  → vsp 미설치. ADT-MCP 브리지: https://github.com/oisee/vibing-steampunk (Releases 에서 단일 바이너리)"
+    Write-Host "    설치 후 ./setup.ps1 재실행 또는 docs/adt-bridge.md 참고"
+  }
+} else {
+  Write-Host "  건너뜀. 나중에: ./setup.ps1 재실행 (기존 config 는 유지 선택 가능)"
+}
+
+# 4. MCP (선택)
+Write-Host ""
+Write-Host "[4/5] MCP 서버 (Evidence Loop / 세션 저장에 사용 — 선택)"
 $mi = Read-Host "  Claude Desktop 에 sapstack MCP 를 설치할까요? (y/N)"
 if ($mi.ToLower() -eq "y") {
   $ps1 = Join-Path $RepoRoot "scripts/install-claude-desktop.ps1"
@@ -112,9 +189,9 @@ if ($mi.ToLower() -eq "y") {
   Write-Host "  건너뜀. 나중에: ./scripts/install-claude-desktop.ps1 (또는 docs/mcp-server.md)"
 }
 
-# 4. 첫 진단
+# 5. 첫 진단
 Write-Host ""
-Write-Host "[4/4] 첫 진단 — 5분 안에"
+Write-Host "[5/5] 첫 진단 — 5분 안에"
 Write-Host "========================================"
 Write-Host " 준비 완료! 이제 이렇게 물어보세요 (Claude Code / Desktop 에서):"
 Write-Host ""

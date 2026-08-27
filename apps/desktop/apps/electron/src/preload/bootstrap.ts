@@ -490,6 +490,11 @@ contextBridge.exposeInMainWorld('sapstack', {
     get: () => ipcRenderer.invoke('sapstack:environment:get'),
     save: (profile: unknown) => ipcRenderer.invoke('sapstack:environment:save', profile),
   },
+  connection: {
+    get: () => ipcRenderer.invoke('sapstack:connection:get'),
+    save: (input: unknown) => ipcRenderer.invoke('sapstack:connection:save', input),
+    probe: (input: unknown) => ipcRenderer.invoke('sapstack:connection:probe', input),
+  },
   support: {
     export: () => ipcRenderer.invoke('sapstack:support:export'),
   },

@@ -1143,6 +1143,35 @@ declare global {
         get(): Promise<SapEnvironmentProfile | null>
         save(profile: Omit<SapEnvironmentProfile, 'profile_version'>): Promise<SapEnvironmentProfile>
       }
+      connection: {
+        get(): Promise<{
+          url: string
+          client: string
+          user: string
+          language: string
+          insecure: boolean
+          hasPassword: boolean
+        } | null>
+        save(input: {
+          url: string
+          client: string
+          user: string
+          password: string
+          language: string
+          insecure: boolean
+        }): Promise<{ url: string; client: string; user: string; language: string; insecure: boolean; hasPassword: boolean }>
+        probe(input: {
+          url: string
+          client: string
+          user: string
+          password: string
+          insecure: boolean
+        }): Promise<{
+          ok: boolean
+          status: number
+          message: 'connected' | 'unauthorized' | 'forbidden' | 'not_found' | 'unreachable' | 'invalid_url' | 'unexpected'
+        }>
+      }
       support: {
         export(): Promise<{ saved: boolean }>
       }
