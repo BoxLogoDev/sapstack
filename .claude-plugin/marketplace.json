@@ -3,226 +3,714 @@
   "version": "2.4.1",
   "description": "SAP Enterprise Operations Platform — 20 plugins, 16 agents, 18 commands, MCP Server (20+ tools, 5 prompts), VS Code Extension, NPM, Compliance (K-SOX/SOC2/ISO27001/GDPR), exceptions/hooks/country/bridge frameworks, 55+ IMG guides, 43+ Best Practices, 7 country localizations, 6 languages",
   "author": "BoxLogoDev",
+  "owner": {
+    "name": "BoxLogoDev"
+  },
   "license": "MIT",
   "repository": "https://github.com/BoxLogoDev/sapstack",
   "plugins": [
     {
-      "id": "sap-fi",
-      "name": "SAP Financial Accounting",
+      "name": "sap-fi",
+      "source": "./plugins/sap-fi",
       "version": "1.0.0",
       "description": "GL, AP, AR, AA — posting, closing, tax, special G/L",
-      "path": "plugins/sap-fi",
-      "keywords": ["FI","GL","AP","AR","AA","FB01","F110","MIRO","OB52","period close","tax","special GL","GR/IR","asset","depreciation"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+      "keywords": [
+        "FI",
+        "GL",
+        "AP",
+        "AR",
+        "AA",
+        "FB01",
+        "F110",
+        "MIRO",
+        "OB52",
+        "period close",
+        "tax",
+        "special GL",
+        "GR/IR",
+        "asset",
+        "depreciation"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-co",
-      "name": "SAP Controlling",
+      "name": "sap-co",
+      "source": "./plugins/sap-co",
       "version": "1.0.0",
       "description": "CCA, PCA, IO, product costing, CO-PA, allocation cycles",
-      "path": "plugins/sap-co",
-      "keywords": ["CO","cost center","profit center","internal order","KSU5","KO88","CK11N","CO-PA","assessment","distribution","settlement"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+      "keywords": [
+        "CO",
+        "cost center",
+        "profit center",
+        "internal order",
+        "KSU5",
+        "KO88",
+        "CK11N",
+        "CO-PA",
+        "assessment",
+        "distribution",
+        "settlement"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-tr",
-      "name": "SAP Treasury & Cash Management",
+      "name": "sap-tr",
+      "source": "./plugins/sap-tr",
       "version": "1.0.0",
       "description": "Liquidity planning, cash position, payment run, bank statement",
-      "path": "plugins/sap-tr",
-      "keywords": ["TR","treasury","FF7A","FF7B","F110","liquidity","cash","MT940","FLQDB","FLQITEM","house bank","FI12","DME"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+      "keywords": [
+        "TR",
+        "treasury",
+        "FF7A",
+        "FF7B",
+        "F110",
+        "liquidity",
+        "cash",
+        "MT940",
+        "FLQDB",
+        "FLQITEM",
+        "house bank",
+        "FI12",
+        "DME"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-mm",
-      "name": "SAP Materials Management",
+      "name": "sap-mm",
+      "source": "./plugins/sap-mm",
       "version": "1.0.0",
       "description": "Procurement, inventory, GR/IR, invoice verification",
-      "path": "plugins/sap-mm",
-      "keywords": ["MM","MIGO","MIRO","ME21N","MB52","GR/IR","MR11","purchasing","inventory","stock","info record","outline agreement"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+      "keywords": [
+        "MM",
+        "MIGO",
+        "MIRO",
+        "ME21N",
+        "MB52",
+        "GR/IR",
+        "MR11",
+        "purchasing",
+        "inventory",
+        "stock",
+        "info record",
+        "outline agreement"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-sd",
-      "name": "SAP Sales & Distribution",
+      "name": "sap-sd",
+      "source": "./plugins/sap-sd",
       "version": "1.0.0",
       "description": "Order-to-cash, billing, credit management, pricing",
-      "path": "plugins/sap-sd",
-      "keywords": ["SD","VA01","VF01","VF04","FD32","credit","billing","sales order","pricing","delivery","condition type","revenue recognition"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+      "keywords": [
+        "SD",
+        "VA01",
+        "VF01",
+        "VF04",
+        "FD32",
+        "credit",
+        "billing",
+        "sales order",
+        "pricing",
+        "delivery",
+        "condition type",
+        "revenue recognition"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-pp",
-      "name": "SAP Production Planning",
+      "name": "sap-pp",
+      "source": "./plugins/sap-pp",
       "version": "1.0.0",
       "description": "MRP, production orders, shop floor, capacity planning",
-      "path": "plugins/sap-pp",
-      "keywords": ["PP","MRP","MD01","CO01","MFBF","production order","BOM","routing","capacity","planned order","confirmation","backflush"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+      "keywords": [
+        "PP",
+        "MRP",
+        "MD01",
+        "CO01",
+        "MFBF",
+        "production order",
+        "BOM",
+        "routing",
+        "capacity",
+        "planned order",
+        "confirmation",
+        "backflush"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-hcm",
-      "name": "SAP HCM On-Premise",
+      "name": "sap-hcm",
+      "source": "./plugins/sap-hcm",
       "version": "1.0.0",
       "description": "ECC HCM and H4S4 — PA, OM, Payroll, Time Management, FI posting",
-      "path": "plugins/sap-hcm",
-      "keywords": ["HCM","HR","PA30","infotype","payroll","PC00","time","PT60","org management","H4S4","wage type","schema","PCR","ESS","MSS"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+      "keywords": [
+        "HCM",
+        "HR",
+        "PA30",
+        "infotype",
+        "payroll",
+        "PC00",
+        "time",
+        "PT60",
+        "org management",
+        "H4S4",
+        "wage type",
+        "schema",
+        "PCR",
+        "ESS",
+        "MSS"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-sfsf",
-      "name": "SAP SuccessFactors",
+      "name": "sap-sfsf",
+      "source": "./plugins/sap-sfsf",
       "version": "1.0.0",
       "description": "Employee Central, ECP, Recruiting, LMS, Performance, People Analytics, SF integration",
-      "path": "plugins/sap-sfsf",
-      "keywords": ["SuccessFactors","SFSF","Employee Central","EC","ECP","Recruiting","Learning","Performance","RBP","OData","integration","cloud HR","MDF","business rules","position management"],
-      "compatibility": { "ecc": false, "s4hana": true, "btp": true }
+      "keywords": [
+        "SuccessFactors",
+        "SFSF",
+        "Employee Central",
+        "EC",
+        "ECP",
+        "Recruiting",
+        "Learning",
+        "Performance",
+        "RBP",
+        "OData",
+        "integration",
+        "cloud HR",
+        "MDF",
+        "business rules",
+        "position management"
+      ],
+      "compatibility": {
+        "ecc": false,
+        "s4hana": true,
+        "btp": true
+      }
     },
     {
-      "id": "sap-abap",
-      "name": "SAP ABAP Development",
+      "name": "sap-abap",
+      "source": "./plugins/sap-abap",
       "version": "1.0.0",
       "description": "Classic ABAP, RAP, CDS views, BAdI, clean core, performance, short dump",
-      "path": "plugins/sap-abap",
-      "keywords": ["ABAP","SE38","SE24","BAdI","CDS","RAP","dump","ST22","clean core","OData","function module","ALV","enhancement","user exit","ATC"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": true }
+      "keywords": [
+        "ABAP",
+        "SE38",
+        "SE24",
+        "BAdI",
+        "CDS",
+        "RAP",
+        "dump",
+        "ST22",
+        "clean core",
+        "OData",
+        "function module",
+        "ALV",
+        "enhancement",
+        "user exit",
+        "ATC"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": true
+      }
     },
     {
-      "id": "sap-s4-migration",
-      "name": "SAP S/4HANA Migration",
+      "name": "sap-s4-migration",
+      "source": "./plugins/sap-s4-migration",
       "version": "1.0.0",
       "description": "ECC to S/4HANA: brownfield, greenfield, BP migration, custom code adaptation",
-      "path": "plugins/sap-s4-migration",
-      "keywords": ["migration","S/4HANA","brownfield","greenfield","SUM","DMO","readiness check","BP migration","simplification","ATC","custom code","ACDOCA"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+      "keywords": [
+        "migration",
+        "S/4HANA",
+        "brownfield",
+        "greenfield",
+        "SUM",
+        "DMO",
+        "readiness check",
+        "BP migration",
+        "simplification",
+        "ATC",
+        "custom code",
+        "ACDOCA"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-btp",
-      "name": "SAP Business Technology Platform",
+      "name": "sap-btp",
+      "source": "./plugins/sap-btp",
       "version": "1.0.0",
       "description": "BTP extensions, CAP, Fiori Elements, OData, Integration Suite",
-      "path": "plugins/sap-btp",
-      "keywords": ["BTP","CAP","Fiori","OData","integration suite","extension","side-by-side","RAP","CAPM","XSUAA","destination","Cloud Foundry","Kyma"],
-      "compatibility": { "ecc": false, "s4hana": true, "btp": true }
+      "keywords": [
+        "BTP",
+        "CAP",
+        "Fiori",
+        "OData",
+        "integration suite",
+        "extension",
+        "side-by-side",
+        "RAP",
+        "CAPM",
+        "XSUAA",
+        "destination",
+        "Cloud Foundry",
+        "Kyma"
+      ],
+      "compatibility": {
+        "ecc": false,
+        "s4hana": true,
+        "btp": true
+      }
     },
     {
-      "id": "sap-basis",
-      "name": "SAP BASIS Administration",
+      "name": "sap-basis",
+      "source": "./plugins/sap-basis",
       "version": "1.0.0",
       "description": "System administration, transport management, performance, security",
-      "path": "plugins/sap-basis",
-      "keywords": ["BASIS","STMS","SM50","ST05","SCC4","transport","performance","authorization","PFCG","SU53","SM21","SM36","SM37"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+      "keywords": [
+        "BASIS",
+        "STMS",
+        "SM50",
+        "ST05",
+        "SCC4",
+        "transport",
+        "performance",
+        "authorization",
+        "PFCG",
+        "SU53",
+        "SM21",
+        "SM36",
+        "SM37"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-bc",
-      "name": "SAP BC (Korean BC Consultant)",
+      "name": "sap-bc",
+      "source": "./plugins/sap-bc",
       "version": "1.0.0",
       "description": "한국 SAP BC(Basis) 컨설턴트 특화 — Solution Manager Korea, HANA 한국 로케일, 전자세금계산서, 망분리, KISA 보안, PFCG 한국 권한, K-SOX 내부통제. 글로벌 Basis 주제는 sap-basis 참조.",
-      "path": "plugins/sap-bc",
-      "keywords": ["BC","베이시스","한국","Korea","Solman","HANA","전자세금계산서","e-Document","망분리","KISA","PFCG","K-SOX","한글","Unicode","Korean locale","공인인증","STRUST","SM50","ST22","STMS"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+      "keywords": [
+        "BC",
+        "베이시스",
+        "한국",
+        "Korea",
+        "Solman",
+        "HANA",
+        "전자세금계산서",
+        "e-Document",
+        "망분리",
+        "KISA",
+        "PFCG",
+        "K-SOX",
+        "한글",
+        "Unicode",
+        "Korean locale",
+        "공인인증",
+        "STRUST",
+        "SM50",
+        "ST22",
+        "STMS"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-gts",
-      "name": "SAP GTS (Global Trade Services)",
+      "name": "sap-gts",
+      "source": "./plugins/sap-gts",
       "version": "1.0.0",
       "description": "Global Trade Services — Export/Import compliance, SPL screening, HS code classification, customs declaration, FTA preference, L/C management. 한국 UNI-PASS 관세청 연동 특화.",
-      "path": "plugins/sap-gts",
-      "keywords": ["GTS","global trade","export","import","customs","HS code","HSK","sanctioned party","SPL","embargo","license","preference","FTA","KORUS","RCEP","UNI-PASS","관세청","수출","수입","수출신고","수입신고","HS코드","통관","원산지","Letter of Credit","L/C","KOSTI","전략물자"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+      "keywords": [
+        "GTS",
+        "global trade",
+        "export",
+        "import",
+        "customs",
+        "HS code",
+        "HSK",
+        "sanctioned party",
+        "SPL",
+        "embargo",
+        "license",
+        "preference",
+        "FTA",
+        "KORUS",
+        "RCEP",
+        "UNI-PASS",
+        "관세청",
+        "수출",
+        "수입",
+        "수출신고",
+        "수입신고",
+        "HS코드",
+        "통관",
+        "원산지",
+        "Letter of Credit",
+        "L/C",
+        "KOSTI",
+        "전략물자"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-cloud",
-      "name": "SAP S/4HANA Cloud Public Edition",
+      "name": "sap-cloud",
+      "source": "./plugins/sap-cloud",
       "version": "1.0.0",
       "description": "Clean Core, Key User Extensibility, 3-Tier Extension Model, Fit-to-Standard, Cloud ALM, Quarterly Release, CSP deployment",
-      "path": "plugins/sap-cloud",
-      "keywords": ["Cloud PE","Public Cloud","Clean Core","Key User","Extensibility","Fit-to-Standard","Cloud ALM","FSD","quarterly release","CSP","클라우드","퍼블릭 클라우드","Custom Logic","Custom Fields","Custom CDS"],
-      "compatibility": { "ecc": false, "s4hana": false, "btp": true }
+      "keywords": [
+        "Cloud PE",
+        "Public Cloud",
+        "Clean Core",
+        "Key User",
+        "Extensibility",
+        "Fit-to-Standard",
+        "Cloud ALM",
+        "FSD",
+        "quarterly release",
+        "CSP",
+        "클라우드",
+        "퍼블릭 클라우드",
+        "Custom Logic",
+        "Custom Fields",
+        "Custom CDS"
+      ],
+      "compatibility": {
+        "ecc": false,
+        "s4hana": false,
+        "btp": true
+      }
     },
     {
-      "id": "sap-pm",
-      "name": "SAP Plant Maintenance",
+      "name": "sap-pm",
+      "source": "./plugins/sap-pm",
       "version": "1.0.0",
       "description": "Equipment master, functional location, maintenance order, notification, preventive maintenance, breakdown analysis, MTBF/MTTR",
-      "path": "plugins/sap-pm",
-      "keywords": ["PM","plant maintenance","설비보전","설비관리","equipment","IE01","IE02","IE03","maintenance order","IW31","IW32","notification","IW21","preventive","IP01","IP10","IP30","breakdown","고장","MTBF","MTTR","task list","IA01","functional location","IL01"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+      "keywords": [
+        "PM",
+        "plant maintenance",
+        "설비보전",
+        "설비관리",
+        "equipment",
+        "IE01",
+        "IE02",
+        "IE03",
+        "maintenance order",
+        "IW31",
+        "IW32",
+        "notification",
+        "IW21",
+        "preventive",
+        "IP01",
+        "IP10",
+        "IP30",
+        "breakdown",
+        "고장",
+        "MTBF",
+        "MTTR",
+        "task list",
+        "IA01",
+        "functional location",
+        "IL01"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-qm",
-      "name": "SAP Quality Management",
+      "name": "sap-qm",
+      "source": "./plugins/sap-qm",
       "version": "1.0.0",
       "description": "Inspection lot, inspection plan, results recording, usage decision, quality notification, quality certificate, sampling, SPC",
-      "path": "plugins/sap-qm",
-      "keywords": ["QM","quality","품질관리","품질검사","inspection lot","QA01","inspection plan","QP01","usage decision","QA11","quality notification","QM01","certificate","QC01","MIC","sampling","SPC","vendor evaluation"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": false }
+      "keywords": [
+        "QM",
+        "quality",
+        "품질관리",
+        "품질검사",
+        "inspection lot",
+        "QA01",
+        "inspection plan",
+        "QP01",
+        "usage decision",
+        "QA11",
+        "quality notification",
+        "QM01",
+        "certificate",
+        "QC01",
+        "MIC",
+        "sampling",
+        "SPC",
+        "vendor evaluation"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-wm",
-      "name": "SAP Warehouse Management",
+      "name": "sap-wm",
+      "source": "./plugins/sap-wm",
       "version": "1.0.0",
       "description": "Warehouse structure, storage type/bin, transfer order, putaway/picking strategies, physical inventory in WM. Legacy ECC module — deprecated in S/4HANA (use EWM).",
-      "path": "plugins/sap-wm",
-      "keywords": ["WM","warehouse","창고관리","storage bin","저장위치","transfer order","이관오더","LT01","LT03","putaway","적치","picking","피킹","storage type","저장유형","quant","LAGP","LQUA"],
-      "compatibility": { "ecc": true, "s4hana": false, "btp": false }
+      "keywords": [
+        "WM",
+        "warehouse",
+        "창고관리",
+        "storage bin",
+        "저장위치",
+        "transfer order",
+        "이관오더",
+        "LT01",
+        "LT03",
+        "putaway",
+        "적치",
+        "picking",
+        "피킹",
+        "storage type",
+        "저장유형",
+        "quant",
+        "LAGP",
+        "LQUA"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": false,
+        "btp": false
+      }
     },
     {
-      "id": "sap-ewm",
-      "name": "SAP Extended Warehouse Management",
+      "name": "sap-ewm",
+      "source": "./plugins/sap-ewm",
       "version": "1.0.0",
       "description": "Warehouse process types, warehouse order, wave management, packing, RF framework, physical inventory, resource/labor management, yard management. Modern replacement for WM.",
-      "path": "plugins/sap-ewm",
-      "keywords": ["EWM","extended warehouse","확장창고관리","warehouse order","창고오더","wave","파도","/SCWM/MON","packing","패킹","RF","핸드헬드","putaway strategy","적치전략","yard","야드","embedded EWM","decentralized EWM"],
-      "compatibility": { "ecc": false, "s4hana": true, "btp": false }
+      "keywords": [
+        "EWM",
+        "extended warehouse",
+        "확장창고관리",
+        "warehouse order",
+        "창고오더",
+        "wave",
+        "파도",
+        "/SCWM/MON",
+        "packing",
+        "패킹",
+        "RF",
+        "핸드헬드",
+        "putaway strategy",
+        "적치전략",
+        "yard",
+        "야드",
+        "embedded EWM",
+        "decentralized EWM"
+      ],
+      "compatibility": {
+        "ecc": false,
+        "s4hana": true,
+        "btp": false
+      }
     },
     {
-      "id": "sap-session",
-      "name": "SAP Evidence Loop Session (v1.5.0)",
+      "name": "sap-session",
+      "source": "./plugins/sap-session",
       "version": "0.1.0",
       "description": "Turn-aware advisory sessions — hypothesis/verify loops without live SAP access. Orchestrates the other 14 plugins and 9 agents. Enables end-user web triage with operator escalation.",
-      "path": "plugins/sap-session",
-      "keywords": ["evidence-loop","session","hypothesis","verify","rollback","operator-workflow","cross-module","orchestration","human-in-the-loop","triage","escalation","turn-aware","end-user"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": true },
+      "keywords": [
+        "evidence-loop",
+        "session",
+        "hypothesis",
+        "verify",
+        "rollback",
+        "operator-workflow",
+        "cross-module",
+        "orchestration",
+        "human-in-the-loop",
+        "triage",
+        "escalation",
+        "turn-aware",
+        "end-user"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": true
+      },
       "stage": "experimental",
-      "depends_on": ["sap-fi","sap-co","sap-mm","sap-sd","sap-tr","sap-basis","sap-abap"]
+      "depends_on": [
+        "sap-fi",
+        "sap-co",
+        "sap-mm",
+        "sap-sd",
+        "sap-tr",
+        "sap-basis",
+        "sap-abap"
+      ]
     },
     {
-      "id": "sap-ibp",
-      "name": "SAP Integrated Business Planning",
+      "name": "sap-ibp",
+      "source": "./plugins/sap-ibp",
       "version": "1.0.0",
       "description": "Demand sensing, S&OP, supply planning, inventory optimization, response & supply, control tower. Cloud-native successor to APO. BTP-deployed.",
-      "path": "plugins/sap-ibp",
-      "keywords": ["IBP","integrated business planning","수요계획","공급계획","S&OP","demand sensing","수요센싱","inventory optimization","재고최적화","response","ATP","Control Tower","APO","planning area","key figure","planning level","Excel UI","BTP planning"],
-      "compatibility": { "ecc": false, "s4hana": true, "btp": true }
+      "keywords": [
+        "IBP",
+        "integrated business planning",
+        "수요계획",
+        "공급계획",
+        "S&OP",
+        "demand sensing",
+        "수요센싱",
+        "inventory optimization",
+        "재고최적화",
+        "response",
+        "ATP",
+        "Control Tower",
+        "APO",
+        "planning area",
+        "key figure",
+        "planning level",
+        "Excel UI",
+        "BTP planning"
+      ],
+      "compatibility": {
+        "ecc": false,
+        "s4hana": true,
+        "btp": true
+      }
     },
     {
-      "id": "sap-sac",
-      "name": "SAP Analytics Cloud",
+      "name": "sap-sac",
+      "source": "./plugins/sap-sac",
       "version": "1.0.0",
       "description": "Cloud BI, Story design, Analytic Applications, Planning models, Smart Predict, BW Bridge, Datasphere connectivity. Cloud-native analytics replacing on-prem BI.",
-      "path": "plugins/sap-sac",
-      "keywords": ["SAC","Analytics Cloud","분석클라우드","Story","Analytic Application","Smart Predict","예측분석","Planning Model","계획모델","BW Bridge","Datasphere","Live Connection","Import Connection"],
-      "compatibility": { "ecc": false, "s4hana": true, "btp": true }
+      "keywords": [
+        "SAC",
+        "Analytics Cloud",
+        "분석클라우드",
+        "Story",
+        "Analytic Application",
+        "Smart Predict",
+        "예측분석",
+        "Planning Model",
+        "계획모델",
+        "BW Bridge",
+        "Datasphere",
+        "Live Connection",
+        "Import Connection"
+      ],
+      "compatibility": {
+        "ecc": false,
+        "s4hana": true,
+        "btp": true
+      }
     },
     {
-      "id": "sap-ariba",
-      "name": "SAP Ariba",
+      "name": "sap-ariba",
+      "source": "./plugins/sap-ariba",
       "version": "1.0.0",
       "description": "Strategic sourcing, contracts, procurement, supplier lifecycle (SLP), spend analysis, Ariba Network. Cloud procurement integrated with S/4 via CIG.",
-      "path": "plugins/sap-ariba",
-      "keywords": ["Ariba","sourcing","소싱","RFx","e-Auction","경쟁입찰","Contracts","계약관리","Procurement","조달","Supplier Lifecycle","SLP","Spend Analysis","지출분석","Ariba Network","ANID","Guided Buying","CIG","Cloud Integration Gateway"],
-      "compatibility": { "ecc": true, "s4hana": true, "btp": true }
+      "keywords": [
+        "Ariba",
+        "sourcing",
+        "소싱",
+        "RFx",
+        "e-Auction",
+        "경쟁입찰",
+        "Contracts",
+        "계약관리",
+        "Procurement",
+        "조달",
+        "Supplier Lifecycle",
+        "SLP",
+        "Spend Analysis",
+        "지출분석",
+        "Ariba Network",
+        "ANID",
+        "Guided Buying",
+        "CIG",
+        "Cloud Integration Gateway"
+      ],
+      "compatibility": {
+        "ecc": true,
+        "s4hana": true,
+        "btp": true
+      }
     },
     {
-      "id": "sap-integration-cloud",
-      "name": "SAP Integration Suite + Datasphere",
+      "name": "sap-integration-cloud",
+      "source": "./plugins/sap-integration-cloud",
       "version": "1.0.0",
       "description": "Cloud integration platform — CPI (Cloud Platform Integration) iFlows, API Management, Event Mesh, Open Connectors, Datasphere (data warehouse cloud). PO/PI successor.",
-      "path": "plugins/sap-integration-cloud",
-      "keywords": ["CPI","Cloud Platform Integration","Integration Suite","iFlow","Datasphere","DWC","Data Warehouse Cloud","API Management","Event Mesh","Open Connectors","Cloud Connector","OData","REST","SOAP","IDoc cloud","SuccessFactors integration","HCI","ABAP CDS exposure"],
-      "compatibility": { "ecc": false, "s4hana": true, "btp": true }
+      "keywords": [
+        "CPI",
+        "Cloud Platform Integration",
+        "Integration Suite",
+        "iFlow",
+        "Datasphere",
+        "DWC",
+        "Data Warehouse Cloud",
+        "API Management",
+        "Event Mesh",
+        "Open Connectors",
+        "Cloud Connector",
+        "OData",
+        "REST",
+        "SOAP",
+        "IDoc cloud",
+        "SuccessFactors integration",
+        "HCI",
+        "ABAP CDS exposure"
+      ],
+      "compatibility": {
+        "ecc": false,
+        "s4hana": true,
+        "btp": true
+      }
     }
   ]
 }

@@ -1,4 +1,7 @@
 {
+  "name": "sap-s4-migration",
+  "version": "1.0.0",
+  "description": "ECC to S/4HANA: brownfield, greenfield, BP migration, custom code adaptation",
   "depends_on": [],
   "reuses_agents": []
 }

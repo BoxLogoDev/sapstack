@@ -1,4 +1,7 @@
 {
+  "name": "sap-pp",
+  "version": "1.0.0",
+  "description": "MRP, production orders, shop floor, capacity planning",
   "depends_on": [],
   "reuses_agents": []
 }

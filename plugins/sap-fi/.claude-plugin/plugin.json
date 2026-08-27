@@ -1,4 +1,7 @@
 {
+  "name": "sap-fi",
+  "version": "1.0.0",
+  "description": "GL, AP, AR, AA — posting, closing, tax, special G/L",
   "depends_on": [],
   "reuses_agents": []
 }

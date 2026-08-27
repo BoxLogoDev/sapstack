@@ -1,4 +1,7 @@
 {
+  "name": "sap-co",
+  "version": "1.0.0",
+  "description": "CCA, PCA, IO, product costing, CO-PA, allocation cycles",
   "depends_on": [],
   "reuses_agents": []
 }

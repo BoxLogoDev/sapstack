@@ -1,4 +1,7 @@
 {
+  "name": "sap-cloud",
+  "version": "1.0.0",
+  "description": "Clean Core, Key User Extensibility, 3-Tier Extension Model, Fit-to-Standard, Cloud ALM, Quarterly Release, CSP deployment",
   "depends_on": [],
   "reuses_agents": []
 }

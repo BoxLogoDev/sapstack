@@ -1,4 +1,7 @@
 {
+  "name": "sap-qm",
+  "version": "1.0.0",
+  "description": "Inspection lot, inspection plan, results recording, usage decision, quality notification, quality certificate, sampling, SPC",
   "depends_on": [],
   "reuses_agents": []
 }

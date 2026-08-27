@@ -1,4 +1,7 @@
 {
+  "name": "sap-abap",
+  "version": "1.0.0",
+  "description": "Classic ABAP, RAP, CDS views, BAdI, clean core, performance, short dump",
   "depends_on": [],
   "reuses_agents": []
 }

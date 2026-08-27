@@ -1,4 +1,7 @@
 {
+  "name": "sap-gts",
+  "version": "1.0.0",
+  "description": "Global Trade Services — Export/Import compliance, SPL screening, HS code classification, customs declaration, FTA preference, L/C management. 한국 UNI-PASS 관세청 연동 특화.",
   "depends_on": [
     "sap-sd",
     "sap-mm",

@@ -1,4 +1,7 @@
 {
+  "name": "sap-ibp",
+  "version": "1.0.0",
+  "description": "Demand sensing, S&OP, supply planning, inventory optimization, response & supply, control tower. Cloud-native successor to APO. BTP-deployed.",
   "depends_on": [
     "sap-sd",
     "sap-pp",

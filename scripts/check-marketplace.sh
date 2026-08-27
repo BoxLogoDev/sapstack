@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # check-marketplace.sh — .claude-plugin/marketplace.json 무결성 검사
 #
-# 검증 항목:
+# 검증 항목 (Claude Code 현행 marketplace 스키마: name/source):
 #   1. JSON 파싱 가능
-#   2. plugins[].id 중복 없음
-#   3. plugins[].path 실제 디렉토리 존재
-#   4. plugins[].path/skills/<id>/SKILL.md 파일 존재
+#   2. plugins[].name 중복 없음
+#   3. plugins[].source 실제 디렉토리 존재
+#   4. plugins[].source/skills/<name>/SKILL.md 파일 존재
 #   5. version 필드 존재
 
 set -euo pipefail
@@ -34,18 +34,19 @@ fi
 
 ERRORS=0
 
-# 2. 중복 ID 검사
-DUP_IDS=$(jq -r '.plugins[].id' "$MARKETPLACE" | sort | uniq -d)
+# 2. 중복 name 검사
+DUP_IDS=$(jq -r '.plugins[].name' "$MARKETPLACE" | sort | uniq -d)
 if [[ -n "$DUP_IDS" ]]; then
-  echo "❌ 중복 plugin id: $DUP_IDS"
+  echo "❌ 중복 plugin name: $DUP_IDS"
   ERRORS=$((ERRORS + 1))
 fi
 
-# 3~4. path & SKILL.md 존재 검증
+# 3~4. source & SKILL.md 존재 검증
 PLUGIN_COUNT=$(jq '.plugins | length' "$MARKETPLACE")
 for ((i = 0; i < PLUGIN_COUNT; i++)); do
-  id=$(jq -r ".plugins[$i].id" "$MARKETPLACE")
-  path=$(jq -r ".plugins[$i].path" "$MARKETPLACE")
+  id=$(jq -r ".plugins[$i].name" "$MARKETPLACE")
+  path=$(jq -r ".plugins[$i].source" "$MARKETPLACE")
+  path="${path#./}"   # source는 ./ 접두사를 가짐 — 경로 비교 전 정규화
   version=$(jq -r ".plugins[$i].version // empty" "$MARKETPLACE")
 
   if [[ ! -d "$path" ]]; then
@@ -66,7 +67,7 @@ for ((i = 0; i < PLUGIN_COUNT; i++)); do
 done
 
 # 5. 등록 안 된 플러그인 탐지 (역방향 검사)
-REGISTERED=$(jq -r '.plugins[].path' "$MARKETPLACE" | sort)
+REGISTERED=$(jq -r '.plugins[].source' "$MARKETPLACE" | sed 's|^\./||' | sort)
 ACTUAL=$(find plugins -maxdepth 1 -mindepth 1 -type d | sort)
 for dir in $ACTUAL; do
   # herestring — 파이프 + grep -q + pipefail 조합은 SIGPIPE 로 거짓 양성을 낸다

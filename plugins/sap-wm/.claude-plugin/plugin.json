@@ -1,4 +1,7 @@
 {
+  "name": "sap-wm",
+  "version": "1.0.0",
+  "description": "Warehouse structure, storage type/bin, transfer order, putaway/picking strategies, physical inventory in WM. Legacy ECC module — deprecated in S/4HANA (use EWM).",
   "depends_on": [],
   "reuses_agents": []
 }

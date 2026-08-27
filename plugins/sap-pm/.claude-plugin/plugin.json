@@ -1,4 +1,7 @@
 {
+  "name": "sap-pm",
+  "version": "1.0.0",
+  "description": "Equipment master, functional location, maintenance order, notification, preventive maintenance, breakdown analysis, MTBF/MTTR",
   "depends_on": [],
   "reuses_agents": []
 }
