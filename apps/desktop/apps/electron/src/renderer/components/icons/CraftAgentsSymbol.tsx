@@ -5,6 +5,9 @@ interface CraftAgentsSymbolProps {
 /**
  * sapstack Desktop "S" symbol. The export name is retained internally to
  * avoid a broad upstream component rename, but no Craft artwork is rendered.
+ *
+ * 브랜드 마크는 테마 accent(업스트림 보라)가 아니라 sapstack 블루 고정.
+ * 라이트/다크 모두에서 아이콘(icon.svg)과 같은 계열로 보이도록 그라디언트 사용.
  */
 export function CraftAgentsSymbol({ className }: CraftAgentsSymbolProps) {
   return (
@@ -14,9 +17,15 @@ export function CraftAgentsSymbol({ className }: CraftAgentsSymbolProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
+      <defs>
+        <linearGradient id="sapstack-symbol-blue" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#0A6ED1" />
+          <stop offset="1" stopColor="#0F5AA8" />
+        </linearGradient>
+      </defs>
       <path
         d="M10 8H54V18H24C20 18 18 20 18 23C18 26 20 28 24 28H42C51 28 56 34 56 44C56 54 49 60 38 60H10V50H38C43 50 46 48 46 44C46 40 43 38 38 38H24C14 38 8 32 8 23C8 14 14 8 24 8Z"
-        fill="currentColor"
+        fill="url(#sapstack-symbol-blue)"
         fillRule="nonzero"
       />
     </svg>
