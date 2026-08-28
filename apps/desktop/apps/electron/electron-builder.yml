@@ -173,7 +173,9 @@ dmg:
     height: 380
 
 win:
-  icon: resources/icon.png
+  # exe 임베디드 아이콘(바탕화면 파일 아이콘·작업표시줄). 마스코트 PNG 는 16~48px
+  # 에서 뭉개지므로 다중 해상도 블루-S ico 를 직접 사용한다.
+  icon: resources/icon.ico
   target:
     - target: nsis
       arch:
