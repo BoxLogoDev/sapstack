@@ -100,7 +100,28 @@ project:
   add_ons: []  # 예: [IS-OIL, IS-U, DM]
 
 # ──────────────────────────────────────────────────────────────
-# 6) 선호 응답 스타일
+# 6) CBO 스냅샷 (선택) — 커스텀 개발 오브젝트(Z/Y) 소스 오프라인 사본
+#    scripts/cbo/export-cbo.mjs 가 사용. 자세히: docs/cbo-snapshot.md
+#    ⚠ 이 기능에서 CBO = 커스텀 개발 오브젝트(Z*/Y*). Clean Core 의
+#      Custom Business Object(키유저 확장)와 다른 용어다.
+# ──────────────────────────────────────────────────────────────
+# cbo:
+#   # 스냅샷 저장 루트 (기본: ~/.sapstack/cbo)
+#   snapshot_root: ~/.sapstack/cbo
+#   # 이 일수를 넘기면 stale 경고 (기본 30)
+#   staleness_warn_days: 30
+#   # PII 처리: off / report / mask (mask 는 주민번호·카드·계좌·사업자번호만)
+#   scrub: mask
+#   systems:
+#     DS4:
+#       landscape_role: dev          # dev / qas / stg / prd
+#       # 패키지 프리픽스 패턴 (뒤에 * = 프리픽스 매칭, 전 모듈 Z = "Z*")
+#       packages: ["Z*", "Y*"]
+#       exclude_packages: []         # 예: [ZHR_AUTH] 권한 민감 패키지 제외
+#       method: adt-source           # adt-source / abapgit-zip (Phase 3)
+
+# ──────────────────────────────────────────────────────────────
+# 7) 선호 응답 스타일
 # ──────────────────────────────────────────────────────────────
 preferences:
   # 답변 언어: ko / en / auto (auto는 사용자 입력 언어 따름)

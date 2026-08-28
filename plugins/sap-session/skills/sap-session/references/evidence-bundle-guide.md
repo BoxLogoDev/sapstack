@@ -98,6 +98,7 @@ AI가 읽어낼 수 있어야 하고, 운영자가 나중에 봐도 읽을 수 �
 | 에러 메시지 | `message_text` | 사용자가 본 빨간 메시지 |
 | 티켓/이메일 | `email_thread` | ServiceNow/Jira/Outlook 원문 |
 | 관찰 메모 | `custom_note` | "재시도했더니 됐어요" 같은 관찰 |
+| 코드 증거 (CBO 스냅샷) | `custom_note` | 커스텀 소스 근거. `tags: [cbo-snapshot, <오브젝트명>]` + inline_content 에 스냅샷 상대경로·라인 범위·발췌(≤20k)·기준일 기입 |
 
 ---
 

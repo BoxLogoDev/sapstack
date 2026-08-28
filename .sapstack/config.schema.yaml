@@ -144,6 +144,44 @@ properties:
         items:
           type: string
 
+  cbo:
+    type: object
+    additionalProperties: false
+    properties:
+      snapshot_root:
+        type: string
+      staleness_warn_days:
+        type: integer
+        minimum: 1
+        default: 30
+      scrub:
+        type: string
+        enum: [off, report, mask]
+        default: mask
+      systems:
+        type: object
+        additionalProperties:
+          type: object
+          additionalProperties: false
+          properties:
+            landscape_role:
+              type: string
+              enum: [dev, qas, stg, prd]
+            packages:
+              type: array
+              items:
+                type: string
+                # Z/Y/$ 프리픽스만 — 표준 SAP 소스 export 금지
+                pattern: "^[$ZY][A-Z0-9_]*\\*?$"
+            exclude_packages:
+              type: array
+              items:
+                type: string
+            method:
+              type: string
+              enum: [adt-source, abapgit-zip, git-remote]
+              default: adt-source
+
   preferences:
     type: object
     required: [language]

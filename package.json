@@ -32,6 +32,8 @@
     "build:desktop": "bun run --cwd apps/desktop electron:build",
     "test:desktop": "bun run --cwd apps/desktop typecheck:shared && bun run --cwd apps/desktop typecheck:electron",
     "check:doc-stats": "node scripts/check-doc-stats.mjs",
-    "check:assets": "node scripts/generate-asset-manifest.mjs --check"
+    "check:assets": "node scripts/generate-asset-manifest.mjs --check",
+    "cbo:export": "node scripts/cbo/export-cbo.mjs",
+    "cbo:test": "node --test scripts/cbo/tests/"
   }
 }

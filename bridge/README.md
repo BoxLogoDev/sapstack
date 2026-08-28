@@ -68,6 +68,7 @@ bridge/
 ├── rest-pattern.md           ← REST API (S/4HANA Cloud PE)
 ├── idoc-pattern.md           ← IDoc 메시징
 ├── cpi-pattern.md            ← SAP Cloud Integration (BTP)
+├── abapgit-pattern.md        ← 코드 스냅샷 (CBO/커스텀 소스 오프라인 사본)
 └── templates/
     ├── python-rfc-client.py   ← PyRFC 샘플 코드
     ├── javascript-odata.js    ← OData 호출 샘플

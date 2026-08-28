@@ -1,6 +1,6 @@
 # AGENTS.md — sapstack (v2.4.0)
 
-<!-- sapstack-stats: version=2.4.1 plugins=24 agents=20 commands=22 tools=23 prompts=12 resources=9 -->
+<!-- sapstack-stats: version=2.4.1 plugins=24 agents=21 commands=23 tools=23 prompts=12 resources=9 -->
 
 > 이 파일은 **sapstack의 프로젝트 운영 계약 정본**입니다. Codex CLI·Kiro·
 > Claude Code·Windsurf 등 **모든 AI 에이전트**가 이 파일을 읽습니다.
@@ -309,6 +309,7 @@ sapstack/
 | sap-ewm-consultant                | EWM·WM — 창고오더·Wave·패킹·RF |
 | sap-hcm-consultant                | HCM — PA·OM·PY·TM, ESS/MSS |
 | sap-abap-developer                | ABAP 코드 리뷰 — Clean Core, ATC, CDS, RAP |
+| sap-cbo-explainer                 | 커스텀 프로그램(CBO 스냅샷) 현업 설명 — 리뷰 아님, 기준일 고지 |
 | sap-s4-migration-advisor          | ECC → S/4HANA 마이그레이션 경로 + Risk |
 | sap-basis-consultant              | Basis 장애 증상 라우팅 — ST22, SM50, STMS |
 | sap-integration-advisor           | 통합 아키텍처 — RFC/IDoc/OData/CPI |

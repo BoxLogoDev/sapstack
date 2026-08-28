@@ -13,6 +13,32 @@ scripts/generate-release-notes.sh 가 태그 버전과 같은 헤딩을 찾아 �
 
 ## [Unreleased]
 
+### Added — CBO 스냅샷: 현업이 커스텀 코드를 질문한다 (Phase 1)
+
+- **`scripts/cbo/export-cbo.mjs` + `export-cbo.lua`** — vsp lua(순수 ADT, SAP측 설치 불요)로
+  Z/Y 커스텀 소스를 `~/.sapstack/cbo/{SID}/` 스냅샷으로 수집. 적응형 이름 슬라이싱
+  (ADT quickSearch 가 대량 결과에서 타입을 SOBJ/P 로 열화시키는 문제 우회), 평면 수집 후
+  mjs 디렉터리 배치, 대조식(`objects_found = files_written + failures`) 검증,
+  스냅샷 로컬 git 이력(델타·복원), `--dry-run/--catalog-only/--limit/--allow-prd`.
+  DS4 ZFI1 실검증: 620/620/0, status complete
+- **PII 스크럽** (`lib/scrub.mjs`) — 형식이 강한 것(주민번호·카드·사업자번호)만 마스킹,
+  계좌·연락처·비밀번호 의심은 리포트 전용(`meta/pii-report.json`) — ABAP 한글 주석 보호
+- **오프라인 카탈로그** (`lib/catalog.mjs`) — `catalog.json/.md`: 제목(`*&` 헤더·ABAP Doc·
+  @EndUserText)·INCLUDE/SUBMIT/CALL FUNCTION/SELECT FROM 관계를 소스에서만 파생
+- **`agents/sap-cbo-explainer.md`** — 현업 페르소나 (한 줄 요약→어디서 쓰나→처리 흐름→
+  주의→기준일 고지; ATC 리뷰 포맷·추측 금지) + **`commands/sap-cbo-explain.md`**
+- **읽기 플레이북** `plugins/sap-abap/.../ko/cbo-snapshot-reading.md` (abapGit 명명·추적 레시피)
+- **`bridge/abapgit-pattern.md`** — Layer 1 여섯 번째 패턴 (3-Phase 모델·폴더 계약 v1·보안 모델)
+- **운영 런북** `docs/cbo-snapshot.md` + 스케줄러 등록 `scripts/cbo/register-task.ps1` +
+  현업 배포 패키징 `scripts/cbo/make-distribution.ps1` (포터블 exe + 스냅샷 동봉 ZIP)
+- Evidence Loop 코드 증거 규약: `custom_note` + `tags:[cbo-snapshot,…]` (evidence-bundle-guide)
+- config: `.sapstack/config.example.yaml`·`config.schema.yaml` 에 `cbo:` 블록
+
+### Changed
+
+- `docs/desktop-install.md` — "SAP 직접 접속 안 함" 서술을 3-경로(복붙 기본 / ADT 브리지 /
+  CBO 스냅샷) 현실로 갱신
+
 ## [2.4.1] - 2026-08-19
 
 **테마: 설치본에서만 드러나던 결함 수리 + 데스크톱 표면 마감**

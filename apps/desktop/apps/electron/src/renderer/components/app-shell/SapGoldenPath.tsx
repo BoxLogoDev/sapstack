@@ -36,6 +36,20 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
   const [exportingSupport, setExportingSupport] = useState(false)
   const [learning, setLearning] = useState<LearningSummary>()
   const [inspectingLearning, setInspectingLearning] = useState(false)
+  const [cboSourceSlug, setCboSourceSlug] = useState<string>()
+
+  // CBO 스냅샷 소스가 등록돼 있으면 커스텀 코드 질문에 자동으로 물린다
+  useEffect(() => {
+    let active = true
+    window.sapstack.cbo?.status()
+      .then((snapshots) => {
+        if (!active) return
+        const slug = snapshots.find((s) => s.sourceSlug)?.sourceSlug
+        if (slug) setCboSourceSlug(slug)
+      })
+      .catch(() => {})
+    return () => { active = false }
+  }, [])
   const paths: GoldenPathItem[] = [
     {
       id: 'quickAdvisory',
@@ -138,7 +152,7 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
         if (typeof started.session_id !== 'string') throw new Error(t('sapGoldenPath.sessionIdMissing'))
         sessionId = started.session_id
       }
-      await onOpenChat(buildGuidedChat({ query, mode, environment, matches, sessionId }))
+      await onOpenChat(buildGuidedChat({ query, mode, environment, matches, sessionId, cboSourceSlug }))
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : t('sapGoldenPath.startFailed'))
     } finally {

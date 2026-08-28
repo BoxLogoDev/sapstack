@@ -7,6 +7,7 @@
  */
 
 import {
+  Archive,
   Building2,
   DatabaseZap,
   Keyboard,
@@ -29,6 +30,7 @@ export const AppearanceIcon = ({ className }: IconProps) => <Palette className={
 export const InputIcon = ({ className }: IconProps) => <Keyboard className={className} />
 export const WorkspaceIcon = ({ className }: IconProps) => <Building2 className={className} />
 export const SapConnectionIcon = ({ className }: IconProps) => <DatabaseZap className={className} />
+export const CboSnapshotIcon = ({ className }: IconProps) => <Archive className={className} />
 export const PermissionsIcon = ({ className }: IconProps) => <ShieldCheck className={className} />
 export const LabelsIcon = ({ className }: IconProps) => <Tag className={className} />
 export const MessagingSettingsIcon = ({ className }: IconProps) => <MessageSquare className={className} />
@@ -47,6 +49,7 @@ export const SETTINGS_ICONS: Record<SettingsSubpage, React.ComponentType<IconPro
   input: InputIcon,
   workspace: WorkspaceIcon,
   sapConnection: SapConnectionIcon,
+  cboSnapshot: CboSnapshotIcon,
   permissions: PermissionsIcon,
   labels: LabelsIcon,
   messaging: MessagingSettingsIcon,
