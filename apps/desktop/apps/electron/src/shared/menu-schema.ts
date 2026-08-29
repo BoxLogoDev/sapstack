@@ -385,6 +385,7 @@ const SETTINGS_ICONS: Record<SettingsSubpage, string> = {
   input: 'Keyboard',
   workspace: 'Building2',
   sapConnection: 'DatabaseZap',
+  cboSnapshot: 'Archive',
   permissions: 'ShieldCheck',
   labels: 'Tag',
   messaging: 'MessageSquare',

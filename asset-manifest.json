@@ -5,8 +5,8 @@
   "generatedAt": "2026-07-28T00:00:00.000Z",
   "counts": {
     "plugins": 24,
-    "agents": 20,
-    "commands": 22,
+    "agents": 21,
+    "commands": 23,
     "tools": 23,
     "prompts": 12,
     "resources": 9

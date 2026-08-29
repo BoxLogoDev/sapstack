@@ -1,6 +1,6 @@
 # sapstack Desktop 설치 (Windows x64)
 
-Windows x64 전용 데스크톱 앱. SAP 데이터는 복붙 기반이며, 앱이 SAP 시스템에 직접 접속하지 않는다.
+Windows x64 전용 데스크톱 앱. SAP 데이터는 기본 복붙 기반이며, 선택적으로 ADT 읽기 전용 브리지(`docs/adt-bridge.md`)·CBO 스냅샷(`docs/cbo-snapshot.md`, 오프라인 사본)을 쓸 수 있다.
 
 ## 설치 파일
 
@@ -51,4 +51,6 @@ Windows에서는 **Git for Windows(Git Bash)가 필수**다. 미설치면 온보
 
 ## SAP 데이터
 
-운영자가 SAP 화면·다운로드 결과를 붙여넣는다. 앱은 SAP 시스템에 직접 접속하지 않는다.
+기본은 운영자가 SAP 화면·다운로드 결과를 붙여넣는 방식이다. 선택 기능 두 가지가 있다:
+① ADT 읽기 전용 브리지(설정 > SAP 접속, `docs/adt-bridge.md`) — 조회 전용 실시간 연동
+② CBO 스냅샷(`docs/cbo-snapshot.md`) — 커스텀 소스의 오프라인 사본. 어느 쪽도 SAP 를 수정하지 않는다.

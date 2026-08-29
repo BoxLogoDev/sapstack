@@ -20,6 +20,7 @@ import AppearanceSettingsPage from './AppearanceSettingsPage'
 import InputSettingsPage from './InputSettingsPage'
 import WorkspaceSettingsPage from './WorkspaceSettingsPage'
 import SapConnectionSettingsPage from './SapConnectionSettingsPage'
+import CboSnapshotSettingsPage from './CboSnapshotSettingsPage'
 import PermissionsSettingsPage from './PermissionsSettingsPage'
 import LabelsSettingsPage from './LabelsSettingsPage'
 import MessagingSettingsPage from './MessagingSettingsPage'
@@ -38,6 +39,7 @@ export const SETTINGS_PAGE_COMPONENTS: Record<SettingsSubpage, ComponentType> = 
   input: InputSettingsPage,
   workspace: WorkspaceSettingsPage,
   sapConnection: SapConnectionSettingsPage,
+  cboSnapshot: CboSnapshotSettingsPage,
   permissions: PermissionsSettingsPage,
   labels: LabelsSettingsPage,
   messaging: MessagingSettingsPage,

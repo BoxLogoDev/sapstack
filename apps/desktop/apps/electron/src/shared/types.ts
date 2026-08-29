@@ -1079,6 +1079,20 @@ export const parseNavigationStateKey = (key: string): NavigationState | null => 
   return parseSessionsKey(key)
 }
 
+export interface CboSnapshotStatus {
+  sid: string
+  client: string
+  exportedAt: string
+  status: string
+  objectCount: number
+  packageCount: number
+  stalenessWarnDays: number
+  staleDays: number
+  path: string
+  registeredWorkspaces: string[]
+  sourceSlug: string | null
+}
+
 export interface SapEnvironmentProfile {
   profile_version: number
   release: 'ECC6_EhP7' | 'ECC6_EhP8' | 'S4_2020' | 'S4_2021' | 'S4_2022' | 'S4_2023' | 'S4_2024' | 'RISE' | 'PublicCloud'
@@ -1171,6 +1185,10 @@ declare global {
           status: number
           message: 'connected' | 'unauthorized' | 'forbidden' | 'not_found' | 'unreachable' | 'invalid_url' | 'unexpected'
         }>
+      }
+      cbo: {
+        status(): Promise<CboSnapshotStatus[]>
+        register(): Promise<CboSnapshotStatus[]>
       }
       support: {
         export(): Promise<{ saved: boolean }>
