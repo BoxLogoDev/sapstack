@@ -48,11 +48,15 @@ LLM 연결(+API 키), SAP 환경 프로파일, 현업 모드(ui_mode), CBO 공�
 ## 검증 샌드박스 (개발자용)
 
 ```powershell
-$env:SAPSTACK_DESKTOP_CONFIG_DIR = "$env:TEMP\prov-cfg"   # config.json/credentials.enc 격리
+$env:SAPSTACK_DESKTOP_CONFIG_DIR = "$env:TEMP\prov-cfg"   # config.json 격리
 $env:SAPSTACK_WORKSPACE = "$env:TEMP\prov-home"           # ~/.sapstack 격리
 $env:SAPSTACK_PROVISION_FILE = "C:\path\to\provision.yaml"
 # 이후 dev 앱 실행 → 온보딩·SAP 환경 폼이 뜨지 않아야 정상
 ```
+
+> 주의: **자격증명 저장소(`~/.sapstack-desktop/credentials.enc`)는 격리되지 않는다**
+> (머신 바운드 고정 경로). 샌드박스 테스트가 남긴 더미 키는 실제 연결이 없어 무해하지만,
+> 테스트에는 실제 키를 넣지 말 것.
 
 ## 문제 해결
 
