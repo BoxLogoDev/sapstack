@@ -150,6 +150,12 @@ properties:
     properties:
       snapshot_root:
         type: string
+      share_roots:
+        type: array
+        description: "스냅샷 공유 게시 루트(UNC) — Desktop 앱이 기동 시 스캔·임포트"
+        items:
+          type: string
+          minLength: 1
       staleness_warn_days:
         type: integer
         minimum: 1

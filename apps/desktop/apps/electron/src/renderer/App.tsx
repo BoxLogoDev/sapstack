@@ -6,7 +6,8 @@ import { useSetAtom, useStore, useAtomValue, useAtom } from 'jotai'
 import type { Session, Workspace, SessionEvent, Message, FileAttachment, StoredAttachment, PermissionRequest, CredentialRequest, CredentialResponse, SetupNeeds, SessionStatus, NewChatActionParams, ContentBadge, LlmConnectionWithStatus, PermissionModeState, SapEnvironmentProfile } from '../shared/types'
 import type { SessionDraft, DraftAttachmentRef } from '@sapstack-desktop/shared/config'
 import type { SessionOptions, SessionOptionUpdates } from './hooks/useSessionOptions'
-import { defaultSessionOptions, mergeSessionOptions } from './hooks/useSessionOptions'
+import { defaultSessionOptions, mergeSessionOptions, setDefaultPermissionMode } from './hooks/useSessionOptions'
+import { UiModeContext } from './contexts/UiModeContext'
 import { generateMessageId } from '../shared/types'
 import { useEventProcessor } from './event-processor'
 import type { AgentEvent, Effect } from './event-processor'
@@ -301,6 +302,13 @@ export default function App() {
         setSapEnvironment(null)
       })
   }, [])
+
+  const uiMode = sapEnvironment?.ui_mode === 'simple' ? 'simple' : 'standard'
+
+  // 현업(simple) 모드: 새 세션 기본 권한을 read-only(safe)로 — 승인 프롬프트 제거
+  useEffect(() => {
+    setDefaultPermissionMode(uiMode === 'simple' ? 'safe' : 'ask')
+  }, [uiMode])
 
   // Per-session Jotai atom setters for isolated updates
   // NOTE: No sessionsAtom - we don't store a Session[] array anywhere to prevent memory leaks
@@ -2002,34 +2010,11 @@ export default function App() {
     )
   }
 
-  // SAP context is mandatory for both Quick Advisory and Evidence Loop. Keep
-  // this gate independent from the upstream LLM-provider onboarding so users
-  // cannot enter a chat with an implicit release or deployment assumption.
-  if (sapEnvironment === null) {
-    return (
-      <DismissibleLayerProvider>
-        <ModalProvider>
-          <WindowCloseHandler />
-          <div className="h-dvh overflow-y-auto bg-foreground-2">
-            <div className="titlebar-drag-region fixed inset-x-0 top-0 z-titlebar h-[50px]" />
-            <main className="flex min-h-full items-center justify-center p-4 sm:p-8">
-              <SapEnvironmentStep
-                initialError={sapEnvironmentError}
-                onComplete={(profile) => {
-                  setSapEnvironment(profile)
-                  setSapEnvironmentError(undefined)
-                }}
-              />
-            </main>
-          </div>
-        </ModalProvider>
-      </DismissibleLayerProvider>
-    )
-  }
-
   // Onboarding state
   // ModalProvider + WindowCloseHandler ensures X button works on Windows
   // (without this, the close IPC message has no listener and window stays open)
+  // 순서: 환영/LLM 온보딩이 먼저, SAP 환경 폼은 그 다음 — 현업의 첫 화면이
+  // EhP7/EhP8 기술 폼이 되지 않게 한다 (프로비저닝이 시딩하면 둘 다 안 뜬다).
   if (appState === 'onboarding') {
     return (
       <DismissibleLayerProvider>
@@ -2060,6 +2045,31 @@ export default function App() {
     )
   }
 
+  // SAP context is mandatory for both Quick Advisory and Evidence Loop. Keep
+  // this gate independent from the upstream LLM-provider onboarding so users
+  // cannot enter a chat with an implicit release or deployment assumption.
+  if (sapEnvironment === null) {
+    return (
+      <DismissibleLayerProvider>
+        <ModalProvider>
+          <WindowCloseHandler />
+          <div className="h-dvh overflow-y-auto bg-foreground-2">
+            <div className="titlebar-drag-region fixed inset-x-0 top-0 z-titlebar h-[50px]" />
+            <main className="flex min-h-full items-center justify-center p-4 sm:p-8">
+              <SapEnvironmentStep
+                initialError={sapEnvironmentError}
+                onComplete={(profile) => {
+                  setSapEnvironment(profile)
+                  setSapEnvironmentError(undefined)
+                }}
+              />
+            </main>
+          </div>
+        </ModalProvider>
+      </DismissibleLayerProvider>
+    )
+  }
+
   // Workspace picker — thin client with no workspace selected
   if (appState === 'workspace-picker') {
     return (
@@ -2083,6 +2093,7 @@ export default function App() {
 
   // Ready state - main app with splash overlay during data loading
   return (
+    <UiModeContext.Provider value={uiMode}>
     <PlatformProvider actions={platformActions}>
     <ShikiThemeProvider shikiTheme={shikiTheme}>
       <ActionRegistryProvider>
@@ -2164,6 +2175,7 @@ export default function App() {
       </ActionRegistryProvider>
     </ShikiThemeProvider>
     </PlatformProvider>
+    </UiModeContext.Provider>
   )
 }
 

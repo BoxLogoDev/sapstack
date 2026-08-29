@@ -5,7 +5,9 @@
 ADT 라이브 브리지(`docs/adt-bridge.md`)의 오프라인 보완재다. 아키텍처·계약: `bridge/abapgit-pattern.md`.
 
 ```
-[관리자 PC] vsp lua export ──▶ ~/.sapstack/cbo/{SID}/ ──(앱 배포 동봉)──▶ [현업 PC] Desktop 로컬 소스
+[관리자 PC] vsp lua export ──▶ ~/.sapstack/cbo/{SID}/ ──┬─(앱 배포 동봉)──────▶ [현업 PC] Desktop 로컬 소스
+                                                        ├─(공유폴더 게시)─────▶ 앱이 기동 시 자동 임포트
+                                                        └─(스냅샷 ZIP)───────▶ 설정 > "ZIP에서 가져오기"
 ```
 
 ## 준비물
@@ -43,22 +45,45 @@ node scripts/cbo/export-cbo.mjs --system DS4 --catalog-only
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/cbo/register-task.ps1            # 등록
 powershell -ExecutionPolicy Bypass -File scripts/cbo/register-task.ps1 -PrintOnly # 명령만 출력
+
+# export 후 공유폴더 자동 게시까지 (아래 "공유폴더 채널" 참고)
+powershell -ExecutionPolicy Bypass -File scripts/cbo/register-task.ps1 -Publish unc -ShareRoot \\fileserver\sapstack\cbo
 ```
 
 Desktop 앱이 켜져 있는 관리자는 앱의 자동화(예약됨 · cron)로도 같은 명령을 걸 수 있다 —
 단, 앱이 실행 중일 때만 트리거된다.
 
-## 현업 배포 (앱 파일 동봉)
+## 현업 배포 — 3가지 채널
+
+**① 앱 파일 동봉 (최초 배포)**
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/cbo/make-distribution.ps1 -Sid DS4
+powershell -ExecutionPolicy Bypass -File scripts/cbo/make-distribution.ps1 -Sid DS4 `
+  [-ProvisionFile .\provision.yaml]   # 무설정 첫 실행 — docs/provisioning.md
 ```
 
 `sapstack-Desktop-…-Portable-x64.exe` + `cbo/DS4/`(.git 제외) + 안내문을 하나의 ZIP 으로 만든다.
 현업은 ZIP 을 풀고 exe 를 실행하면 앱이 exe 옆의 `cbo/` 를 자동 임포트·등록한다.
 
+**② 공유폴더 게시 (지속 갱신 — 권장)**
+
+관리자: `register-task.ps1 -Publish unc -ShareRoot \\서버\공유\cbo` 로 야간 export 후 자동 게시.
+현업: `~/.sapstack/config.yaml` 에 `cbo.share_roots` 가 있으면(프로비저닝으로 시딩 가능)
+앱이 기동 시 공유폴더를 스캔해 **더 새 스냅샷만 로컬로 복사**한다 — 이후 오프라인에서도 동작.
+공유는 현업 계정에 **읽기 전용**으로 열고, `~/.sapstack` 자체를 공유/동기화 경로에 두지 않는다.
+
+**③ 스냅샷 ZIP (공유 접근이 없는 사용자용 폴백)**
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/cbo/make-distribution.ps1 -Sid DS4 -SnapshotOnly
+```
+
+산출물 `sapstack-CBO-snapshot-DS4-*.zip` 을 전달하면 현업이 **설정 → CBO 스냅샷 →
+"ZIP에서 가져오기"** 로 직접 임포트한다 (zip-slip 가드·status:failed 거부 내장).
+
 **배포 전 점검**: ① `manifest.yaml` 의 `status: complete` 확인 ② `meta/pii-report.json` 의
 리포트 항목(계좌·연락처·비밀번호 의심) 검토 ③ 커스텀 소스는 회사 자산 — 사내 반출 정책 확인.
+공유폴더·ZIP 채널은 소스 유통 범위를 넓히므로 ③의 정책 확인이 특히 중요하다.
 
 ## 보안 수칙
 

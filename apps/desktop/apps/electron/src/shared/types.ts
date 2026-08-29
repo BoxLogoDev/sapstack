@@ -1101,6 +1101,10 @@ export interface SapEnvironmentProfile {
   language: 'ko' | 'en' | 'de' | 'ja' | 'zh' | 'vi' | 'id' | 'fr' | 'es'
   country_iso?: string
   client?: string
+  /** 현업(simple) UI 모드 — 프로비저닝/설정이 config.yaml 에 기록, environment.get 으로 수신 */
+  ui_mode?: 'simple' | 'standard'
+  /** CBO 스냅샷 설정(공유 스캔 루트 등) — main 프로세스(cbo-snapshot.ts)가 소비 */
+  cbo?: { share_roots?: string[] }
 }
 
 declare global {
@@ -1189,6 +1193,7 @@ declare global {
       cbo: {
         status(): Promise<CboSnapshotStatus[]>
         register(): Promise<CboSnapshotStatus[]>
+        importZip(filePath?: string): Promise<{ canceled: boolean; importedSids: string[]; snapshots: CboSnapshotStatus[] }>
       }
       support: {
         export(): Promise<{ saved: boolean }>

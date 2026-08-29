@@ -13,6 +13,35 @@ scripts/generate-release-notes.sh 가 태그 버전과 같은 헤딩을 찾아 �
 
 ## [Unreleased]
 
+### Added — 관리자 프로비저닝: 현업 무설정 첫 실행
+
+- **`provision.yaml`** (`apps/desktop .../main/provisioning.ts`) — exe 인접(또는
+  `~/.sapstack/`)의 파일 하나로 첫 실행 시 LLM 연결+API 키(머신 바운드 저장소)·SAP 환경
+  프로파일·현업 모드·CBO 공유 경로를 자동 시딩 — 온보딩/환경 폼이 아예 뜨지 않는다.
+  3가지 공급: `api_key`(직결·게이트웨이) / `local`(동봉 GGUF) / `environment`(GPO 환경변수).
+  import-once 마커 + `version` 증가 재적용(키 로테이션), 적용 후 apiKey 자동 스크럽,
+  실패 시 일반 온보딩 폴백. 템플릿 `scripts/cbo/provision.template.yaml`, 문서 `docs/provisioning.md`
+- `make-distribution.ps1 -ProvisionFile/-ModelFile` — 배포 ZIP 에 프로비저닝·모델팩 동봉
+
+### Added — CBO 공급 채널: 공유폴더 스캔 + ZIP 임포트
+
+- **공유폴더 자동 스캔** — `~/.sapstack/config.yaml` `cbo.share_roots`(UNC)를 앱 기동 시
+  스캔, 더 새 스냅샷만 로컬로 복사(오프라인 대응). 관리자측 게시:
+  `register-task.ps1 -Publish unc -ShareRoot \\서버\공유\cbo`
+- **설정 → CBO 스냅샷 → "ZIP에서 가져오기"** — 스냅샷 ZIP 직접 임포트 (zip-slip 가드·
+  status:failed 거부·manifest 탐색 기반 루트 식별). 관리자측:
+  `make-distribution.ps1 -SnapshotOnly`
+- 스냅샷 임포트 공통화: `importSnapshotsFrom(root, origin)` + `exported_at` Date 비교
+
+### Added — 현업 모드 (ui_mode: simple)
+
+- `config.yaml` `ui_mode`(프로비저닝/설정 → 외관 토글) — 홈을 질문 중심으로 단순화
+  (카드 3장, 카탈로그 카운터·개선 후보·Support bundle 숨김), 새 세션 기본 권한
+  `safe`(승인 프롬프트 제거)
+- 홈 입력창 아래 **예시 질문 칩** 4종 (CBO/오류/마감/개념)
+- 온보딩 순서 교정 — 환영/LLM 온보딩이 먼저, SAP 환경 폼은 그 다음. 환경 폼 소프트닝:
+  업종 선택화·응답 언어 UI 언어 프리필
+
 ### Added — CBO 스냅샷: 현업이 커스텀 코드를 질문한다 (Phase 1)
 
 - **`scripts/cbo/export-cbo.mjs` + `export-cbo.lua`** — vsp lua(순수 ADT, SAP측 설치 불요)로

@@ -3,7 +3,19 @@ import { useTranslation } from 'react-i18next'
 import { BookOpen, CalendarCheck, Code2, Download, MessageSquareText, RefreshCw, Stethoscope } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { NewChatActionParams } from '../../../shared/types'
+import { useUiMode } from '../../contexts/UiModeContext'
 import { buildGuidedChat, selectAdvisoryMode, type SymptomMatch } from './sap-golden-path'
+
+/** 현업 모드에서 남기는 카드 — 질문/오류진단/커스텀(CBO) 3장 */
+const SIMPLE_MODE_CARDS = new Set(['quickAdvisory', 'evidenceLoop', 'abapAnalysis'])
+
+/** 입력창 아래 예시 질문 칩 (i18n 키) — 현업이 첫 질문을 베껴 쓸 수 있게 */
+const EXAMPLE_KEYS = [
+  'sapGoldenPath.examples.cbo',
+  'sapGoldenPath.examples.error',
+  'sapGoldenPath.examples.close',
+  'sapGoldenPath.examples.concept',
+] as const
 
 interface CatalogSummary {
   plugins: number
@@ -27,6 +39,8 @@ interface LearningSummary {
 
 export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatActionParams) => Promise<void> }) {
   const { t } = useTranslation()
+  const uiMode = useUiMode()
+  const simple = uiMode === 'simple'
   const [catalog, setCatalog] = useState<CatalogSummary>()
   const [catalogUnavailable, setCatalogUnavailable] = useState(false)
   const [request, setRequest] = useState('')
@@ -50,7 +64,7 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
       .catch(() => {})
     return () => { active = false }
   }, [])
-  const paths: GoldenPathItem[] = [
+  const allPaths: GoldenPathItem[] = [
     {
       id: 'quickAdvisory',
       title: t('sapGoldenPath.cards.quickAdvisory.title'),
@@ -87,6 +101,8 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
       chat: { name: t('sapGoldenPath.cards.knowledgeVault.chatName'), input: t('sapGoldenPath.cards.knowledgeVault.chatInput') },
     },
   ]
+  // 현업 모드에서는 홈을 "질문하는 곳"으로 좁힌다 — 카드 3장
+  const paths = simple ? allPaths.filter((path) => SIMPLE_MODE_CARDS.has(path.id)) : allPaths
 
   useEffect(() => {
     let active = true
@@ -194,15 +210,17 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">{t('sapGoldenPath.brand')}</p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight">{t('sapGoldenPath.title')}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            {catalog
-              ? t('sapGoldenPath.catalogSummary', {
-                  plugins: catalog.plugins,
-                  agents: catalog.agents,
-                  commands: catalog.commands,
-                })
-              : catalogUnavailable
-                ? t('sapGoldenPath.catalogUnavailable')
-                : t('sapGoldenPath.catalogLoading')}
+            {simple
+              ? t('sapGoldenPath.simpleSubtitle')
+              : catalog
+                ? t('sapGoldenPath.catalogSummary', {
+                    plugins: catalog.plugins,
+                    agents: catalog.agents,
+                    commands: catalog.commands,
+                  })
+                : catalogUnavailable
+                  ? t('sapGoldenPath.catalogUnavailable')
+                  : t('sapGoldenPath.catalogLoading')}
           </p>
         </div>
 
@@ -226,6 +244,19 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
             >
               {submitting ? t('sapGoldenPath.analyzing') : t('sapGoldenPath.startDiagnosis')}
             </button>
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-1.5" aria-label={t('sapGoldenPath.examples.label')}>
+            <span className="text-xs text-muted-foreground">{t('sapGoldenPath.examples.label')}</span>
+            {EXAMPLE_KEYS.map((key) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setRequest(t(key))}
+                className="rounded-full border border-foreground/15 bg-background px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-foreground/[0.055] hover:text-foreground"
+              >
+                {t(key)}
+              </button>
+            ))}
           </div>
           <p className="mt-2 text-xs text-muted-foreground">{t('sapGoldenPath.routingHint')}</p>
           {notice && <p role="status" className="mt-2 text-sm text-foreground">{notice}</p>}
@@ -257,6 +288,7 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
           })}
         </div>
 
+        {!simple && (
         <section className="mt-5 rounded-xl border border-foreground/10 bg-foreground/[0.025] p-4 shadow-minimal" aria-labelledby="sap-learning-title">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -294,18 +326,21 @@ export function SapGoldenPath({ onOpenChat }: { onOpenChat?: (params: NewChatAct
             </div>
           )}
         </section>
+        )}
 
         <div className="mt-5 flex flex-col items-center gap-2 text-center text-xs text-muted-foreground">
           <p>{t('sapGoldenPath.noOrgAssumptions')}</p>
-          <button
-            type="button"
-            onClick={exportSupportBundle}
-            disabled={exportingSupport}
-            className="inline-flex min-h-9 items-center gap-2 rounded-lg px-3 hover:bg-foreground/[0.055] disabled:opacity-50"
-          >
-            <Download className="size-4" aria-hidden="true" />
-            {exportingSupport ? t('sapGoldenPath.supportBundleSaving') : t('sapGoldenPath.supportBundleSave')}
-          </button>
+          {!simple && (
+            <button
+              type="button"
+              onClick={exportSupportBundle}
+              disabled={exportingSupport}
+              className="inline-flex min-h-9 items-center gap-2 rounded-lg px-3 hover:bg-foreground/[0.055] disabled:opacity-50"
+            >
+              <Download className="size-4" aria-hidden="true" />
+              {exportingSupport ? t('sapGoldenPath.supportBundleSaving') : t('sapGoldenPath.supportBundleSave')}
+            </button>
+          )}
         </div>
       </div>
     </div>

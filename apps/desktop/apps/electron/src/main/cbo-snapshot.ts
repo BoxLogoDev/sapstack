@@ -12,11 +12,12 @@
  * 'cbo-snapshot' 계열을 쓴다 (로컬 소스라 정책 대상은 아니지만 미래 여지 보존).
  */
 
-import { homedir } from 'node:os'
+import { homedir, tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
-import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs'
-import { ipcMain } from 'electron'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { BrowserWindow, dialog, ipcMain, type IpcMainInvokeEvent } from 'electron'
 import * as yaml from 'js-yaml'
+import { unzipSync } from 'fflate'
 import {
   createSource,
   loadWorkspaceSources,
@@ -24,10 +25,12 @@ import {
   saveSourceGuide,
 } from '@sapstack-desktop/shared/sources/storage'
 import { getWorkspaces } from '@sapstack-desktop/shared/config/storage'
+import { environmentProfilePath } from './environment-profile'
 
 export const CBO_IPC = {
   status: 'sapstack:cbo:status',
   register: 'sapstack:cbo:register',
+  importZip: 'sapstack:cbo:importZip',
 } as const
 
 const CBO_PROVIDER = 'cbo-snapshot'
@@ -95,23 +98,79 @@ function listSnapshots(root: string): Array<{ sid: string; dir: string; manifest
   return out
 }
 
-/** 포터블 인접 스냅샷을 ~/.sapstack/cbo 로 임포트 (없거나 더 새 것일 때) */
-function importAdjacentSnapshots(): void {
-  const adjacent = portableAdjacentRoot()
-  if (!adjacent) return
-  for (const snap of listSnapshots(adjacent)) {
+/** exported_at 비교 — ISO 파싱 우선, 실패 시 문자열 비교 폴백 */
+function isNewer(candidate: string, existing: string): boolean {
+  const [tc, te] = [Date.parse(String(candidate)), Date.parse(String(existing))]
+  if (Number.isFinite(tc) && Number.isFinite(te)) return tc > te
+  return String(candidate) > String(existing)
+}
+
+/**
+ * manifest.yaml 탐색으로 스냅샷 루트 식별 — 디렉터리 깊이를 가정하지 않는다.
+ * (Compress-Archive 는 cbo/{SID}/ 프리픽스를 만들고, ZIP 은 임의 구조일 수 있다)
+ */
+function findSnapshotDirs(root: string, maxDepth = 3): Array<{ sid: string; dir: string; manifest: ParsedManifest }> {
+  const out: Array<{ sid: string; dir: string; manifest: ParsedManifest }> = []
+  const walk = (dir: string, depth: number): void => {
+    const manifest = readManifest(dir)
+    if (manifest) {
+      out.push({ sid: manifest.sid, dir, manifest })
+      return // 스냅샷 안쪽으로는 더 내려가지 않는다
+    }
+    if (depth >= maxDepth) return
+    let entries: string[]
+    try {
+      entries = readdirSync(dir)
+    } catch {
+      return
+    }
+    for (const entry of entries) {
+      if (entry === '.git') continue
+      const child = join(dir, entry)
+      try {
+        if (statSync(child).isDirectory()) walk(child, depth + 1)
+      } catch {
+        /* 접근 불가 항목 무시 */
+      }
+    }
+  }
+  walk(root, 0)
+  return out
+}
+
+/**
+ * 임의 위치(sourceRoot)의 스냅샷들을 ~/.sapstack/cbo 로 임포트 — 없거나 더 새 것일 때.
+ * 인접 폴더·공유폴더·ZIP 추출 임시 폴더가 전부 이 경로를 탄다. 임포트된 SID 목록 반환.
+ */
+function importSnapshotsFrom(sourceRoot: string, origin: string): string[] {
+  const imported: string[] = []
+  if (!existsSync(sourceRoot)) return imported
+  for (const snap of findSnapshotDirs(sourceRoot)) {
     const target = join(cboRoot(), snap.sid)
     const existing = readManifest(target)
-    const newer = !existing || String(snap.manifest.exported_at) > String(existing.exported_at)
-    if (!newer) continue
+    if (existing && !isNewer(String(snap.manifest.exported_at), String(existing.exported_at))) continue
     try {
       if (existsSync(target)) rmSync(target, { recursive: true, force: true })
       mkdirSync(dirname(target), { recursive: true })
       cpSync(snap.dir, target, { recursive: true })
-      console.log(`[cbo] 인접 스냅샷 임포트: ${snap.sid} (${snap.manifest.exported_at})`)
+      imported.push(snap.sid)
+      console.log(`[cbo] 스냅샷 임포트(${origin}): ${snap.sid} (${snap.manifest.exported_at})`)
     } catch (err) {
-      console.error(`[cbo] 인접 스냅샷 임포트 실패 (${snap.sid}):`, err)
+      console.error(`[cbo] 스냅샷 임포트 실패(${origin}, ${snap.sid}):`, err)
     }
+  }
+  return imported
+}
+
+/** ~/.sapstack/config.yaml 의 cbo.share_roots — 공유폴더 스캔 루트 (프로비저닝/수기 설정) */
+function shareRootsFromConfig(): string[] {
+  try {
+    const doc = yaml.load(readFileSync(environmentProfilePath(), 'utf8')) as Record<string, unknown> | null
+    const cbo = (doc?.cbo ?? {}) as Record<string, unknown>
+    const roots = cbo.share_roots
+    return Array.isArray(roots) ? roots.map(String).filter((r) => r.trim()) : []
+  } catch {
+    return []
   }
 }
 
@@ -161,7 +220,17 @@ async function registerForWorkspace(workspaceRootPath: string, sid: string, dir:
 }
 
 async function ensureCboSourcesRegistered(): Promise<CboSnapshotInfo[]> {
-  importAdjacentSnapshots()
+  // ① 포터블 exe 인접본 ② 공유폴더(cbo.share_roots) — 로컬로 복사해 임포트
+  //    (오프라인 노트북에서도 스냅샷이 계속 동작해야 하므로 제로카피 등록은 안 한다)
+  const adjacent = portableAdjacentRoot()
+  if (adjacent) importSnapshotsFrom(adjacent, '인접')
+  for (const root of shareRootsFromConfig()) {
+    try {
+      importSnapshotsFrom(root, '공유폴더')
+    } catch (err) {
+      console.error(`[cbo] 공유폴더 스캔 실패 (${root}):`, err)
+    }
+  }
   const snapshots = listSnapshots(cboRoot())
   const workspaces = getWorkspaces()
   const infos: CboSnapshotInfo[] = []
@@ -196,9 +265,64 @@ async function ensureCboSourcesRegistered(): Promise<CboSnapshotInfo[]> {
   return infos
 }
 
+/** ZIP 항목 경로 가드 — zip-slip(../, 절대경로, 드라이브 문자) 차단 */
+function isSafeZipEntry(name: string): boolean {
+  if (name.includes('\\')) return false // 백슬래시 경로는 비표준 저장 — 거부
+  if (name.startsWith('/') || /^[A-Za-z]:/.test(name)) return false
+  return !name.split('/').some((segment) => segment === '..')
+}
+
+export interface CboImportZipResult {
+  canceled: boolean
+  importedSids: string[]
+  snapshots: CboSnapshotInfo[]
+}
+
+/**
+ * 스냅샷 ZIP 임포트 — make-distribution.ps1 -SnapshotOnly 산출물(또는 cbo/ 트리를
+ * 담은 임의 ZIP)을 풀어 importSnapshotsFrom 으로 넘긴다. 공유폴더 접근이 없는
+ * 현업의 갱신 폴백 경로.
+ */
+async function importSnapshotZip(event: IpcMainInvokeEvent, filePath?: string): Promise<CboImportZipResult> {
+  let zipPath = filePath
+  if (!zipPath) {
+    const owner = BrowserWindow.fromWebContents(event.sender)
+    const options = {
+      title: 'CBO 스냅샷 ZIP 선택',
+      filters: [{ name: 'ZIP', extensions: ['zip'] }],
+      properties: ['openFile' as const],
+    }
+    const result = owner ? await dialog.showOpenDialog(owner, options) : await dialog.showOpenDialog(options)
+    if (result.canceled || !result.filePaths[0]) return { canceled: true, importedSids: [], snapshots: [] }
+    zipPath = result.filePaths[0]
+  }
+
+  const entries = unzipSync(new Uint8Array(readFileSync(zipPath)))
+  const tmp = mkdtempSync(join(tmpdir(), 'sapstack-cbo-zip-'))
+  try {
+    for (const [name, bytes] of Object.entries(entries)) {
+      if (!isSafeZipEntry(name)) throw new Error(`허용되지 않는 ZIP 항목 경로: ${name}`)
+      if (name.endsWith('/') || name.split('/').includes('.git')) continue
+      const dest = join(tmp, name)
+      mkdirSync(dirname(dest), { recursive: true })
+      writeFileSync(dest, bytes)
+    }
+    const found = findSnapshotDirs(tmp)
+    if (found.length === 0) throw new Error('ZIP 에서 manifest.yaml 을 가진 스냅샷을 찾지 못했습니다')
+    const failed = found.find((snap) => String(snap.manifest.status) === 'failed')
+    if (failed) throw new Error(`스냅샷(${failed.sid}) status=failed — export 를 다시 실행한 산출물을 사용하세요`)
+    const importedSids = importSnapshotsFrom(tmp, 'ZIP')
+    const snapshots = await ensureCboSourcesRegistered()
+    return { canceled: false, importedSids, snapshots }
+  } finally {
+    rmSync(tmp, { recursive: true, force: true })
+  }
+}
+
 export function registerCboSnapshotHandlers(): void {
   ipcMain.handle(CBO_IPC.status, async () => ensureCboSourcesRegistered())
   ipcMain.handle(CBO_IPC.register, async () => ensureCboSourcesRegistered())
+  ipcMain.handle(CBO_IPC.importZip, async (event, filePath?: string) => importSnapshotZip(event, filePath))
 
   // 기동 시 1회 — 실패해도 앱 기동을 막지 않는다
   ensureCboSourcesRegistered().catch((err) => console.error('[cbo] 초기 등록 실패:', err))

@@ -108,6 +108,10 @@ project:
 # cbo:
 #   # 스냅샷 저장 루트 (기본: ~/.sapstack/cbo)
 #   snapshot_root: ~/.sapstack/cbo
+#   # 스냅샷 공유 게시 루트(UNC) — Desktop 앱이 기동 시 스캔해 로컬로 임포트.
+#   # 관리자측 게시는 register-task.ps1 -Publish unc -ShareRoot ... 참조.
+#   share_roots:
+#     - '\\fileserver\sapstack\cbo'
 #   # 이 일수를 넘기면 stale 경고 (기본 30)
 #   staleness_warn_days: 30
 #   # PII 처리: off / report / mask (mask 는 주민번호·카드·계좌·사업자번호만)

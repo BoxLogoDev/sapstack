@@ -1,0 +1,46 @@
+# sapstack Desktop 관리자 프로비저닝 파일 (v1) — docs/provisioning.md 참조
+#
+# 이 파일이 포터블 exe 옆(또는 %USERPROFILE%\.sapstack\)에 있으면 첫 실행 시
+# 자동 적용되어 현업 사용자는 어떤 설정 화면도 보지 않고 바로 질문할 수 있습니다.
+#
+# 보안:
+#  - apiKey 는 첫 적용 후 이 파일에서 자동으로 "<imported>" 로 스크럽됩니다.
+#  - 그래도 배포 ZIP 에는 평문 키가 실립니다 — 반드시 예산 상한이 걸린 전용 키
+#    또는 사내 게이트웨이 키만 사용하세요.
+#  - 키 교체(로테이션): 새 키를 넣고 version 숫자를 올려 재배포하면 됩니다.
+version: 1
+
+# ── LLM 연결 (셋 중 하나) ─────────────────────────────────────────
+llm:
+  kind: api_key                # api_key | local | environment
+  apiKey: sk-ant-REPLACE-ME    # kind: api_key 필수. 적용 후 자동 스크럽.
+  # baseUrl: https://litellm.corp.example   # 선택 — 사내 게이트웨이. 없으면 Anthropic 직결.
+  # api: anthropic-messages    # baseUrl 있을 때: anthropic-messages | openai-completions
+  # models: [claude-sonnet-4-5]             # baseUrl 있을 때 필수 (게이트웨이 모델 id)
+  # defaultModel: claude-sonnet-4-5         # 선택 (기본: models 첫 항목)
+  # name: 사내 AI 게이트웨이     # 선택 — 설정 화면 표시 이름
+  #
+  # ── kind: local (폐쇄망 — 동봉 llama-server + GGUF) ──
+  # kind: local
+  # modelFile: models/qwen3-8b-q4_k_m.gguf  # 이 파일 기준 상대경로. ~/.sapstack/models 로 복사됨.
+  #
+  # ── kind: environment (GPO 로 ANTHROPIC_API_KEY/BASE_URL 배포된 조직) ──
+  # kind: environment
+
+# ── SAP 환경 프로파일 (현업이 EhP7/EhP8 폼을 안 보게) ────────────
+sapEnvironment:
+  release: S4_2023             # ECC6_EhP7|ECC6_EhP8|S4_2020..S4_2024|RISE|PublicCloud|Unknown
+  deployment: private_cloud    # on_premise | private_cloud | public_cloud | unknown
+  industry: 제조
+  language: ko
+  # client: "600"              # 선택
+  # airGapped: true            # 선택 — 크래시 리포팅·업데이트 폴링 차단 (재시작 후 적용)
+
+# ── 현업 모드 (개발자용 UI 숨김) ─────────────────────────────────
+features:
+  uiMode: simple               # simple(현업) | standard
+
+# ── CBO 스냅샷 공유 스캔 루트 (선택) ─────────────────────────────
+# cbo:
+#   shareRoots:
+#     - '\\fileserver\sapstack\cbo'

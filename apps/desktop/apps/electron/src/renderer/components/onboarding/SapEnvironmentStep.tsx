@@ -19,25 +19,31 @@ const selectClassName = 'flex h-9 w-full rounded-md border border-foreground/15 
  * Deliberately excludes company code, account and organisation defaults.
  */
 export function SapEnvironmentStep({ initialError, onComplete }: SapEnvironmentStepProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [release, setRelease] = useState<SapEnvironmentProfile['release'] | ''>('')
   const [deployment, setDeployment] = useState<SapEnvironmentProfile['deployment'] | ''>('')
   const [industry, setIndustry] = useState('')
-  const [language, setLanguage] = useState<SapEnvironmentProfile['language']>('ko')
+  // 응답 언어는 UI 언어에서 프리필 — 같은 질문을 두 번 하지 않는다 (zh-Hans → zh)
+  const uiLanguageBase = (i18n.resolvedLanguage ?? 'ko').split('-')[0]
+  const prefillLanguage = (['ko', 'en', 'de', 'ja', 'zh'].includes(uiLanguageBase)
+    ? uiLanguageBase
+    : 'ko') as SapEnvironmentProfile['language']
+  const [language, setLanguage] = useState<SapEnvironmentProfile['language']>(prefillLanguage)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(initialError)
 
-  const isValid = Boolean(release && deployment && industry.trim() && language)
+  // 업종은 선택 — 현업이 답하기 어려운 필드로 첫 화면을 막지 않는다
+  const isValid = Boolean(release && deployment && language)
 
   const save = async () => {
-    if (!release || !deployment || !industry.trim() || !language || saving) return
+    if (!release || !deployment || !language || saving) return
     setSaving(true)
     setError(undefined)
     try {
       const profile = await window.sapstack.environment.save({
         release,
         deployment,
-        industry: industry.trim(),
+        industry: industry.trim() || t('onboarding.sapEnvironment.industryUnspecified'),
         language,
       })
       onComplete(profile)
@@ -87,7 +93,10 @@ export function SapEnvironmentStep({ initialError, onComplete }: SapEnvironmentS
         </div>
 
         <div className={fieldClassName}>
-          <label className={labelClassName} htmlFor="sap-industry">{t('onboarding.sapEnvironment.industry')}</label>
+          <label className={labelClassName} htmlFor="sap-industry">
+            {t('onboarding.sapEnvironment.industry')}
+            <span className="ml-1 font-normal text-muted-foreground">{t('onboarding.sapEnvironment.optionalTag')}</span>
+          </label>
           <Input
             id="sap-industry"
             value={industry}

@@ -498,6 +498,7 @@ contextBridge.exposeInMainWorld('sapstack', {
   cbo: {
     status: () => ipcRenderer.invoke('sapstack:cbo:status'),
     register: () => ipcRenderer.invoke('sapstack:cbo:register'),
+    importZip: (filePath?: string) => ipcRenderer.invoke('sapstack:cbo:importZip', filePath),
   },
   support: {
     export: () => ipcRenderer.invoke('sapstack:support:export'),

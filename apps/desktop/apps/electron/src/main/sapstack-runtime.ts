@@ -1,14 +1,14 @@
 import { homedir } from 'node:os'
-import { dirname, join } from 'node:path'
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import { writeFile } from 'node:fs/promises'
 import { app, BrowserWindow, dialog, ipcMain } from 'electron'
-import * as yaml from 'js-yaml'
 import {
   FileSystemAssetProvider,
   SapstackRuntime,
   buildSupportBundle,
 } from '../../../../../../packages/runtime/src/index.js'
 import { getSapConnection, probeSapConnection, saveSapConnection } from './sap-connection'
+import { readEnvironmentProfile, saveEnvironmentProfile } from './environment-profile'
 
 export const SAPSTACK_IPC = {
   catalog: 'sapstack:catalog',
@@ -77,7 +77,12 @@ export function registerSapstackRuntimeHandlers(): void {
   ipcMain.handle(SAPSTACK_IPC.listSessions, async (_event, filter) => (await getRuntime()).sessions.list(filter))
   ipcMain.handle(SAPSTACK_IPC.scrub, async (_event, text) => (await getRuntime()).security.scrub(text))
   ipcMain.handle(SAPSTACK_IPC.inspectLearning, async () => (await getRuntime()).learning.inspect())
-  ipcMain.handle(SAPSTACK_IPC.getEnvironment, async () => readEnvironmentProfile())
+  ipcMain.handle(SAPSTACK_IPC.getEnvironment, async () => {
+    // 프로비저닝이 ui_mode/cbo 만 시딩한 부분 config.yaml 은 프로파일이 아니다 —
+    // release 가 없으면 null 을 돌려 SapEnvironmentStep 게이트가 유지되게 한다.
+    const profile = (await readEnvironmentProfile()) as Record<string, unknown> | null
+    return profile && profile.release ? profile : null
+  })
   ipcMain.handle(SAPSTACK_IPC.saveEnvironment, async (_event, profile) => saveEnvironmentProfile(profile))
   ipcMain.handle(SAPSTACK_IPC.getSapConnection, async () => getSapConnection())
   ipcMain.handle(SAPSTACK_IPC.saveSapConnection, async (_event, input) => saveSapConnection(input))
@@ -109,52 +114,5 @@ function desktopSessionInput(input: any): any {
   return { ...input, surface: 'desktop' }
 }
 
-function environmentProfilePath(): string {
-  return join(process.env.SAPSTACK_WORKSPACE || homedir(), '.sapstack', 'config.yaml')
-}
-
-async function readEnvironmentProfile(): Promise<unknown> {
-  try {
-    return yaml.load(await readFile(environmentProfilePath(), 'utf8'))
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null
-    throw error
-  }
-}
-
-async function saveEnvironmentProfile(input: Record<string, unknown>): Promise<Record<string, unknown>> {
-  const releases = new Set(['ECC6_EhP7', 'ECC6_EhP8', 'S4_2020', 'S4_2021', 'S4_2022', 'S4_2023', 'S4_2024', 'RISE', 'PublicCloud', 'Unknown'])
-  const deployments = new Set(['on_premise', 'private_cloud', 'public_cloud', 'unknown'])
-  const languages = new Set(['ko', 'en', 'de', 'ja', 'zh', 'vi', 'id', 'fr', 'es'])
-  if (!releases.has(String(input.release))) throw new Error('A supported SAP release is required')
-  if (!deployments.has(String(input.deployment))) throw new Error('A supported deployment model is required')
-  if (!String(input.industry || '').trim()) throw new Error('Industry is required')
-  if (!languages.has(String(input.language || 'ko'))) throw new Error('A supported language is required')
-
-  // 선택 키는 기존 profile 을 베이스로 보존한다. SapEnvironmentStep 은 4개 필수
-  // 필드만 보내므로, profile 을 처음부터 재작성하면 수동으로 켠 air_gapped 나
-  // country_iso/client 가 환경 재설정 한 번에 소실된다. input 에 명시된 값이 우선.
-  const existing = ((await readEnvironmentProfile().catch(() => null)) ?? {}) as Record<string, unknown>
-  const countryIso = input.country_iso ?? existing.country_iso
-  const client = input.client ?? existing.client
-  const airGapped = input.air_gapped ?? existing.air_gapped
-
-  const profile = {
-    profile_version: 1,
-    release: input.release,
-    deployment: input.deployment,
-    industry: String(input.industry).trim(),
-    language: input.language || 'ko',
-    ...(countryIso ? { country_iso: String(countryIso).toLowerCase() } : {}),
-    ...(client ? { client: String(client) } : {}),
-    // 폐쇄망 모드. main/airgap.ts 가 부팅 시 이 키를 동기로 읽어 크래시 리포팅과
-    // 업데이트 폴링을 끈다. 적용하려면 재시작이 필요하다.
-    ...(airGapped === true ? { air_gapped: true } : {}),
-  }
-  const target = environmentProfilePath()
-  await mkdir(dirname(target), { recursive: true })
-  const temporary = `${target}.${process.pid}.tmp`
-  await writeFile(temporary, yaml.dump(profile, { lineWidth: -1, noRefs: true }), 'utf8')
-  await rename(temporary, target)
-  return profile
-}
+// 환경 프로파일 읽기·저장은 ./environment-profile 로 이동 (provisioning.ts 와 공유,
+// electron 무의존이라 bun test 가능).
