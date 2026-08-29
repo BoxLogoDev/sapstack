@@ -20,6 +20,20 @@
 
 Phase 가 올라가도 **폴더 계약은 동일** — 소비 측은 무수정.
 
+> **Phase 3 실측 한계 (설계 전 필독)**: vsp `GitExport` 는 1회 호출당 **약 150 오브젝트 /
+> 120초** 수준에서 한계가 관측됐고, 직렬화 실패는 **무음 스킵**된다(오류 없이 파일만 빠짐).
+> 따라서 Phase 3 exporter 는 단일 호출이 아니라 **패키지별 분할 루프 + manifest 대조식
+> (`objects_found = files_written + failures`) 검증**으로 설계해야 한다.
+
+### 현업 도달 채널 (소비 측 배포)
+
+| 채널 | 생산자 | 소비자 | 비고 |
+|---|---|---|---|
+| 앱 배포 동봉 | `make-distribution.ps1` | exe 인접 `cbo/` 자동 임포트 | 최초 배포 |
+| 공유폴더 게시 | `register-task.ps1 -Publish unc` | `cbo.share_roots` 기동 시 스캔 → 로컬 복사 | 지속 갱신 권장. 공유는 읽기 전용 |
+| 스냅샷 ZIP | `make-distribution.ps1 -SnapshotOnly` | 설정 > "ZIP에서 가져오기" | 공유 접근 없는 사용자 폴백 |
+| (예정) 원격 아카이브 풀 | abapGit push 또는 관리자 git push | 앱이 HTTPS 아카이브 다운로드 (`manifest.method: git-remote`) | 고객사 협의 후 — "remote 없음" 보안 속성을 의도적으로 완화하므로 사내망·읽기 전용 토큰 한정 |
+
 ## 폴더 계약 v1
 
 ```

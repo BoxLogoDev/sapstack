@@ -102,6 +102,7 @@ import { createApplicationMenu } from './menu'
 import { WindowManager } from './window-manager'
 import { registerSapstackRuntimeHandlers } from './sapstack-runtime'
 import { registerCboSnapshotHandlers } from './cbo-snapshot'
+import { applyProvisioningIfPresent } from './provisioning'
 import { initLocalLlm } from './local-llm'
 import { loadWindowState, saveWindowState } from './window-state'
 import { getWorkspaces, getWorkspaceByNameOrId, loadStoredConfig, addWorkspace, saveConfig } from '@sapstack-desktop/shared/config'
@@ -392,6 +393,15 @@ app.whenReady().then(async () => {
   // Register bundled assets root so all seeding functions can find their files
   // (docs, permissions, themes, tool-icons resolve via getBundledAssetsDir)
   setBundledAssetsRoot(__dirname)
+
+  // 관리자 프로비저닝(provision.yaml) — 현업 PC 무설정 첫 실행. LLM 연결·환경
+  // 프로파일이 getSetupNeeds/온보딩 게이트보다 먼저 시딩되고, GGUF 모델팩 복사가
+  // initLocalLlm() 의 모델 스캔보다 먼저 끝나야 하므로 이 위치에서 await 한다.
+  try {
+    await applyProvisioningIfPresent()
+  } catch (err) {
+    mainLog.error('[provision] 적용 중 예외 (앱 기동은 계속):', err)
+  }
 
   // sapstack's canonical knowledge and Evidence Loop run in-process. External
   // MCP remains available for third-party sources but is not required here.

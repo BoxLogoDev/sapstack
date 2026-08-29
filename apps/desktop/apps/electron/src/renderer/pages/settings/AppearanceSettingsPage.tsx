@@ -18,7 +18,7 @@ import { useAppShellContext } from '@/context/AppShellContext'
 import { routes } from '@/lib/navigate'
 import { Monitor, Sun, Moon } from 'lucide-react'
 import type { DetailsPageMeta } from '@/lib/navigation-registry'
-import type { ToolIconMapping } from '../../../shared/types'
+import type { SapEnvironmentProfile, ToolIconMapping } from '../../../shared/types'
 
 import {
   SettingsSection,
@@ -137,6 +137,32 @@ export default function AppearanceSettingsPage() {
 
   // Resolved path to tool-icons.json (needed for EditPopover and "Edit File" action)
   const [toolIconsJsonPath, setToolIconsJsonPath] = useState<string | null>(null)
+
+  // 현업(simple) 모드 — ~/.sapstack/config.yaml 의 ui_mode. 프로파일이 있어야 저장 가능.
+  // 홈/기본 권한 등은 App 기동 시 ui_mode 를 읽으므로 재시작 후 완전 적용된다.
+  const [envProfile, setEnvProfile] = useState<SapEnvironmentProfile | null>(null)
+  const [workerMode, setWorkerMode] = useState(false)
+  useEffect(() => {
+    let active = true
+    window.sapstack.environment.get()
+      .then((profile) => {
+        if (!active) return
+        setEnvProfile(profile)
+        setWorkerMode(profile?.ui_mode === 'simple')
+      })
+      .catch(() => {})
+    return () => { active = false }
+  }, [])
+  const handleWorkerModeChange = useCallback(async (checked: boolean) => {
+    if (!envProfile) return
+    setWorkerMode(checked)
+    try {
+      const saved = await window.sapstack.environment.save({ ...envProfile, ui_mode: checked ? 'simple' : 'standard' })
+      setEnvProfile(saved as SapEnvironmentProfile)
+    } catch {
+      setWorkerMode(!checked) // 저장 실패 시 롤백
+    }
+  }, [envProfile])
 
   // Connection icon visibility toggle
   const [showConnectionIcons, setShowConnectionIcons] = useState(() =>
@@ -436,6 +462,13 @@ export default function AppearanceSettingsPage() {
               {/* Interface */}
               <SettingsSection title={t("settings.appearance.interface")}>
                 <SettingsCard>
+                  <SettingsToggle
+                    label={t("settings.appearance.workerMode")}
+                    description={t("settings.appearance.workerModeDesc")}
+                    checked={workerMode}
+                    disabled={envProfile === null}
+                    onCheckedChange={handleWorkerModeChange}
+                  />
                   <SettingsToggle
                     label={t("settings.appearance.connectionIcons")}
                     description={t("settings.appearance.connectionIconsDesc")}

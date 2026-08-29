@@ -25,6 +25,10 @@ Windows에서는 **Git for Windows(Git Bash)가 필수**다. 미설치면 온보
 
 온보딩에서 **Local Model**을 선택하면 클라우드 API 키 없이 완주할 수 있다.
 
+**현업 대량 배포**: 관리자가 `provision.yaml` 을 exe 옆에 동봉하면 온보딩·SAP 환경 폼이
+아예 뜨지 않고 바로 질문할 수 있다 — [provisioning.md](provisioning.md). 현업 모드
+(`features.uiMode: simple`)까지 함께 시딩하면 개발자용 메뉴도 숨겨진다.
+
 ## 로컬 추론
 
 - 엔진 `llama-server`(llama.cpp, CPU 빌드)가 설치파일에 번들된다. 별도 다운로드는 필요 없다.
@@ -48,6 +52,11 @@ Windows에서는 **Git for Windows(Git Bash)가 필수**다. 미설치면 온보
 - `~/.sapstack/config.yaml`에 `air_gapped: true`
 
 폐쇄망 반입·운영의 나머지 절차는 [compliance/air-gapped-deployment.md](compliance/air-gapped-deployment.md)를 본다.
+
+주의 두 가지: ① 저장소가 private 인 동안은 GH_TOKEN 미설정 상태의 클라이언트에서
+업데이트 폴링이 404 로 실패한다 — 사내 배포는 포터블 exe 재배포(또는 electron-builder
+`generic` provider 로 사내 웹서버/공유에 `latest.yml`+exe 를 미러링)로 운영한다.
+② 폐쇄망 모드에서는 업데이트 경로가 없으므로 갱신은 항상 수동 반입이다.
 
 ## SAP 데이터
 

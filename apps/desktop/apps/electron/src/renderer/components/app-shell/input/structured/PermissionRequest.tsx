@@ -55,7 +55,7 @@ export function PermissionRequest({ request, onResponse, unstyled = false }: Per
             <span>{t('chat.permissionRequired')}</span>
           </div>
           <div className="text-xs leading-[18px] text-muted-foreground">
-            <span className="font-medium text-foreground">Tool:</span> {request.toolName}
+            <span className="font-medium text-foreground">{t('chat.permissionTool')}</span> {request.toolName}
             <br />
             {request.description}
           </div>

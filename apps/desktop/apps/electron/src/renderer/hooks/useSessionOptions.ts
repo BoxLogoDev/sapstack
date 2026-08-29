@@ -32,6 +32,16 @@ export const defaultSessionOptions: SessionOptions = {
   thinkingLevel: DEFAULT_THINKING_LEVEL, // Default to 'medium' level
 }
 
+/**
+ * 현업(simple) 모드에서 새 세션 기본 권한을 'safe' 로 낮춘다 — SAP 스냅샷 질의는
+ * read-only 로 충분하고, 현업에게 도구 승인 프롬프트를 보여주지 않기 위함.
+ * App.tsx 가 ui_mode 해석 직후 호출한다. 모듈 상수를 직접 갱신하므로
+ * defaultSessionOptions 를 폴백으로 쓰는 모든 지점이 일관되게 따라온다.
+ */
+export function setDefaultPermissionMode(mode: PermissionMode): void {
+  defaultSessionOptions.permissionMode = mode
+}
+
 /** Type for partial updates to session options */
 export type SessionOptionUpdates = Partial<SessionOptions>
 

@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Archive, RefreshCw, AlertTriangle, CheckCircle2, FolderOpen } from 'lucide-react'
+import { Archive, RefreshCw, AlertTriangle, CheckCircle2, FolderOpen, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 import { PanelHeader } from '@/components/app-shell/PanelHeader'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -29,6 +29,7 @@ export default function CboSnapshotSettingsPage() {
   const [snapshots, setSnapshots] = useState<CboSnapshotStatus[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
 
   const load = useCallback(async () => {
     try {
@@ -53,6 +54,25 @@ export default function CboSnapshotSettingsPage() {
       toast.error(t('settings.cboSnapshot.refreshFailed', { message: err instanceof Error ? err.message : String(err) }))
     } finally {
       setIsRefreshing(false)
+    }
+  }
+
+  const handleImportZip = async () => {
+    setIsImporting(true)
+    try {
+      const result = await window.sapstack.cbo.importZip()
+      if (!result.canceled) {
+        setSnapshots(result.snapshots)
+        if (result.importedSids.length > 0) {
+          toast.success(t('settings.cboSnapshot.importZipDone', { sids: result.importedSids.join(', ') }))
+        } else {
+          toast.info(t('settings.cboSnapshot.importZipUpToDate'))
+        }
+      }
+    } catch (err) {
+      toast.error(t('settings.cboSnapshot.importZipFailed', { message: err instanceof Error ? err.message : String(err) }))
+    } finally {
+      setIsImporting(false)
     }
   }
 
@@ -128,9 +148,13 @@ export default function CboSnapshotSettingsPage() {
           })}
 
           <div className="flex items-center gap-2 px-1">
-            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
+            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing || isImporting}>
               {isRefreshing ? <Spinner className="mr-1.5" /> : <RefreshCw className="h-3.5 w-3.5 mr-1.5" />}
               {t('settings.cboSnapshot.refresh')}
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleImportZip} disabled={isRefreshing || isImporting}>
+              {isImporting ? <Spinner className="mr-1.5" /> : <Upload className="h-3.5 w-3.5 mr-1.5" />}
+              {t('settings.cboSnapshot.importZip')}
             </Button>
           </div>
 
