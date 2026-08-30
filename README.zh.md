@@ -4,16 +4,18 @@
 
 <img src="docs/assets/mascot/standard-en.png" alt="标准小姐 — sapstack 吉祥物" width="280" />
 
-_“在 SAP 中这是标准，所以无法更改。” — 标准小姐 ([品牌指南](MASCOT.md))_
+_"在 SAP 里这是标准，所以改不了。" — 标准小姐（[品牌指南](MASCOT.md)）_
 
-### AI 编码助手的 SAP 企业运营平台
+### 面向 SAP 运维的 AI 桌面应用
+
+**装上就能问 — 从标准流程到贵公司的自定义（Z/Y）程序。**
 
 [![npm](https://img.shields.io/npm/v/@boxlogodev/sapstack-mcp?label=npm&color=cb3837)](https://www.npmjs.com/package/@boxlogodev/sapstack-mcp)
 [![release](https://img.shields.io/github/v/release/BoxLogoDev/sapstack?label=release&color=2ea043)](https://github.com/BoxLogoDev/sapstack/releases)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![languages](https://img.shields.io/badge/languages-6-orange)](#)
 
-**24 个插件 · 20 个代理 · 22 个命令 · MCP 23 个工具 (npm) · VS Code 扩展 v2.4.0 · 兼容 8 个 AI 工具 · 6 个国家 · 6 种语言 · 合规就绪**
+**Windows 桌面应用 v2.4.1 · 24 插件 · 21 智能体 · 23 命令 · CBO 快照 · 支持隔离网络 · 6 种语言 · 合规就绪**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 
@@ -23,113 +25,125 @@ _“在 SAP 中这是标准，所以无法更改。” — 标准小姐 ([品牌
 
 ## sapstack 是什么？
 
-**sapstack** 为 Claude、Copilot、Cursor 等 AI 工具**注入 SAP 专业知识**。覆盖 SAP 运营全生命周期 —— **Configure → Implement → Operate → Diagnose → Optimize**。
+**sapstack** 是面向 SAP 业务用户和顾问的**SAP 专用 AI 桌面应用**。
+不需要 ADT、开发权限或自己的 API 密钥 — 打开应用，输入一个问题即可。
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│ SAP 运营人员 ─┐                                               │
-│              ├─→ [AI Tool] ←── sapstack ──→ SAP 知识         │
-│ 新员工培训师 ─┤      ↓                       + IMG 指南       │
-│              ├── Evidence Loop               + 最佳实践       │
-│ 顾问 ─────────┘   (4 轮诊断)                 + 合规           │
-└──────────────────────────────────────────────────────────────┘
+"运行 F110 付款时出错"          → 4 轮 Evidence Loop 诊断（假设→证据→验证→回滚）
+"月结顺序是什么？"              → 期末结账序列 + T-code/菜单路径
+"ZFI0042 是做什么的程序？"      → 读取贵公司自定义代码（CBO 快照）并用业务语言解释
 ```
 
-> 决策原则见 [**ETHOS.md**](ETHOS.md) —— 实证优先 · 证据先行 · 禁止硬编码 · ECC≠S/4 · 现场术语 · 运营者决定。
+底层是覆盖 SAP 运维全生命周期（**Configure → Implement → Operate → Diagnose → Optimize**）的
+24 个模块知识、IMG 指南、最佳实践与合规内容；同样的知识也可在 Claude Code、MCP、VS Code 中
+使用（→ [面向开发者与高级用户的集成](#-面向开发者与高级用户的集成)）。
+
+> 决策原则见 [**ETHOS.md**](ETHOS.md) — 基于事实 · 证据优先 · 禁止硬编码 · ECC≠S/4 · 现场术语 · 由操作员决定。
 
 ---
 
 ## 👥 适合谁
 
-| 你是… | sapstack 这样帮你 |
+| 你是… | sapstack 桌面这样帮你 |
 |---|---|
-| **SAP 运营人员**（一线，赶结账） | 用 **Evidence Loop（4 轮）** 诊断故障 —— 假设→证据→验证→回滚，无需实时访问。用症状命令（`/sap-migo-debug`、`/sap-payment-run-debug` …）直接开始。 |
-| **新员工培训师 / 新人** | `sap-tutor` 对问题分类，委派给模块专家，并把答案翻译成初学者语言。始终同时给出 T-code 与菜单路径。 |
-| **SAP 顾问 / 合作伙伴** | 把 24 个模块知识 + IMG 配置 + 3 层最佳实践 + 合规注入 AI 工具，按客户环境快速落地。 |
+| **SAP 业务用户**（赶结账、无开发权限） | 在主屏输入问题即可 — 故障自动进入 **4 轮 Evidence Loop**，事实性问题直接回答。**贵公司的 Z/Y 程序**也能基于快照解释（不猜测，始终注明快照基准日）。 |
+| **管理员 / IT** | 一个 `provision.yaml` 实现**零配置部署** — 用户解压运行 exe 即可。CBO 快照夜间自动采集 → 发布到共享文件夹 → 应用自动刷新。隔离网络用内置本地 LLM。 |
+| **SAP 顾问 / 合作伙伴** | 24 个模块知识 + IMG 配置 + 三层最佳实践 + 合规，桌面与 AI 工具两侧可用 — 按客户环境快速套用。 |
 
 ---
 
-## 🧭 Golden Path — 何时用什么
+## 🖥 桌面应用能做什么
 
-不是零散的工具，而是**一条路径**。完整指南：**[docs/workflow.md](docs/workflow.md)** · 完成度差距分析：[docs/gstack-gap-analysis.md](docs/gstack-gap-analysis.md)
+### 💬 从一个问题开始
+在主屏输入即可 — 故障/事故进入 **Evidence Loop**（INTAKE→HYPOTHESIS→COLLECT→VERIFY，
+必须给出证伪条件与回滚方案），事实性问题走 **Quick Advisory** 自动分流。示例问题标签可直接套用。
 
-| 你想要的 | 路径 |
-|---|---|
-| 快速事实答案 | **Quick Advisory** — 直接提问 |
-| 故障诊断 | **Evidence Loop**（4 轮）→ 模块顾问 / 症状命令 |
-| 不确定模块 | `sap-tutor`（分类后委派专家） |
-| 配置（IMG）问题 | `/sap-img-guide` |
-| 期末结账 | `/sap-fi-closing` → `/sap-quarter-close` → `/sap-year-end` |
-| 为项目贡献 | 维护者 Golden Path |
+### 🗂 CBO 快照 — 询问贵公司的自定义代码
+管理员将自定义 ABAP（Z/Y）源码导出为快照后，应用**无需连接 SAP** 即可读取副本，用业务语言
+回答"这个程序是干什么的？"。三种交付渠道 — 随发行 ZIP 附带 · 共享文件夹自动更新 ·
+设置中"从 ZIP 导入"。所有回答均注明**快照基准日**。→ [docs/cbo-snapshot.md](docs/cbo-snapshot.md)
 
-> 卡住了就上一层（Evidence Loop），不清楚就从 `sap-tutor` 开始。
+### 📦 零配置批量部署（管理员预配置）
+在 exe 旁附带一个 `provision.yaml`，首次启动即自动配置 LLM 连接（公司密钥·网关·本地模型）、
+SAP 环境与业务用户模式 — **用户不会看到任何设置界面。** 换密钥只需提升 version 后重新分发。
+→ [docs/provisioning.md](docs/provisioning.md)
+
+### 🙋 业务用户模式
+以提问为中心的简洁主页（3 张卡片 + 示例标签），隐藏开发者菜单，无工具审批弹窗
+（默认只读）。在 设置 → 外观 中切换。
+
+### 🔒 支持隔离网络（网络分离）
+内置 `llama-server`（llama.cpp）本地推理引擎 — 用 U 盘带入 GGUF 模型包即可离线运行。
+`air_gapped: true` 时连崩溃上报与更新轮询也会关闭。
+→ [docs/compliance/air-gapped-deployment.md](docs/compliance/air-gapped-deployment.md)
+
+### 📚 底层 SAP 知识（所有回答的依据）
+- **24 个模块**：FI · CO · TR · MM · SD · PP · HCM · PM · QM · WM · EWM · ABAP · BASIS · BTP · SFSF · S4Mig · GTS · BC · Cloud PE · Session 等
+- **21 个智能体**：16 个模块顾问 + ABAP developer + Integration/S4 migration advisor + SAP tutor（新人培训） + **CBO explainer**（面向业务用户的自定义代码讲解）
+- **IMG 配置框架**：76 个基于 SPRO 的指南（含 ECC vs S/4 差异、验证方法）
+- **三层最佳实践**：Operational · Period-End · Governance
+- **6 种语言**：한국어 · English · 中文 · 日本語 · Deutsch · Tiếng Việt（24 模块 × 5 语言 quick-guide）
+- **合规**：K-SOX · SOC 2 · ISO 27001 · GDPR · PII 自动脱敏
 
 ---
 
-## ✅ 实际效果 (See it work)
+## ✅ 实际使用示例
 
-**场景**：_“我想在 MIGO 过账收货，但总是失败。”_ —— Evidence Loop 用证据而非断言逐步缩小范围。
+**场景 1**：_"用 MIGO 过账收货总是失败。"_ — Evidence Loop 用证据收敛而非武断结论。
 
 ```
-Turn 1 · INTAKE      先确认环境：ECC(EhP?) / S/4(版本?)，移动类型 (MvT)，
-                     完整错误信息 (M7 xxx)。
-Turn 2 · HYPOTHESIS  A：过账期间未打开 —— 检查：MMRV 中当前期间是否与过账日期一致？
-                     （证伪：若一致则排除 A）
-                     B：移动类型 / 科目确定 (OBYC) —— 检查：…
-Turn 3 · COLLECT     （运营者执行 MMRV → 反馈结果）
-Turn 4 · VERIFY      确认期间不匹配 → 修复：用 MMPV 滚动期间（先模拟，经 Transport）。
-                     附回滚计划 + 相关 SAP Note 指针。
+Turn 1 · INTAKE      先确认环境：ECC(EhP?) / S/4(版本?)、移动类型(MvT)、
+                     完整错误消息(M7 xxx)。
+Turn 2 · HYPOTHESIS  假设 A：过账期间未打开 — 验证：MMRV 当前期间与过账日期
+                     是否一致？（若一致则否定 A）
+                     假设 B：移动类型/科目确定(OBYC)问题 — 验证：…
+Turn 3 · COLLECT     （操作员查询 MMRV 并反馈结果）
+Turn 4 · VERIFY      确认期间不一致 → 修复：用 MMPV 结转期间（先模拟，
+                     经由 Transport）。附回滚计划 + 相关 SAP Note 指引。
 ```
 
-> 每个假设都有**证伪标准**，每个修复都有**回滚计划**。不直接写入生产 —— 由运营者决定。(→ [ETHOS](ETHOS.md))
+**场景 2**：_"ZFI0042 是干什么的？"_ — 基于 CBO 快照（虚构示例）按此格式回答：
 
----
+```
+一句话总结   （从快照源码头注释/目录派生的程序目的）
+在哪里使用   执行画面·按钮功能（T-code 映射不在快照范围内则如实说明）
+处理流程     权限检查 → 查询 → 列表/打印 等从源码读出的真实流程
+注意事项     业务用户会遇到的消息及应对（禁止猜测 — 快照里没有就答"没有"）
+基准日       本回答基于 YYYY-MM-DD 快照。
+```
 
-## 核心功能
-
-### 🎯 SAP 全模块覆盖
-FI · CO · TR · MM · SD · PP · HCM · PM · QM · WM · EWM · ABAP · BASIS · BTP · SFSF · S4Mig · GTS · BC · **Cloud PE** · Session
-
-### 🤖 19 个专家代理 + 1 个 SAP 导师
-16 个模块顾问 (FI·CO·TR·MM·SD·PP·PM·QM·EWM·HCM·IBP·SAC·Ariba·Integration-Cloud·Cloud·BASIS) + ABAP developer + Integration advisor + S4 migration advisor + **SAP tutor**（新员工培训）
-
-### 🔁 Evidence Loop (v1.5+)
-无需实时 SAP 访问即可诊断 —— **INTAKE → HYPOTHESIS → COLLECT → VERIFY** 4 轮结构，必须有证伪条件，必须配回滚
-
-### 🏗 IMG 配置框架 (v1.6+)
-76 个基于 SPRO 的配置指南 —— 配置步骤、ECC 与 S/4 差异、验证方法
-
-### 📋 3 层最佳实践
-**Operational**（日常）· **Period-End**（期末）· **Governance**（治理）—— 应用于 23 个模块
-
-### 🌐 6 种语言支持 (v1.7+)
-한국어 · English · 中文 · 日本語 · Deutsch · Tiếng Việt —— 24 模块 × 5 语言 = 120 quick-guide
-
-### ☁️ S/4HANA Cloud PE 就绪
-Clean Core · Key User Extensibility · 3-Tier Extension · Fit-to-Standard · Cloud ALM
-
-### 🚀 MCP Runtime (v2.0+)
-`@boxlogodev/sapstack-mcp` —— 在 Claude Desktop 中运行完整 Evidence Loop。**23 个工具 + 12 个提示 + 9 个资源**。
-
-### 💻 VS Code Extension (v2.4.0)
-会话管理侧栏 · YAML 校验 · Webview 渲染 · File Watcher
-
-### 🖥 Desktop
-仅限 Windows x64。安装包 `sapstack-Desktop-<版本>-Setup-x64.exe`（NSIS）及 Portable 变体。按用户安装（`%LOCALAPPDATA%\Programs\`），无需管理员权限。约 219MB（v2.4.0 实测）。捆绑 `llama-server`（llama.cpp）；将 GGUF 权重放入 `~/.sapstack/models/` 即可自动检测。隔离网：`SAPSTACK_AIRGAPPED=1` 或 `~/.sapstack/config.yaml` 中的 `air_gapped: true`。SAP 数据为粘贴方式 — 应用不直接连接 SAP 系统。安装：[docs/desktop-install.md](docs/desktop-install.md)
-
-### 🛡 合规就绪 (v2.0+)
-K-SOX · SOC 2 · ISO 27001 · GDPR · 网络隔离部署 · PII 自动脱敏
+> 每个假设都有**证伪标准**，每个修复都有**回滚计划**。只提供指引、不直接改生产 — 由操作员决定。（→ [ETHOS](ETHOS.md)）
 
 ---
 
 ## 快速开始
 
-### ⚡ 5分钟上手（推荐起点）
-非开发者也能用一条命令从安装到首次诊断。详情：[docs/quickstart-5min.md](docs/quickstart-5min.md)
+### 🖥 桌面应用（推荐 — 业务用户与顾问）
+
+**拿到发行 ZIP 的话**：解压后运行 `sapstack-Desktop-*-Portable-x64.exe` — 完成。
+（若管理员附带了 provision.yaml，则无需任何设置即可提问。）
+
+**自行安装**：从 [GitHub Releases](https://github.com/BoxLogoDev/sapstack/releases) 下载
+`sapstack-Desktop-<版本>-Setup-x64.exe`（NSIS，per-user，无需管理员权限）或 Portable 版。
+需要 Git for Windows（Git Bash），约 249MB（v2.4.1 实测）。
+→ 安装：[docs/desktop-install.md](docs/desktop-install.md) · 分发打包：[docs/provisioning.md](docs/provisioning.md)
+
+**SAP 数据的 3 条路径** — 都不会修改 SAP：
+① 默认复制粘贴 ② ADT 只读桥（设置 > SAP 连接，[docs/adt-bridge.md](docs/adt-bridge.md)）
+③ CBO 快照（离线副本，[docs/cbo-snapshot.md](docs/cbo-snapshot.md)）
+
+### ⚡ 5 分钟上手（基于仓库）
 ```bash
 git clone https://github.com/BoxLogoDev/sapstack.git && cd sapstack
 ./setup.sh        # Windows: ./setup.ps1   ·   仅检查: ./setup.sh --check
 ```
+详见：[docs/quickstart-5min.md](docs/quickstart-5min.md)
+
+---
+
+## 🔧 面向开发者与高级用户的集成
+
+使用同一套 SAP 知识的其他入口。
 
 ### Claude Code
 ```bash
@@ -137,17 +151,14 @@ git clone https://github.com/BoxLogoDev/sapstack.git && cd sapstack
 /plugin install sap-fi@sapstack sap-session@sapstack
 ```
 
-### NPM (MCP 服务器)
+### NPM（MCP 服务器）— 23 工具 + 12 提示 + 9 资源
 ```bash
 npm install -g @boxlogodev/sapstack-mcp
 sapstack-mcp --sessions-dir ~/.sapstack/sessions
 ```
 
-### VS Code Extension
-在 VS Code Marketplace 搜索 "sapstack" → Install ·（或从 [GitHub Release](https://github.com/BoxLogoDev/sapstack/releases) 直接安装 `.vsix`）
-
-### Desktop (Windows x64)
-从 [GitHub Releases](https://github.com/BoxLogoDev/sapstack/releases) 下载 `sapstack-Desktop-<版本>-Setup-x64.exe`。Windows 必须安装 Git for Windows（Git Bash）。隔离网需通过 USB 一并带入离线安装包。详情：[docs/desktop-install.md](docs/desktop-install.md)
+### VS Code 扩展
+在 VS Code Marketplace 搜索 "sapstack" → Install ·（或直接安装 [GitHub Release](https://github.com/BoxLogoDev/sapstack/releases) 中的 `.vsix`）
 
 ### Amazon Kiro IDE
 ```bash
@@ -156,23 +167,35 @@ cp sapstack/.kiro/settings/mcp.json .kiro/settings/
 cp sapstack/.kiro/steering/*.md .kiro/steering/
 ```
 
-### 其他 (Codex / Copilot / Cursor / Continue.dev / Aider)
+### 其他（Codex / Copilot / Cursor / Continue.dev / Aider）
 克隆仓库 → 自动识别。详见：[docs/multi-ai-compatibility.md](docs/multi-ai-compatibility.md)
+
+### 🧭 Golden Path — 什么情况用什么
+完整指南：[docs/workflow.md](docs/workflow.md)
+
+| 你想要 | 路径 |
+|---|---|
+| 快速的事实性回答 | **Quick Advisory** — 直接问 |
+| 故障诊断 | **Evidence Loop**（4 轮）→ 模块顾问 / 症状命令 |
+| 了解自定义（Z/Y）程序 | 在桌面主页直接问 / `/sap-cbo-explain` |
+| 不知道属于哪个模块 | `sap-tutor`（分类后转交专家） |
+| 配置（IMG）问题 | `/sap-img-guide` |
+| 期末结账 | `/sap-fi-closing` → `/sap-quarter-close` → `/sap-year-end` |
 
 ---
 
 ## Universal Rules
 
-1. **绝不硬编码** —— 禁止固定公司代码、总账科目、组织单位
-2. **环境采集优先** —— 先确认 SAP 版本、部署模式、公司代码
-3. **明确区分 ECC 与 S/4HANA** —— 明确版本差异行为
-4. **必须 Transport** —— 生产变更始终经 Transport
-5. **先模拟** —— AFAB、F.13、FAGL_FC_VAL、MR11、F110 等
-6. **禁止 SE16N 编辑** —— 不建议直接修改生产数据
-7. **T-code + SPRO 路径** —— 每项操作两者都给
-8. **韩语优先现场术语** —— 双标注 "코스트 센터 (원가센터, KOSTL)"
+1. **绝不硬编码** — 禁用固定的公司代码、总账科目、组织单元
+2. **环境信息优先** — 先确认 SAP 版本、部署模型、公司代码
+3. **明确区分 ECC 与 S/4HANA** — 说明版本间行为差异
+4. **必须走 Transport** — 生产环境变更一律经由 Transport
+5. **先模拟** — AFAB、F.13、FAGL_FC_VAL、MR11、F110 等
+6. **禁止 SE16N 编辑** — 不建议直接修改生产数据
+7. **T-code + SPRO 路径** — 每个操作都同时给出两者
+8. **韩语优先现场用语** — 如 "코스트 센터 (원가센터, KOSTL)" 双重标注
 
-> 这些规则的*原因*见 [**ETHOS.md**](ETHOS.md)，完整运营规则见 [CLAUDE.md](CLAUDE.md)。
+> 规则背后的*为什么*见 [**ETHOS.md**](ETHOS.md)，完整运行规则见 [CLAUDE.md](CLAUDE.md)。
 
 ---
 
@@ -180,9 +203,10 @@ cp sapstack/.kiro/steering/*.md .kiro/steering/
 
 | 级别 | 路径 |
 |------|------|
-| 🆕 **入门** | [教程 (15 分钟)](docs/tutorial.md) → [FAQ](docs/faq.md) |
+| 🆕 **入门** | [教程（15 分钟）](docs/tutorial.md) → [FAQ](docs/faq.md) |
+| 🖥 **桌面运维** | [安装](docs/desktop-install.md) → [预配置](docs/provisioning.md) → [CBO 快照](docs/cbo-snapshot.md) |
 | 📘 **实战** | [5 个场景](docs/scenarios/) → [术语表](docs/glossary.md) |
-| 🧭 **工作流** | [Golden Path](docs/workflow.md) → [差距分析](docs/gstack-gap-analysis.md) |
+| 🧭 **工作流** | [Golden Path](docs/workflow.md) → [完成度差距分析](docs/gstack-gap-analysis.md) |
 | 🏗 **深入** | [架构](docs/architecture.md) → [Multi-AI 指南](docs/multi-ai-compatibility.md) |
 | 🔒 **安全** | [SECURITY.md](SECURITY.md) → [合规](docs/compliance/) |
 | 🤝 **贡献** | [CONTRIBUTING](CONTRIBUTING.md) → [路线图](docs/roadmap.md) |
@@ -193,12 +217,12 @@ cp sapstack/.kiro/steering/*.md .kiro/steering/
 
 | 资产 | 数量 | 文件 |
 |------|------|------|
-| 确定 T-code | 361 | [`data/tcodes.yaml`](data/tcodes.yaml) |
+| 确认的 T-code | 472 | [`data/tcodes.yaml`](data/tcodes.yaml) |
 | 自然语言症状索引 | 90（6 种语言） | [`data/symptom-index.yaml`](data/symptom-index.yaml) |
-| 确定 SAP Note/KBA | 112 | [`data/sap-notes.yaml`](data/sap-notes.yaml) |
-| 多语言同义词 | 80+ terms × 6 langs | [`data/synonyms.yaml`](data/synonyms.yaml) |
-| 期末序列 | 24 步 | [`data/period-end-sequence.yaml`](data/period-end-sequence.yaml) |
-| 行业矩阵 | 7 industries | [`data/industry-matrix.yaml`](data/industry-matrix.yaml) |
+| 确认的 SAP Note/KBA | 112 | [`data/sap-notes.yaml`](data/sap-notes.yaml) |
+| 多语言同义词 | 80+ 术语 × 6 语言 | [`data/synonyms.yaml`](data/synonyms.yaml) |
+| 期末结账序列 | 24 步 | [`data/period-end-sequence.yaml`](data/period-end-sequence.yaml) |
+| 行业矩阵 | 7 个行业 | [`data/industry-matrix.yaml`](data/industry-matrix.yaml) |
 
 ---
 
@@ -208,27 +232,27 @@ cp sapstack/.kiro/steering/*.md .kiro/steering/
 |------|----------|
 | 💰 **财务** | [sap-fi](plugins/sap-fi/) · [sap-co](plugins/sap-co/) · [sap-tr](plugins/sap-tr/) |
 | 📦 **物流** | [sap-mm](plugins/sap-mm/) · [sap-sd](plugins/sap-sd/) · [sap-pp](plugins/sap-pp/) · [sap-pm](plugins/sap-pm/) · [sap-qm](plugins/sap-qm/) · [sap-wm](plugins/sap-wm/) · [sap-ewm](plugins/sap-ewm/) |
-| 👥 **人力资源** | [sap-hcm](plugins/sap-hcm/) · [sap-sfsf](plugins/sap-sfsf/) |
+| 👥 **人力** | [sap-hcm](plugins/sap-hcm/) · [sap-sfsf](plugins/sap-sfsf/) |
 | 💻 **技术** | [sap-abap](plugins/sap-abap/) · [sap-s4-migration](plugins/sap-s4-migration/) · [sap-btp](plugins/sap-btp/) · [sap-basis](plugins/sap-basis/) · [sap-cloud](plugins/sap-cloud/) |
 | ☁️ **云/集成** | [sap-ibp](plugins/sap-ibp/) · [sap-sac](plugins/sap-sac/) · [sap-ariba](plugins/sap-ariba/) · [sap-integration-cloud](plugins/sap-integration-cloud/) |
 | 🇰🇷 **韩国/全球** | [sap-bc](plugins/sap-bc/) · [sap-gts](plugins/sap-gts/) |
-| 🔁 **元** | [sap-session](plugins/sap-session/) (Evidence Loop) |
+| 🔁 **元** | [sap-session](plugins/sap-session/)（Evidence Loop） |
 
 ---
 
-## 多语言审校 — 欢迎贡献
+## 多语言审校贡献
 
-5 种语言（en/zh/ja/de/vi）的 quick-guide 为 **Claude 撰写的初稿**。欢迎各语言母语者 + SAP 领域专家审校。
+5 种语言（en/zh/ja/de/vi）的 quick-guide 均为 **Claude 撰写的草稿**。欢迎各语言母语者 + SAP 领域专家审校。
 
-- 流程 · 标准 · PR 格式：**[docs/TRANSLATION-REVIEW.md](docs/TRANSLATION-REVIEW.md)**
+- 流程·评审标准·PR 格式：**[docs/TRANSLATION-REVIEW.md](docs/TRANSLATION-REVIEW.md)**
 - 反馈：[Translation Feedback issue](https://github.com/BoxLogoDev/sapstack/issues/new?template=translation-feedback.md)
 - T-code/Note 编号不翻译（保持原样）
 
 ---
 
-## 许可证 & 贡献
+## 许可证与贡献
 
-**MIT License** —— 商业与非商业使用均自由。请保留版权声明。
+**MIT License** — 商用/非商用皆可自由使用。保留版权声明。
 
 - 🐛 [Bug 报告](https://github.com/BoxLogoDev/sapstack/issues/new?template=bug_report.md)
 - ✨ [功能请求](https://github.com/BoxLogoDev/sapstack/issues/new?template=feature_request.md)

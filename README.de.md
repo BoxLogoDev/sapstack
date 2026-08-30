@@ -2,18 +2,20 @@
 
 # 🏛 sapstack
 
-<img src="docs/assets/mascot/standard-en.png" alt="Ms. Standard — das sapstack-Maskottchen" width="280" />
+<img src="docs/assets/mascot/standard-en.png" alt="Frau Standard — das sapstack-Maskottchen" width="280" />
 
-_„In SAP ist das Standard, also kann es nicht geändert werden." — Ms. Standard ([Markenrichtlinie](MASCOT.md))_
+_„In SAP ist das Standard, das geht nicht." — Frau Standard ([Markenrichtlinie](MASCOT.md))_
 
-### AI-Codierungsassistent für SAP-Unternehmensoperationen
+### Der KI-Desktop für den SAP-Betrieb
+
+**Installieren und einfach fragen — vom Standardprozess bis zu den kundeneigenen (Z/Y) Programmen Ihrer Firma.**
 
 [![npm](https://img.shields.io/npm/v/@boxlogodev/sapstack-mcp?label=npm&color=cb3837)](https://www.npmjs.com/package/@boxlogodev/sapstack-mcp)
 [![release](https://img.shields.io/github/v/release/BoxLogoDev/sapstack?label=release&color=2ea043)](https://github.com/BoxLogoDev/sapstack/releases)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![languages](https://img.shields.io/badge/languages-6-orange)](#)
 
-**24 Plugins · 20 Agenten · 22 Befehle · MCP 23 Tools (npm) · VS Code-Erweiterung v2.4.0 · 8 KI-Tool-Kompatibilität · 6 Länder · 6 Sprachen · Konformitätsbereit**
+**Windows-Desktop-App v2.4.1 · 24 Plugins · 21 Agenten · 23 Befehle · CBO-Snapshots · Air-Gap-fähig · 6 Sprachen · Compliance-ready**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 
@@ -23,113 +25,133 @@ _„In SAP ist das Standard, also kann es nicht geändert werden." — Ms. Stand
 
 ## Was ist sapstack?
 
-**sapstack** spritzt **SAP-Fachwissen** in KI-Tools wie Claude, Copilot und Cursor ein. Es deckt den gesamten SAP-Betriebslebenszyklus ab — **Configure → Implement → Operate → Diagnose → Optimize**.
+**sapstack** ist eine **dedizierte SAP-KI-Desktop-App** für Anwender und Berater.
+Kein ADT, keine Entwicklerberechtigungen, kein eigener API-Schlüssel — App öffnen, Frage eintippen.
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│ SAP-Betreiber ┐                                               │
-│              ├─→ [AI Tool] ←── sapstack ──→ SAP-Wissen       │
-│ Trainer für ──┤      ↓                       + IMG-Leitfäden  │
-│ Neulinge     ├── Evidence Loop               + Best Practice  │
-│ Berater ──────┘   (4-Turn-Diagnose)          + Compliance     │
-└──────────────────────────────────────────────────────────────┘
+„Der F110-Zahllauf bricht mit Fehler ab"      → 4-Turn Evidence Loop (Hypothese→Beweis→Verifikation→Rollback)
+„Wie ist die Reihenfolge beim Monatsabschluss?" → Abschluss-Sequenz mit T-Codes und Menüpfaden
+„Was macht das Programm ZFI0042?"              → Liest den kundeneigenen Code (CBO-Snapshot) und erklärt ihn
 ```
 
-> Die Entscheidungsprinzipien stehen in [**ETHOS.md**](ETHOS.md) — Ground-truth · Evidenz zuerst · Kein Hardcoding · ECC≠S/4 · Feldsprache · Betreiber entscheidet.
+Darunter liegt SAP-Wissen über den gesamten Betriebslebenszyklus
+(**Configure → Implement → Operate → Diagnose → Optimize**) — 24 Modul-Plugins, IMG-Leitfäden,
+Best Practices und Compliance — dasselbe Wissen ist auch aus Claude Code, MCP und VS Code
+nutzbar (→ [Integrationen für Entwickler & Power-User](#-integrationen-für-entwickler--power-user)).
+
+> Entscheidungsprinzipien: [**ETHOS.md**](ETHOS.md) — Ground-Truth · Beweise zuerst · kein Hardcoding · ECC≠S/4 · Praxisterminologie · der Operator entscheidet.
 
 ---
 
-## 👥 Für wen das ist
+## 👥 Für wen
 
-| Sie sind… | sapstack macht das |
+| Sie sind… | Der sapstack-Desktop bietet |
 |---|---|
-| **SAP-Betreiber** (im Tagesgeschäft, im Abschlussstress) | Störungen über den **Evidence Loop (4 Runden)** diagnostizieren — Hypothese→Evidenz→Verifizierung→Rollback, ohne Live-Zugriff. Direkt einsteigen mit Symptom-Befehlen (`/sap-migo-debug`, `/sap-payment-run-debug` …). |
-| **Trainer für Neulinge / neue Mitarbeitende** | `sap-tutor` klassifiziert die Frage, delegiert an einen Modulspezialisten und übersetzt die Antwort in Anfängersprache. T-Code + Menüpfad immer gepaart. |
-| **SAP-Berater / Partner** | 24 Module Wissen + IMG-Konfiguration + 3-Tier Best Practice + Compliance in KI-Tools einspeisen, pro Kundenlandschaft angepasst. |
+| **SAP-Anwender** (im Abschlussstress, ohne Entwicklerrechte) | Frage auf dem Startbildschirm eintippen — Störungen laufen in den **4-Turn Evidence Loop**, Faktenfragen werden direkt beantwortet. Auch die **Z/Y-Programme Ihrer Firma** werden auf Snapshot-Basis erklärt (kein Raten, Stichtag wird immer genannt). |
+| **Administrator / IT** | **Zero-Config-Rollout** mit einer einzigen `provision.yaml` — Anwender entpacken das ZIP und starten die exe, fertig. CBO-Snapshots werden nächtlich gesammelt, auf eine Netzwerkfreigabe publiziert und von der App selbst aktualisiert. Air-Gapped-Standorte nutzen das mitgelieferte lokale LLM. |
+| **SAP-Berater / Partner** | 24 Module Wissen + IMG-Konfiguration + 3-Tier Best Practices + Compliance — im Desktop und in Ihren KI-Tools, schnell pro Kundenumgebung angewendet. |
 
 ---
 
-## 🧭 Golden Path — was wann verwenden
+## 🖥 Was der Desktop kann
 
-Keine verstreuten Werkzeuge, sondern **ein Weg**. Vollständige Anleitung: **[docs/workflow.md](docs/workflow.md)** · Vollständigkeits-Gap-Analyse: [docs/gstack-gap-analysis.md](docs/gstack-gap-analysis.md)
+### 💬 Mit einer Frage starten
+Einfach eintippen — Störungen verzweigen in den **Evidence Loop**
+(INTAKE→HYPOTHESIS→COLLECT→VERIFY, Falsifikationskriterien und Rollback-Paare Pflicht),
+Faktenfragen in die **Quick Advisory**. Beispielfragen-Chips helfen bei der ersten Frage.
 
-| Was Sie wollen | Der Weg |
-|---|---|
-| Schnelle Faktantwort | **Quick Advisory** — einfach fragen |
-| Störungsdiagnose | **Evidence Loop** (4 Runden) → Modul-Consultant / Symptom-Befehl |
-| Modul unbekannt | `sap-tutor` (klassifiziert, delegiert an Spezialist) |
-| Konfiguration (IMG) | `/sap-img-guide` |
-| Periodenabschluss | `/sap-fi-closing` → `/sap-quarter-close` → `/sap-year-end` |
-| Zum Projekt beitragen | Maintainer Golden Path |
+### 🗂 CBO-Snapshots — Fragen zum kundeneigenen Code
+Ein Administrator exportiert kundeneigene ABAP-Quellen (Z/Y) in einen Snapshot; die App liest
+diese Kopie **ohne SAP-Verbindung** und beantwortet „was macht dieses Programm?" in
+Anwendersprache. Drei Lieferwege — im Distributions-ZIP gebündelt · Auto-Refresh von einer
+Netzwerkfreigabe · „Aus ZIP importieren" in den Einstellungen. Jede Antwort nennt den
+**Snapshot-Stichtag**. → [docs/cbo-snapshot.md](docs/cbo-snapshot.md)
 
-> Stecken geblieben? Eine Ebene höher (Evidence Loop). Unsicher? Mit `sap-tutor` starten.
+### 📦 Zero-Config-Massenrollout (Admin-Provisionierung)
+Eine `provision.yaml` neben der exe genügt: Der erste Start konfiguriert LLM-Verbindung
+(Firmenschlüssel, Gateway oder lokales Modell), SAP-Umgebung und Anwendermodus automatisch —
+**Anwender sehen keinerlei Einrichtungsbildschirm.** Schlüsselrotation = Version hochzählen und
+neu verteilen. → [docs/provisioning.md](docs/provisioning.md)
+
+### 🙋 Anwendermodus
+Ein einfacher, fragenzentrierter Start (3 Karten + Beispiel-Chips), Entwicklermenüs ausgeblendet,
+keine Tool-Freigabedialoge (standardmäßig schreibgeschützt). Umschaltbar unter Einstellungen → Aussehen.
+
+### 🔒 Air-Gap-Unterstützung (getrennte Netze)
+Bündelt die lokale Inferenz-Engine `llama-server` (llama.cpp) — GGUF-Modellpakete per USB
+einbringen, läuft ohne Internet. Mit `air_gapped: true` sind auch Crash-Reporting und
+Update-Polling deaktiviert. → [docs/compliance/air-gapped-deployment.md](docs/compliance/air-gapped-deployment.md)
+
+### 📚 Das SAP-Wissen darunter (Basis jeder Antwort)
+- **24 Module**: FI · CO · TR · MM · SD · PP · HCM · PM · QM · WM · EWM · ABAP · BASIS · BTP · SFSF · S4Mig · GTS · BC · Cloud PE · Session u. a.
+- **21 Agenten**: 16 Modulberater + ABAP developer + Integration-/S4-Migration-Advisor + SAP tutor (Onboarding) + **CBO explainer** (Custom-Code-Erklärungen für Anwender)
+- **IMG-Konfigurationsframework**: 76 SPRO-basierte Leitfäden (ECC-vs-S/4-Unterschiede, Verifikationsschritte)
+- **3-Tier Best Practices**: Operational · Period-End · Governance
+- **6 Sprachen**: 한국어 · English · 中文 · 日本語 · Deutsch · Tiếng Việt (24 Module × 5 Sprachen Quick-Guides)
+- **Compliance**: K-SOX · SOC 2 · ISO 27001 · GDPR · automatische PII-Maskierung
 
 ---
 
-## ✅ So funktioniert es (See it work)
+## ✅ So arbeitet es
 
-**Szenario**: _„Ich versuche, einen Wareneingang in MIGO zu buchen, aber es schlägt immer fehl."_ — der Evidence Loop grenzt mit Evidenz ein, nicht mit Behauptungen.
+**Szenario 1**: _„Die MIGO-Wareneingangsbuchung schlägt immer wieder fehl."_ — Der Evidence Loop grenzt mit Beweisen ein, statt zu behaupten.
 
 ```
-Turn 1 · INTAKE      Zuerst die Umgebung: ECC(EhP?) / S/4(Release?), Bewegungsart (BWA),
+Turn 1 · INTAKE      Zuerst die Umgebung: ECC (EhP?) / S/4 (Release?), Bewegungsart (MvT),
                      vollständige Fehlermeldung (M7 xxx).
-Turn 2 · HYPOTHESIS  A: Buchungsperiode nicht offen — Prüfung: Zeigt MMRV die aktuelle
-                     Periode passend zum Buchungsdatum? (Falsifikation: passt sie, A verwerfen)
-                     B: Bewegungsart / Kontenfindung (OBYC) — Prüfung: …
-Turn 3 · COLLECT     (Betreiber führt MMRV aus → meldet das Ergebnis)
-Turn 4 · VERIFY      Periodenkonflikt bestätigt → Fix: Periode mit MMPV verschieben
-                     (zuerst simulieren, via Transport). Rollback-Plan + relevanter SAP-Note-Verweis.
+Turn 2 · HYPOTHESIS  Hypothese A: Buchungsperiode nicht offen — Prüfung: stimmt die aktuelle
+                     Periode in MMRV mit dem Buchungsdatum überein? (falsifiziert → A verwerfen)
+                     Hypothese B: Bewegungsart/Kontenfindung (OBYC) — Prüfung: …
+Turn 3 · COLLECT     (Der Operator prüft MMRV und meldet das Ergebnis)
+Turn 4 · VERIFY      Periodenabweichung bestätigt → Fix: Periode mit MMPV fortschreiben
+                     (erst simulieren, via Transport). Rollback-Plan + SAP-Note-Verweise inklusive.
 ```
 
-> Jede Hypothese trägt ein **Falsifikationskriterium**, jeder Fix einen **Rollback-Plan**. Keine direkten Produktivschreibvorgänge — der Betreiber entscheidet. (→ [ETHOS](ETHOS.md))
+**Szenario 2**: _„Was macht ZFI0042?"_ — beantwortet aus dem CBO-Snapshot (fiktives Beispiel), in diesem Format:
+
+```
+Kurzfassung     (Programmzweck, abgeleitet aus Quellkopf/Katalog des Snapshots)
+Wo genutzt      Dynpros und Schaltflächen (liegt das T-Code-Mapping außerhalb des Snapshots,
+                wird das gesagt)
+Ablauf          Berechtigungsprüfung → Abfrage → Liste/Druck — der real aus dem Quelltext
+                gelesene Ablauf
+Achtung         Meldungen, die Anwender sehen, und was zu tun ist (kein Raten — was nicht im
+                Snapshot steht, wird als „nicht vorhanden" beantwortet)
+Stichtag        Diese Antwort basiert auf dem Snapshot vom JJJJ-MM-TT.
+```
+
+> Jede Hypothese trägt ein **Falsifikationskriterium**, jeder Fix einen **Rollback-Plan**. Nur Anleitung, keine direkten Produktivänderungen — der Operator entscheidet. (→ [ETHOS](ETHOS.md))
 
 ---
 
-## Kernfunktionen
+## Schnellstart
 
-### 🎯 Vollständige SAP-Modulabdeckung
-FI · CO · TR · MM · SD · PP · HCM · PM · QM · WM · EWM · ABAP · BASIS · BTP · SFSF · S4Mig · GTS · BC · **Cloud PE** · Session
+### 🖥 Desktop (empfohlen — Anwender & Berater)
 
-### 🤖 19 Spezialagenten + 1 SAP-Tutor
-16 Modulberater (FI·CO·TR·MM·SD·PP·PM·QM·EWM·HCM·IBP·SAC·Ariba·Integration-Cloud·Cloud·BASIS) + ABAP developer + Integration advisor + S4 migration advisor + **SAP tutor** (Einarbeitung)
+**Distributions-ZIP erhalten?** Entpacken und `sapstack-Desktop-*-Portable-x64.exe` starten — fertig.
+(Hat der Admin eine provision.yaml beigelegt, können Sie ohne jeden Einrichtungsschritt fragen.)
 
-### 🔁 Evidence Loop (v1.5+)
-Diagnose ohne Live-SAP-Zugriff — **INTAKE → HYPOTHESIS → COLLECT → VERIFY** 4-Runden-Struktur, Falsifikationskriterien erforderlich, Rollback-Paarung erforderlich
+**Selbst installieren**: `sapstack-Desktop-<Version>-Setup-x64.exe` (NSIS, per-user, keine
+Adminrechte) oder die Portable-Variante von den [GitHub Releases](https://github.com/BoxLogoDev/sapstack/releases)
+laden. Git for Windows (Git Bash) erforderlich; ca. 249 MB (gemessen mit v2.4.1).
+→ Installation: [docs/desktop-install.md](docs/desktop-install.md) · Paketierung: [docs/provisioning.md](docs/provisioning.md)
 
-### 🏗 IMG-Konfigurationsframework (v1.6+)
-76 SPRO-basierte Konfigurationsleitfäden — Konfigurationsschritte, ECC vs. S/4-Unterschiede, Verifizierungsmethoden
+**Drei SAP-Datenwege** — keiner verändert SAP:
+① Copy-Paste als Standard ② schreibgeschützte ADT-Bridge (Einstellungen > SAP-Verbindung, [docs/adt-bridge.md](docs/adt-bridge.md))
+③ CBO-Snapshots (Offline-Kopie, [docs/cbo-snapshot.md](docs/cbo-snapshot.md))
 
-### 📋 3-Tier Best Practice
-**Operational** (täglich) · **Period-End** (Abschluss) · **Governance** — auf 23 Module angewandt
-
-### 🌐 6-Sprachen-Unterstützung (v1.7+)
-한국어 · English · 中文 · 日本語 · Deutsch · Tiếng Việt — 24 Module × 5 Sprachen = 120 Quick-Guides
-
-### ☁️ S/4HANA Cloud PE bereit
-Clean Core · Key User Extensibility · 3-Tier Extension · Fit-to-Standard · Cloud ALM
-
-### 🚀 MCP Runtime (v2.0+)
-`@boxlogodev/sapstack-mcp` — den vollständigen Evidence Loop aus Claude Desktop ausführen. **23 Tools + 12 Prompts + 9 Ressourcen**.
-
-### 💻 VS Code Extension (v2.4.0)
-Sitzungs-Seitenleiste · YAML-Validierung · Webview-Rendering · File Watcher
-
-### 🖥 Desktop
-Nur Windows x64. Installer `sapstack-Desktop-<Version>-Setup-x64.exe` (NSIS) plus Portable-Variante. Per-User-Installation (`%LOCALAPPDATA%\Programs\`), keine Administratorrechte. Etwa 219MB (gemessen an v2.4.0). Enthält die Engine `llama-server` (llama.cpp); GGUF-Gewichte in `~/.sapstack/models/` werden automatisch erkannt. Air-Gap: `SAPSTACK_AIRGAPPED=1` oder `air_gapped: true` in `~/.sapstack/config.yaml`. SAP-Daten per Einfügen — die App verbindet sich nicht mit SAP-Systemen. Installation: [docs/desktop-install.md](docs/desktop-install.md)
-
-### 🛡 Konformitätsbereit (v2.0+)
-K-SOX · SOC 2 · ISO 27001 · GDPR · Air-Gap-Bereitstellung · automatische PII-Maskierung
-
----
-
-## Schnelleinstieg
-
-### ⚡ 5-Minuten-Onboarding (empfohlener Start)
-Von der Installation bis zur ersten Diagnose mit einem Befehl — kein Programmieren nötig. Details: [docs/quickstart-5min.md](docs/quickstart-5min.md)
+### ⚡ 5-Minuten-Onboarding (Repository-basiert)
 ```bash
 git clone https://github.com/BoxLogoDev/sapstack.git && cd sapstack
 ./setup.sh        # Windows: ./setup.ps1   ·   nur prüfen: ./setup.sh --check
 ```
+Details: [docs/quickstart-5min.md](docs/quickstart-5min.md)
+
+---
+
+## 🔧 Integrationen für Entwickler & Power-User
+
+Weitere Zugänge zum selben SAP-Wissen.
 
 ### Claude Code
 ```bash
@@ -137,17 +159,14 @@ git clone https://github.com/BoxLogoDev/sapstack.git && cd sapstack
 /plugin install sap-fi@sapstack sap-session@sapstack
 ```
 
-### NPM (MCP-Server)
+### NPM (MCP-Server) — 23 Tools + 12 Prompts + 9 Ressourcen
 ```bash
 npm install -g @boxlogodev/sapstack-mcp
 sapstack-mcp --sessions-dir ~/.sapstack/sessions
 ```
 
-### VS Code Extension
-Im VS Code Marketplace nach "sapstack" suchen → Install ·(oder die `.vsix` direkt aus einem [GitHub Release](https://github.com/BoxLogoDev/sapstack/releases) installieren)
-
-### Desktop (Windows x64)
-`sapstack-Desktop-<Version>-Setup-x64.exe` von [GitHub Releases](https://github.com/BoxLogoDev/sapstack/releases) herunterladen. Unter Windows ist Git for Windows (Git Bash) erforderlich. Im Air-Gap-Netz die Offline-Installer zusätzlich per USB mitbringen. Details: [docs/desktop-install.md](docs/desktop-install.md)
+### VS-Code-Erweiterung
+Im VS Code Marketplace nach „sapstack" suchen → Install · (oder die `.vsix` direkt aus einem [GitHub Release](https://github.com/BoxLogoDev/sapstack/releases) installieren)
 
 ### Amazon Kiro IDE
 ```bash
@@ -156,23 +175,35 @@ cp sapstack/.kiro/settings/mcp.json .kiro/settings/
 cp sapstack/.kiro/steering/*.md .kiro/steering/
 ```
 
-### Andere (Codex / Copilot / Cursor / Continue.dev / Aider)
-Repo klonen → automatisch erkannt. Details: [docs/multi-ai-compatibility.md](docs/multi-ai-compatibility.md)
+### Weitere (Codex / Copilot / Cursor / Continue.dev / Aider)
+Repository klonen → automatische Erkennung. Details: [docs/multi-ai-compatibility.md](docs/multi-ai-compatibility.md)
+
+### 🧭 Golden Path — was wann nutzen
+Vollständiger Leitfaden: [docs/workflow.md](docs/workflow.md)
+
+| Sie möchten | Der Weg |
+|---|---|
+| Eine schnelle Faktenantwort | **Quick Advisory** — einfach fragen |
+| Störungsdiagnose | **Evidence Loop** (4 Turns) → Modulberater / Symptom-Befehle |
+| Ein kundeneigenes (Z/Y) Programm verstehen | Auf dem Desktop-Start direkt fragen / `/sap-cbo-explain` |
+| Modul unbekannt | `sap-tutor` (klassifiziert und delegiert an Spezialisten) |
+| Ein Konfigurationsproblem (IMG) | `/sap-img-guide` |
+| Periodenabschluss | `/sap-fi-closing` → `/sap-quarter-close` → `/sap-year-end` |
 
 ---
 
 ## Universal Rules
 
-1. **Niemals hardcoden** — keine festen Buchungskreise, Sachkonten oder Org-Einheiten
-2. **Umgebungsabfrage zuerst** — SAP-Release, Bereitstellungsmodell, Buchungskreis klären
-3. **ECC vs. S/4HANA explizit unterscheiden** — versionsspezifisches Verhalten klar machen
-4. **Transport erforderlich** — Produktivänderungen immer über Transport
-5. **Zuerst simulieren** — AFAB, F.13, FAGL_FC_VAL, MR11, F110 usw.
-6. **Keine SE16N-Bearbeitung** — direkte Produktivdatenänderungen nicht empfehlen
-7. **T-Code + SPRO-Pfad** — für jede Aktion beides angeben
-8. **Koreanisch: Feldsprache zuerst** — Doppelnotation "코스트 센터 (원가센터, KOSTL)"
+1. **Niemals hardcoden** — keine festen Buchungskreise, Sachkonten oder Organisationseinheiten
+2. **Umgebungsaufnahme zuerst** — SAP-Release, Deployment-Modell, Buchungskreis
+3. **ECC vs. S/4HANA explizit unterscheiden** — versionsspezifisches Verhalten klar benennen
+4. **Transport Pflicht** — Produktivänderungen immer via Transport
+5. **Erst simulieren** — AFAB, F.13, FAGL_FC_VAL, MR11, F110 usw.
+6. **Kein SE16N-Editieren** — keine direkten Datenänderungen in Produktion empfehlen
+7. **T-Code + SPRO-Pfad** — beides zu jeder Maßnahme
+8. **Koreanisch mit Praxisterminologie zuerst** — Doppelnotation wie „코스트 센터 (원가센터, KOSTL)"
 
-> Das *Warum* hinter diesen Regeln steht in [**ETHOS.md**](ETHOS.md), die vollständigen Betriebsregeln in [CLAUDE.md](CLAUDE.md).
+> Das *Warum* hinter den Regeln: [**ETHOS.md**](ETHOS.md) · vollständige Betriebsregeln: [CLAUDE.md](CLAUDE.md).
 
 ---
 
@@ -181,24 +212,25 @@ Repo klonen → automatisch erkannt. Details: [docs/multi-ai-compatibility.md](d
 | Stufe | Pfad |
 |------|------|
 | 🆕 **Einstieg** | [Tutorial (15 Min.)](docs/tutorial.md) → [FAQ](docs/faq.md) |
+| 🖥 **Desktop-Betrieb** | [Installation](docs/desktop-install.md) → [Provisionierung](docs/provisioning.md) → [CBO-Snapshots](docs/cbo-snapshot.md) |
 | 📘 **Praxis** | [5 Szenarien](docs/scenarios/) → [Glossar](docs/glossary.md) |
-| 🧭 **Workflow** | [Golden Path](docs/workflow.md) → [Gap-Analyse](docs/gstack-gap-analysis.md) |
+| 🧭 **Workflow** | [Golden Path](docs/workflow.md) → [Vollständigkeits-Gap-Analyse](docs/gstack-gap-analysis.md) |
 | 🏗 **Vertiefung** | [Architektur](docs/architecture.md) → [Multi-AI-Leitfaden](docs/multi-ai-compatibility.md) |
 | 🔒 **Sicherheit** | [SECURITY.md](SECURITY.md) → [Compliance](docs/compliance/) |
-| 🤝 **Beitragen** | [CONTRIBUTING](CONTRIBUTING.md) → [Roadmap](docs/roadmap.md) |
+| 🤝 **Mitwirken** | [CONTRIBUTING](CONTRIBUTING.md) → [Roadmap](docs/roadmap.md) |
 
 ---
 
 ## Datenbestände
 
-| Asset | Anzahl | Datei |
+| Bestand | Anzahl | Datei |
 |------|------|------|
-| Verifizierte T-Codes | 361 | [`data/tcodes.yaml`](data/tcodes.yaml) |
-| Natürlichsprachiger Symptomindex | 90 (6 Sprachen) | [`data/symptom-index.yaml`](data/symptom-index.yaml) |
+| Verifizierte T-Codes | 472 | [`data/tcodes.yaml`](data/tcodes.yaml) |
+| Natürlichsprachlicher Symptomindex | 90 (6 Sprachen) | [`data/symptom-index.yaml`](data/symptom-index.yaml) |
 | Verifizierte SAP Notes/KBAs | 112 | [`data/sap-notes.yaml`](data/sap-notes.yaml) |
-| Mehrsprachige Synonyme | 80+ terms × 6 langs | [`data/synonyms.yaml`](data/synonyms.yaml) |
-| Periodenabschlusssequenz | 24 Schritte | [`data/period-end-sequence.yaml`](data/period-end-sequence.yaml) |
-| Branchenmatrix | 7 industries | [`data/industry-matrix.yaml`](data/industry-matrix.yaml) |
+| Mehrsprachige Synonyme | 80+ Begriffe × 6 Sprachen | [`data/synonyms.yaml`](data/synonyms.yaml) |
+| Periodenabschluss-Sequenz | 24 Schritte | [`data/period-end-sequence.yaml`](data/period-end-sequence.yaml) |
+| Branchenmatrix | 7 Branchen | [`data/industry-matrix.yaml`](data/industry-matrix.yaml) |
 
 ---
 
@@ -209,29 +241,29 @@ Repo klonen → automatisch erkannt. Details: [docs/multi-ai-compatibility.md](d
 | 💰 **Finanzen** | [sap-fi](plugins/sap-fi/) · [sap-co](plugins/sap-co/) · [sap-tr](plugins/sap-tr/) |
 | 📦 **Logistik** | [sap-mm](plugins/sap-mm/) · [sap-sd](plugins/sap-sd/) · [sap-pp](plugins/sap-pp/) · [sap-pm](plugins/sap-pm/) · [sap-qm](plugins/sap-qm/) · [sap-wm](plugins/sap-wm/) · [sap-ewm](plugins/sap-ewm/) |
 | 👥 **Personal** | [sap-hcm](plugins/sap-hcm/) · [sap-sfsf](plugins/sap-sfsf/) |
-| 💻 **Technologie** | [sap-abap](plugins/sap-abap/) · [sap-s4-migration](plugins/sap-s4-migration/) · [sap-btp](plugins/sap-btp/) · [sap-basis](plugins/sap-basis/) · [sap-cloud](plugins/sap-cloud/) |
+| 💻 **Technik** | [sap-abap](plugins/sap-abap/) · [sap-s4-migration](plugins/sap-s4-migration/) · [sap-btp](plugins/sap-btp/) · [sap-basis](plugins/sap-basis/) · [sap-cloud](plugins/sap-cloud/) |
 | ☁️ **Cloud/Integration** | [sap-ibp](plugins/sap-ibp/) · [sap-sac](plugins/sap-sac/) · [sap-ariba](plugins/sap-ariba/) · [sap-integration-cloud](plugins/sap-integration-cloud/) |
 | 🇰🇷 **Korea/Global** | [sap-bc](plugins/sap-bc/) · [sap-gts](plugins/sap-gts/) |
 | 🔁 **Meta** | [sap-session](plugins/sap-session/) (Evidence Loop) |
 
 ---
 
-## Übersetzungsreview — Beiträge willkommen
+## Mitwirkung an Übersetzungsreviews
 
-Die Quick-Guides in 5 Sprachen (en/zh/ja/de/vi) sind **von Claude erstellte Entwürfe**. Review durch Muttersprachler + SAP-Fachexperten ist willkommen.
+Die Quick-Guides in 5 Sprachen (en/zh/ja/de/vi) sind **von Claude verfasste Entwürfe**. Reviews durch Muttersprachler mit SAP-Domänenwissen sind sehr willkommen.
 
-- Prozess · Kriterien · PR-Format: **[docs/TRANSLATION-REVIEW.md](docs/TRANSLATION-REVIEW.md)**
-- Feedback: [Translation Feedback Issue](https://github.com/BoxLogoDev/sapstack/issues/new?template=translation-feedback.md)
-- T-Code/Note-Nummern werden nicht übersetzt (wortgetreu beibehalten)
+- Prozess, Kriterien, PR-Format: **[docs/TRANSLATION-REVIEW.md](docs/TRANSLATION-REVIEW.md)**
+- Feedback: [Translation-Feedback-Issue](https://github.com/BoxLogoDev/sapstack/issues/new?template=translation-feedback.md)
+- T-Codes/Note-Nummern werden nicht übersetzt (Original beibehalten)
 
 ---
 
-## Lizenz & Beitrag
+## Lizenz & Mitwirken
 
-**MIT License** — frei für kommerzielle und nicht-kommerzielle Nutzung. Copyright-Hinweis beibehalten.
+**MIT License** — freie kommerzielle und nichtkommerzielle Nutzung. Copyright-Hinweis beibehalten.
 
-- 🐛 [Fehlerbericht](https://github.com/BoxLogoDev/sapstack/issues/new?template=bug_report.md)
-- ✨ [Funktionswunsch](https://github.com/BoxLogoDev/sapstack/issues/new?template=feature_request.md)
+- 🐛 [Bug melden](https://github.com/BoxLogoDev/sapstack/issues/new?template=bug_report.md)
+- ✨ [Feature anfragen](https://github.com/BoxLogoDev/sapstack/issues/new?template=feature_request.md)
 - 💬 [Diskussionen](https://github.com/BoxLogoDev/sapstack/discussions)
 - 📖 [Beitragsleitfaden](CONTRIBUTING.md)
 
