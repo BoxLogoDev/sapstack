@@ -98,6 +98,7 @@ powershell -ExecutionPolicy Bypass -File scripts/cbo/make-distribution.ps1 -Sid 
 
 | 증상 | 조치 |
 |---|---|
+| `치명: 수집 0건 (열거 전패…)` | 사내망/VPN 미연결 상태 — 직전 스냅샷이 자동 복원되며 exit 1. 망 연결 후 재실행 |
 | `SAP_URL/SAP_USER 필요` | `~/.sapstack/.env` 생성 — setup 스크립트 [3/5] |
 | status: partial | `meta/failures.json` 의 reason 확인 → 재실행 (성공분은 유지) |
 | 열거 0건 | SAP 계정의 S_DEVELOP 조회 권한, `vsp search "Z*"` 로 단독 확인 |

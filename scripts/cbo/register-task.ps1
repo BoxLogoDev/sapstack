@@ -34,14 +34,21 @@ if ($Publish -eq "unc") {
   $Cmd += " & robocopy $SnapshotDir $ShareRoot\$Sid /E /XD .git /NFL /NDL /NJH /NJS /NP >> $LogDir\export-log.txt 2>&1"
 }
 
+# schtasks /TR 은 261자 한계 — 전체 체인을 러너 .cmd 로 떨어뜨리고 /TR 은 러너만 가리킨다.
+# 러너는 스냅샷 폴더 밖(~/.sapstack/cbo/)에 둬서 robocopy 게시본에 섞이지 않게 한다.
+$Runner = Join-Path (Split-Path $SnapshotDir -Parent) "run-export-$Sid.cmd"
+
 if ($PrintOnly) {
+  Write-Host "러너($Runner) 내용:"
+  Write-Host "  $Cmd"
   Write-Host "등록될 명령:"
-  Write-Host "  schtasks /Create /TN $TaskName /SC WEEKLY /D MON,TUE,WED,THU,FRI /ST $At /TR `"cmd /c $Cmd`" /F"
+  Write-Host "  schtasks /Create /TN $TaskName /SC WEEKLY /D MON,TUE,WED,THU,FRI /ST $At /TR `"cmd /c $Runner`" /F"
   exit 0
 }
 
 New-Item -ItemType Directory -Force $LogDir | Out-Null
-schtasks /Create /TN $TaskName /SC WEEKLY /D MON,TUE,WED,THU,FRI /ST $At /TR "cmd /c $Cmd" /F
+Set-Content $Runner "@echo off`r`n$Cmd`r`n" -Encoding ASCII
+schtasks /Create /TN $TaskName /SC WEEKLY /D MON,TUE,WED,THU,FRI /ST $At /TR "cmd /c $Runner" /F
 if ($LASTEXITCODE -eq 0) {
   Write-Host "등록 완료: $TaskName (평일 $At) — 로그: $LogDir\export-log.txt"
   if ($Publish -eq "unc") { Write-Host "게시: export 후 $ShareRoot\$Sid 로 robocopy (.git 제외)" }

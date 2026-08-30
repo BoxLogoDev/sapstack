@@ -187,6 +187,16 @@ async function main() {
     }
     if (exitCode !== 0) log(`경고: vsp 종료코드 ${exitCode} (부분 수집 ${records.length}건으로 계속)`)
 
+    // 수집 0건은 vsp 가 정상 종료해도 치명으로 취급한다 — 전 패턴 열거 실패(사내망/VPN
+    // 단절 등)를 "빈 스냅샷 성공"으로 커밋하면 좋은 스냅샷을 덮어쓰고, 스케줄러가
+    // 그걸 공유폴더에 게시해버린다 (2026-08-30 실사고: 오프넷 상태 수집이 1,950파일
+    // 스냅샷을 0건으로 교체·커밋 — git revert 로 복구).
+    if (!args.dryRun && records.length === 0) {
+      log('치명: 수집 0건 (열거 전패 — SAP 접속/사내망 확인) — 직전 스냅샷 복원')
+      try { git(snapshotRoot, ['reset', '--hard', '-q']); git(snapshotRoot, ['clean', '-fdq']) } catch {}
+      process.exit(1)
+    }
+
     // 평면 → 패키지 디렉터리 배치 (Lua 는 셸 의존 mkdir 를 피해 flat 으로만 쓴다)
     if (!args.dryRun) {
       for (const rec of records) {
