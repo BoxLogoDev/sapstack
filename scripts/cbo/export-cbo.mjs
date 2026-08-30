@@ -90,8 +90,10 @@ function resolveVspBin(cbo) {
 }
 
 // ── git 헬퍼 (스냅샷 로컬 이력 — remote 없음) ───────────────
+// maxBuffer 기본 1MB 는 전 모듈 수집(3만+ 파일)의 status/add 출력에 ENOBUFS 로 터진다
+// (2026-08-31 실사고: 124k 오브젝트 수집 성공 후 커밋 단계에서 사망). 256MB 로 상향.
 function git(root, args, opts = {}) {
-  return execFileSync('git', args, { cwd: root, encoding: 'utf8', ...opts }).trim()
+  return execFileSync('git', args, { cwd: root, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, ...opts }).trim()
 }
 
 function ensureGit(root) {
