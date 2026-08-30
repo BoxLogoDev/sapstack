@@ -18,13 +18,20 @@ $SnapshotDir = Join-Path $HOME ".sapstack\cbo\$Sid"
 $LogDir = Join-Path $SnapshotDir "meta"
 $NodeExe = (Get-Command node -ErrorAction SilentlyContinue).Source
 if (-not $NodeExe) { Write-Host "node 를 찾을 수 없습니다 (Node.js 20+ 필요)"; exit 1 }
+# schtasks /TR 은 중첩 따옴표에 취약 — 경로 공백("Program Files")을 8.3 단축 경로로 제거
+try { $NodeExe = (New-Object -ComObject Scripting.FileSystemObject).GetFile($NodeExe).ShortPath } catch {}
 if ($Publish -eq "unc" -and -not $ShareRoot) { Write-Host "-Publish unc 에는 -ShareRoot \\서버\공유\cbo 가 필요합니다"; exit 1 }
 
-$Cmd = "`"$NodeExe`" `"$RepoRoot\scripts\cbo\export-cbo.mjs`" --system $Sid >> `"$LogDir\export-log.txt`" 2>&1"
+# 경로에 공백이 있으면 schtasks /TR 중첩 인용이 깨진다 — 단축 경로 확보 후 무인용으로 조립
+foreach ($p in @($RepoRoot, $LogDir)) {
+  if ($p -match ' ') { Write-Host "중단: 경로에 공백 — schtasks /TR 인용 한계. 공백 없는 경로로 옮기세요: $p"; exit 1 }
+}
+$Cmd = "$NodeExe $RepoRoot\scripts\cbo\export-cbo.mjs --system $Sid >> $LogDir\export-log.txt 2>&1"
 if ($Publish -eq "unc") {
+  if ($ShareRoot -match ' ') { Write-Host "중단: ShareRoot 에 공백 — 공백 없는 공유 경로를 사용하세요"; exit 1 }
   # export 실패(exit 1) 시에도 폴더에는 직전 정상 스냅샷이 복원돼 있으므로 게시는 안전하다.
   # robocopy 는 복사 성공이 exit 1 이라 && 대신 & 로 잇는다.
-  $Cmd += " & robocopy `"$SnapshotDir`" `"$ShareRoot\$Sid`" /E /XD .git /NFL /NDL /NJH /NJS /NP >> `"$LogDir\export-log.txt`" 2>&1"
+  $Cmd += " & robocopy $SnapshotDir $ShareRoot\$Sid /E /XD .git /NFL /NDL /NJH /NJS /NP >> $LogDir\export-log.txt 2>&1"
 }
 
 if ($PrintOnly) {
