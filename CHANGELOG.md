@@ -13,6 +13,14 @@ scripts/generate-release-notes.sh 가 태그 버전과 같은 헤딩을 찾아 �
 
 ## [Unreleased]
 
+### Added — 로컬 LLM 제로 셋팅
+
+- **자동 기본 연결**: LLM 연결이 전무한 첫 실행에서 번들 엔진 + GGUF 모델팩이 발견되면
+  로컬 연결을 자동 시딩 — 온보딩 연결 선택 화면이 뜨지 않는다 (provision.yaml 불필요,
+  기존 사용자 설정은 불변)
+- llama-server ctx 8192→16384 (sapstack 프롬프트+지식 주입 수용, 16GB 노트북 예산 안).
+  OpenAI 도구 호출은 `--jinja` 로 실측 확인(finish_reason=tool_calls)
+
 ### Added — 관리자 프로비저닝: 현업 무설정 첫 실행
 
 - **`provision.yaml`** (`apps/desktop .../main/provisioning.ts`) — exe 인접(또는

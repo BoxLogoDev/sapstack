@@ -202,8 +202,11 @@ function startServer(): void {
 
   const modelPath = join(modelsDir(), model)
   // --jinja enables the GGUF's own chat template on /v1/chat/completions —
-  // required for Qwen-family instruct formatting through the pi_compat path.
-  // ctx 8192 keeps a 8B Q4 model within a 16 GB no-GPU laptop's budget.
+  // required for Qwen-family instruct formatting AND OpenAI tool calls through
+  // the pi_compat path (도구 호출 실측 확인: finish_reason=tool_calls).
+  // ctx 16384: sapstack 시스템 프롬프트 + 지식 주입 + CBO guide/grep 결과가 8192 를
+  // 쉽게 넘는다. KV 캐시 ~2.3GB(f16)로 4B/8B Q4 모두 16GB 노트북 예산 안.
+  // (catalog.md 전체는 ~45k 토큰 — guide.md 의 "grep 우선" 규칙이 전제)
   // --reasoning-budget 0 disables thinking: Qwen3 thinks by default and on
   // CPU that burns the whole token budget before any visible answer (measured:
   // 150 tokens of pure <think> at <1 tok/s). The compact diagnosis cards are
@@ -212,7 +215,7 @@ function startServer(): void {
     '-m', modelPath,
     '--host', HOST,
     '--port', String(PORT),
-    '--ctx-size', '8192',
+    '--ctx-size', '16384',
     '--jinja',
     '--reasoning-budget', '0',
     '-a', MODEL_ALIAS,
@@ -247,6 +250,15 @@ export function stopLocalLlm(): void {
     child.kill()
   }
   child = null
+}
+
+/**
+ * 번들 엔진 + 모델팩이 모두 있어 로컬 추론이 즉시 가능한 상태인지.
+ * provisioning.ts 의 "제로 셋팅" 자동 기본 연결(ensureLocalLlmDefaultConnection)이
+ * 시딩 여부를 판단할 때 쓴다.
+ */
+export function isLocalLlmAvailable(): boolean {
+  return serverBinaryPath() !== null && findModelFile() !== null
 }
 
 /**

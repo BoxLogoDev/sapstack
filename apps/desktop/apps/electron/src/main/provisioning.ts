@@ -24,6 +24,7 @@ import {
 import { dialog } from 'electron'
 import {
   addLlmConnection,
+  getDefaultLlmConnection,
   getLlmConnection,
   loadStoredConfig,
   saveConfig,
@@ -33,6 +34,7 @@ import {
 } from '@sapstack-desktop/shared/config'
 import { getCredentialManager } from '@sapstack-desktop/shared/credentials'
 import { i18n, SUPPORTED_LANGUAGE_CODES, type LanguageCode } from '@sapstack-desktop/shared/i18n'
+import { isLocalLlmAvailable } from './local-llm'
 import { mainLog } from './logger'
 import { mergeEnvironmentConfigKeys, readEnvironmentProfile, saveEnvironmentProfile } from './environment-profile'
 import {
@@ -175,6 +177,25 @@ async function applySection(name: string, sections: Record<string, string>, fn: 
     const message = err instanceof Error ? err.message : String(err)
     sections[name] = `error: ${message}`
     mainLog.error(`[provision] ${name} 섹션 적용 실패:`, err)
+  }
+}
+
+/**
+ * 제로 셋팅 폴백 — LLM 연결이 하나도 없는 첫 실행에서 번들 엔진 + GGUF 모델팩이
+ * 발견되면 로컬 연결을 자동 시딩해 기본으로 지정한다. provision.yaml 없이도
+ * (모델만 동봉/반입돼 있으면) 온보딩의 "어떻게 연결할까요?" 화면이 뜨지 않는다.
+ * 이미 연결을 설정한 사용자는 절대 건드리지 않는다. applyProvisioningIfPresent()
+ * 뒤에 호출 — 프로비저닝(명시 설정)이 항상 우선한다.
+ */
+export async function ensureLocalLlmDefaultConnection(): Promise<void> {
+  if (process.env.SAPSTACK_DESKTOP_SERVER_URL) return // 씬클라이언트 — 서버가 설정 소유
+  if (getDefaultLlmConnection()) return // 이미 설정됨 (프로비저닝 포함) — 존중
+  if (!isLocalLlmAvailable()) return // 엔진 또는 모델팩 없음 — 기존 온보딩으로
+  try {
+    await seedLlm({ kind: 'local' }, '')
+    mainLog.info('[provision] 로컬 LLM 자동 기본 연결 시딩 (제로 셋팅 폴백)')
+  } catch (err) {
+    mainLog.error('[provision] 로컬 LLM 자동 시딩 실패 (온보딩으로 폴백):', err)
   }
 }
 

@@ -30,6 +30,10 @@ LLM 연결(+API 키), SAP 환경 프로파일, 현업 모드(ui_mode), CBO 공�
 |---|---|---|
 | `api_key` | 회사 API 키 직결 또는 사내 게이트웨이(`baseUrl`) | **예산 상한 걸린 전용 키만** 사용. Anthropic 콘솔에서 워크스페이스 분리 + 지출 한도 설정 권장 |
 | `local` | 폐쇄망 — 동봉 llama-server + GGUF 모델팩 | `modelFile` 을 ZIP 에 함께 동봉(`make-distribution.ps1 -ModelFile`). 품질은 클라우드 모델보다 낮음 |
+
+> 참고: 연결이 전무한 첫 실행에서 GGUF 모델팩이 발견되면 provision.yaml 의 `llm` 섹션이
+> 없어도 로컬 연결이 **자동 시딩**된다(제로 셋팅 폴백). provision.yaml 은 여전히
+> SAP 환경·현업 모드·공유 경로 시딩을 위해 권장된다.
 | `environment` | GPO 로 `ANTHROPIC_API_KEY`/`ANTHROPIC_BASE_URL` 환경변수를 배포하는 조직 | 파일에 키가 실리지 않음 — 가장 안전 |
 
 ## 배포 절차 (하드 룰 포함)

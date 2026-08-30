@@ -102,7 +102,7 @@ import { createApplicationMenu } from './menu'
 import { WindowManager } from './window-manager'
 import { registerSapstackRuntimeHandlers } from './sapstack-runtime'
 import { registerCboSnapshotHandlers } from './cbo-snapshot'
-import { applyProvisioningIfPresent } from './provisioning'
+import { applyProvisioningIfPresent, ensureLocalLlmDefaultConnection } from './provisioning'
 import { initLocalLlm } from './local-llm'
 import { loadWindowState, saveWindowState } from './window-state'
 import { getWorkspaces, getWorkspaceByNameOrId, loadStoredConfig, addWorkspace, saveConfig } from '@sapstack-desktop/shared/config'
@@ -401,6 +401,14 @@ app.whenReady().then(async () => {
     await applyProvisioningIfPresent()
   } catch (err) {
     mainLog.error('[provision] 적용 중 예외 (앱 기동은 계속):', err)
+  }
+
+  // 제로 셋팅 폴백: 연결이 전무하고 번들 엔진 + GGUF 모델팩이 있으면 로컬 LLM 을
+  // 자동 기본 연결로 — provision.yaml 없이도 온보딩 연결 화면이 뜨지 않는다.
+  try {
+    await ensureLocalLlmDefaultConnection()
+  } catch (err) {
+    mainLog.error('[provision] 로컬 자동 시딩 예외 (앱 기동은 계속):', err)
   }
 
   // sapstack's canonical knowledge and Evidence Loop run in-process. External
