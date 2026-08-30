@@ -53,12 +53,20 @@ New-Item -ItemType Directory -Force "$Stage\cbo\$Sid" | Out-Null
 robocopy $Snapshot "$Stage\cbo\$Sid" /E /XD .git /NFL /NDL /NJH /NJS /NP | Out-Null
 if ($LASTEXITCODE -ge 8) { Write-Host "중단: robocopy 실패 ($LASTEXITCODE)"; exit 1 }
 
+# Compress-Archive 는 단일 파일 2GB 한계("Stream was too long")가 있어 GGUF 동봉 시 실패 —
+# Zip64 를 지원하는 .NET ZipFile 로 압축한다 (PS5.1/pwsh 공용, Fastest: GGUF 는 고엔트로피)
+function New-DistZip([string]$SourceDir, [string]$Destination) {
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  if (Test-Path $Destination) { Remove-Item $Destination -Force -Confirm:$false }
+  [System.IO.Compression.ZipFile]::CreateFromDirectory($SourceDir, $Destination, [System.IO.Compression.CompressionLevel]::Fastest, $false)
+}
+
 if ($SnapshotOnly) {
   # 스냅샷만 ZIP — 설정 > CBO 스냅샷 > "ZIP에서 가져오기" 또는 공유폴더 게시용
   New-Item -ItemType Directory -Force $OutDir | Out-Null
   $ZipPath = Join-Path $OutDir "sapstack-CBO-snapshot-$Sid-$exportDate.zip"
-  if (Test-Path $ZipPath) { Remove-Item $ZipPath -Force -Confirm:$false }
-  Compress-Archive -Path "$Stage\cbo" -DestinationPath $ZipPath
+  # cbo\ 프리픽스를 유지하려고 $Stage 전체를 압축한다 (이 시점의 $Stage 에는 cbo\ 만 있음)
+  New-DistZip $Stage $ZipPath
   Remove-Item $Stage -Recurse -Force -Confirm:$false
   $SizeMB = [math]::Round((Get-Item $ZipPath).Length / 1MB)
   Write-Host "생성 완료(스냅샷만): $ZipPath (${SizeMB}MB)"
@@ -85,10 +93,11 @@ sapstack Desktop + CBO 스냅샷 ($Sid, $exportDate 기준)
 
 # ── ZIP ──
 New-Item -ItemType Directory -Force $OutDir | Out-Null
-$ZipPath = Join-Path $OutDir "sapstack-Desktop-CBO-$Sid-$exportDate.zip"
-if (Test-Path $ZipPath) { Remove-Item $ZipPath -Force -Confirm:$false }
-Compress-Archive -Path "$Stage\*" -DestinationPath $ZipPath
+$ZipName = if ($ModelFile) { "sapstack-Desktop-CBO-$Sid-$exportDate-localllm.zip" } else { "sapstack-Desktop-CBO-$Sid-$exportDate.zip" }
+$ZipPath = Join-Path $OutDir $ZipName
+New-DistZip $Stage $ZipPath
 Remove-Item $Stage -Recurse -Force -Confirm:$false
 
 $SizeMB = [math]::Round((Get-Item $ZipPath).Length / 1MB)
 Write-Host "생성 완료: $ZipPath (${SizeMB}MB)"
+exit 0 # robocopy 성공 코드(1)가 세션 종료코드로 새어나가지 않게
