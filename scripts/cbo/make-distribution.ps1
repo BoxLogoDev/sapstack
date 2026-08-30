@@ -1,4 +1,4 @@
-# make-distribution.ps1 — 현업 배포용 ZIP 생성 (포터블 exe + CBO 스냅샷 동봉)
+﻿# make-distribution.ps1 — 현업 배포용 ZIP 생성 (포터블 exe + CBO 스냅샷 동봉)
 # 사용:
 #   powershell -ExecutionPolicy Bypass -File scripts/cbo/make-distribution.ps1 -Sid DS4 [-OutDir .\dist-cbo]
 #     [-ProvisionFile .\provision.yaml]   # 관리자 프로비저닝 동봉 → 현업 무설정 첫 실행 (docs/provisioning.md)

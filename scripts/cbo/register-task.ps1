@@ -1,4 +1,4 @@
-# register-task.ps1 — CBO 스냅샷 주기 수집을 Windows 작업 스케줄러에 등록
+﻿# register-task.ps1 — CBO 스냅샷 주기 수집을 Windows 작업 스케줄러에 등록
 # 사용:
 #   powershell -ExecutionPolicy Bypass -File scripts/cbo/register-task.ps1 [-Sid DS4] [-At 06:30] [-PrintOnly]
 #     [-Publish unc -ShareRoot \\fileserver\sapstack\cbo]  # export 후 공유폴더 게시 (현업 앱이 기동 시 자동 임포트)
