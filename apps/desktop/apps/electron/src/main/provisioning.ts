@@ -16,6 +16,7 @@ import {
   copyFileSync,
   existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   renameSync,
   statSync,
@@ -181,15 +182,41 @@ async function applySection(name: string, sections: Record<string, string>, fn: 
 }
 
 /**
+ * 포터블 exe 옆의 models\*.gguf 를 ~/.sapstack/models 로 임포트 — 배포 ZIP 에
+ * 동봉된 모델팩이 provision.yaml 없이도 잡히게 한다 (cbo-snapshot.ts 의 인접
+ * 스냅샷 임포트와 같은 패턴). 크기 같으면 재복사하지 않는다(멱등).
+ */
+function importAdjacentModelPacks(): void {
+  const base = process.env.PORTABLE_EXECUTABLE_DIR || dirname(process.execPath)
+  const adjacent = join(base, 'models')
+  if (!existsSync(adjacent)) return
+  const destDir = join(sapstackHome(), 'models')
+  mkdirSync(destDir, { recursive: true })
+  for (const file of readdirSync(adjacent)) {
+    if (!file.toLowerCase().endsWith('.gguf')) continue
+    const src = join(adjacent, file)
+    const dest = join(destDir, file)
+    try {
+      if (existsSync(dest) && statSync(dest).size === statSync(src).size) continue
+      mainLog.info(`[provision] 인접 모델팩 임포트 (수 GB 일 수 있음): ${file}`)
+      copyFileSync(src, dest)
+    } catch (err) {
+      mainLog.error(`[provision] 인접 모델팩 임포트 실패 (${file}):`, err)
+    }
+  }
+}
+
+/**
  * 제로 셋팅 폴백 — LLM 연결이 하나도 없는 첫 실행에서 번들 엔진 + GGUF 모델팩이
  * 발견되면 로컬 연결을 자동 시딩해 기본으로 지정한다. provision.yaml 없이도
- * (모델만 동봉/반입돼 있으면) 온보딩의 "어떻게 연결할까요?" 화면이 뜨지 않는다.
- * 이미 연결을 설정한 사용자는 절대 건드리지 않는다. applyProvisioningIfPresent()
- * 뒤에 호출 — 프로비저닝(명시 설정)이 항상 우선한다.
+ * (모델이 exe 옆에 동봉됐거나 USB 로 반입돼 있으면) 온보딩의 "어떻게 연결할까요?"
+ * 화면이 뜨지 않는다. 이미 연결을 설정한 사용자는 절대 건드리지 않는다.
+ * applyProvisioningIfPresent() 뒤에 호출 — 프로비저닝(명시 설정)이 항상 우선한다.
  */
 export async function ensureLocalLlmDefaultConnection(): Promise<void> {
   if (process.env.SAPSTACK_DESKTOP_SERVER_URL) return // 씬클라이언트 — 서버가 설정 소유
   if (getDefaultLlmConnection()) return // 이미 설정됨 (프로비저닝 포함) — 존중
+  importAdjacentModelPacks() // 동봉 모델팩을 먼저 홈으로 (initLocalLlm 스캔 이전)
   if (!isLocalLlmAvailable()) return // 엔진 또는 모델팩 없음 — 기존 온보딩으로
   try {
     await seedLlm({ kind: 'local' }, '')
