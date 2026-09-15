@@ -144,7 +144,7 @@ fi
 # ────────────────────────────────────────────────────
 # 6. 플러그인 수 일관성
 # ────────────────────────────────────────────────────
-MARKETPLACE_PLUGINS=$(grep -c '"id":' .claude-plugin/marketplace.json || echo 0)
+MARKETPLACE_PLUGINS=$(grep -c '"source":' .claude-plugin/marketplace.json || echo 0)
 if [[ "$MARKETPLACE_PLUGINS" != "$PLUGIN_COUNT" ]]; then
   echo "❌ 플러그인 수 불일치: dir=$PLUGIN_COUNT vs marketplace=$MARKETPLACE_PLUGINS"
   exit 1
