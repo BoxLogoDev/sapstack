@@ -25,6 +25,7 @@ import {
   saveSourceGuide,
 } from '@sapstack-desktop/shared/sources/storage'
 import { getWorkspaces } from '@sapstack-desktop/shared/config/storage'
+import { getPersistedUiLanguage } from '@sapstack-desktop/shared/config/preferences'
 import { environmentProfilePath } from './environment-profile'
 
 export const CBO_IPC = {
@@ -174,9 +175,29 @@ function shareRootsFromConfig(): string[] {
   }
 }
 
+/** UI 언어가 명시적으로 한국어 외로 저장돼 있을 때만 영어 — 미선택(undefined)은 기존 한국어 동작 유지 */
+function useEnglishGuide(): boolean {
+  const lang = getPersistedUiLanguage()
+  return !!lang && lang !== 'ko'
+}
+
 function taglineFor(m: ParsedManifest): string {
   const date = String(m.exported_at).slice(0, 10)
-  return `커스텀 ABAP 스냅샷 (${m.sid}/${m.client}, ${date} 기준)`
+  return useEnglishGuide()
+    ? `Custom ABAP snapshot (${m.sid}/${m.client}, as of ${date})`
+    : `커스텀 ABAP 스냅샷 (${m.sid}/${m.client}, ${date} 기준)`
+}
+
+/** 스냅샷 동봉 guide — 영어 UI면 guide.en.md(export 가 함께 기록) 우선, 없으면 guide.md */
+function readGuide(dir: string, sid: string, m: ParsedManifest): string {
+  const candidates = useEnglishGuide() ? ['guide.en.md', 'guide.md'] : ['guide.md']
+  for (const name of candidates) {
+    const p = join(dir, name)
+    if (existsSync(p)) return readFileSync(p, 'utf8')
+  }
+  return useEnglishGuide()
+    ? `# CBO snapshot (${sid})\n\n${taglineFor(m)}. Find the object in catalog.md first, then Read it.\n`
+    : `# CBO 스냅샷 (${sid})\n\n${taglineFor(m)}. catalog.md 에서 오브젝트를 먼저 찾은 뒤 Read 하세요.\n`
 }
 
 /** 워크스페이스마다 스냅샷 소스 등록/동기화 — 멱등. 등록된 슬러그를 반환 */
@@ -186,10 +207,7 @@ async function registerForWorkspace(workspaceRootPath: string, sid: string, dir:
     (s) => s.config.provider === CBO_PROVIDER && (s.config.local?.path || '').replace(/[\\/]+$/, '').toUpperCase().endsWith(sid.toUpperCase()),
   )
 
-  const guidePath = join(dir, 'guide.md')
-  const guideRaw = existsSync(guidePath)
-    ? readFileSync(guidePath, 'utf8')
-    : `# CBO 스냅샷 (${sid})\n\n${taglineFor(m)}. catalog.md 에서 오브젝트를 먼저 찾은 뒤 Read 하세요.\n`
+  const guideRaw = readGuide(dir, sid, m)
 
   if (!existing) {
     // 이름은 ASCII 유지 — 슬러그가 'cbo-snapshot-{sid}' 로 안정되게 (한글은 tagline 이 담당)
@@ -207,7 +225,7 @@ async function registerForWorkspace(workspaceRootPath: string, sid: string, dir:
     return config.slug
   }
 
-  // 재동기화: 기준일이 바뀌었을 때만 tagline/guide 갱신
+  // 재동기화: 기준일 또는 UI 언어(tagline 언어)가 바뀌었을 때만 tagline/guide 갱신
   if (existing.config.tagline !== taglineFor(m)) {
     existing.config.tagline = taglineFor(m)
     existing.config.local = { path: dir, format: 'filesystem' }

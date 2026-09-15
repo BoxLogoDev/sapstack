@@ -42,6 +42,7 @@ Phase 가 올라가도 **폴더 계약은 동일** — 소비 측은 무수정.
   catalog.json    # 기계 색인 — name/type/package/file/title/관계
   catalog.md      # 사람·에이전트용 색인 (grep 전 필독)
   guide.md        # 이 스냅샷의 사용 규칙 (Desktop 로컬 소스의 guide 로 그대로 사용)
+  guide.en.md     # 영어판 — Desktop UI 언어가 한국어가 아니면 이 파일을 guide 로 선택 (없으면 guide.md)
   meta/           # pii-report.json, failures.json
   src/{패키지}/…  # abapGit 명명 소스 파일
   .git/           # 로컬 이력 (remote 없음 — 델타·복원용)

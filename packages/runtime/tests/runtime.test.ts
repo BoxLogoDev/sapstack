@@ -71,6 +71,12 @@ test("security scrubs PII and rejects path traversal", async t => {
   const result = runtime.security.scrub("user@example.com 900101-1234567 010-1234-5678");
   assert.equal(result.hitCount, 3);
   assert.doesNotMatch(result.scrubbedText, /900101-1234567|010-1234-5678/);
+
+  // US patterns (LS Mtron USA): separator-required, SAP document/PO numbers untouched
+  const us = runtime.security.scrub("SSN 123-45-6789 EIN 12-3456789 phone (555) 123-4567 doc 5100000123 PO 4500001234");
+  assert.deepEqual(us.findings.map(finding => finding.type).sort(), ["us_ein", "us_phone", "us_ssn"]);
+  assert.doesNotMatch(us.scrubbedText, /123-45-6789|12-3456789|123-4567/);
+  assert.match(us.scrubbedText, /5100000123 PO 4500001234/);
   assert.throws(() => runtime.security.resolveInside(sessionsDir, "../outside"), /traversal/);
 });
 

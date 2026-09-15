@@ -4,6 +4,7 @@ import { abapgitFilename, matchesPackagePatterns, isCustomPackage, sourceFetchTy
 import { scrubSource } from '../lib/scrub.mjs'
 import { extractTitle, extractRelations, extractClassMeta, buildCatalog } from '../lib/catalog.mjs'
 import { renderManifest, reconcile } from '../lib/manifest.mjs'
+import { renderGuide } from '../lib/guide.mjs'
 
 // ── naming ──────────────────────────────────────────────────
 test('abapGit 파일명: 타입별 확장자 + 소문자 + 네임스페이스 #', () => {
@@ -45,6 +46,29 @@ test('스크럽: RESTRICTED 마스킹 + 리포트 전용 분리', () => {
   assert.ok(kinds.includes('resident_id') && kinds.includes('email') && kinds.includes('mobile_phone'))
   const masked = findings.filter((f) => f.masked).map((f) => f.kind)
   assert.ok(masked.includes('resident_id') && !masked.includes('email'))
+})
+
+test('스크럽: 미국 SSN(3-2-4)은 마스킹, SAP 전표번호·사업자번호와 충돌 없음', () => {
+  const src = [
+    "  lv_ssn = '123-45-6789'.",
+    "  lv_belnr = '5100000123'. lv_brn = '123-45-67890'.",
+  ].join('\n')
+  const { text, findings } = scrubSource(src, 'mask')
+  assert.ok(!text.includes('123-45-6789\''), 'SSN 마스킹돼야 함')
+  assert.ok(text.includes('5100000123'), '전표번호 보존')
+  const masked = findings.filter((f) => f.masked).map((f) => f.kind).sort()
+  assert.deepEqual(masked, ['business_id', 'us_ssn']) // bank_account 리포트(형식 겹침)는 별도
+  assert.ok(!scrubSource("  lv_x = '000-12-3456'.", 'mask').findings.some((f) => f.kind === 'us_ssn'), '무효 구간 000 은 SSN 아님')
+})
+
+test('guide: ko/en 렌더 — 기준일·오브젝트 수·언어별 고지 문구', () => {
+  const p = { sid: 'DS4', client: '100', exportedAt: '2026-09-15T04:14:16.033Z', count: 42, packages: ['ZFI1', 'ZMM1'], stalenessWarnDays: 30 }
+  const ko = renderGuide(p, 'ko')
+  const en = renderGuide(p, 'en')
+  assert.ok(ko.startsWith('# CBO 스냅샷 (DS4)') && ko.includes('스냅샷 기준일: 2026-09-15') && ko.includes('오브젝트 42개'))
+  assert.ok(en.startsWith('# CBO snapshot (DS4)') && en.includes('Snapshot as of: 2026-09-15') && en.includes('42 objects'))
+  assert.ok(!/[가-힣]/.test(en), '영어 guide 에 한글 없음')
+  assert.equal(renderGuide(p), ko, '기본은 한국어')
 })
 
 test("스크럽: 공백 리터럴 PASSWORD = ' ' 는 시크릿 아님", () => {

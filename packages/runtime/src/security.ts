@@ -24,6 +24,10 @@ const PII_PATTERNS: Array<{
   { type: "mobile_phone", classification: "CONFIDENTIAL", pattern: /\b(?:\+82[- ]?|0)1\d[- ]?\d{3,4}[- ]?\d{4}\b/g, replace: "010-****-****" },
   { type: "email", classification: "CONFIDENTIAL", pattern: /\b([\w.+-])([\w.+-]*)@([\w.-]+\.[A-Za-z]{2,})\b/g, replace: (_value, first, _rest, domain) => `${first}****@${domain}` },
   { type: "employee_id", classification: "INTERNAL", pattern: /\bE\d{5,8}\b/g, replace: value => `${value[0]}${"*".repeat(value.length - 1)}` },
+  // US entities (LS Mtron USA) — separator-required forms only, so 10-digit SAP document/PO numbers never collide
+  { type: "us_ssn", classification: "RESTRICTED", pattern: /\b(?!000|666|9\d\d)\d{3}-(?!00)\d{2}-(?!0000)\d{4}\b/g, replace: "###-##-####" },
+  { type: "us_ein", classification: "RESTRICTED", pattern: /\b\d{2}-\d{7}\b/g, replace: "##-#######" },
+  { type: "us_phone", classification: "CONFIDENTIAL", pattern: /(?:\+1[- .])?(?:\(\d{3}\)|\b[2-9]\d{2})[- .]\d{3}[- .]\d{4}\b/g, replace: "(***) ***-****" },
 ];
 
 export class SecurityService {

@@ -4,11 +4,13 @@
 #     [-ProvisionFile .\provision.yaml]   # 관리자 프로비저닝 동봉 → 현업 무설정 첫 실행 (docs/provisioning.md)
 #     [-ModelFile .\models\qwen3-8b.gguf] # 로컬 LLM 모델팩 동봉 (provision.yaml 의 llm.kind: local 과 짝)
 #     [-SnapshotOnly]                     # exe 없이 스냅샷만 ZIP — 갱신 배포용 (앱의 "ZIP에서 가져오기"로 임포트)
+#     [-Language en]                      # 해외 법인용 영어 킷: README.txt 영문 + ZIP 접미 -en (provision 의 language: en 과 짝)
 param(
   [string]$Sid = "DS4",
   [string]$OutDir = "",
   [string]$ProvisionFile = "",
   [string]$ModelFile = "",
+  [ValidateSet("ko", "en")][string]$Language = "ko",
   [switch]$SnapshotOnly
 )
 
@@ -39,6 +41,9 @@ if ($ProvisionFile) {
     Write-Host "  - 앱이 첫 실행 시 키를 머신 바운드 저장소로 옮기고 파일에서 스크럽합니다."
     Write-Host "  - 배포 전 이 ZIP 으로 스모크 테스트 1회가 런북 필수 절차입니다."
     Write-Host "=================================================================="
+  }
+  if ($Language -eq "en" -and $prov -notmatch "(?m)^\s*language\s*:\s*en\b") {
+    Write-Host "경고: -Language en 인데 provision.yaml 의 sapEnvironment.language 가 en 이 아닙니다 — 앱 UI·안내 프롬프트가 한국어로 뜹니다."
   }
 }
 if ($ModelFile -and -not (Test-Path $ModelFile)) { Write-Host "중단: ModelFile 없음 — $ModelFile"; exit 1 }
@@ -80,8 +85,20 @@ if ($ModelFile) {
   Copy-Item $ModelFile "$Stage\models\"
 }
 
-$provisionLine = if ($ProvisionFile) { "이 폴더에는 관리자 설정(provision.yaml)이 들어 있어 별도 설정 없이 바로 질문할 수 있습니다." } else { "첫 실행 시 화면 안내에 따라 설정을 완료하세요." }
-@"
+if ($Language -eq "en") {
+  $provisionLine = if ($ProvisionFile) { "This folder includes an administrator configuration (provision.yaml), so you can start asking questions without any setup." } else { "On first run, follow the on-screen guidance to complete setup." }
+  @"
+sapstack Desktop + CBO snapshot ($Sid, as of $exportDate)
+
+1. Keep this whole folder together and run sapstack-Desktop-*-Portable-x64.exe.
+2. $provisionLine
+3. On first run the cbo\ folder next to the exe is registered automatically (Settings > CBO snapshots).
+4. Ask in the chat, for example: "What does program ZFI0171 do?"
+5. If the "Snapshot as of" date in an answer looks old, ask your administrator for a refresh.
+"@ | Set-Content "$Stage\README.txt" -Encoding UTF8
+} else {
+  $provisionLine = if ($ProvisionFile) { "이 폴더에는 관리자 설정(provision.yaml)이 들어 있어 별도 설정 없이 바로 질문할 수 있습니다." } else { "첫 실행 시 화면 안내에 따라 설정을 완료하세요." }
+  @"
 sapstack Desktop + CBO 스냅샷 ($Sid, $exportDate 기준)
 
 1. 이 폴더 전체를 원하는 위치에 두고 sapstack-Desktop-*-Portable-x64.exe 를 실행하세요.
@@ -90,10 +107,12 @@ sapstack Desktop + CBO 스냅샷 ($Sid, $exportDate 기준)
 4. 채팅에서 이렇게 물어보세요: "ZFI0171이 뭐 하는 프로그램이에요?"
 5. 답변의 "스냅샷 기준일"이 오래됐으면 관리자에게 갱신을 요청하세요.
 "@ | Set-Content "$Stage\읽어보세요.txt" -Encoding UTF8
+}
 
 # ── ZIP ──
 New-Item -ItemType Directory -Force $OutDir | Out-Null
-$ZipName = if ($ModelFile) { "sapstack-Desktop-CBO-$Sid-$exportDate-localllm.zip" } else { "sapstack-Desktop-CBO-$Sid-$exportDate.zip" }
+$langSuffix = if ($Language -eq "en") { "-en" } else { "" }
+$ZipName = if ($ModelFile) { "sapstack-Desktop-CBO-$Sid-$exportDate-localllm$langSuffix.zip" } else { "sapstack-Desktop-CBO-$Sid-$exportDate$langSuffix.zip" }
 $ZipPath = Join-Path $OutDir $ZipName
 New-DistZip $Stage $ZipPath
 Remove-Item $Stage -Recurse -Force -Confirm:$false

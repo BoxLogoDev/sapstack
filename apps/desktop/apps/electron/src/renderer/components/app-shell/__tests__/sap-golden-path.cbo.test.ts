@@ -28,6 +28,55 @@ describe('detectCboQuery', () => {
     expect(detectCboQuery('BSEG와 ACDOCA 차이는?')).toBe(false)
     expect(detectCboQuery('월마감 순서 알려줘')).toBe(false)
   })
+
+  test('영어 커스텀 키워드 — customer/customizing 오탐 없음', () => {
+    expect(detectCboQuery('What does our custom report do?')).toBe(true)
+    expect(detectCboQuery('the in-house screen fails on save')).toBe(true)
+    expect(detectCboQuery('our own program shows a wrong value')).toBe(true)
+    expect(detectCboQuery('where is the z-program for invoices')).toBe(true)
+    expect(detectCboQuery('customer master data is missing')).toBe(false)
+    expect(detectCboQuery('customizing for payment terms')).toBe(false)
+    expect(detectCboQuery('Your F110 payment run failed yesterday')).toBe(false)
+  })
+})
+
+describe('영어 프로파일 (LS Mtron USA 등 language=en)', () => {
+  const ENV_EN: SapEnvironmentProfile = { ...ENV, language: 'en' }
+
+  test('안내 프롬프트가 영어 — 한글 없음, 핵심 라벨 유지', () => {
+    const quick = buildGuidedChat({
+      query: 'What does program ZFI0171 do?',
+      mode: 'quick',
+      environment: ENV_EN,
+      matches: [],
+      cboSourceSlug: 'cbo-snapshot-ds4',
+    })
+    expect((quick.input ?? '').startsWith('[source:cbo-snapshot-ds4]')).toBe(true)
+    expect(quick.input).toContain('Request: What does program ZFI0171 do?')
+    expect(quick.input).toContain('snapshot as-of date')
+    expect(quick.input).not.toMatch(/[가-힣]/)
+
+    const evidence = buildGuidedChat({
+      query: 'ZFI0171 dumps on save',
+      mode: 'evidence',
+      environment: ENV_EN,
+      matches: [],
+      sessionId: 's1',
+    })
+    expect(evidence.input).toContain('Turn 1 INTAKE')
+    expect(evidence.input).toContain('Rollback Plan')
+    expect(evidence.input).not.toMatch(/[가-힣]/)
+  })
+
+  test('ko 이외 언어(vi 등)도 영어 프롬프트', () => {
+    const chat = buildGuidedChat({ query: 'ZFI0171', mode: 'quick', environment: { ...ENV, language: 'vi' }, matches: [] })
+    expect(chat.input).not.toMatch(/[가-힣]/)
+  })
+
+  test('ko 프로파일은 기존 한국어 프롬프트 유지', () => {
+    const chat = buildGuidedChat({ query: 'ZFI0171이 뭐예요?', mode: 'quick', environment: ENV, matches: [] })
+    expect(chat.input).toContain('사용자 요청: ZFI0171이 뭐예요?')
+  })
 })
 
 describe('buildGuidedChat + CBO 소스 멘션', () => {

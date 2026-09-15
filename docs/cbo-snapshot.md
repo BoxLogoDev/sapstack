@@ -28,7 +28,7 @@ node scripts/cbo/export-cbo.mjs --system DS4 --packages "ZFI1"             # 실
 # 전 모듈 Z/Y (최초 수집은 수 시간 — 야간 권장)
 node scripts/cbo/export-cbo.mjs --system DS4
 
-# 카탈로그/guide 만 재생성 (SAP 미접속)
+# 카탈로그/guide 만 재생성 (SAP 미접속) — guide.md(한국어)·guide.en.md(영어) 둘 다 다시 씀
 node scripts/cbo/export-cbo.mjs --system DS4 --catalog-only
 ```
 

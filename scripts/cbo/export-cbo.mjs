@@ -28,6 +28,7 @@ import { CLAS_INCLUDES, isCustomPackage } from './lib/naming.mjs'
 import { scrubSource } from './lib/scrub.mjs'
 import { buildCatalog } from './lib/catalog.mjs'
 import { renderManifest, reconcile } from './lib/manifest.mjs'
+import { renderGuide } from './lib/guide.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const log = (m) => console.error(`[cbo] ${m}`)
@@ -303,7 +304,10 @@ async function main() {
     stalenessWarnDays,
   })
   writeFileSync(join(snapshotRoot, 'manifest.yaml'), manifest)
-  writeFileSync(join(snapshotRoot, 'guide.md'), renderGuide({ sid: args.system, client: sapEnv.SAP_CLIENT || '?', exportedAt, count: catalogJson.count, packages: packages.map((p) => p.name), stalenessWarnDays }))
+  // guide.md(ko) + guide.en.md(en) — Desktop 앱이 UI 언어로 고른다 (영어 배포용)
+  const guideParams = { sid: args.system, client: sapEnv.SAP_CLIENT || '?', exportedAt, count: catalogJson.count, packages: packages.map((p) => p.name), stalenessWarnDays }
+  writeFileSync(join(snapshotRoot, 'guide.md'), renderGuide(guideParams, 'ko'))
+  writeFileSync(join(snapshotRoot, 'guide.en.md'), renderGuide(guideParams, 'en'))
 
   // ── git commit ─────────────────────────────────────────────
   git(snapshotRoot, ['add', '-A'])
@@ -338,46 +342,6 @@ function scanTree(srcRoot) {
     }
   }
   return out
-}
-
-/** 스냅샷 동봉 guide.md — 소비 측(Desktop 에이전트)의 사용 규칙 */
-function renderGuide(p) {
-  const date = p.exportedAt.slice(0, 10)
-  return `# CBO 스냅샷 (${p.sid})
-
-${p.sid} 클라이언트 ${p.client}에서 ${date}에 내보낸 커스텀 ABAP 소스의 오프라인 사본입니다. 오브젝트 ${p.count}개.
-
-## Scope
-
-- \`manifest.yaml\` — 출처·기준일·수집 상태. **답변 전 1회 확인.**
-- \`catalog.md\` / \`catalog.json\` — 오브젝트 색인(이름→파일·설명·참조 관계). **grep 전에 항상 여기서 먼저 찾기.**
-- \`src/{패키지}/\` — abapGit 명명 규칙의 소스 파일.
-- 이 폴더는 **읽기 전용 사본**입니다. 수정 금지. SAP 실시간 상태가 아닙니다.
-
-## Guidelines
-
-파일명 규칙 (abapGit): \`zfi0171.prog.abap\`(리포트/인클루드) · \`sapmz*.prog.abap\`(모듈풀 — 화면 로직은 PBO/PAI MODULE) · \`saplz*.prog.abap\`+\`lz*.prog.abap\`(함수그룹 본체 — \`CALL FUNCTION 'Z…'\`의 구현) · \`*.clas.abap\`(클래스, locals/testclasses 별도 파일) · \`*.fugr.json\`(함수그룹 메타).
-
-추적 레시피 (Grep 은 항상 -i):
-- \`PERFORM xxx\` → 같은 파일 또는 include 의 \`FORM xxx\`
-- \`INCLUDE zxxx\` → catalog 에서 zxxx 파일 찾기
-- \`CALL FUNCTION 'Z_XXX'\` → \`lz*\` include 에서 \`FUNCTION z_xxx\`
-- "저장할 때 오류" 류 → \`MESSAGE\` 리터럴/메시지번호 검색 후 PAI(\`MODULE … INPUT\`) 우선 확인
-- 화면 흐름 → \`sapmz*\` 의 PBO/PAI 모듈과 \`CHAIN…ENDCHAIN\`
-
-답변 규칙 (현업 대상):
-- T-code·화면 이름으로 설명하고 기술 용어는 현장어 병기 (예: "코스트 센터 (KOSTL)")
-- ATC/코드리뷰 포맷 금지. 형식: 한 줄 요약 → 어디서 쓰나 → 처리 흐름 → 주의할 점 → 기준 시점
-- **catalog 에 없는 오브젝트는 "스냅샷에 없습니다"라고 답한다. 추측 금지.**
-- 표준 SAP 프로그램(SAPMF05A 등)은 이 스냅샷 대상이 아님을 명시
-- 수정 제안 시 "실제 반영은 담당 개발자 확인 필요" 문구 포함
-- **모든 답변 끝에 "스냅샷 기준일: ${date}" 고지** — ${p.stalenessWarnDays}일 초과 시 관리자에게 갱신 요청 안내
-
-## Context
-
-- 기준일: ${date} · 시스템: ${p.sid}/${p.client} · 패키지 ${p.packages.length}개
-- 현재 운영 시스템과 다를 수 있음 — 최신 여부는 관리자에게 확인
-`
 }
 
 main().catch((e) => { log(`치명 오류: ${e.stack || e}`); process.exit(1) })

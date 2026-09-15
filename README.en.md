@@ -210,7 +210,7 @@ Full guide: [docs/workflow.md](docs/workflow.md)
 | Level | Path |
 |------|------|
 | 🆕 **Getting started** | [Tutorial (15 min)](docs/tutorial.md) → [FAQ](docs/faq.md) |
-| 🖥 **Desktop operations** | [Install](docs/desktop-install.md) → [Provisioning](docs/provisioning.md) → [CBO snapshots](docs/cbo-snapshot.md) |
+| 🖥 **Desktop operations** | [Install](docs/desktop-install.md) → [Provisioning](docs/provisioning.md) → [CBO snapshots](docs/cbo-snapshot.md) → [US pilot runbook](docs/en/us-pilot-runbook.md) |
 | 📘 **Hands-on** | [5 scenarios](docs/scenarios/) → [Glossary](docs/glossary.md) |
 | 🧭 **Workflow** | [Golden Path](docs/workflow.md) → [Completeness gap analysis](docs/gstack-gap-analysis.md) |
 | 🏗 **Deep dive** | [Architecture](docs/architecture.md) → [Multi-AI guide](docs/multi-ai-compatibility.md) |

@@ -1,0 +1,46 @@
+# sapstack Desktop provisioning — LS Mtron USA pilot (English, cloud LLM)
+# Copy next to the portable exe as provision.yaml. Reference: docs/provisioning.md, docs/en/us-pilot-runbook.md
+# Build the kit: powershell -File scripts/cbo/make-distribution.ps1 -Sid DS4 -Language en -ProvisionFile .\provision.yaml
+version: 1
+
+# ── LLM ──────────────────────────────────────────────────────────
+# Phase 1: Anthropic API key (dedicated key with a spend limit in the Anthropic Console).
+# The app moves the key into the machine-bound vault on first run and scrubs it from this file.
+llm:
+  kind: api_key
+  apiKey: sk-ant-REPLACE-ME
+  # Alternative — Claude via Microsoft Foundry (Azure billing / US data residency), Anthropic-Messages compatible:
+  # baseUrl: https://<resource>.services.ai.azure.com/anthropic
+  # api: anthropic-messages
+  # models: [claude-sonnet-4-5]
+  # name: LS Mtron USA AI
+
+# ── SAP environment (same global S/4 instance as Korea) ────────────
+sapEnvironment:
+  release: S4_2023
+  deployment: private_cloud
+  industry: Injection molding machinery
+  language: en                 # English UI + English guidance prompts + guide.en.md from the snapshot
+  country: US                  # passed to the assistant as Country=US (US GAAP / US-specific wording)
+  # client: "100"
+
+# ── Business-user mode (developer UI hidden) ─────────────────────
+features:
+  uiMode: simple
+
+# ── CBO snapshot delivery ─────────────────────────────────────────
+# US PCs cannot reach the Korean file share (\\lsitc-fs01), so shareRoots is intentionally omitted.
+# The kit ships cbo\<SID>\ next to the exe; refresh with a -SnapshotOnly ZIP via Settings > CBO snapshots > Import from ZIP.
+
+# ── Planned (v2.6): Microsoft sign-in and in-app change requests to LS ITC ──
+# auth:                                   # see docs/entra-signin.md (LS ITC tenant, US users as B2B guests)
+#   required: true
+#   tenantId: <LS ITC tenant GUID>
+#   clientId: <app registration client id>
+#   offlineGraceDays: 14
+#   domainHint: lsinjectionusa.com
+# changeRequests:
+#   provider: azure_devops
+#   orgUrl: https://dev.azure.com/lsitc
+#   project: SAP-Change-Requests
+#   areaPath: SAP-Change-Requests\LSMtron-USA
