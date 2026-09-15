@@ -32,6 +32,7 @@ import {
   SettingsInput,
 } from '@/components/settings'
 import { useUpdateChecker } from '@/hooks/useUpdateChecker'
+import { useIdentity } from '@/contexts/IdentityContext'
 
 export const meta: DetailsPageMeta = {
   navigator: 'settings',
@@ -94,6 +95,7 @@ function validateProxyUrl(url: string): string | undefined {
 
 export default function AppSettingsPage() {
   const { t } = useTranslation()
+  const identity = useIdentity()
 
   // Notifications state
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
@@ -309,6 +311,34 @@ export default function AppSettingsPage() {
               </SettingsSection>
 
               {/* About */}
+              {identity.state.status.kind !== 'disabled' && (
+                <SettingsSection title={t("settings.account.title")}>
+                  <SettingsCard>
+                    <SettingsRow label={identity.state.status.kind === 'signed_in' ? t("settings.account.signedInAs") : t("settings.account.notSignedIn")}>
+                      <div className="flex items-center gap-2">
+                        {identity.state.status.kind === 'signed_in' && (
+                          <span className="text-muted-foreground text-sm">
+                            {identity.state.status.identity.name} &lt;{identity.state.status.identity.email}&gt;
+                            {identity.state.status.offline && (
+                              <span className="ml-2 text-warning">
+                                ({t("settings.account.offline", { date: new Date(identity.state.status.verifiedAt).toLocaleDateString() })})
+                              </span>
+                            )}
+                          </span>
+                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => (identity.state.status.kind === 'signed_in' ? identity.signOut() : identity.signIn())}
+                        >
+                          {identity.state.status.kind === 'signed_in' ? t("settings.account.signOut") : t("settings.account.signIn")}
+                        </Button>
+                      </div>
+                    </SettingsRow>
+                  </SettingsCard>
+                </SettingsSection>
+              )}
+
               <SettingsSection title={t("settings.about.title")}>
                 <SettingsCard>
                   <SettingsRow label={t("settings.about.version")}>

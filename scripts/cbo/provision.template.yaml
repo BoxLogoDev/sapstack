@@ -32,13 +32,24 @@ sapEnvironment:
   release: S4_2023             # ECC6_EhP7|ECC6_EhP8|S4_2020..S4_2024|RISE|PublicCloud|Unknown
   deployment: private_cloud    # on_premise | private_cloud | public_cloud | unknown
   industry: 제조
-  language: ko
+  language: ko                 # en 이면 영어 UI·영어 안내 프롬프트·guide.en.md (해외 법인 예시: examples/provision-lsmtron-usa.yaml)
+  # country: US                # 선택 — ISO 국가코드. 안내 프롬프트에 Country= 로 전달
   # client: "600"              # 선택
   # airGapped: true            # 선택 — 크래시 리포팅·업데이트 폴링 차단 (재시작 후 적용)
 
 # ── 현업 모드 (개발자용 UI 숨김) ─────────────────────────────────
 features:
   uiMode: simple               # simple(현업) | standard
+
+# ── Microsoft(Entra) 로그인 (선택) — docs/entra-signin.md ─────────
+# 블록이 있으면 첫 화면에서 회사 Microsoft 계정 로그인을 요구합니다(접근 통제·작성자 식별).
+# 값이 잘못되면 앱은 로그인 불가(fail closed) 상태로 멈추니 GUID 를 그대로 붙이세요.
+# auth:
+#   required: true
+#   tenantId: 11111111-2222-3333-4444-555555555555   # 앱 등록 테넌트 GUID (common 불가)
+#   clientId: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee   # Application (client) ID
+#   offlineGraceDays: 14                             # 0~90, 오프라인 허용 일수
+#   domainHint: example.com                          # 선택 — 로그인 화면 계정 자동 선택
 
 # ── CBO 스냅샷 공유 스캔 루트 (선택) ─────────────────────────────
 # cbo:

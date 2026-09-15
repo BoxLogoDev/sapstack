@@ -66,3 +66,17 @@ describe('readEnvironmentProfile', () => {
     expect(await readEnvironmentProfile()).toBeNull()
   })
 })
+
+describe('auth / change_requests 보존', () => {
+  test('프로비저닝이 시딩한 auth·change_requests 는 환경 재설정(4필수만 저장)에도 남는다', async () => {
+    await mergeEnvironmentConfigKeys({
+      auth: { required: true, tenant_id: '11111111-2222-3333-4444-555555555555', client_id: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', offline_grace_days: 14 },
+      change_requests: { provider: 'azure_devops', org_url: 'https://dev.azure.com/example', project: 'SAP-Change-Requests' },
+    })
+    await saveEnvironmentProfile({ ...BASE, release: 'S4_2024' })
+    const saved = yaml.load(readFileSync(environmentProfilePath(), 'utf8')) as Record<string, unknown>
+    expect(saved.release).toBe('S4_2024')
+    expect((saved.auth as Record<string, unknown>).tenant_id).toBe('11111111-2222-3333-4444-555555555555')
+    expect((saved.change_requests as Record<string, unknown>).project).toBe('SAP-Change-Requests')
+  })
+})

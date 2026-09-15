@@ -503,4 +503,9 @@ contextBridge.exposeInMainWorld('sapstack', {
   support: {
     export: () => ipcRenderer.invoke('sapstack:support:export'),
   },
+  auth: {
+    status: (force?: boolean) => ipcRenderer.invoke('sapstack:auth:status', force),
+    signIn: () => ipcRenderer.invoke('sapstack:auth:signIn'),
+    signOut: () => ipcRenderer.invoke('sapstack:auth:signOut'),
+  },
 })

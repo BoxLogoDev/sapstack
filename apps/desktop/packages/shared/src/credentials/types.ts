@@ -33,7 +33,9 @@ export type CredentialType =
   | 'source_apikey'      // API keys
   | 'source_basic'       // Basic auth (base64 encoded user:pass)
   // Messaging gateway credentials (keyed by workspaceId + platform)
-  | 'messaging_bearer';  // Platform tokens (e.g., Telegram bot token)
+  | 'messaging_bearer'   // Platform tokens (e.g., Telegram bot token)
+  // App user sign-in (Entra ID) — global, one signed-in user per machine vault
+  | 'entra_signin';      // access token in `value`, refresh token, id_token, verifiedAt
 
 /** Valid credential types for validation */
 const VALID_CREDENTIAL_TYPES: readonly CredentialType[] = [
@@ -49,6 +51,7 @@ const VALID_CREDENTIAL_TYPES: readonly CredentialType[] = [
   'source_apikey',
   'source_basic',
   'messaging_bearer',
+  'entra_signin',
 ] as const;
 
 /** Check if a string is a valid CredentialType */
@@ -104,6 +107,11 @@ export interface StoredCredential {
    * The `value` field stores access_token, this field stores id_token.
    */
   idToken?: string;
+  /**
+   * Last time the credential was verified online (Unix timestamp ms).
+   * Used by entra_signin for the offline grace window.
+   */
+  verifiedAt?: number;
 
   // --- AWS IAM credentials (for llm_iam type) ---
 

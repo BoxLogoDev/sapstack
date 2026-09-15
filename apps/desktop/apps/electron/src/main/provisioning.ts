@@ -127,6 +127,7 @@ async function seedSapEnvironment(env: NonNullable<ProvisionSpec['sapEnvironment
     deployment: env.deployment,
     industry: env.industry,
     language: env.language ?? 'ko',
+    ...(env.country ? { country_iso: env.country } : {}),
     ...(env.client ? { client: env.client } : {}),
     ...(env.airGapped === true ? { air_gapped: true } : {}),
   })
@@ -259,6 +260,20 @@ export async function applyProvisioningIfPresent(): Promise<void> {
     })
   }
   if (spec.cbo?.shareRoots?.length) await applySection('cbo', sections, () => seedCboShareRoots(spec.cbo!.shareRoots!))
+  if (spec.auth) {
+    await applySection('auth', sections, async () => {
+      const a = spec.auth!
+      await mergeEnvironmentConfigKeys({
+        auth: {
+          required: a.required,
+          tenant_id: a.tenantId,
+          client_id: a.clientId,
+          offline_grace_days: a.offlineGraceDays,
+          ...(a.domainHint ? { domain_hint: a.domainHint } : {}),
+        },
+      })
+    })
+  }
 
   writeMarker({ version: spec.version, appliedAt: new Date().toISOString(), sourcePath: found, sections })
 

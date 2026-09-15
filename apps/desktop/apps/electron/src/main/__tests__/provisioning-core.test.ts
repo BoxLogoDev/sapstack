@@ -154,3 +154,28 @@ describe('findProvisionFile', () => {
     expect(findProvisionFile({ envPath: join(base, 'missing.yaml'), execDir, homeDir })).toBeNull()
   })
 })
+
+describe('parseProvisionSpec sapEnvironment.country (해외 법인)', () => {
+  test('country 는 문자열로 통과, 없으면 키 자체가 없음', () => {
+    const withCountry = parseProvisionSpec('version: 1\nsapEnvironment:\n  release: S4_2023\n  deployment: private_cloud\n  industry: machinery\n  language: en\n  country: US\n')
+    expect(withCountry.sapEnvironment?.country).toBe('US')
+    expect(withCountry.sapEnvironment?.language).toBe('en')
+    const without = parseProvisionSpec('version: 1\nsapEnvironment:\n  release: S4_2023\n  deployment: private_cloud\n  industry: machinery\n')
+    expect('country' in (without.sapEnvironment ?? {})).toBe(false)
+  })
+})
+
+describe('parseProvisionSpec auth (Entra 로그인)', () => {
+  const TENANT = '11111111-2222-3333-4444-555555555555'
+  const CLIENT = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
+
+  test('정상 블록은 EntraAuthConfig 로 정규화(기본 required:true, grace 14)', () => {
+    const spec = parseProvisionSpec(`version: 1\nauth:\n  tenantId: ${TENANT}\n  clientId: ${CLIENT}\n  domainHint: lsinjectionusa.com\n`)
+    expect(spec.auth).toEqual({ required: true, tenantId: TENANT, clientId: CLIENT, offlineGraceDays: 14, domainHint: 'lsinjectionusa.com' })
+  })
+
+  test('common 테넌트·GUID 아님은 ProvisionError 로 거부', () => {
+    expect(() => parseProvisionSpec(`version: 1\nauth:\n  tenantId: common\n  clientId: ${CLIENT}\n`)).toThrow('tenant GUID')
+    expect(() => parseProvisionSpec(`version: 1\nauth:\n  tenantId: ${TENANT}\n  clientId: nope\n`)).toThrow('client')
+  })
+})

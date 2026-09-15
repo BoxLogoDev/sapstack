@@ -102,6 +102,7 @@ import { createApplicationMenu } from './menu'
 import { WindowManager } from './window-manager'
 import { registerSapstackRuntimeHandlers } from './sapstack-runtime'
 import { registerCboSnapshotHandlers } from './cbo-snapshot'
+import { getSignedInIdentity, registerIdentityHandlers } from './identity'
 import { applyProvisioningIfPresent, ensureLocalLlmDefaultConnection } from './provisioning'
 import { initLocalLlm } from './local-llm'
 import { loadWindowState, saveWindowState } from './window-state'
@@ -415,6 +416,8 @@ app.whenReady().then(async () => {
   // MCP remains available for third-party sources but is not required here.
   registerSapstackRuntimeHandlers()
   registerCboSnapshotHandlers()
+  // 앱 사용자 로그인(Entra) — config.yaml `auth` 가 없으면 disabled 를 돌려주는 것 외에 아무 일도 하지 않는다
+  registerIdentityHandlers()
 
   // Bundled local LLM engine (llama-server + operator-imported model pack).
   // No-op when either piece is absent; loopback-only, air-gapped safe.
@@ -673,6 +676,10 @@ app.whenReady().then(async () => {
             updateBadgeCount,
             onSessionStarted,
             onSessionStopped,
+            getSessionAuthor: async () => {
+              const id = await getSignedInIdentity()
+              return id ? { email: id.email, name: id.name, oid: id.oid } : null
+            },
             captureException: (error, context) => {
               Sentry.captureException(error instanceof Error ? error : new Error(String(error)), {
                 tags: {

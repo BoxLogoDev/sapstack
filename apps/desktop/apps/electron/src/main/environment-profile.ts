@@ -49,6 +49,9 @@ export async function saveEnvironmentProfile(input: Record<string, unknown>): Pr
   const airGapped = input.air_gapped ?? existing.air_gapped
   const uiMode = input.ui_mode ?? existing.ui_mode
   const cbo = input.cbo ?? existing.cbo
+  // 앱 로그인(identity.ts)·변경 요청(change-requests.ts) 설정 — 프로비저닝이 시딩, 환경 재설정에 소실되면 안 된다
+  const auth = input.auth ?? existing.auth
+  const changeRequests = input.change_requests ?? existing.change_requests
 
   const profile = {
     profile_version: 1,
@@ -65,6 +68,8 @@ export async function saveEnvironmentProfile(input: Record<string, unknown>): Pr
     ...(uiMode === 'simple' || uiMode === 'standard' ? { ui_mode: uiMode } : {}),
     // CBO 스냅샷 설정(공유 스캔 루트 등) — cbo-snapshot.ts 가 소비.
     ...(cbo && typeof cbo === 'object' ? { cbo } : {}),
+    ...(auth && typeof auth === 'object' ? { auth } : {}),
+    ...(changeRequests && typeof changeRequests === 'object' ? { change_requests: changeRequests } : {}),
   }
   await writeProfileAtomic(profile)
   return profile

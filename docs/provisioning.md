@@ -38,16 +38,37 @@ LLM 연결(+API 키), SAP 환경 프로파일, 현업 모드(ui_mode), CBO 공�
 
 ## 배포 절차 (하드 룰 포함)
 
-1. `provision.template.yaml` 을 복사해 값 채우기
+1. `provision.template.yaml` 을 복사해 값 채우기 (해외 법인 영어 배포는 `scripts/cbo/examples/provision-lsmtron-usa.yaml` 참조 — `language: en`, `country: US`)
 2. ZIP 생성:
    ```powershell
    powershell -ExecutionPolicy Bypass -File scripts/cbo/make-distribution.ps1 `
-     -Sid DS4 -ProvisionFile .\provision.yaml [-ModelFile .\qwen3-8b.gguf]
+     -Sid DS4 -ProvisionFile .\provision.yaml [-ModelFile .\qwen3-8b.gguf] [-Language en]
    ```
+   `-Language en` 은 영문 `README.txt` 와 ZIP 접미 `-en` 을 쓴다 (영어 운영 문서: `docs/en/us-pilot-runbook.md`)
 3. **[필수] 스모크 테스트 1회**: 깨끗한 PC(또는 아래 샌드박스)에서 ZIP 을 풀고
    exe 실행 → 설정 화면 없이 채팅 도달 → 질문 1개 성공 확인.
    키 무효는 프로비저닝 시점에 검증할 수 없고 첫 채팅에서야 드러난다.
 4. 배포. 키가 든 ZIP 은 사내 승인된 채널로만 전달하고 배포 후 원본 삭제.
+
+## Microsoft(Entra) 로그인 (auth, 선택)
+
+`auth:` 블록이 있으면 앱은 온보딩 이전에 **회사 Microsoft 계정 로그인 게이트**를 띄운다.
+접근 허용은 Entra(Enterprise App 할당·보안 그룹)가 결정하고, 로그인 신원은 세션 헤더
+`createdBy` 에 남는다. 값은 `~/.sapstack/config.yaml` 의 `auth` 로 시딩되며 환경 프로파일
+재저장에도 보존된다.
+
+```yaml
+auth:
+  required: true
+  tenantId: <테넌트 GUID>      # common/organizations 불가
+  clientId: <Application (client) ID>
+  offlineGraceDays: 14         # 0~90
+  # domainHint: example.com
+```
+
+- 블록이 **없으면** 로그인 기능이 꺼진다(기존 동작). 블록이 있는데 GUID 가 잘못되면 프로비저닝이
+  실패하고 앱은 **fail closed**(로그인 불가·관리자 문의) 로 멈춘다 — 오탈자에 주의.
+- 앱 등록·그룹·B2B 게스트·회수 절차와 스모크 항목은 [entra-signin.md](entra-signin.md).
 
 ## 검증 샌드박스 (개발자용)
 
@@ -72,4 +93,4 @@ $env:SAPSTACK_PROVISION_FILE = "C:\path\to\provision.yaml"
 | 로컬 모델이 안 뜸 | GGUF 복사 확인(`~/.sapstack/models/`), 모델 로딩에 수십 초 소요(503 정상) |
 | 사용자가 연결을 지웠음 | version 을 올려 재배포하면 재생성됨 |
 
-관련 문서: [cbo-snapshot.md](cbo-snapshot.md)(스냅샷 운영), [desktop-install.md](desktop-install.md)
+관련 문서: [cbo-snapshot.md](cbo-snapshot.md)(스냅샷 운영), [entra-signin.md](entra-signin.md)(Microsoft 로그인), [desktop-install.md](desktop-install.md)

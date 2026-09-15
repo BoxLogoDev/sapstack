@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { useTheme } from '@/hooks/useTheme'
 import type { ThemeOverrides } from '@config/theme'
 import { useSetAtom, useStore, useAtomValue, useAtom } from 'jotai'
-import type { Session, Workspace, SessionEvent, Message, FileAttachment, StoredAttachment, PermissionRequest, CredentialRequest, CredentialResponse, SetupNeeds, SessionStatus, NewChatActionParams, ContentBadge, LlmConnectionWithStatus, PermissionModeState, SapEnvironmentProfile } from '../shared/types'
+import type { Session, Workspace, SessionEvent, Message, FileAttachment, StoredAttachment, PermissionRequest, CredentialRequest, CredentialResponse, SetupNeeds, SessionStatus, NewChatActionParams, ContentBadge, LlmConnectionWithStatus, PermissionModeState, SapEnvironmentProfile, SignInState } from '../shared/types'
+import { IdentityContext, type IdentityContextValue } from './contexts/IdentityContext'
 import type { SessionDraft, DraftAttachmentRef } from '@sapstack-desktop/shared/config'
 import type { SessionOptions, SessionOptionUpdates } from './hooks/useSessionOptions'
 import { defaultSessionOptions, mergeSessionOptions, setDefaultPermissionMode } from './hooks/useSessionOptions'
@@ -13,7 +14,7 @@ import { useEventProcessor } from './event-processor'
 import type { AgentEvent, Effect } from './event-processor'
 import { AppShell } from '@/components/app-shell/AppShell'
 import type { AppShellContextType } from '@/context/AppShellContext'
-import { OnboardingWizard, ReauthScreen, SapEnvironmentStep } from '@/components/onboarding'
+import { OnboardingWizard, ReauthScreen, SapEnvironmentStep, SignInGate } from '@/components/onboarding'
 import { WorkspacePicker } from '@/components/workspace'
 import { ResetConfirmationDialog } from '@/components/ResetConfirmationDialog'
 import { SplashScreen } from '@/components/SplashScreen'
@@ -304,6 +305,25 @@ export default function App() {
   }, [])
 
   const uiMode = sapEnvironment?.ui_mode === 'simple' ? 'simple' : 'standard'
+
+  // 앱 사용자 로그인(Entra) — config.yaml `auth` 가 없으면 disabled. 접근 통제가 우선이므로
+  // 온보딩보다 먼저 판정하고, required && signed_out 이면 SignInGate 가 모든 화면을 대신한다.
+  const [signInState, setSignInState] = useState<SignInState | undefined>(undefined)
+  useEffect(() => {
+    window.sapstack.auth.status()
+      .then(setSignInState)
+      .catch((error) => {
+        console.error('[App] sign-in status failed:', error)
+        // IPC 자체가 실패하면 게이트를 걸 근거가 없다 — 기존 동작(비활성)으로 진행
+        setSignInState({ status: { kind: 'disabled' }, required: false })
+      })
+  }, [])
+  const identityValue = useMemo<IdentityContextValue>(() => ({
+    state: signInState ?? { status: { kind: 'disabled' }, required: false },
+    signIn: async () => { const next = await window.sapstack.auth.signIn(); setSignInState(next); return next },
+    signOut: async () => { const next = await window.sapstack.auth.signOut(); setSignInState(next); return next },
+    refresh: async () => { const next = await window.sapstack.auth.status(true); setSignInState(next); return next },
+  }), [signInState])
 
   // 현업(simple) 모드: 새 세션 기본 권한을 read-only(safe)로 — 승인 프롬프트 제거
   useEffect(() => {
@@ -1985,8 +2005,20 @@ export default function App() {
   }), [handleOpenFile, handleOpenUrl, linkInterceptor.openFileExternal])
 
   // Loading state - show splash screen
-  if (appState === 'loading' || sapEnvironment === undefined) {
+  if (appState === 'loading' || sapEnvironment === undefined || signInState === undefined) {
     return <SplashScreen isExiting={false} />
+  }
+
+  // Sign-in gate — access control comes before onboarding/workspace (LS Mtron USA rollout)
+  if (signInState.required && signInState.status.kind === 'signed_out') {
+    return (
+      <DismissibleLayerProvider>
+        <ModalProvider>
+          <WindowCloseHandler />
+          <SignInGate state={signInState} onSignIn={identityValue.signIn} />
+        </ModalProvider>
+      </DismissibleLayerProvider>
+    )
   }
 
   // Reauth state - session expired, need to re-login
@@ -2093,6 +2125,7 @@ export default function App() {
 
   // Ready state - main app with splash overlay during data loading
   return (
+    <IdentityContext.Provider value={identityValue}>
     <UiModeContext.Provider value={uiMode}>
     <PlatformProvider actions={platformActions}>
     <ShikiThemeProvider shikiTheme={shikiTheme}>
@@ -2176,6 +2209,7 @@ export default function App() {
     </ShikiThemeProvider>
     </PlatformProvider>
     </UiModeContext.Provider>
+    </IdentityContext.Provider>
   )
 }
 

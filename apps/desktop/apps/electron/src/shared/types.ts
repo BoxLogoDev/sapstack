@@ -1198,6 +1198,17 @@ declare global {
       support: {
         export(): Promise<{ saved: boolean }>
       }
+      /** 앱 사용자 로그인(Entra ID) — main/identity.ts. status.kind === 'disabled' 면 설정 없음 */
+      auth: {
+        status(force?: boolean): Promise<SignInState>
+        signIn(): Promise<SignInState>
+        signOut(): Promise<SignInState>
+      }
     }
   }
+}
+
+export interface SignInState {
+  status: import('@sapstack-desktop/shared/auth/entra-signin').SignInStatus
+  required: boolean
 }

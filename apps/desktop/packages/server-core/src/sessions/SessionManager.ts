@@ -71,6 +71,7 @@ import {
   type SessionMetadata,
   type SessionStatus,
   type SessionHeader,
+  type SessionAuthor,
   pickSessionFields,
 } from '@sapstack-desktop/shared/sessions'
 import { loadWorkspaceSources, loadAllSources, getSourcesBySlugs, isSourceUsable, type LoadedSource, type McpServerConfig, getSourcesNeedingAuth, getSourceCredentialManager, getSourceServerBuilder, type SourceWithCredential, isApiOAuthProvider, hasRenewEndpoint, SERVER_BUILD_ERRORS, TokenRefreshManager, createTokenGetter } from '@sapstack-desktop/shared/sources'
@@ -123,6 +124,8 @@ interface SessionRuntimeHooks {
   captureException: (error: unknown, context?: { errorSource?: string; sessionId?: string }) => void
   onSessionStarted: () => void
   onSessionStopped: () => void
+  /** Entra sign-in identity to stamp on new sessions (null when sign-in is disabled / signed out). */
+  getSessionAuthor?: () => Promise<SessionAuthor | null>
 }
 
 const defaultSessionRuntimeHooks: SessionRuntimeHooks = {
@@ -975,6 +978,8 @@ interface ManagedSession {
   tokenRefreshManager: TokenRefreshManager
   // Metadata for sessions created by automations
   triggeredBy?: { automationName?: string; event?: string; timestamp?: number }
+  // Signed-in user who created the session
+  createdBy?: SessionAuthor
   // Promise that resolves when the agent instance is ready (for title gen to await)
   agentReady?: Promise<void>
   agentReadyResolve?: () => void
@@ -2888,8 +2893,10 @@ export class SessionManager implements ISessionManager {
     }
 
     // Use storage layer to create and persist the session
+    const createdBy = (await sessionRuntimeHooks.getSessionAuthor?.()) ?? undefined
     const storedSession = await createStoredSession(workspaceRootPath, {
       name: options?.name,
+      createdBy,
       permissionMode: defaultPermissionMode,
       workingDirectory: resolvedWorkingDir,
       hidden: options?.hidden,

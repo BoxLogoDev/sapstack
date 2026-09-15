@@ -10,6 +10,7 @@ import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { existsSync } from 'node:fs'
 import * as yaml from 'js-yaml'
+import { parseEntraAuthConfig, type EntraAuthConfig } from '@sapstack-desktop/shared/auth/entra-signin'
 import {
   type CustomEndpointApi,
   type LlmConnection,
@@ -44,10 +45,14 @@ export interface ProvisionSpec {
     deployment: string
     industry: string
     language?: string
+    /** ISO 3166-1 alpha-2 (예: US) → config.yaml country_iso — 안내 프롬프트의 Country= 로 전달 */
+    country?: string
     client?: string
     airGapped?: boolean
   }
   features?: { uiMode?: 'simple' | 'standard' }
+  /** 앱 사용자 로그인(Entra ID) — config.yaml `auth` 로 시딩. 검증은 shared/auth/entra-signin 의 파서가 담당 */
+  auth?: EntraAuthConfig
   cbo?: { shareRoots?: string[] }
 }
 
@@ -154,6 +159,7 @@ export function parseProvisionSpec(raw: string): ProvisionSpec {
       deployment: String(env.deployment ?? ''),
       industry: String(env.industry ?? ''),
       ...(env.language !== undefined ? { language: String(env.language) } : {}),
+      ...(env.country !== undefined ? { country: String(env.country) } : {}),
       ...(env.client !== undefined ? { client: String(env.client) } : {}),
       ...(env.airGapped === true ? { airGapped: true } : {}),
     }
@@ -165,6 +171,15 @@ export function parseProvisionSpec(raw: string): ProvisionSpec {
       const uiMode = String(features.uiMode)
       if (!UI_MODES.has(uiMode)) throw new ProvisionError('features.uiMode 는 simple | standard 중 하나여야 합니다')
       spec.features = { uiMode: uiMode as 'simple' | 'standard' }
+    }
+  }
+
+  if (d.auth !== undefined) {
+    try {
+      const auth = parseEntraAuthConfig(asMapping(d.auth, 'auth'))
+      if (auth) spec.auth = auth
+    } catch (err) {
+      throw new ProvisionError(err instanceof Error ? err.message : String(err))
     }
   }
 

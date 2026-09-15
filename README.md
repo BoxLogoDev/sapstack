@@ -207,7 +207,7 @@ cp sapstack/.kiro/steering/*.md .kiro/steering/
 | 레벨 | 경로 |
 |------|------|
 | 🆕 **입문** | [튜토리얼 (15분)](docs/tutorial.md) → [FAQ](docs/faq.md) |
-| 🖥 **데스크톱 운영** | [설치](docs/desktop-install.md) → [프로비저닝](docs/provisioning.md) → [CBO 스냅샷](docs/cbo-snapshot.md) |
+| 🖥 **데스크톱 운영** | [설치](docs/desktop-install.md) → [프로비저닝](docs/provisioning.md) → [CBO 스냅샷](docs/cbo-snapshot.md) → [Microsoft 로그인](docs/entra-signin.md) |
 | 📘 **실전** | [시나리오 5개](docs/scenarios/) → [용어집](docs/glossary.md) |
 | 🧭 **워크플로** | [Golden Path](docs/workflow.md) → [완성도 갭 분석](docs/gstack-gap-analysis.md) |
 | 🏗 **심화** | [아키텍처](docs/architecture.md) → [Multi-AI 가이드](docs/multi-ai-compatibility.md) |

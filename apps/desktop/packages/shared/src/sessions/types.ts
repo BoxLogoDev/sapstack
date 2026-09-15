@@ -53,6 +53,8 @@ export const SESSION_PERSISTENT_FIELDS = [
   'transferredSessionSummaryApplied',
   // Automation origin
   'triggeredBy',
+  // Author (Entra sign-in identity at creation time)
+  'createdBy',
   // Project binding (workspace-scoped grouping)
   'projectId',
   // Kanban: task/subtask hierarchy + board column
@@ -103,6 +105,13 @@ export interface SessionTokenUsage {
  * Re-exported from @sapstack-desktop/core for convenience
  */
 export type { StoredMessage } from '@sapstack-desktop/core/types';
+
+/** Signed-in user who created the session (from the Entra id_token; absent when sign-in is disabled). */
+export interface SessionAuthor {
+  email: string;
+  name: string;
+  oid: string;
+}
 
 /**
  * Session configuration (persisted metadata)
@@ -208,6 +217,8 @@ export interface SessionConfig {
   transferredSessionSummaryApplied?: boolean;
   /** Metadata for sessions created by automations */
   triggeredBy?: { automationName?: string; event?: string; timestamp?: number };
+  /** Signed-in user who created the session */
+  createdBy?: SessionAuthor;
   /** Workspace-scoped project id this session belongs to (undefined = unbound). */
   projectId?: string;
   /** Parent session id — when set, this session is a subtask of the parent (undefined = top-level task). */
@@ -315,6 +326,8 @@ export interface SessionHeader {
   transferredSessionSummaryApplied?: boolean;
   /** Metadata for sessions created by automations */
   triggeredBy?: { automationName?: string; event?: string; timestamp?: number };
+  /** Signed-in user who created the session */
+  createdBy?: SessionAuthor;
   /** Workspace-scoped project id this session belongs to (undefined = unbound). */
   projectId?: string;
   /** Parent session id — when set, this session is a subtask of the parent (undefined = top-level task). */
