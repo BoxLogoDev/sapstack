@@ -47,6 +47,13 @@ test('스크럽: RESTRICTED 마스킹 + 리포트 전용 분리', () => {
   assert.ok(masked.includes('resident_id') && !masked.includes('email'))
 })
 
+test("스크럽: 공백 리터럴 PASSWORD = ' ' 는 시크릿 아님", () => {
+  const blank = scrubSource("*     PASSWORD                        = ' '", 'report')
+  assert.equal(blank.findings.length, 0)
+  const real = scrubSource("  IF password = 'abcd'.", 'report')
+  assert.deepEqual(real.findings.map((f) => f.kind), ['hardcoded_secret'])
+})
+
 test('스크럽 report 모드: 아무것도 변형하지 않음', () => {
   const src = "  lv_rrn = '900101-1234567'."
   const { text, findings } = scrubSource(src, 'report')

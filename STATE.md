@@ -1,6 +1,6 @@
 # STATE — sapstack
 
-> 갱신: 2026-09-15 · `main` @ `d255f5f` · **CI 녹색 복구(08-20 이후 처음) · v2.5.0 태그 로컬 생성, 푸시 대기 · 현업 파일럿 진행 중(08-30~)**
+> 갱신: 2026-09-15 오후 · `main` = origin(백로그 진행 커밋 포함) · **CI 녹색 복구(08-20 이후 처음) · v2.5.0 태그 로컬 생성, 푸시 대기 · DS4 실제 수집 진행 중 · 현업 파일럿 진행 중(08-30~)**
 > 규약: 규칙은 `AGENTS.md`, 판단은 `decisions/`, 상태는 이 파일. 개선 후보 순위표는
 > `plans/2026-09-15-improvement-backlog.md`.
 
@@ -19,9 +19,14 @@
   드리프트 ⑤ OAuth 테스트 2파일이 `globalThis.fetch`를 404 mock으로 바꾸고 복원 안 함 →
   러너의 파일 순서에 따라 webui http-server 테스트 6건 404. ①②는 08-29부터, ③은 08-20 이후
   Content Gates가 링크 검사에서 멈춰 숨어 있었고, ④⑤는 ①②를 고친 뒤에야 드러났다
-- **CBO 야간 스케줄러** — 배터리 시작 허용·놓친 시각 실행·robocopy 재시도 상한. 기동과 로그
-  기록은 실측 확인했으나 **이 PC는 09-15 현재 DS4/QS4/PS4 모두 TCP 불통**이라 0건 → 치명 가드가
-  직전 스냅샷을 보존했다(정상 동작). 실제 수집은 사내망에서의 다음 06:30 실행이 첫 검증
+- **CBO 야간 스케줄러** — 배터리 시작 허용·놓친 시각 실행·robocopy 재시도 상한. 오전 불통 시엔
+  치명 가드가 직전 스냅샷을 보존했고(정상), **12:25 사내망 복귀 후 실제 수집을 기동**했다 —
+  124,363건 열거, 약 400건/분, 17:30 전후 완료 예상(직전 08-30 스냅샷은 34,460건)
+- **QS4 정례화** — `export-cbo.mjs`가 `~/.sapstack/.env.<SID>` 오버레이(URL/클라이언트만)를 읽고,
+  `sapstack-cbo-export-QS4` 평일 07:30 태스크 등록. dry-run ZFI1 1,937건으로 시스템 전환 확인
+- **시크릿 25건 열람** — 24건은 주석 처리된 `PASSWORD = ' '` 자리표시자(오탐) → 규칙에서 공백
+  리터럴 제외(테스트 추가). 진짜 1건 `zhr0/zhrrd015.prog.abap:108`(HR 리포트 접근코드) 판단 대기
+- **백로그 정리** — runtime 테스트 고정값을 asset-manifest 대조로, 통계 문자열 갱신, #18/#20 종료
 - **QS4 전체 덤프 영구화** — `~/.sapstack/cbo/QS4-dump/`(59,264파일) + `~/.sapstack/cbo/abapdump-tool/`
 
 모델 판단: 4~12B 로컬 모델은 SAP 지식이 없다(F110 질의 3회 전부 오답). 답 품질은 앱의 지식 주입이
@@ -32,26 +37,26 @@
 | 항목                                          | 상태·증거                                                                                                                                                | 다음 행동                                                                                                                                                       |
 | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **🔴 v2.5.0 태그 푸시**                        | 로컬 태그 `v2.5.0` = `d255f5f`(= origin/main, CI 녹색). 자동 모드 정책이 공개 릴리스 생성(태그 푸시)을 차단                                                 | **사용자**: `git push origin v2.5.0` → `release.yml`(desktop-windows 빌드 → Release 생성 → npm publish). npm publish는 토큰 만료로 실패 예상, Release 자산은 올라감 |
-| **🔴 CBO 스냅샷 신선도**                       | 스냅샷 `exported_at` 08-30 23:30Z 고정. 스케줄러는 복구됐으나 이 PC에서 SAP 3계 TCP 불통                                                                   | 사내망 연결 상태에서 06:30 이후 `DS4/meta/export-log.txt`와 manifest `exported_at` 확인                                                                          |
+| **🔴 CBO 스냅샷 신선도**                       | DS4 실제 수집 09-15 12:25 기동(124,363건, 17:30 전후 완료 예상). QS4 첫 정례 실행은 09-16 07:30                                                            | 완료 후 `DS4/manifest.yaml`의 `exported_at`·`status`·`totals` 확인. QS4는 `~/.sapstack/cbo/QS4/manifest.yaml` 생성 확인. 게시 robocopy는 DNS로 실패 예상       |
 | 🟡 npm MCP 미발행                              | `npm view` = 2.4.0. 토큰 만료(E404)                                                                                                                       | **사용자**: Automation 토큰 재발급 → `NPM_TOKEN` secret 갱신 → release 워크플로 rerun                                                                            |
 | 🟡 공유폴더 게시 막힘                           | `lsitc-fs01` DNS 미해석(09-15 재확인)                                                                                                                     | **사용자**: 서버 개통/호스트명 확인. 열리면 스케줄러가 자동 게시                                                                                                 |
-| 🟡 배포 전 시크릿 25건 검토                     | `DS4/meta/pii-report.json` reported 420 중 시크릿 25                                                                                                     | 25건 열람 → 진짜 시크릿이면 마스킹 규칙 추가                                                                                                                     |
+| 🟡 시크릿 1건 판단                              | 25건 중 24건은 `PASSWORD = ' '` 자리표시자 오탐 → 규칙 수정 완료. 남은 1건 `zhr0/zhrrd015.prog.abap:108`(HR 리포트 접근코드, 리포트만 되고 마스킹 안 됨)      | **사용자**: 리포트만 둘지, 문자 비밀번호 마스킹 규칙을 추가할지(백로그 #6)                                                                                       |
 | 🟡 PS4 ADT HTTP 403                            | `/sap/bc/adt` ICF 비활성                                                                                                                                  | **사용자**: Basis에 SICF 활성화 요청(읽기 전용 수집 목적 명시)                                                                                                    |
 | 데스크톱 테스트 격리                            | 전역 `fetch`를 바꾸는 테스트 파일 9개 중 복원 없던 2개 수정. bun test는 373파일을 한 프로세스에서 돌리고 파일 순서가 러너마다 달라 누출이 잠복한다             | 새 테스트에서 전역 스텁은 반드시 `afterEach/afterAll` 복원. `--frozen-lockfile` 드리프트 방지로 `"latest"` 지정 금지                                               |
-| 로컬 LLM 답 품질 기준선 없음                    | `docs/eval/pilot-local.json` 0.316은 08-17 4건, 제로 셋팅·지식 주입 이전                                                                                   | Qwen3-4B/8B로 gold-set 58건 재실행 → 클라우드 0.638과 격차 수치화                                                                                                |
+| 로컬 LLM 답 품질 기준선 없음                    | `docs/eval/pilot-local.json` 0.316은 08-17 4건, 제로 셋팅·지식 주입 이전. 이 PC 여유 RAM 3.7GB라 세션과 병행 불가                                            | PC 여유 시 로컬 eval 실행(명령은 백로그 #13) → 클라우드 0.638과 격차 수치화                                                                                      |
 | 스크래치패드 잔재                               | lock 드리프트 재현용 worktree(`…/scratchpad/wt-main`, node_modules 포함)가 경로 길이 오류로 자동 삭제 실패                                                   | 사용자 승인 시 재귀 삭제 후 `git worktree prune`                                                                                                                 |
 
 ## 다음 한 걸음
 
 **`git push origin v2.5.0`** 한 줄이다. 그러면 release 워크플로가 Windows 설치파일·vsix·MCP tgz를
 빌드해 GitHub Release를 만든다. 확인할 것: Release 자산 5종(Setup/Portable exe, latest.yml, vsix,
-tgz). 그 뒤 현업 PC 업데이트 안내와, 사내망에서 스케줄러 첫 실제 수집 확인.
+tgz). 그 뒤 현업 PC 업데이트 안내. 오늘 17:30 이후 DS4 스냅샷, 내일 07:30 이후 QS4 스냅샷 확인.
 
 ## 건드리면 안 되는 것
 
 - `data/eval/gold-set.yaml` — 시험지. 에이전트가 열람하면 채점이 무의미해진다
 - `mcp/assets/` — gitignore 된 빌드 생성물. 고치려면 `mcp/build.mjs` 를 고친다
-- `~/.sapstack/.env` — SAP 비밀번호 평문. 공유·커밋 금지
+- `~/.sapstack/.env` — SAP 비밀번호 평문. 공유·커밋 금지. `.env.<SID>`에는 URL/클라이언트만 두고 비밀번호를 복제하지 않는다
 - CI-parity 규율: push 전 `ci.yml`의 게이트를 **전부** 로컬 실행(첫 실패에서 멈추므로 뒤 게이트 고장이 숨는다) + bump 후 `build-multi-ai --write`
 - 빌드 중 `git checkout` 금지. 빌드는 `build-win.ps1 -KeepRunningProcesses` 절대경로로(메모리 `sapstack-build-windows`)
 - electron `resources/release-notes/`에 `next.md` 같은 비버전 파일 금지 — 로더가 모든 .md를 버전으로 읽는다

@@ -132,7 +132,9 @@ async function main() {
   const srcRoot = join(snapshotRoot, 'src')
   const metaRoot = join(snapshotRoot, 'meta')
 
-  const sapEnv = parseEnvFile(join(homedir(), '.sapstack', '.env'))
+  // 시스템별 재정의: ~/.sapstack/.env.<SID> 가 있으면 그 키만 덮어쓴다 (SAP_URL/SAP_CLIENT 만 적고 계정은 .env 상속)
+  const envDir = join(homedir(), '.sapstack')
+  const sapEnv = { ...parseEnvFile(join(envDir, '.env')), ...parseEnvFile(join(envDir, `.env.${args.system}`)) }
   if (!args.catalogOnly && (!sapEnv.SAP_URL || !sapEnv.SAP_USER)) {
     log('거부: ~/.sapstack/.env 에 SAP_URL/SAP_USER 필요 (setup.sh [3/5] 또는 Desktop 설정 > SAP 접속)')
     process.exit(1)

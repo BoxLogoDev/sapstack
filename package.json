@@ -1,7 +1,7 @@
 {
   "name": "sapstack",
   "version": "2.5.0",
-  "description": "SAP Enterprise Operations Platform — 20 plugins, 16 agents, 18 commands, 328+ T-codes, 6 languages, MCP server, VS Code Extension, country/industry/bridge/exceptions/hooks frameworks",
+  "description": "SAP Enterprise Operations Platform — 24 plugins, 21 agents, 23 commands, 472 T-codes, 6 languages, MCP server, VS Code Extension, country/industry/bridge/exceptions/hooks frameworks",
   "license": "MIT",
   "author": "BoxLogoDev",
   "keywords": [

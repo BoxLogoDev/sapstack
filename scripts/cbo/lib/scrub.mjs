@@ -19,7 +19,8 @@ const REPORT_PATTERNS = [
   { kind: 'bank_account', re: /\b\d{3}[-\s]\d{2,6}[-\s]\d{2,8}\b/g },
   { kind: 'mobile_phone', re: /\b01[016789][-\s]?\d{3,4}[-\s]?\d{4}\b/g },
   { kind: 'email', re: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g },
-  { kind: 'hardcoded_secret', re: /\b(?:PASSWORD|PASSWD|PWD)\s*(?:=|EQ)\s*'[^']+'/gi },
+  // 공백뿐인 리터럴(PASSWORD = ' ')은 주석 처리된 호출 블록의 자리표시자 — 제외
+  { kind: 'hardcoded_secret', re: /\b(?:PASSWORD|PASSWD|PWD)\s*(?:=|EQ)\s*'(?=[^']*[^'\s])[^']+'/gi },
 ]
 
 function maskValue(match) {

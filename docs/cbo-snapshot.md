@@ -15,6 +15,7 @@ ADT 라이브 브리지(`docs/adt-bridge.md`)의 오프라인 보완재다. 아�
 1. Node.js 20+ 및 이 저장소 (`npm install` 1회)
 2. [vsp](https://github.com/oisee/vibing-steampunk) 단일 바이너리 — 경로를 `VSP_BIN` 환경변수로 지정 (미지정 시 `~/vibing-steampunk/build/vsp.exe` → PATH 순)
 3. SAP 접속 프로필 `~/.sapstack/.env` — `setup.sh`/`setup.ps1` 의 [3/5] 단계 또는 Desktop 설정 > SAP 접속이 생성
+   - 시스템이 여럿이면 `~/.sapstack/.env.<SID>`(예: `.env.QS4`)에 `SAP_URL`/`SAP_CLIENT` 만 적는다 — 나머지 키는 `.env` 를 상속
 4. (선택) `~/.sapstack/config.yaml` 의 `cbo:` 블록 — 시스템별 패키지 목록 (`.sapstack/config.example.yaml` 참고)
 
 ## 실행
