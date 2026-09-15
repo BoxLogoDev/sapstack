@@ -11,7 +11,7 @@
 | 1   | ✅ CI main 적색                        | 원인 5종 수정·푸시(45f0eb7 a921e03 7132e7d d255f5f). run 34921336264 전 잡 녹색 — 08-20 이후 처음. 숨어 있던 원인: multi-AI `"id"` 카운트, `@types/bun: latest` 드리프트, OAuth 테스트의 전역 fetch 누출                                       | ✅ runtime 테스트 고정값 → `asset-manifest.json` counts 대조(09-15 오후)                                              | —    | `gh run list -b main -L 1` success                                        |
 | 2   | ✅ CBO 야간 스케줄러 미실행             | `register-task.ps1`: 배터리 시작 허용·StartWhenAvailable·robocopy `/R:2 /W:5`. 09-15 12:27 사내망 복귀 후 스케줄러 경로로 첫 실제 수집 완료(13:14, 47분): 검색 히트 124,363 → 오브젝트 34,496 / 파일 33,957 / 실패 539, 카탈로그 32,653, git 178파일 변경(08-30 대비), status partial. 12:03 기동분은 네트워크 불통으로 0건 가드 작동 | partial 원인은 08-30과 동일한 539건(538건 ADT 404 — 열거는 되나 소스가 없는 PROG). 404를 실패 대신 스킵으로 다루면 complete — 별건 후보. 게시 robocopy는 DNS(#5)로 실패 | —    | 완료: manifest `exported_at` 2026-09-15T04:14Z                             |
 | 3   | ✅ QS4 전체 덤프 임시 폴더              | `~/.sapstack/cbo/QS4-dump/`(59,264파일, `_INDEX.md`) + `~/.sapstack/cbo/abapdump-tool/`(exe·Go 소스·래퍼·로그). 스크래치패드 원본은 지워도 됨                                                                                          | —                                                                                                                   | —    | 완료                                                                      |
-| 4   | **v2.5.0 컷 — 태그 푸시만 남음**        | 릴리스 커밋 c501692 푸시됨, 로컬 annotated 태그 `v2.5.0` → `d255f5f`. 자동 모드가 공개 릴리스 생성(태그 푸시)을 차단                                                                                                                    | `git push origin v2.5.0` → release.yml 감시 → Release 자산 5종 확인. npm publish 단계는 토큰 만료로 실패 예상(#8) | 🧑 푸시 → 🤖 확인 | `gh release view v2.5.0` 자산: Setup/Portable exe, latest.yml, vsix, tgz |
+| 4   | ✅ v2.5.0 컷                          | 09-15 13:50 사용자 지시로 태그 푸시 → release run 34930314696: Desktop installer 성공, Release 생성 성공, 자산 5종 확인(Setup 256MB / Portable 256MB / latest.yml / vsix / MCP tgz 1.1MB). `Publish MCP to npm`만 E404(토큰 만료)                          | npm은 #8 — 토큰 갱신 후 같은 run의 실패 잡 재실행                                                                    | —    | 완료                                                                      |
 
 ## P1 — 파일럿 운영
 
@@ -48,7 +48,7 @@
 
 ## 제안 순서
 
-- **즉시 (🧑 1줄)**: #4 `git push origin v2.5.0` → 🤖 릴리스 감시·자산 확인
+- **즉시 (🧑)**: #8 npm 토큰 갱신 → release run 34930314696 "Re-run failed jobs"
 - **사용자 병행**: #5 DNS · #7 SICF · #8 npm 토큰 · #17 EV 인증서 — 전부 외부 리드타임이 있는 것
 - **사용자 판단 1건**: #6 남은 시크릿 1건(HR 리포트 접근코드) — 리포트만 둘지, 문자 비밀번호 마스킹을 추가할지
 - **다음 세션 (🤖)**: #2 DS4 수집 결과(09-15 17:30 이후)·#9 QS4 첫 정례 실행(09-16 07:30) 확인 → #13 로컬 기준선(PC 여유 시) → #14/#15 보강 → #16 환류 정책

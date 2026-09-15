@@ -1,6 +1,6 @@
 # STATE — sapstack
 
-> 갱신: 2026-09-15 오후 · `main` = origin(백로그 진행 커밋 포함) · **CI 녹색 복구(08-20 이후 처음) · v2.5.0 태그 로컬 생성, 푸시 대기 · DS4 첫 실제 수집 완료(13:14) · 현업 파일럿 진행 중(08-30~)**
+> 갱신: 2026-09-15 오후 · `main` = origin(백로그 진행 커밋 포함) · **CI 녹색 복구(08-20 이후 처음) · v2.5.0 Release 게시(자산 5종, npm publish만 실패) · DS4 첫 실제 수집 완료(13:14) · 현업 파일럿 진행 중(08-30~)**
 > 규약: 규칙은 `AGENTS.md`, 판단은 `decisions/`, 상태는 이 파일. 개선 후보 순위표는
 > `plans/2026-09-15-improvement-backlog.md`.
 
@@ -8,8 +8,9 @@
 
 **현업 파일럿 국면**이다. v2.4.1이 GitHub Release에 올라갔고(08-20), 그 위에 파일럿용 기능
 27커밋(CBO 스냅샷·관리자 프로비저닝·현업 모드·공급 채널·로컬 LLM 제로 셋팅)을 쌓았다.
-09-15에 이것을 **v2.5.0으로 묶는 준비를 끝냈다**: 버전 일괄 갱신, CHANGELOG `[2.5.0]`,
-한국어 릴리스 노트, 로컬 annotated 태그 `v2.5.0` → `d255f5f`. 태그 푸시만 남았다.
+09-15에 이것을 **v2.5.0으로 릴리스했다**: 버전 일괄 갱신, CHANGELOG `[2.5.0]`, 한국어 릴리스 노트,
+태그 `v2.5.0` → `d255f5f` 푸시(13:50) → release run 34930314696이 GitHub Release와 자산 5종
+(Setup/Portable exe, latest.yml, vsix, MCP tgz)을 게시. `Publish MCP to npm` 단계만 토큰 만료(E404)로 실패.
 
 09-15에 함께 고친 것 (모두 `main`에 푸시, CI run 34921336264 전 잡 녹색):
 
@@ -37,9 +38,9 @@
 
 | 항목                                          | 상태·증거                                                                                                                                                | 다음 행동                                                                                                                                                       |
 | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **🔴 v2.5.0 태그 푸시**                        | 로컬 태그 `v2.5.0` = `d255f5f`(= origin/main, CI 녹색). 자동 모드 정책이 공개 릴리스 생성(태그 푸시)을 차단                                                 | **사용자**: `git push origin v2.5.0` → `release.yml`(desktop-windows 빌드 → Release 생성 → npm publish). npm publish는 토큰 만료로 실패 예상, Release 자산은 올라감 |
+| 🟢 v2.5.0 릴리스                               | Release 게시 완료(run 34930314696): Setup 256MB · Portable 256MB · latest.yml · vsix · MCP tgz. `gh release view v2.5.0`                                   | 현업 PC 업데이트 안내(latest.yml이 있어 앱 자동 업데이트 대상). npm은 아래 항목                                                                                  |
 | 🟢 CBO 스냅샷 신선도                           | DS4 `exported_at` 2026-09-15T04:14Z — 스케줄러 경로 첫 실제 수집. QS4 첫 정례 실행은 09-16 07:30                                                            | 09-16 06:30 DS4 무인 실행과 07:30 QS4 첫 스냅샷(`~/.sapstack/cbo/QS4/manifest.yaml`) 확인. 게시 robocopy는 DNS로 실패                                            |
-| 🟡 npm MCP 미발행                              | `npm view` = 2.4.0. 토큰 만료(E404)                                                                                                                       | **사용자**: Automation 토큰 재발급 → `NPM_TOKEN` secret 갱신 → release 워크플로 rerun                                                                            |
+| 🟡 npm MCP 미발행                              | `npm view` = 2.4.0. release run 34930314696의 `Publish MCP to npm`이 E404(토큰 만료)로 실패 — 09-15 재확인                                                  | **사용자**: Automation 토큰 재발급 → `NPM_TOKEN` secret 갱신 → run 34930314696 "Re-run failed jobs"(같은 태그)                                                     |
 | 🟡 공유폴더 게시 막힘                           | `lsitc-fs01` DNS 미해석(09-15 재확인)                                                                                                                     | **사용자**: 서버 개통/호스트명 확인. 열리면 스케줄러가 자동 게시                                                                                                 |
 | 🟢 시크릿 처리                                  | 24건 오탐은 규칙에서 제외, 남은 1건 `zhr0/zhrrd015.prog.abap:108`은 사용자 결정으로 마스킹 승격(`'***'`). DS4 재수집(09-15 오후)으로 스냅샷 반영                | 재수집 후 pii-report `hardcoded_secret` masked:true 확인                                                                                                         |
 | 🟡 PS4 ADT HTTP 403                            | `/sap/bc/adt` ICF 비활성                                                                                                                                  | **사용자**: Basis에 SICF 활성화 요청(읽기 전용 수집 목적 명시)                                                                                                    |
@@ -49,9 +50,8 @@
 
 ## 다음 한 걸음
 
-**`git push origin v2.5.0`** 한 줄이다. 그러면 release 워크플로가 Windows 설치파일·vsix·MCP tgz를
-빌드해 GitHub Release를 만든다. 확인할 것: Release 자산 5종(Setup/Portable exe, latest.yml, vsix,
-tgz). 그 뒤 현업 PC 업데이트 안내. 내일 06:30 DS4 무인 실행과 07:30 QS4 첫 스냅샷 확인.
+현업 PC에 v2.5.0 업데이트를 안내하고, npm 토큰을 갱신해 release run의 실패 잡을 재실행한다.
+내일 06:30 DS4 무인 실행과 07:30 QS4 첫 스냅샷을 확인한다.
 
 ## 건드리면 안 되는 것
 
