@@ -1,4 +1,4 @@
-import { describe, it, expect, mock, beforeEach } from 'bun:test'
+import { describe, it, expect, mock, beforeEach, afterAll } from 'bun:test'
 
 /**
  * Tests that all OAuth prepare functions correctly support callbackUrl
@@ -6,8 +6,15 @@ import { describe, it, expect, mock, beforeEach } from 'bun:test'
  */
 
 // Mock fetch globally to prevent real HTTP requests during metadata discovery
+const originalFetch = globalThis.fetch
 const mockFetch = mock(() => Promise.resolve(new Response('Not Found', { status: 404 })))
 globalThis.fetch = mockFetch as any
+
+// bun test runs every file in one process — leaving the 404 mock installed makes every
+// later file's fetch() return 404 (seen: server-core webui http-server tests).
+afterAll(() => {
+  globalThis.fetch = originalFetch
+})
 
 import { prepareGoogleOAuth } from '../google-oauth'
 
