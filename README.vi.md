@@ -15,7 +15,7 @@ _"Trong SAP đây là tiêu chuẩn nên không thể thay đổi." — Cô Tiê
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![languages](https://img.shields.io/badge/languages-6-orange)](#)
 
-**Ứng dụng desktop Windows v2.4.1 · 24 plugin · 21 agent · 23 lệnh · CBO snapshot · hỗ trợ mạng cách ly · 6 ngôn ngữ · sẵn sàng tuân thủ**
+**Ứng dụng desktop Windows v2.5.0 · 24 plugin · 21 agent · 23 lệnh · CBO snapshot · hỗ trợ mạng cách ly · 6 ngôn ngữ · sẵn sàng tuân thủ**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 

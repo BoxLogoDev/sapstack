@@ -16,7 +16,7 @@
 Repository: https://github.com/BoxLogoDev/sapstack
 
 <!-- BEGIN sapstack-auto: stats -->
-- **sapstack 버전**: v2.4.1
+- **sapstack 버전**: v2.5.0
 - **플러그인**: 24개
 - **서브에이전트**: 21개
 - **슬래시 커맨드**: 23개

@@ -40,6 +40,7 @@ TARGETS=(
   "packages/runtime/package.json"
   "apps/desktop/package.json"
   "apps/desktop/apps/electron/package.json"
+  "apps/desktop/packages/shared/package.json"
 )
 
 # version 필드를 추출 (jq 없이 sed로, 첫 매치만)

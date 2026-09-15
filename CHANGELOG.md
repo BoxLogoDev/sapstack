@@ -11,7 +11,13 @@ scripts/generate-release-notes.sh 가 태그 버전과 같은 헤딩을 찾아 �
 추출하므로, 헤딩이 없으면 릴리스 노트가 비어서 나간다.
 -->
 
-## [Unreleased]
+## [2.5.0] - 2026-09-15
+
+### Fixed
+
+- **CI main 적색 복구** — runtime 테스트의 카탈로그 고정값(에이전트 21·커맨드 23) 갱신, electron `resources/AGENTS.md` 의 `release-notes/next.md` 끊어진 링크 제거, `build-multi-ai.sh --check` 가 새 marketplace 스키마(`"id"`→`"name"`)에서 플러그인을 0개로 세던 문제 수정. 08-29 이후 Content Gates 가 링크 검사에서 멈춰 뒤쪽 게이트가 실행되지 않고 있었다
+- **CBO 야간 스케줄러가 실제로 돈다** — `register-task.ps1` 이 배터리에서도 시작·지속하고 놓친 시각을 깨어난 뒤 실행하도록 설정(기본값에서는 노트북이 0x800710E0 으로 거부해 한 번도 돌지 않았다). 공유폴더 게시 robocopy 재시도를 `/R:2 /W:5` 로 제한해 불통 시 태스크가 영원히 Running 으로 남지 않게
+- `npm run cbo:test` 가 Node 21+ 에서 디렉터리 인자를 모듈로 해석해 실패하던 것을 파일 지정으로 수정
 
 ### Added — 로컬 LLM 제로 셋팅
 

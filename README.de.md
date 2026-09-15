@@ -15,7 +15,7 @@ _„In SAP ist das Standard, das geht nicht." — Frau Standard ([Markenrichtlin
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![languages](https://img.shields.io/badge/languages-6-orange)](#)
 
-**Windows-Desktop-App v2.4.1 · 24 Plugins · 21 Agenten · 23 Befehle · CBO-Snapshots · Air-Gap-fähig · 6 Sprachen · Compliance-ready**
+**Windows-Desktop-App v2.5.0 · 24 Plugins · 21 Agenten · 23 Befehle · CBO-Snapshots · Air-Gap-fähig · 6 Sprachen · Compliance-ready**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 
