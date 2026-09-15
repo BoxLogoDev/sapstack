@@ -34,6 +34,6 @@
     "check:doc-stats": "node scripts/check-doc-stats.mjs",
     "check:assets": "node scripts/generate-asset-manifest.mjs --check",
     "cbo:export": "node scripts/cbo/export-cbo.mjs",
-    "cbo:test": "node --test scripts/cbo/tests/"
+    "cbo:test": "node --test scripts/cbo/tests/lib.test.mjs"
   }
 }

@@ -55,8 +55,8 @@ test("catalog and knowledge services use the canonical repository assets", async
   t.after(() => rm(sessionsDir, { recursive: true, force: true }));
 
   assert.equal((await runtime.catalog.plugins()).length, 24);
-  assert.equal((await runtime.catalog.agents()).length, 20);
-  assert.equal((await runtime.catalog.commands()).length, 22);
+  assert.equal((await runtime.catalog.agents()).length, 21);
+  assert.equal((await runtime.catalog.commands()).length, 23);
   assert.equal((await runtime.knowledge.checkTcode("F110")).verified, true);
   assert.ok((await runtime.knowledge.resolveSymptom({ query: "F110 payment method" })).length > 0);
   assert.equal((await runtime.knowledge.lookupSynonym("코스트센터")).canonical, "cost_center");

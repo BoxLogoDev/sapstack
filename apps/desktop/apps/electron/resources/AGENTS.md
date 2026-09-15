@@ -52,8 +52,8 @@ There is no TypeScript fallback - if the bundled JSON file is missing, the app w
 
 ## Release Notes Authoring
 
-**Never create `{version}.md` files in feature commits.** Versioned files in `release-notes/` are owned by the release skill — it consolidates pending entries into `{version}.md` at release-prep time and resets the scratch file.
+**Never create `{version}.md` files in feature commits.** Versioned files in `release-notes/` are written at release time only, in Korean, from the repository root `CHANGELOG.md` (`scripts/generate-release-notes.sh` extracts the matching heading). sapstack has no `next.md` scratch file — the loader treats every `.md` here as a version, so a scratch file would surface as a ghost entry.
 
-For PRs that add user-visible behavior, append a bullet to the relevant section in [`release-notes/next.md`](release-notes/next.md). Match the tone and depth of recent versioned files (e.g. `0.9.0.md`): bold short title — detailed paragraph — issue reference — commit hash.
+For PRs that add user-visible behavior, add a bullet under `[Unreleased]` in the root `CHANGELOG.md`. Match the tone and depth of recent versioned files (e.g. `2.4.1.md`): bold short title — one user-facing paragraph.
 
 **Why this exists:** during v0.9.0 prep, two feature commits had pre-emptively written `0.8.14.md` and `0.8.15.md` (guessing patch releases), but the changes ended up rolled into a minor. Both files had to be deleted and folded back in — without that cleanup, they would have surfaced as ghost versions in the in-app release-notes panel.
