@@ -1,57 +1,49 @@
 # STATE — sapstack
 
-> 갱신: 2026-08-19 · `main` @ `7c4aef9` · **v2.4.1 태그 푸시 완료, 릴리스 빌드 중**
-> 규약: `~/.claude/workflows/project-memory.md`. 규칙은 `AGENTS.md`, 판단 이력은 `decisions/`.
+> 갱신: 2026-09-15 · `main` @ `cd876ec` · **v2.4.1 릴리스 게시(08-20) · 현업 파일럿 진행 중(08-30~) · 미출시 커밋 27개**
+> 규약: 규칙은 `AGENTS.md`, 판단은 `decisions/`, 상태는 이 파일. 개선 후보 순위표는
+> `plans/2026-09-15-improvement-backlog.md`.
 
 ## 지금 어디까지 왔나
 
-네 번째 표면인 **데스크톱 앱**을 출시 가능한 상태로 마감하는 국면이다.
-v2.4.0 이 npm 에 라이브인 상태에서, 데스크톱(Electron) 쪽 미완성을 걷어내고 있다.
+**현업 파일럿 국면**이다. v2.4.1이 GitHub Release에 올라갔고(Setup/Portable exe, vsix, MCP tgz),
+그 위에 파일럿용 기능을 27커밋 쌓았지만 아직 릴리스로 묶지 않았다:
 
-2026-08-19 함대 작업으로 세 가지가 닫혔다:
+- **CBO 스냅샷** — DS4 Z/Y 커스텀 코드를 ADT로 수집해 현업이 자기 코드를 질문한다
+  (`sap-cbo-explainer` 에이전트 + `/sap-cbo-explain`). 08-31 전 모듈 수집 34,460 오브젝트
+  (실패 539, status partial). PII 마스킹 430건, 리포트 420건
+- **관리자 프로비저닝 + 현업 모드** — `provision.yaml` 하나로 무설정 첫 실행, 홈 화면 단순화
+- **로컬 LLM 제로 셋팅** — 연결 전무 + GGUF 발견 시 자동 연결. 깨끗한 PC E2E 스모크 통과.
+  08-19 STATE의 "pi-agent-server 미포함으로 로컬 채팅 불가"는 이 시점에 **해소**
+- **배포 킷 3종** `dist-cbo/`(git 미추적) — 일반 264MB / Qwen3-4B 2.9GB / Qwen3-8B 5.4GB
 
-- **다국어가 실제로 동작한다** — ko/vi 로케일을 신설(각 1,721키, en parity)하고 SAP UI 4파일의
-  한국어 하드코딩을 i18n 키로 이전. "6개 언어 지원"이 앱 기준으로 참이 됐다
-- **로컬 LLM 온보딩 결함 수리** — 서버가 안 떠 있어도 온보딩이 완료되고 첫 채팅에서
-  `piServerPath not configured` 로 죽던 것을, probe IPC + 저장 전 2단계 검증으로 차단
-- **T-code 백로그 101건 전수 검증** — 실존 56건 등록, 오탐 31·확인필요 14는 사유 주석과 함께
-  allowlist 유지(창작 등록 0건)
+모델 판단: 4~12B 로컬 모델은 SAP 지식이 없다(F110 질의 3회 전부 오답). 답 품질은 앱의 지식 주입이
+결정하고, 품질이 필요하면 프로비저닝 `kind: api_key`(클라우드)가 정답. 근거는 메모리 `sapstack-pilot`.
 
-지시서도 정리했다: `AGENTS.md` 가 정본이 되고 `CLAUDE.md`·`.windsurfrules` 는 포인터로 축소.
-그 여파로 규칙을 코드로 읽던 3곳(eval 하니스·MCP 리소스·데스크톱 자산 복사)을 함께 정렬했다.
+## 열린 것 (2026-09-15 전수 재검증)
 
-**릴리스 파이프라인을 네 번에 걸쳐 뚫었다** (PR #45, #47, #48, #49). 데스크톱 잡이 추가된 뒤
-이 파이프라인이 끝까지 간 적이 한 번도 없었고, 결함이 **순차적으로만** 드러났다 —
-앞의 것을 고쳐야 다음 것이 보인다:
-
-1. `build-win.ps1` 이 BOM 없는 UTF-8 → 영어 로케일 러너에서만 파서가 깨짐 (#45)
-2. `bun install --ignore-scripts` 가 `@vscode/ripgrep`·`electron` 바이너리 postinstall 을 건너뜀 (#47)
-3. `electron-builder` 가 태그 푸시에서 스스로 업로드하려다 `GH_TOKEN` 요구 (#48)
-4. `npm publish` 실패가 `Create GitHub Release` 를 skip 시켜 데스크톱 배포까지 막음 (#49)
-
-네 개 다 "로컬은 통과, CI 만 실패" 형태다. 전체 캐스케이드는
-`~/.claude/.../memory/sapstack-release-cascade.md`, 4번의 판단 근거는
-`decisions/active/2026-08-19-workflow-owns-release-upload.md` 에 있다.
-
-## 열린 것
-
-| 항목                                                                                 | 막힌 이유                                                                                                                                                                                                                                                                                      | 다음 행동                                                                                                                                                                                                       |
-| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **🔴 설치본에 pi-agent-server 가 없다 — 로컬 채팅 전면 불가 (v2.4.1 에서도 미해소)** | 수리를 `scripts/electron-build-resources.ts` 에 넣었는데 **`build-win.ps1` 은 그걸 부르지 않는다** — 조각 빌드 + `copy-assets.ts`(정적 자산만)만 돈다. 2.4.1 설치본 실측으로 재확인. 게다가 `pi-agent-server` 는 로컬 빌드 자체가 안 된다(`@aws-crypto/crc32` 미해석, 루트 `.bun` 스토어 누락) | ① 클린 체크아웃에서 `bun install` → `bun run server:build:subprocess` 통과 여부 확인 → ② 통과하면 `build-win.ps1` 에 `server:build:subprocess` + `electron:build:resources` 추가. 검증 전 워크플로에 넣지 말 것 |
-| **로컬 LLM 실기기 검증**                                                             | 위 항목이 먼저다. 2.4.1 설치본으로는 여전히 못 한다                                                                                                                                                                                                                                            | 서브프로세스 서버가 실린 빌드가 나온 뒤 → 모델팩을 `~/.sapstack/models/` 에 넣고 채팅 1턴                                                                                                                       |
-| **🟡 npm 토큰 만료 — MCP 2.4.1 미발행**                                              | `Publish MCP to npm` 이 `E404 PUT` 로 실패. 패키지는 존재하므로(2.4.0) 스코프가 아니라 토큰 문제 — npm 은 권한 부족에도 404 를 준다                                                                                                                                                            | **사용자 조치**: npm Automation 토큰 재발급 → `NPM_TOKEN` secret 갱신 → 워크플로 rerun. 미발행 버전이라 같은 태그 재사용 가능                                                                                   |
-| GGUF 가중치 미번들                                                                   | 라이선스·용량 문제로 설치파일에 못 넣음                                                                                                                                                                                                                                                        | 운영자가 USB 반입. 권장 모델팩 결정 필요                                                                                                                                                                        |
-| Qwen3 8B "권장" 판정 보류                                                            | 개발 머신 실측 0.75 tok/s — 타깃 사양(16GB 노트북) 미실측                                                                                                                                                                                                                                      | 실기기 측정 후 문서의 "장비에 따라 선택" 문구 확정                                                                                                                                                              |
+| 항목                                               | 상태·증거                                                                                                                                                                                          | 다음 행동                                                                                                                                  |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **🔴 CI main 적색 — 08-29부터 12회 연속**           | ① runtime 테스트의 카탈로그 고정값 stale(에이전트 21·커맨드 23 vs 20·22 — CBO 기능이 각 1개 추가) ② `check-links --strict`: electron `resources/AGENTS.md` → `release-notes/next.md` 끊어짐(527240f에서 next.md 삭제, 문단만 잔존) | 두 건 **09-15 로컬 수정 완료** — 테스트 고정값 21/23, AGENTS.md 문단을 CHANGELOG 기반 실제 흐름으로 갱신(next.md는 복원하면 앱 패널에 유령 버전으로 뜨므로 미복원)| 두 건 **09-15 로컬 수정 완료** — `npm test` 36/36, `check-links` 0건. 커밋·푸시 → CI 녹색 확인 → v2.5.0 컷                                  |
+| **🔴 CBO 야간 스케줄러가 한 번도 돌지 않았다**        | `sapstack-cbo-export-DS4` Last Result `0x800710E0`, `DS4/meta/export-log.txt` 부재, 스냅샷 `exported_at` 08-30 23:30Z 고정. 태스크 XML `DisallowStartIfOnBatteries=true` + `InteractiveToken`   | `register-task.ps1`에 배터리 허용 설정 반영 → 재등록 → `schtasks /Run` 1회 실측. 로그온 없이 돌릴지(`/RU`+비밀번호 또는 S4U) 결정 필요       |
+| **🟠 QS4 전체 덤프 774MB가 임시 폴더에**             | 세션 `13bf26e0…` 스크래치패드 `ps4/qs4-full/`(패키지 228, `.md` 59k) + `abapdump/` 도구. 세션 정리 시 소멸                                                                                          | 영구 위치로 복사. 제안: 덤프 `~/.sapstack/cbo/QS4-dump/`, 도구 `scripts/cbo/abapdump/`. **위치는 사용자 결정**                               |
+| 🟡 npm MCP 2.4.1 미발행                             | `npm view` = 2.4.0. `E404 PUT` = 토큰 만료 그대로                                                                                                                                                  | **사용자**: Automation 토큰 재발급 → `NPM_TOKEN` secret 갱신 → release 워크플로 rerun                                                        |
+| 🟡 공유폴더 게시 막힘                                | `lsitc-fs01` DNS 미해석(09-15 재확인). 스케줄러 robocopy와 provision `shareRoots` 모두 여기로 향함                                                                                                   | **사용자**: 서버 개통/호스트명 확인. 열리면 스케줄러가 자동 게시                                                                            |
+| 🟡 배포 전 시크릿 25건 검토                          | `DS4/meta/pii-report.json` reported 420 중 시크릿 25                                                                                                                                              | 25건 열람 → 진짜 시크릿이면 마스킹 규칙 추가                                                                                                |
+| 🟡 PS4 ADT HTTP 403                                 | `/sap/bc/adt` ICF 비활성. QS4/DS4는 정상                                                                                                                                                           | **사용자**: Basis에 SICF 활성화 요청(읽기 전용 수집 목적 명시)                                                                              |
+| `npm run cbo:test` 로컬 실패                        | Node 24가 `scripts/cbo/tests/` 디렉터리 인자를 `MODULE_NOT_FOUND`. CI에는 없는 테스트                                                                                                              | 스크립트를 파일 패턴으로                                                                                                                    |
+| 로컬 LLM 답 품질 기준선 없음                         | `docs/eval/pilot-local.json` 0.316은 08-17 4건, 제로 셋팅·지식 주입 이전 측정. 클라우드 0.638(58건)                                                                                                | Qwen3-4B/8B로 gold-set 58건 재실행 → 격차 수치화                                                                                            |
 
 ## 다음 한 걸음
 
-**클린 체크아웃에서 `bun install` → `bun run server:build:subprocess` 가 통과하는지 확인.**
-이 한 줄이 갈림길이다 — 통과하면 로컬 스토어 오염이라 `build-win.ps1` 만 고치면 되고,
-실패하면 의존성 해석 자체의 결함이라 별도 조사가 필요하다. 데스크톱의 핵심 판매 포인트인
-로컬 LLM 채팅이 여기에 걸려 있고, 아직 한 번도 실제로 돈 적이 없다.
+**CI를 녹색으로 되돌리고 v2.5.0을 컷한다.** 수정 2건은 로컬에 있다(미커밋). 커밋·푸시 → CI 확인 →
+`scripts/bump-version.sh` → CHANGELOG `[Unreleased]`를 `[2.5.0]`으로 → 태그. 27커밋의 파일럿
+기능이 릴리스 없이 배포 ZIP으로만 나가 있어, 현업 PC 앱은 "2.4.1"을 표시하는 미출시 코드다.
 
 ## 건드리면 안 되는 것
 
 - `data/eval/gold-set.yaml` — 시험지. 에이전트가 열람하면 채점이 무의미해진다
 - `mcp/assets/` — gitignore 된 빌드 생성물. 고치려면 `mcp/build.mjs` 를 고친다
-- CI-parity 규율: push 전 로컬 11게이트 `--strict` 선검증 + bump 후 `build-multi-ai --write`
+- `~/.sapstack/.env` — SAP 비밀번호 평문. 공유·커밋 금지
+- CI-parity 규율: push 전 로컬 게이트 `--strict` 선검증 + bump 후 `build-multi-ai --write`
+- 빌드 중 `git checkout` 금지. 빌드는 `build-win.ps1 -KeepRunningProcesses` 절대경로로(메모리 `sapstack-build-windows`)
