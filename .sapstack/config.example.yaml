@@ -114,7 +114,7 @@ project:
 #     - '\\fileserver\sapstack\cbo'
 #   # 이 일수를 넘기면 stale 경고 (기본 30)
 #   staleness_warn_days: 30
-#   # PII 처리: off / report / mask (mask 는 주민번호·카드·계좌·사업자번호만)
+#   # PII 처리: off / report / mask (mask 는 주민번호·카드·사업자번호·하드코딩 비밀번호, 계좌·연락처·이메일은 리포트만)
 #   scrub: mask
 #   systems:
 #     DS4:

@@ -66,7 +66,7 @@ vsp 의 직렬화 실패는 무음 스킵이므로 이 식이 유일한 탐지 �
 | 패키지 가드 `^[$ZY]` (스크립트 강제) | 표준 SAP 소스 export 원천 차단 |
 | PRD 기본 거부 (`--allow-prd` 필요) | 운영 직접 수집 방지 |
 | 조회 전용 SAP 계정 (S_DEVELOP ACTVT 03) | vsp export 경로에 안전 플래그가 **적용되지 않으므로** 계정 권한이 실질 경계 |
-| PII 스크럽: 주민번호·카드·사업자번호 마스킹 / 계좌·연락처·비밀번호 의심은 리포트 | 한글 주석 오탐 보호 — 배포 전 `meta/pii-report.json` 검토 필수 |
+| PII 스크럽: 주민번호·카드·사업자번호·하드코딩 비밀번호 마스킹 / 계좌·연락처는 리포트 | 한글 주석 오탐 보호 — 배포 전 `meta/pii-report.json` 검토 필수 |
 | 스냅샷 git remote 없음 + repo 트리 밖 저장 | 소스 유출 경로 차단, check-hardcoding 게이트와 무충돌 |
 | `manifest.exported_by` | K-SOX 감사용 수집 주체 기록 |
 

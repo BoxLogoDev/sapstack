@@ -4,23 +4,25 @@
  * 원칙 (mcp/pii-scrubber.ts 에서 파생 — 형식이 강한 것만 자동 마스킹):
  * - 자동 마스킹: 주민등록번호(6-7, 성별자리 검증) / 신용카드(4-4-4-4) / 사업자번호(3-2-5)
  *   — 형식이 강해 오탐이 드물고, 소스에 있어선 안 되는 데이터다.
+ *   하드코딩 비밀번호(PASSWORD = '...')도 마스킹 — 리터럴 전체를 '***' 로 바꾼다
+ *   (길이도 남기지 않는다). 2026-09-15 DS4 검토에서 진짜 1건 발견 후 승격.
  * - 리포트만: 계좌번호(국내 표준 형식 없음 — 휴대폰·전표번호와 충돌) / 휴대전화 /
- *   이메일 / 하드코딩 비밀번호 의심 — 자동 변형하면 사본·주석이 훼손된다.
- * 마스킹은 자릿수 보존 형태(끝 4자리 유지)로 diff 안정성을 유지한다.
+ *   이메일 — 자동 변형하면 사본·주석이 훼손된다.
+ * 숫자 마스킹은 자릿수 보존 형태(끝 4자리 유지)로 diff 안정성을 유지한다.
  */
 
 const MASK_PATTERNS = [
   { kind: 'resident_id', re: /\b(\d{6})[-\s]?([1-4]\d{6})\b/g },
   { kind: 'credit_card', re: /\b(\d{4})[-\s]?(\d{4})[-\s]?(\d{4})[-\s]?(\d{4})\b/g },
   { kind: 'business_id', re: /\b(\d{3})-(\d{2})-(\d{5})\b/g },
+  // 공백뿐인 리터럴(PASSWORD = ' ')은 주석 처리된 호출 블록의 자리표시자 — 제외
+  { kind: 'hardcoded_secret', re: /\b(?:PASSWORD|PASSWD|PWD)\s*(?:=|EQ)\s*'(?=[^']*[^'\s])[^']+'/gi, mask: (m) => m.replace(/'[^']*'$/, "'***'") },
 ]
 
 const REPORT_PATTERNS = [
   { kind: 'bank_account', re: /\b\d{3}[-\s]\d{2,6}[-\s]\d{2,8}\b/g },
   { kind: 'mobile_phone', re: /\b01[016789][-\s]?\d{3,4}[-\s]?\d{4}\b/g },
   { kind: 'email', re: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g },
-  // 공백뿐인 리터럴(PASSWORD = ' ')은 주석 처리된 호출 블록의 자리표시자 — 제외
-  { kind: 'hardcoded_secret', re: /\b(?:PASSWORD|PASSWD|PWD)\s*(?:=|EQ)\s*'(?=[^']*[^'\s])[^']+'/gi },
 ]
 
 function maskValue(match) {
@@ -41,13 +43,13 @@ export function scrubSource(text, mode = 'mask') {
 
   const scan = (patterns, masked) => {
     for (let i = 0; i < lines.length; i++) {
-      for (const { kind, re } of patterns) {
+      for (const { kind, re, mask = maskValue } of patterns) {
         re.lastIndex = 0
         if (!re.test(lines[i])) continue
         findings.push({ kind, line: i + 1, masked })
         if (masked) {
           re.lastIndex = 0
-          lines[i] = lines[i].replace(re, (m) => maskValue(m))
+          lines[i] = lines[i].replace(re, (m) => mask(m))
         }
       }
     }

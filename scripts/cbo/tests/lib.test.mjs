@@ -52,6 +52,13 @@ test("스크럽: 공백 리터럴 PASSWORD = ' ' 는 시크릿 아님", () => {
   assert.equal(blank.findings.length, 0)
   const real = scrubSource("  IF password = 'abcd'.", 'report')
   assert.deepEqual(real.findings.map((f) => f.kind), ['hardcoded_secret'])
+  assert.ok(real.text.includes("'abcd'"), 'report 모드는 원문 보존')
+})
+
+test('스크럽 mask 모드: 하드코딩 비밀번호 리터럴은 통째로 ***', () => {
+  const { text, findings } = scrubSource("  IF password = 'abcd'.\n  CALL FUNCTION 'X' EXPORTING pwd = 'p@ss 1'.", 'mask')
+  assert.equal(text, "  IF password = '***'.\n  CALL FUNCTION 'X' EXPORTING pwd = '***'.")
+  assert.deepEqual(findings.map((f) => [f.kind, f.line, f.masked]), [['hardcoded_secret', 1, true], ['hardcoded_secret', 2, true]])
 })
 
 test('스크럽 report 모드: 아무것도 변형하지 않음', () => {

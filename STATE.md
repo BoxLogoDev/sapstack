@@ -25,7 +25,8 @@
 - **QS4 정례화** — `export-cbo.mjs`가 `~/.sapstack/.env.<SID>` 오버레이(URL/클라이언트만)를 읽고,
   `sapstack-cbo-export-QS4` 평일 07:30 태스크 등록. dry-run ZFI1 1,937건으로 시스템 전환 확인
 - **시크릿 25건 열람** — 24건은 주석 처리된 `PASSWORD = ' '` 자리표시자(오탐) → 규칙에서 공백
-  리터럴 제외(테스트 추가). 진짜 1건 `zhr0/zhrrd015.prog.abap:108`(HR 리포트 접근코드) 판단 대기
+  리터럴 제외(테스트 추가). 진짜 1건 `zhr0/zhrrd015.prog.abap:108`(HR 리포트 접근코드)은 사용자
+  결정으로 마스킹 승격 — 리터럴을 `'***'`로 치환. DS4 재수집(오후)으로 스냅샷에 반영
 - **백로그 정리** — runtime 테스트 고정값을 asset-manifest 대조로, 통계 문자열 갱신, #18/#20 종료
 - **QS4 전체 덤프 영구화** — `~/.sapstack/cbo/QS4-dump/`(59,264파일) + `~/.sapstack/cbo/abapdump-tool/`
 
@@ -40,7 +41,7 @@
 | 🟢 CBO 스냅샷 신선도                           | DS4 `exported_at` 2026-09-15T04:14Z — 스케줄러 경로 첫 실제 수집. QS4 첫 정례 실행은 09-16 07:30                                                            | 09-16 06:30 DS4 무인 실행과 07:30 QS4 첫 스냅샷(`~/.sapstack/cbo/QS4/manifest.yaml`) 확인. 게시 robocopy는 DNS로 실패                                            |
 | 🟡 npm MCP 미발행                              | `npm view` = 2.4.0. 토큰 만료(E404)                                                                                                                       | **사용자**: Automation 토큰 재발급 → `NPM_TOKEN` secret 갱신 → release 워크플로 rerun                                                                            |
 | 🟡 공유폴더 게시 막힘                           | `lsitc-fs01` DNS 미해석(09-15 재확인)                                                                                                                     | **사용자**: 서버 개통/호스트명 확인. 열리면 스케줄러가 자동 게시                                                                                                 |
-| 🟡 시크릿 1건 판단                              | 25건 중 24건은 `PASSWORD = ' '` 자리표시자 오탐 → 규칙 수정 완료. 남은 1건 `zhr0/zhrrd015.prog.abap:108`(HR 리포트 접근코드, 리포트만 되고 마스킹 안 됨)      | **사용자**: 리포트만 둘지, 문자 비밀번호 마스킹 규칙을 추가할지(백로그 #6)                                                                                       |
+| 🟢 시크릿 처리                                  | 24건 오탐은 규칙에서 제외, 남은 1건 `zhr0/zhrrd015.prog.abap:108`은 사용자 결정으로 마스킹 승격(`'***'`). DS4 재수집(09-15 오후)으로 스냅샷 반영                | 재수집 후 pii-report `hardcoded_secret` masked:true 확인                                                                                                         |
 | 🟡 PS4 ADT HTTP 403                            | `/sap/bc/adt` ICF 비활성                                                                                                                                  | **사용자**: Basis에 SICF 활성화 요청(읽기 전용 수집 목적 명시)                                                                                                    |
 | 데스크톱 테스트 격리                            | 전역 `fetch`를 바꾸는 테스트 파일 9개 중 복원 없던 2개 수정. bun test는 373파일을 한 프로세스에서 돌리고 파일 순서가 러너마다 달라 누출이 잠복한다             | 새 테스트에서 전역 스텁은 반드시 `afterEach/afterAll` 복원. `--frozen-lockfile` 드리프트 방지로 `"latest"` 지정 금지                                               |
 | 로컬 LLM 답 품질 기준선 없음                    | `docs/eval/pilot-local.json` 0.316은 08-17 4건, 제로 셋팅·지식 주입 이전. 이 PC 여유 RAM 3.7GB라 세션과 병행 불가                                            | PC 여유 시 로컬 eval 실행(명령은 백로그 #13) → 클라우드 0.638과 격차 수치화                                                                                      |

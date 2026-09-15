@@ -35,7 +35,7 @@ node scripts/cbo/export-cbo.mjs --system DS4 --catalog-only
 | 플래그 | 의미 |
 |---|---|
 | `--packages "A,B"` | config 대신 이 패턴 사용 (`Z*` = 프리픽스, `ZFI1` = 정확) |
-| `--scrub mask\|report\|off` | PII 처리 (기본 mask — 주민번호·카드·사업자번호만 마스킹) |
+| `--scrub mask\|report\|off` | PII 처리 (기본 mask — 주민번호·카드·사업자번호·하드코딩 비밀번호 마스킹, 계좌·연락처·이메일은 리포트) |
 | `--limit N` | 테스트용 객체 수 상한 |
 | `--allow-prd` | landscape_role: prd 시스템 수집 허용 (기본 거부) |
 
