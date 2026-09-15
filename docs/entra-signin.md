@@ -56,6 +56,6 @@ auth:
 - id_token 서명은 검증하지 않는다 — 토큰은 TLS 로 Microsoft 에서 직접 받고, 공개 클라이언트(PKCE) 관행을 따른다. 위조 가능한 경로는 로컬 PC 장악이 전제라 금고와 같은 신뢰 경계다.
 - 그룹 제거가 리프레시 시점에 평가되는지는 스모크로 확인할 것. 확인 전까지 하드 회수는 ⑧의 계정 비활성.
 - 게스트 토큰에 `email` 클레임이 없을 수 있다. 앱은 `email → preferred_username → upn → #EXT# 역변환` 순으로 폴백한다.
-- 미국 법인이 B2B 게스트를 거부하면 멀티테넌트 앱으로 전환한다 — 코드 변경 없이 `tenantId` 만 바꾸고, 변경 요청은 릴레이 폴백([change-requests.md](change-requests.md) 예정) 을 쓴다.
+- 미국 법인이 B2B 게스트를 거부하면 멀티테넌트 앱으로 전환한다 — 코드 변경 없이 `tenantId` 만 바꾸고, 변경 요청은 릴레이 폴백(`docs/change-requests.md`, Workstream B 에서 작성) 을 쓴다.
 
 관련 파일: `apps/desktop/packages/shared/src/auth/entra-signin.ts`(순수 판단 로직), `apps/desktop/apps/electron/src/main/identity.ts`(IPC·금고), `renderer/components/onboarding/SignInGate.tsx`(게이트 UI).
