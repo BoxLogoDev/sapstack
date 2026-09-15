@@ -50,6 +50,8 @@ New-Item -ItemType Directory -Force $LogDir | Out-Null
 Set-Content $Runner "@echo off`r`n$Cmd`r`n" -Encoding ASCII
 schtasks /Create /TN $TaskName /SC WEEKLY /D MON,TUE,WED,THU,FRI /ST $At /TR "cmd /c $Runner" /F
 if ($LASTEXITCODE -eq 0) {
+  # 노트북·미로그온 대비: 배터리에서도 시작·지속하고, 놓친 시각은 깨어난 뒤 즉시 실행 (schtasks 에는 이 옵션이 없다)
+  Set-ScheduledTask -TaskName $TaskName -Settings (New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable) | Out-Null
   Write-Host "등록 완료: $TaskName (평일 $At) — 로그: $LogDir\export-log.txt"
   if ($Publish -eq "unc") { Write-Host "게시: export 후 $ShareRoot\$Sid 로 robocopy (.git 제외)" }
   Write-Host "해제: schtasks /Delete /TN $TaskName /F"
