@@ -30,8 +30,9 @@ $Cmd = "$NodeExe $RepoRoot\scripts\cbo\export-cbo.mjs --system $Sid >> $LogDir\e
 if ($Publish -eq "unc") {
   if ($ShareRoot -match ' ') { Write-Host "중단: ShareRoot 에 공백 — 공백 없는 공유 경로를 사용하세요"; exit 1 }
   # export 실패(exit 1) 시에도 폴더에는 직전 정상 스냅샷이 복원돼 있으므로 게시는 안전하다.
-  # robocopy 는 복사 성공이 exit 1 이라 && 대신 & 로 잇는다.
-  $Cmd += " & robocopy $SnapshotDir $ShareRoot\$Sid /E /XD .git /NFL /NDL /NJH /NJS /NP >> $LogDir\export-log.txt 2>&1"
+  # robocopy 는 복사 성공이 exit 1 이라 && 대신 & 로 잇는다. /R /W 를 안 주면 기본 100만회×30초 재시도라
+  # 공유가 불통일 때 태스크가 영원히 'Running' 으로 남아 다음 예약(IgnoreNew)까지 막는다.
+  $Cmd += " & robocopy $SnapshotDir $ShareRoot\$Sid /E /XD .git /R:2 /W:5 /NFL /NDL /NJH /NJS /NP >> $LogDir\export-log.txt 2>&1"
 }
 
 # schtasks /TR 은 261자 한계 — 전체 체인을 러너 .cmd 로 떨어뜨리고 /TR 은 러너만 가리킨다.
