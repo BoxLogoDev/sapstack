@@ -75,6 +75,7 @@ import { CHAT_LAYOUT } from "@/config/layout"
 import { collectFileChangesFromActivities, getFirstFileChangeIdForActivity } from "@/lib/file-changes"
 import { resolveBranchNewPanelOption } from "./branching"
 import { handleErrorMessageAction } from "./error-message-actions"
+import { ChangeRequestEntry } from "@/components/change-requests/ChangeRequestDialog"
 
 // ============================================================================
 // CSS Custom Highlight API helper
@@ -1886,6 +1887,9 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
                           }
                         }}
                       />
+                      {isLastResponse && turn.isComplete && !session.isProcessing && (
+                        <ChangeRequestEntry session={session} />
+                      )}
                       </div>
                     )
                   })}

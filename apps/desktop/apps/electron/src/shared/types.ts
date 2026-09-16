@@ -1199,6 +1199,15 @@ declare global {
         export(): Promise<{ saved: boolean }>
       }
       /** 앱 사용자 로그인(Entra ID) — main/identity.ts. status.kind === 'disabled' 면 설정 없음 */
+      /** 변경 요청서(Azure DevOps Boards) — main/change-requests.ts. enabled=false 면 버튼 숨김 */
+      changeRequests: {
+        status(): Promise<ChangeRequestsStatus>
+        submit(input: ChangeRequestSubmitInput): Promise<QueuedChangeRequest>
+        listMine(): Promise<ChangeRequestItem[]>
+        queue(): Promise<QueuedChangeRequest[]>
+        retry(id: string): Promise<QueuedChangeRequest | null>
+        discard(id: string): Promise<QueuedChangeRequest[]>
+      }
       auth: {
         status(force?: boolean): Promise<SignInState>
         signIn(): Promise<SignInState>
@@ -1212,3 +1221,8 @@ export interface SignInState {
   status: import('@sapstack-desktop/shared/auth/entra-signin').SignInStatus
   required: boolean
 }
+
+export type ChangeRequestsStatus = import('./change-requests-core').ChangeRequestsStatus
+export type ChangeRequestSubmitInput = import('./change-requests-core').ChangeRequestSubmitInput
+export type QueuedChangeRequest = import('./change-requests-core').QueuedChangeRequest
+export type ChangeRequestItem = import('./change-requests-core').ChangeRequestItem

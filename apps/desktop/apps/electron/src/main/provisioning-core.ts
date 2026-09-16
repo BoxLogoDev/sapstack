@@ -11,6 +11,7 @@ import { dirname, join } from 'node:path'
 import { existsSync } from 'node:fs'
 import * as yaml from 'js-yaml'
 import { parseEntraAuthConfig, type EntraAuthConfig } from '@sapstack-desktop/shared/auth/entra-signin'
+import { parseChangeRequestsConfig, type ChangeRequestsConfig } from '../shared/change-requests-core'
 import {
   type CustomEndpointApi,
   type LlmConnection,
@@ -53,6 +54,8 @@ export interface ProvisionSpec {
   features?: { uiMode?: 'simple' | 'standard' }
   /** 앱 사용자 로그인(Entra ID) — config.yaml `auth` 로 시딩. 검증은 shared/auth/entra-signin 의 파서가 담당 */
   auth?: EntraAuthConfig
+  /** 변경 요청서(Azure DevOps Boards) — config.yaml `change_requests` 로 시딩 */
+  changeRequests?: ChangeRequestsConfig
   cbo?: { shareRoots?: string[] }
 }
 
@@ -178,6 +181,15 @@ export function parseProvisionSpec(raw: string): ProvisionSpec {
     try {
       const auth = parseEntraAuthConfig(asMapping(d.auth, 'auth'))
       if (auth) spec.auth = auth
+    } catch (err) {
+      throw new ProvisionError(err instanceof Error ? err.message : String(err))
+    }
+  }
+
+  if (d.changeRequests !== undefined) {
+    try {
+      const cr = parseChangeRequestsConfig(asMapping(d.changeRequests, 'changeRequests'))
+      if (cr) spec.changeRequests = cr
     } catch (err) {
       throw new ProvisionError(err instanceof Error ? err.message : String(err))
     }

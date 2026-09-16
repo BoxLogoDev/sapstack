@@ -237,7 +237,7 @@ async function registerForWorkspace(workspaceRootPath: string, sid: string, dir:
   return existing.config.slug
 }
 
-async function ensureCboSourcesRegistered(): Promise<CboSnapshotInfo[]> {
+export async function ensureCboSourcesRegistered(): Promise<CboSnapshotInfo[]> {
   // ① 포터블 exe 인접본 ② 공유폴더(cbo.share_roots) — 로컬로 복사해 임포트
   //    (오프라인 노트북에서도 스냅샷이 계속 동작해야 하므로 제로카피 등록은 안 한다)
   const adjacent = portableAdjacentRoot()

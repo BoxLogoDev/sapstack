@@ -179,3 +179,15 @@ describe('parseProvisionSpec auth (Entra 로그인)', () => {
     expect(() => parseProvisionSpec(`version: 1\nauth:\n  tenantId: ${TENANT}\n  clientId: nope\n`)).toThrow('client')
   })
 })
+
+describe('parseProvisionSpec changeRequests (Azure DevOps Boards)', () => {
+  test('정상 블록은 ChangeRequestsConfig 로 정규화(workItemType 기본 Issue)', () => {
+    const spec = parseProvisionSpec(`version: 1\nchangeRequests:\n  provider: azure_devops\n  orgUrl: https://dev.azure.com/lsitc/\n  project: SAP-Change-Requests\n  areaPath: SAP-Change-Requests\LSMtron-USA\n  entityTag: LSMtron-USA\n`)
+    expect(spec.changeRequests).toEqual({ provider: 'azure_devops', orgUrl: 'https://dev.azure.com/lsitc', project: 'SAP-Change-Requests', workItemType: 'Issue', areaPath: 'SAP-Change-Requests\LSMtron-USA', entityTag: 'LSMtron-USA' })
+  })
+
+  test('다른 provider·project 누락은 ProvisionError', () => {
+    expect(() => parseProvisionSpec(`version: 1\nchangeRequests:\n  provider: jira\n  orgUrl: https://x.atlassian.net\n  project: P\n`)).toThrow('only azure_devops')
+    expect(() => parseProvisionSpec(`version: 1\nchangeRequests:\n  orgUrl: https://dev.azure.com/lsitc\n`)).toThrow('project')
+  })
+})

@@ -275,6 +275,22 @@ export async function applyProvisioningIfPresent(): Promise<void> {
     })
   }
 
+  if (spec.changeRequests) {
+    await applySection('changeRequests', sections, async () => {
+      const c = spec.changeRequests!
+      await mergeEnvironmentConfigKeys({
+        change_requests: {
+          provider: c.provider,
+          org_url: c.orgUrl,
+          project: c.project,
+          work_item_type: c.workItemType,
+          ...(c.areaPath ? { area_path: c.areaPath } : {}),
+          ...(c.entityTag ? { entity_tag: c.entityTag } : {}),
+        },
+      })
+    })
+  }
+
   writeMarker({ version: spec.version, appliedAt: new Date().toISOString(), sourcePath: found, sections })
 
   if (sections.llm === 'ok' && spec.llm?.kind === 'api_key') scrubSecret(found)

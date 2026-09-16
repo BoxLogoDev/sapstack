@@ -89,8 +89,8 @@ Users import it via **Settings › CBO snapshots › Import from ZIP**. The app 
 - Portable exe: redistribute a new kit or just the new exe (keep `cbo\` and `provision.yaml`).
 - In-app update from GitHub Releases works when outbound access is allowed; it is disabled when `airGapped: true`.
 
-## 11. v2.6 — Microsoft sign-in (available) and change requests (planned)
+## 11. v2.6 — Microsoft sign-in and change requests
 
 - **Microsoft sign-in** with the LS ITC tenant (US users as B2B guests). When the kit's `provision.yaml` has an `auth:` block, the app shows a sign-in screen before anything else. Access is controlled by an Entra security group; unassigned users see a clear message to contact LS ITC IT. Offline use is allowed for `offlineGraceDays` (default 14) after the last online check. **Settings › Account** shows who is signed in and offers Sign out (use it on shared PCs). Admin setup: `docs/entra-signin.md` (Korean).
-- **Request a change to this program** button under an answer: creates a change-request work item in LS ITC's Azure DevOps Boards under the requester's own identity; status is visible in **Settings › Change requests** and LS ITC receives e-mail/Teams notifications.
+- **Request a change to this program** button under an answer about a custom (Z/Y) program: opens a short form pre-filled from the conversation (title, affected objects, your original question, the assistant's explanation). Add the expected behavior and a priority, optionally attach the conversation, and submit. A change-request work item is created in LS ITC's Azure DevOps Boards under your own name — nothing is changed in SAP. Track it in **Settings › Change requests** (My requests, Refresh); LS ITC receives e-mail/Teams notifications and you get an e-mail when the state changes. If the PC is offline the draft is kept locally and can be retried from the same page.
 - Configuration lands in `provision.yaml` (`auth:` and `changeRequests:` blocks, see the example file).

@@ -51,6 +51,15 @@ features:
 #   offlineGraceDays: 14                             # 0~90, 오프라인 허용 일수
 #   domainHint: example.com                          # 선택 — 로그인 화면 계정 자동 선택
 
+# ── 변경 요청서 → Azure DevOps Boards (선택, auth 필요) — docs/change-requests.md ──
+# changeRequests:
+#   provider: azure_devops
+#   orgUrl: https://dev.azure.com/<org>
+#   project: SAP-Change-Requests
+#   workItemType: Issue                       # 기본 Issue
+#   areaPath: SAP-Change-Requests\<법인>
+#   entityTag: <법인 태그>                     # ADO 에 미리 만든 태그와 일치
+
 # ── CBO 스냅샷 공유 스캔 루트 (선택) ─────────────────────────────
 # cbo:
 #   shareRoots:

@@ -42,8 +42,12 @@
   접근 통제는 Entra 할당·그룹이 결정(미할당 AADSTS50105 → 사유 문구), 오프라인 유예 14일, 설정 › Account,
   세션 헤더 `createdBy` 작성자 스탬프, 같은 리프레시 토큰으로 DevOps 토큰 발급(`getAccessToken(scopes)`).
   관리자 런북 `docs/entra-signin.md`. **LS ITC 테넌트 앱 등록 전까지는 코드만 완성된 상태**
-- 다음은 **Workstream B 변경 요청**(앱 안에서 LS ITC DevOps Boards에 변경 요청서 작업 항목 생성,
-  설정 "내 요청", 관리자 대시보드는 ADO 내장) → 킷 조립 → v2.6.0
+- **Workstream B 변경 요청서** — CBO 답 아래 "Request a change to this program" → 대화에서 초안(질문 원문·
+  최종 답·Z/Y 오브젝트·활성 스냅샷 SID) → 제목·기대 동작·우선순위·전문 첨부(옵트인) → 요청자 본인 토큰으로
+  LS ITC Azure DevOps Boards 작업 항목(문서) 생성. 로컬 큐 선기록·재시도, 설정 › 변경 요청(연결·내 요청·초안),
+  폐쇄망/미로그인/미설정이면 숨김. 런북 `docs/change-requests.md`, ADR `decisions/active/2026-09-16-change-requests-document-only.md`.
+  **ADO 조직·프로젝트·태그·게스트 권한은 IT 전제(런북 1~8) — 스모크 전**
+- 다음은 킷 조립(`make-distribution.ps1 -Sid DS4 -Language en -ProvisionFile …usa.yaml`) → 클린 PC 스모크 → v2.6.0
 
 모델 판단: 4~12B 로컬 모델은 SAP 지식이 없다(F110 질의 3회 전부 오답). 답 품질은 앱의 지식 주입이
 결정하고, 품질이 필요하면 프로비저닝 `kind: api_key`(클라우드)가 정답. 근거는 메모리 `sapstack-pilot`.
@@ -57,7 +61,7 @@
 | 🟡 npm MCP 미발행                              | `npm view` = 2.4.0. release run 34930314696의 `Publish MCP to npm`이 E404(토큰 만료)로 실패 — 09-15 재확인                                                  | **사용자**: Automation 토큰 재발급 → `NPM_TOKEN` secret 갱신 → run 34930314696 "Re-run failed jobs"(같은 태그)                                                     |
 | 🟡 공유폴더 게시 막힘                           | `lsitc-fs01` DNS 미해석(09-15 재확인)                                                                                                                     | **사용자**: 서버 개통/호스트명 확인. 열리면 스케줄러가 자동 게시                                                                                                 |
 | 🟡 시크릿 처리                                  | 24건 오탐은 규칙에서 제외, 남은 1건 `zhr0/zhrrd015.prog.abap:108`은 사용자 결정으로 마스킹 승격(`'***'`). 09-15 오후 DS4 재수집은 작업 트리에 마스킹을 적용했으나 마무리(커밋) 단계가 15:25 외부 Ctrl+C(0xC000013A)로 중단 — 63파일 dirty  | 09-16 06:30 야간 실행이 다시 수집·커밋. 이후 pii-report `hardcoded_secret` masked:true 확인. 수집 중 powershell을 띄우는 감시 루프를 돌리지 말 것(중단 원인)      |
-| 🟢 LS엠트론 US — 코드                           | Workstream C·A 커밋(09-16). B(변경 요청)는 미착수                                                                                                          | B 구현 → `make-distribution.ps1 -Sid DS4 -Language en -ProvisionFile scripts/cbo/examples/provision-lsmtron-usa.yaml` → 클린 PC 스모크 → v2.6.0                    |
+| 🟢 LS엠트론 US — 코드                           | Workstream C·A·B 커밋(09-16). 게스트 1명 E2E 스모크는 IT 전제 후                                                                                             | `make-distribution.ps1 -Sid DS4 -Language en -ProvisionFile scripts/cbo/examples/provision-lsmtron-usa.yaml` → 클린 PC 스모크 → v2.6.0                             |
 | 🔴 LS엠트론 US — IT 전제                         | LS ITC 테넌트 앱 등록·그룹·B2B 게스트·ADO 조직 모두 미착수                                                                                                   | **사용자/IT**: `docs/entra-signin.md` ①~⑨, 계획서 체크리스트(ADO 프로젝트·태그·Stakeholder·알림), Anthropic 워크스페이스 + 미국 PC `api.anthropic.com` 허용        |
 | 🟡 PS4 ADT HTTP 403                            | `/sap/bc/adt` ICF 비활성                                                                                                                                  | **사용자**: Basis에 SICF 활성화 요청(읽기 전용 수집 목적 명시)                                                                                                    |
 | 데스크톱 테스트 격리                            | 전역 `fetch`를 바꾸는 테스트 파일 9개 중 복원 없던 2개 수정. bun test는 373파일을 한 프로세스에서 돌리고 파일 순서가 러너마다 달라 누출이 잠복한다             | 새 테스트에서 전역 스텁은 반드시 `afterEach/afterAll` 복원. `--frozen-lockfile` 드리프트 방지로 `"latest"` 지정 금지                                               |
@@ -66,7 +70,7 @@
 
 ## 다음 한 걸음
 
-Workstream B(변경 요청: `change-requests-core.ts` 순수 코어 → 프로비저닝 `changeRequests` → 메인 IPC → 대화상자·설정 페이지 → i18n → 런북·ADR)를 구현한다.
+US 킷을 조립해(`-Language en`, provision 예시) 클린 PC 스모크를 돌리고 v2.6.0 을 컷한다. IT 전제(앱 등록·ADO)가 갖춰지면 게스트 1명으로 로그인·변경 요청 E2E 스모크.
 현업 PC에 v2.5.0 업데이트를 안내하고, npm 토큰을 갱신해 release run의 실패 잡을 재실행한다.
 06:30 DS4 무인 실행과 07:30 QS4 첫 스냅샷을 확인한다.
 

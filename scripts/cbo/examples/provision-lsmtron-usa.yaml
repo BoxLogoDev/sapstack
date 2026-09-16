@@ -39,8 +39,9 @@ features:
 #   clientId: <app registration client id>
 #   offlineGraceDays: 14
 #   domainHint: lsinjectionusa.com
-# changeRequests:
+# changeRequests:                          # see docs/change-requests.md (needs auth above)
 #   provider: azure_devops
 #   orgUrl: https://dev.azure.com/lsitc
 #   project: SAP-Change-Requests
 #   areaPath: SAP-Change-Requests\LSMtron-USA
+#   entityTag: LSMtron-USA

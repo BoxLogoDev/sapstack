@@ -503,6 +503,14 @@ contextBridge.exposeInMainWorld('sapstack', {
   support: {
     export: () => ipcRenderer.invoke('sapstack:support:export'),
   },
+  changeRequests: {
+    status: () => ipcRenderer.invoke('sapstack:changeRequests:status'),
+    submit: (input: unknown) => ipcRenderer.invoke('sapstack:changeRequests:submit', input),
+    listMine: () => ipcRenderer.invoke('sapstack:changeRequests:listMine'),
+    queue: () => ipcRenderer.invoke('sapstack:changeRequests:queue'),
+    retry: (id: string) => ipcRenderer.invoke('sapstack:changeRequests:retry', id),
+    discard: (id: string) => ipcRenderer.invoke('sapstack:changeRequests:discard', id),
+  },
   auth: {
     status: (force?: boolean) => ipcRenderer.invoke('sapstack:auth:status', force),
     signIn: () => ipcRenderer.invoke('sapstack:auth:signIn'),

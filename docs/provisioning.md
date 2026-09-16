@@ -70,6 +70,24 @@ auth:
   실패하고 앱은 **fail closed**(로그인 불가·관리자 문의) 로 멈춘다 — 오탈자에 주의.
 - 앱 등록·그룹·B2B 게스트·회수 절차와 스모크 항목은 [entra-signin.md](entra-signin.md).
 
+## 변경 요청서 (changeRequests, 선택)
+
+CBO 설명 아래 **"Request a change to this program"** 버튼을 켠다. 요청서(문서)는 요청자 본인 토큰으로
+LS ITC Azure DevOps Boards 작업 항목으로 만들어지고, 상태는 설정 › 변경 요청에서 본다. `auth:` 가 필요하다.
+
+```yaml
+changeRequests:
+  provider: azure_devops
+  orgUrl: https://dev.azure.com/lsitc
+  project: SAP-Change-Requests
+  # workItemType: Issue
+  areaPath: SAP-Change-Requests\LSMtron-USA
+  entityTag: LSMtron-USA        # ADO 에 미리 만든 태그와 일치해야 함
+```
+
+`~/.sapstack/config.yaml` 의 `change_requests` 로 시딩된다. ADO 조직·프로젝트·태그·알림·대시보드 전제와
+스모크는 [change-requests.md](change-requests.md).
+
 ## 검증 샌드박스 (개발자용)
 
 ```powershell
@@ -93,4 +111,4 @@ $env:SAPSTACK_PROVISION_FILE = "C:\path\to\provision.yaml"
 | 로컬 모델이 안 뜸 | GGUF 복사 확인(`~/.sapstack/models/`), 모델 로딩에 수십 초 소요(503 정상) |
 | 사용자가 연결을 지웠음 | version 을 올려 재배포하면 재생성됨 |
 
-관련 문서: [cbo-snapshot.md](cbo-snapshot.md)(스냅샷 운영), [entra-signin.md](entra-signin.md)(Microsoft 로그인), [desktop-install.md](desktop-install.md)
+관련 문서: [cbo-snapshot.md](cbo-snapshot.md)(스냅샷 운영), [entra-signin.md](entra-signin.md)(Microsoft 로그인), [change-requests.md](change-requests.md)(변경 요청서), [desktop-install.md](desktop-install.md)
