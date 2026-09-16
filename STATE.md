@@ -1,6 +1,6 @@
 # STATE — sapstack
 
-> 갱신: 2026-09-16 오전 · `main` = origin · **LS엠트론 US Workstream C·A·B 커밋 + v2.6.0 버전 갱신 · 2.6.0 Portable 빌드 + 영어 킷 `dist-cbo/sapstack-Desktop-CBO-DS4-2026-09-16-en.zip`(361MB) 생성 — 클린 PC 스모크 후 태그 v2.6.0 · DS4 수동 재수집 커밋 fdd17cb1(마스킹 반영) · QS4 첫 수동 수집 10:26 시작 · 현업 파일럿 진행 중(08-30~)**
+> 갱신: 2026-09-16 오전 · `main` = origin · **LS엠트론 US Workstream C·A·B 커밋 + v2.6.0 버전 갱신 · 2.6.0 Portable 빌드 + 영어 킷 `dist-cbo/sapstack-Desktop-CBO-DS4-2026-09-16-en.zip`(361MB) 생성 — 클린 PC 스모크 후 태그 v2.6.0 · DS4 수동 재수집 커밋 fdd17cb1(마스킹 반영) · QS4 첫 스냅샷 커밋 3d7b7217(10:56) · 현업 파일럿 진행 중(08-30~)**
 > 규약: 규칙은 `AGENTS.md`, 판단은 `decisions/`, 상태는 이 파일. 개선 후보 순위표는
 > `plans/2026-09-15-improvement-backlog.md`.
 
@@ -62,7 +62,7 @@
 | 항목                                          | 상태·증거                                                                                                                                                | 다음 행동                                                                                                                                                       |
 | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🟢 v2.5.0 릴리스                               | Release 게시 완료(run 34930314696): Setup 256MB · Portable 256MB · latest.yml · vsix · MCP tgz. `gh release view v2.5.0`                                   | 현업 PC 업데이트 안내(latest.yml이 있어 앱 자동 업데이트 대상). npm은 아래 항목                                                                                  |
-| 🟢 CBO 스냅샷 신선도                           | DS4 수동 재수집 완료 — 커밋 fdd17cb1(10:12, `exported_at` 2026-09-16T01:11Z, 32,658 오브젝트, status partial, 17파일 변경, `guide.en.md` 첫 생성; 수집 46분 + 마무리 11분). QS4 첫 수동 수집 10:26 시작(117,810 오브젝트 열거, 진행 중). 06:30/07:30 예약 실행은 노트북이 사내망 밖이면 0건→복원으로 끝난다(09-16 둘 다) | QS4 완료 확인: `git -C ~/.sapstack/cbo/QS4 log -1`, `meta/export-log.txt` 의 `[cbo] 완료`. 예약 실행은 노트북이 사내망에 있을 때만 유효 |
+| 🟢 CBO 스냅샷 신선도                           | DS4 수동 재수집 완료 — 커밋 fdd17cb1(10:12, `exported_at` 2026-09-16T01:11Z, 32,658 오브젝트, status partial, 17파일 변경, `guide.en.md` 첫 생성; 수집 46분 + 마무리 11분). QS4 첫 스냅샷 커밋 3d7b7217(10:26~10:56, client 100, `exported_at` 2026-09-16T01:47Z, 31,480 오브젝트, status partial, 마스킹 423/리포트 384, 같은 `zhrrd015:108` 마스킹). 06:30/07:30 예약 실행은 노트북이 사내망 밖이면 0건→복원으로 끝난다(09-16 둘 다) | 다음 예약 실행(09-17 06:30 DS4 / 07:30 QS4) 결과를 `meta/export-log.txt` 로 확인. 노트북이 사내망에 있을 때만 유효 |
 | 🟡 npm MCP 미발행                              | `npm view` = 2.4.0. release run 34930314696의 `Publish MCP to npm`이 E404(토큰 만료)로 실패 — 09-15 재확인                                                  | **사용자**: Automation 토큰 재발급 → `NPM_TOKEN` secret 갱신 → run 34930314696 "Re-run failed jobs"(같은 태그)                                                     |
 | 🟡 공유폴더 게시 막힘                           | `lsitc-fs01` DNS 미해석(09-15 재확인)                                                                                                                     | **사용자**: 서버 개통/호스트명 확인. 열리면 스케줄러가 자동 게시                                                                                                 |
 | 🟢 시크릿 처리                                  | 24건 오탐 제외, 1건 `zhr0/zhrrd015.prog.abap:108` 마스킹 승격 → **fdd17cb1 에 `'***'` 반영**(pii-report `hardcoded_secret` masked:true, 마스킹 431/리포트 395/228파일). 09-16 영어 킷은 이 스냅샷을 담았다(ZIP 안 108행 마스킹 확인) | 없음(#6 종료). 새 시크릿은 다음 수집의 pii-report 로 확인 |
@@ -75,7 +75,7 @@
 
 ## 다음 한 걸음
 
-영어 킷 `dist-cbo/sapstack-Desktop-CBO-DS4-2026-09-16-en.zip` 을 클린 PC 에서 스모크(영어 UI·simple·CBO 영어 답)하고 태그 `v2.6.0` 을 푸시한다. QS4 첫 수집(10:26 시작) 완료를 확인한다. IT 전제(앱 등록·ADO)가 갖춰지면 `provision-lsmtron-usa.yaml` 에 tenantId/clientId/ADO 값을 넣어 킷을 다시 조립하고 게스트 1명으로 로그인·변경 요청 E2E 스모크.
+영어 킷 `dist-cbo/sapstack-Desktop-CBO-DS4-2026-09-16-en.zip` 을 클린 PC 에서 스모크(영어 UI·simple·CBO 영어 답)하고 태그 `v2.6.0` 을 푸시한다. IT 전제(앱 등록·ADO)가 갖춰지면 `provision-lsmtron-usa.yaml` 에 tenantId/clientId/ADO 값을 넣어 킷을 다시 조립하고 게스트 1명으로 로그인·변경 요청 E2E 스모크.
 현업 PC에 v2.5.0 업데이트를 안내하고, npm 토큰을 갱신해 release run의 실패 잡을 재실행한다.
 
 ## 건드리면 안 되는 것
