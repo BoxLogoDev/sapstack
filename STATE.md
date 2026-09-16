@@ -1,6 +1,6 @@
 # STATE — sapstack
 
-> 갱신: 2026-09-16 오전 · `main` = origin(3220817) · **LS엠트론 US Workstream C·A·B 커밋 + v2.6.0 버전 갱신(태그는 클린 PC 스모크 뒤) · CI 녹색 · DS4 09:27 수동 재수집 진행 중(06:30/07:30 예약 실행은 사내망 밖이라 0건→복원) · 현업 파일럿 진행 중(08-30~)**
+> 갱신: 2026-09-16 오전 · `main` = origin · **LS엠트론 US Workstream C·A·B 커밋 + v2.6.0 버전 갱신 · 2.6.0 Portable 빌드 + 영어 킷 `dist-cbo/sapstack-Desktop-CBO-DS4-2026-09-16-en.zip`(361MB) 생성 — 클린 PC 스모크 후 태그 v2.6.0 · DS4 수동 재수집 커밋 fdd17cb1(마스킹 반영) · QS4 첫 수동 수집 10:26 시작 · 현업 파일럿 진행 중(08-30~)**
 > 규약: 규칙은 `AGENTS.md`, 판단은 `decisions/`, 상태는 이 파일. 개선 후보 순위표는
 > `plans/2026-09-15-improvement-backlog.md`.
 
@@ -48,8 +48,11 @@
   폐쇄망/미로그인/미설정이면 숨김. 런북 `docs/change-requests.md`, ADR `decisions/active/2026-09-16-change-requests-document-only.md`.
   **ADO 조직·프로젝트·태그·게스트 권한은 IT 전제(런북 1~8) — 스모크 전**
 - **v2.6.0 버전 갱신 커밋(3220817)** — 패키지 9종·CHANGELOG `[2.6.0]`·인앱 노트 `release-notes/2.6.0.md`. CI 녹색.
-  태그 `v2.6.0` 은 영어 킷 클린 PC 스모크 뒤에 푸시. 다음은 DS4 재수집 커밋 확인 → Windows 빌드 →
-  킷 조립(`make-distribution.ps1 -Sid DS4 -Language en -ProvisionFile …usa.yaml`)
+  태그 `v2.6.0` 은 영어 킷 클린 PC 스모크 뒤에 푸시
+- **2.6.0 빌드·영어 킷 조립(10:13~10:33)** — `build-win.ps1 -KeepRunningProcesses` → Portable 249.11MB(1차 시도 성공) →
+  `make-distribution.ps1 -Sid DS4 -Language en -ProvisionFile scripts/cbo/examples/provision-lsmtron-usa.yaml` →
+  `dist-cbo/sapstack-Desktop-CBO-DS4-2026-09-16-en.zip`(361MB: 영문 README.txt·provision.yaml·`cbo/DS4` 33,962 src + `guide.en.md`, `.git` 제외).
+  예시 provision 의 `auth:`/`changeRequests:` 는 IT 값이 없어 주석 상태 — 이 킷은 영어 UI·simple·CBO 설명까지만 켜진다
 
 모델 판단: 4~12B 로컬 모델은 SAP 지식이 없다(F110 질의 3회 전부 오답). 답 품질은 앱의 지식 주입이
 결정하고, 품질이 필요하면 프로비저닝 `kind: api_key`(클라우드)가 정답. 근거는 메모리 `sapstack-pilot`.
@@ -59,11 +62,11 @@
 | 항목                                          | 상태·증거                                                                                                                                                | 다음 행동                                                                                                                                                       |
 | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🟢 v2.5.0 릴리스                               | Release 게시 완료(run 34930314696): Setup 256MB · Portable 256MB · latest.yml · vsix · MCP tgz. `gh release view v2.5.0`                                   | 현업 PC 업데이트 안내(latest.yml이 있어 앱 자동 업데이트 대상). npm은 아래 항목                                                                                  |
-| 🟡 CBO 스냅샷 신선도                           | 09-16 06:30 DS4·07:30 QS4 예약 실행 둘 다 노트북이 사내망 밖 → 열거 0건 → 직전 스냅샷 복원(DS4 HEAD 7992688d = 09-15 04:14Z 그대로, QS4 는 `meta/` 만). 사내망 복귀 확인 후 09:27 `Start-ScheduledTask sapstack-cbo-export-DS4` 수동 실행 — 진행 중(09:47 48,000/124,368) | 완료 로그 `[cbo] 완료: status=` 와 새 커밋 확인 → QS4 수동 실행(`Start-ScheduledTask -TaskName sapstack-cbo-export-QS4`) → 첫 QS4 스냅샷 확인. 예약 실행은 노트북이 사내망에 있을 때만 유효 |
+| 🟢 CBO 스냅샷 신선도                           | DS4 수동 재수집 완료 — 커밋 fdd17cb1(10:12, `exported_at` 2026-09-16T01:11Z, 32,658 오브젝트, status partial, 17파일 변경, `guide.en.md` 첫 생성; 수집 46분 + 마무리 11분). QS4 첫 수동 수집 10:26 시작(117,810 오브젝트 열거, 진행 중). 06:30/07:30 예약 실행은 노트북이 사내망 밖이면 0건→복원으로 끝난다(09-16 둘 다) | QS4 완료 확인: `git -C ~/.sapstack/cbo/QS4 log -1`, `meta/export-log.txt` 의 `[cbo] 완료`. 예약 실행은 노트북이 사내망에 있을 때만 유효 |
 | 🟡 npm MCP 미발행                              | `npm view` = 2.4.0. release run 34930314696의 `Publish MCP to npm`이 E404(토큰 만료)로 실패 — 09-15 재확인                                                  | **사용자**: Automation 토큰 재발급 → `NPM_TOKEN` secret 갱신 → run 34930314696 "Re-run failed jobs"(같은 태그)                                                     |
 | 🟡 공유폴더 게시 막힘                           | `lsitc-fs01` DNS 미해석(09-15 재확인)                                                                                                                     | **사용자**: 서버 개통/호스트명 확인. 열리면 스케줄러가 자동 게시                                                                                                 |
-| 🟡 시크릿 처리                                  | 24건 오탐은 규칙에서 제외, 남은 1건 `zhr0/zhrrd015.prog.abap:108`은 사용자 결정으로 마스킹 승격(`'***'`). 09-15 오후 재수집은 커밋 단계가 외부 Ctrl+C(0xC000013A)로 중단, 09-16 06:30 예약 실행은 0건→복원이라 **HEAD 7992688d 와 작업 트리 모두 미마스킹** | 09:27 수동 재수집 커밋 후 `git show HEAD:src/zhr0/zhrrd015.prog.abap \| sed -n 108p` 에 `***`, pii-report `hardcoded_secret` masked:true 확인. 그 전에는 킷 조립 금지(킷이 스냅샷을 그대로 복사). 수집 중 감시 루프 금지 |
-| 🟢 LS엠트론 US — 코드                           | Workstream C·A·B 커밋 + v2.6.0 버전 갱신(3220817), CI 녹색. 게스트 1명 E2E 스모크는 IT 전제 후                                                                | DS4 재수집 커밋 뒤 `build-win.ps1 -KeepRunningProcesses`(수집 중 금지 — 재시도 경로가 node 전부 종료) → `make-distribution.ps1 -Sid DS4 -Language en -ProvisionFile scripts/cbo/examples/provision-lsmtron-usa.yaml` → 클린 PC 스모크 → 태그 `v2.6.0` 푸시 |
+| 🟢 시크릿 처리                                  | 24건 오탐 제외, 1건 `zhr0/zhrrd015.prog.abap:108` 마스킹 승격 → **fdd17cb1 에 `'***'` 반영**(pii-report `hardcoded_secret` masked:true, 마스킹 431/리포트 395/228파일). 09-16 영어 킷은 이 스냅샷을 담았다(ZIP 안 108행 마스킹 확인) | 없음(#6 종료). 새 시크릿은 다음 수집의 pii-report 로 확인 |
+| 🟢 LS엠트론 US — 코드·킷                        | C·A·B 커밋 + v2.6.0 갱신(3220817), CI 녹색. 2.6.0 Portable 빌드(249MB) + 영어 킷 `dist-cbo/sapstack-Desktop-CBO-DS4-2026-09-16-en.zip`(361MB, 33,974 엔트리). 게스트 1명 E2E 스모크는 IT 전제 후 | **사용자**: 클린 PC 스모크(영어 UI·simple·"What does program ZFI0171 do?" 영어 답 + Snapshot as of) → 태그 `v2.6.0` 푸시 → release 워크플로 → SharePoint/Teams 로 킷 전달 |
 | 🔴 LS엠트론 US — IT 전제                         | LS ITC 테넌트 앱 등록·그룹·B2B 게스트·ADO 조직 모두 미착수                                                                                                   | **사용자/IT**: `docs/entra-signin.md` ①~⑨, 계획서 체크리스트(ADO 프로젝트·태그·Stakeholder·알림), Anthropic 워크스페이스 + 미국 PC `api.anthropic.com` 허용        |
 | 🟡 PS4 ADT HTTP 403                            | `/sap/bc/adt` ICF 비활성                                                                                                                                  | **사용자**: Basis에 SICF 활성화 요청(읽기 전용 수집 목적 명시)                                                                                                    |
 | 데스크톱 테스트 격리                            | 전역 `fetch`를 바꾸는 테스트 파일 9개 중 복원 없던 2개 수정. bun test는 373파일을 한 프로세스에서 돌리고 파일 순서가 러너마다 달라 누출이 잠복한다             | 새 테스트에서 전역 스텁은 반드시 `afterEach/afterAll` 복원. `--frozen-lockfile` 드리프트 방지로 `"latest"` 지정 금지                                               |
@@ -72,7 +75,7 @@
 
 ## 다음 한 걸음
 
-DS4 수동 재수집(09:27) 커밋과 `zhrrd015:108` 마스킹을 확인한 뒤 Windows 빌드 → US 킷 조립(`-Language en`, provision 예시) → 클린 PC 스모크 → 태그 `v2.6.0` 푸시. 이어서 QS4 수동 수집으로 첫 스냅샷을 만든다. IT 전제(앱 등록·ADO)가 갖춰지면 게스트 1명으로 로그인·변경 요청 E2E 스모크.
+영어 킷 `dist-cbo/sapstack-Desktop-CBO-DS4-2026-09-16-en.zip` 을 클린 PC 에서 스모크(영어 UI·simple·CBO 영어 답)하고 태그 `v2.6.0` 을 푸시한다. QS4 첫 수집(10:26 시작) 완료를 확인한다. IT 전제(앱 등록·ADO)가 갖춰지면 `provision-lsmtron-usa.yaml` 에 tenantId/clientId/ADO 값을 넣어 킷을 다시 조립하고 게스트 1명으로 로그인·변경 요청 E2E 스모크.
 현업 PC에 v2.5.0 업데이트를 안내하고, npm 토큰을 갱신해 release run의 실패 잡을 재실행한다.
 
 ## 건드리면 안 되는 것
