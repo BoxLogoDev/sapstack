@@ -1,4 +1,4 @@
-<!-- sapstack-stats: version=2.5.0 plugins=24 agents=21 commands=23 tools=23 prompts=12 resources=9 -->
+<!-- sapstack-stats: version=2.6.0 plugins=24 agents=21 commands=23 tools=23 prompts=12 resources=9 -->
 <div align="center">
 
 # 🏛 sapstack
@@ -16,7 +16,7 @@ _"SAP에서는 스탠다드라서 안됩니다." — 표준씨 ([브랜드 가�
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![languages](https://img.shields.io/badge/languages-6-orange)](#)
 
-**Windows 데스크톱 앱 v2.5.0 · 24 플러그인 · 21 에이전트 · 23 커맨드 · CBO 스냅샷 · 폐쇄망 지원 · 6개 언어 · 컴플라이언스**
+**Windows 데스크톱 앱 v2.6.0 · 24 플러그인 · 21 에이전트 · 23 커맨드 · CBO 스냅샷 · 폐쇄망 지원 · 6개 언어 · 컴플라이언스**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 

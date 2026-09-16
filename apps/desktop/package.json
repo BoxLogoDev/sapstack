@@ -1,6 +1,6 @@
 {
   "name": "sapstack-desktop",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "license": "Apache-2.0",
   "description": "sapstack Desktop for SAP operators and consultants",
   "type": "module",

@@ -15,7 +15,7 @@ _"In SAP, it's standard, so it can't be changed." — Ms. Standard ([brand guide
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![languages](https://img.shields.io/badge/languages-6-orange)](#)
 
-**Windows desktop app v2.5.0 · 24 plugins · 21 agents · 23 commands · CBO snapshots · air-gap ready · 6 languages · compliance ready**
+**Windows desktop app v2.6.0 · 24 plugins · 21 agents · 23 commands · CBO snapshots · air-gap ready · 6 languages · compliance ready**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 

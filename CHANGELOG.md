@@ -11,6 +11,48 @@ scripts/generate-release-notes.sh 가 태그 버전과 같은 헤딩을 찾아 �
 추출하므로, 헤딩이 없으면 릴리스 노트가 비어서 나간다.
 -->
 
+## [2.6.0] - 2026-09-16
+
+해외 법인(LS엠트론 미국) 배포를 위한 릴리스. 세 기능 모두 `provision.yaml` 블록이 있을 때만 켜지며,
+블록이 없는 기존 설치는 동작이 바뀌지 않는다. 계획: `plans/2026-09-15-lsmtron-usa-rollout.md`.
+
+### Added — 영어 배포 준비
+
+- **안내 프롬프트 ko/en** — SAP 환경 프로파일의 `language` 가 `ko` 가 아니면 Quick Advisory / Evidence Loop
+  안내 문장을 영어로 조립한다(`sap-golden-path.ts`). CBO 질문 감지에 영어 키워드(`custom`, `in-house`,
+  `our program`, `z-program`)와 공용 Z/Y 오브젝트 정규식(`shared/cbo-objects.ts`) 추가
+- **`guide.en.md`** — `export-cbo.mjs` 가 스냅샷마다 한국어 `guide.md` 와 영어 `guide.en.md` 를 함께 쓰고,
+  앱은 UI 언어에 따라 골라 소스 가이드로 등록한다. `sap-cbo-explainer` 는 사용자 언어로 답하되
+  Summary / Where used / Flow / Watch out / As-of 라벨을 고정
+- **미국형 개인정보 마스킹** — 런타임 `security.ts` 에 SSN(`###-##-####`, 000/666/9xx 제외)·EIN·NANP 전화,
+  수집 스크러버에 SSN 추가. SAP 전표 10자리·한국 사업자/주민번호와 충돌 없음
+- **영어 킷** — `make-distribution.ps1 -Language en`(영문 README.txt, ZIP 접미 `-en`), 예시
+  `scripts/cbo/examples/provision-lsmtron-usa.yaml`, `sapEnvironment.country` → `country_iso`,
+  영어 운영 문서 `docs/en/us-pilot-runbook.md`
+
+### Added — Microsoft(Entra) 로그인
+
+- **`provision.yaml auth:`** `{required, tenantId, clientId, offlineGraceDays, domainHint}` → 스플래시 직후·온보딩
+  이전에 로그인 게이트. 접근 허용은 Entra(Enterprise App 할당·보안 그룹)가 결정하고 앱은 `tid`/`aud` 만 검사한다.
+  미할당 `AADSTS50105` → "IT 관리자에게 그룹 추가 요청", 다른 조직 계정 → `wrong_tenant`, 값 오류는 fail closed
+- 기동마다 리프레시로 재검증, 네트워크 없으면 `offlineGraceDays`(기본 14) 안에서 오프라인 사용. 토큰은
+  자격증명 금고(`entra_signin`), 설정 › **Account** 에 이름·메일·offline 배지·Sign out
+- 세션 헤더 `createdBy {email, name, oid}` 작성자 스탬프(`SessionRuntimeHooks.getSessionAuthor`)
+- 같은 리프레시 토큰으로 다른 MS 리소스 토큰 발급(`getAccessToken(scopes)`) — 변경 요청서가 사용
+- 관리자 런북 `docs/entra-signin.md`(앱 등록·그룹·B2B 게스트·회수·스모크)
+
+### Added — 변경 요청서(Azure DevOps Boards)
+
+- **`provision.yaml changeRequests:`** `{provider: azure_devops, orgUrl, project, workItemType, areaPath, entityTag}`
+  → CBO 답 아래 **"Request a change to this program"**. 대화에서 초안(질문 원문·최종 답·Z/Y 오브젝트·활성 스냅샷
+  SID)을 채우고 제목·기대 동작·우선순위(1~4)·대화 전문 첨부(옵트인)만 손본다. 미리보기 = 전송 본문(Markdown)
+- 요청자 본인 토큰으로 작업 항목 생성(`System.CreatedBy` = 요청자) — 문서만, AI diff·SAP 쓰기 없음. 설명 꼬리에
+  `transport_required · reviewer_required · rollback_plan` 자리. Markdown 거부(400) 시 HTML `<pre>` 1회 재시도
+- 네트워크 전에 `~/.sapstack/change-requests/` 로컬 큐 선기록, 설정 › **변경 요청**(연결·내 요청 `@Me`·미전송 초안
+  재시도/폐기). 폐쇄망·미로그인·미설정이면 숨김
+- 런북 `docs/change-requests.md`(ADO 조직·프로젝트·태그·Stakeholder·알림·대시보드 전제 1~8), ADR
+  `decisions/active/2026-09-16-change-requests-document-only.md`
+
 ## [2.5.0] - 2026-09-15
 
 ### Fixed

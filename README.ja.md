@@ -15,7 +15,7 @@ _「SAP では標準仕様なのでできません。」 — スタンダード�
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![languages](https://img.shields.io/badge/languages-6-orange)](#)
 
-**Windows デスクトップアプリ v2.5.0 · 24 プラグイン · 21 エージェント · 23 コマンド · CBO スナップショット · 閉域網対応 · 6 言語 · コンプライアンス対応**
+**Windows デスクトップアプリ v2.6.0 · 24 プラグイン · 21 エージェント · 23 コマンド · CBO スナップショット · 閉域網対応 · 6 言語 · コンプライアンス対応**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 

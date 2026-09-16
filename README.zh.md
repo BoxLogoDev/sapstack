@@ -15,7 +15,7 @@ _"在 SAP 里这是标准，所以改不了。" — 标准小姐（[品牌指南
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![languages](https://img.shields.io/badge/languages-6-orange)](#)
 
-**Windows 桌面应用 v2.5.0 · 24 插件 · 21 智能体 · 23 命令 · CBO 快照 · 支持隔离网络 · 6 种语言 · 合规就绪**
+**Windows 桌面应用 v2.6.0 · 24 插件 · 21 智能体 · 23 命令 · CBO 快照 · 支持隔离网络 · 6 种语言 · 合规就绪**
 
 🌐 [🇰🇷 한국어](README.md) · [🇬🇧 English](README.en.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇩🇪 Deutsch](README.de.md) · [🇻🇳 Tiếng Việt](README.vi.md)
 
